@@ -1,5 +1,16 @@
 """Flow-SDE sampler with per-transition log-probability for GRPO-style RL.
 
+NOTE ON CLASSIFICATION (audit item #3): this is a **Z-1-style fixed-noise tractable
+Gaussian transition**, NOT pi-RL's marginal-preserving Flow-SDE. It uses the mean
+mu = x + v*dt with a constant per-step std sigma = eta*sqrt(dt); it does NOT implement
+pi-RL's corrected drift or its tau-dependent sigma schedule, and it does NOT claim to
+preserve the ODE marginals. We keep it because (a) at eta=0 it is bit-for-bit the
+checkpoint's deterministic Euler ODE (verified), and (b) every transition is an exact,
+differentiable Gaussian so the importance ratio the GRPO update needs is exact and
+tractable. If a marginal-preserving sampler is required later, replace this module with
+the pi-RL corrected-drift schedule; the ODE-vs-stochastic action-distribution and
+task-success checks across eta levels are the acceptance test for that swap.
+
 The Xiaomi-Robotics-1 action expert is a rectified-flow / flow-matching model.
 At deployment it integrates a *deterministic* ODE (see checkpoint modeling_mibot.py
 `ActionExpert.forward`, ~line 1864):

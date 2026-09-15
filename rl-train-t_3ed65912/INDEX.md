@@ -1,6 +1,15 @@
 # INDEX — CloseBlenderLid skill-conditioned GRPO (task t_3ed65912)
 
-Primary report: REPORT/arm_comparison.md
+## ⚠ AUDIT INVALIDATION NOTICE (task t_37303cd3)
+A code audit found that eta=0 deterministic eval ran with the trained adapter DISABLED
+(`op_sample` used `skill if eta>0 else None`), so all adapter-only before/after
+success-rate deltas below are NOT valid evidence of policy improvement. The GRPO
+pipeline, reward layer, and checkpoints remain valid; the success deltas do not.
+See REPORT/audit_fixes.md for the full gate table, fixes, and preserved
+`*_invalid_pre_fix` artifacts. Any re-run for policy-improvement claims must use the
+fixed eta=0 eval and paired before/after seeds, labelled post-fix.
+
+Primary report: REPORT/arm_comparison.md · Audit report: REPORT/audit_fixes.md
 
 ## Results at a glance (N=50 eval, identical seeds 5000-5049; heldout 9000-9049)
 
