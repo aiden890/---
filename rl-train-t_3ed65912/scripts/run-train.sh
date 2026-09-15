@@ -82,7 +82,23 @@ case "${1:-help}" in
       --entrypoint python "$client_image" /train/src/grpo_train_loop.py \
       --out /out --trainer-port $port "${@:3}" 2>&1 | tee "$out/train.log"
     ;;
+  sft)
+    # Goal-3 SFT client (CFM per-skill LoRA). Uses the SERVER image (torch+hf+torchvision
+    # +pyarrow for demo parquet/video decode; no sim needed) networked to the trainer.
+    # The trainer must be started with the SFT hyperparams (e.g. --optimizer adamw --lr 1e-4
+    # --train-mode adapter_only --grad-checkpoint). Subcommand form:
+    #   bash run-train.sh sft <out-subdir> --op overfit --skill GRASP_HANDLE --arm nl_plus_skill_id ...
+    docker ps --format '{{.Names}}' | grep -q "^${trainer}$" || { echo "start trainer first: bash $0 trainer-start" >&2; exit 5; }
+    run="${2:-sft}"; out="$train/results/skill_sft/$run"; mkdir -p "$out"
+    docker run --rm --name "xiaomi-sft-$run" --gpus all --shm-size=2g \
+      -v "$parent/checkpoint:/checkpoint:ro" -v "$rlenv:/rl_env:ro" -v "$train:/train" -v "$out:/out" \
+      -e HF_HOME=/tmp/hf --network "container:$trainer" \
+      --entrypoint bash "$server_image" -lc \
+      "python3 -m pip install --quiet --target /tmp/pylibs pyarrow av 2>/dev/null; \
+       PYTHONPATH=/tmp/pylibs python3 /train/scripts/skill_sft_train.py \
+       --model /checkpoint --port $port --cache /tmp/hf/cache --out /out ${*:3}" 2>&1 | tee "$out/sft.log"
+    ;;
   *)
-    echo "Usage: bash run-train.sh {probe [args]|trainer-start [server args]|trainer-stop|train <run> [loop args]}" >&2
+    echo "Usage: bash run-train.sh {probe|trainer-start [server args]|trainer-stop|audit-p0|audit-branch|train <run> [args]|sft <run> [sft args]}" >&2
     exit 2;;
 esac

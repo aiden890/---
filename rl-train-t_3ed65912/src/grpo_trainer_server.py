@@ -350,10 +350,85 @@ class GRPOTrainerServer:
             prob = vlm_scorer.answer_probability(logits_last, yes_ids, no_ids)
         return {"prob": prob, "question": req.get("question")}
 
+    def op_sft_update(self, req):
+        """Goal-3: per-skill conditional flow-matching (CFM) SFT step.
+
+        The client sends, per batch item, the SAME processor conditioning inputs used
+        at rollout (3-camera video history + state + skill instruction) plus:
+          x1        : target action chunk in the model's action space, [B, L, A_full]
+          loss_mask : [B, L, A_full] float mask -- 1.0 only on ACTIVE action dims
+                      (std>1e-5, i.e. the 12 real dims) AND action steps INSIDE the
+                      skill's [start,end) span; 0.0 elsewhere (the Goal-1 loss mask).
+        CFM (rectified-flow) objective, matching the checkpoint's Euler ODE reversed:
+          x0 ~ N(0,I); t ~ U(0,1); xt = (1-t)x0 + t*x1; u = x1 - x0
+          L  = mean_masked( || v_theta(xt, t) - u ||^2 )
+        Only the active per-skill LoRA (or shared LoRA + learned embedding) is trained;
+        the backbone stays frozen per train_mode. Supports several optimizer steps.
+        """
+        skill = req.get("skill")
+        set_active_skill(self.wrappers, skill)
+        assert_no_active_dropout(self.model)
+        steps = int(req.get("sft_steps", 1))
+        seed = req.get("seed")
+        gen = torch.Generator(device="cuda").manual_seed(int(seed)) if seed is not None else None
+        inputs = req["inputs"]
+        state, action_mask, vlm = self._split(inputs)
+        x1 = self._to_dev(req["x1"])                         # [B,L,A_full]
+        loss_mask = self._to_dev(req["loss_mask"]).to(self.model.dtype)  # [B,L,A_full]
+
+        losses = []
+        gn = 0.0
+        for _ in range(steps):
+            self.opt.zero_grad(set_to_none=True)
+            vfield, shape, dev, dt = build_velocity_field(self.model, state, action_mask, **vlm)
+            x0 = torch.randn(shape, device=dev, dtype=action_mask.dtype, generator=gen)
+            t = torch.rand((shape[0], 1, 1), device=dev, dtype=action_mask.dtype, generator=gen)
+            xt = (1.0 - t) * x0 + t * x1
+            u = x1 - x0
+            if self.a.grad_checkpoint:
+                v = torch.utils.checkpoint.checkpoint(vfield, xt, t, use_reentrant=False)
+            else:
+                v = vfield(xt, t)
+            se = (v - u) ** 2 * loss_mask
+            denom = loss_mask.sum().clamp_min(1.0)
+            loss = se.sum() / denom
+            loss.backward()
+            gn = float(torch.nn.utils.clip_grad_norm_(self.trainable_params, max_norm=self.a.grad_clip))
+            self.opt.step()
+            losses.append(float(loss.detach().cpu()))
+        return {"loss": losses[-1], "loss_first": losses[0], "losses": losses,
+                "grad_norm": gn, "n_active": int(loss_mask.sum().item()),
+                "peak_mem_gb": round(torch.cuda.max_memory_allocated() / 1e9, 2)}
+
+    def op_sft_val(self, req):
+        """CFM validation loss (no grad, no optimizer step). Averages over `mc` random
+        (x0,t) draws to reduce Monte-Carlo variance of the flow-matching loss."""
+        skill = req.get("skill")
+        set_active_skill(self.wrappers, skill)
+        mc = int(req.get("mc", 8))
+        seed = req.get("seed")
+        gen = torch.Generator(device="cuda").manual_seed(int(seed)) if seed is not None else None
+        state, action_mask, vlm = self._split(req["inputs"])
+        x1 = self._to_dev(req["x1"])
+        loss_mask = self._to_dev(req["loss_mask"]).to(self.model.dtype)
+        with torch.no_grad():
+            vfield, shape, dev, dt = build_velocity_field(self.model, state, action_mask, **vlm)
+            tot = 0.0
+            for _ in range(mc):
+                x0 = torch.randn(shape, device=dev, dtype=action_mask.dtype, generator=gen)
+                t = torch.rand((shape[0], 1, 1), device=dev, dtype=action_mask.dtype, generator=gen)
+                xt = (1.0 - t) * x0 + t * x1
+                u = x1 - x0
+                v = vfield(xt, t)
+                se = (v - u) ** 2 * loss_mask
+                tot += float((se.sum() / loss_mask.sum().clamp_min(1.0)).cpu())
+        return {"val_loss": tot / mc, "mc": mc, "n_active": int(loss_mask.sum().item())}
+
     def handle(self, req):
         fn = {"sample": self.op_sample, "update": self.op_update, "save": self.op_save,
               "load": self.op_load, "metrics": self.op_metrics,
-              "vlm_score": self.op_vlm_score}.get(req.get("op"))
+              "vlm_score": self.op_vlm_score,
+              "sft_update": self.op_sft_update, "sft_val": self.op_sft_val}.get(req.get("op"))
         return fn(req) if fn else {"error": f"unknown op {req.get('op')}"}
 
     def serve(self):
