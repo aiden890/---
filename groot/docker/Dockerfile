@@ -32,8 +32,11 @@ RUN python3 -m pip install transformers==4.51.3
 
 # Simulation deps (robosuite/robocasa), then GR00T runtime deps. Both installed --no-deps
 # so we don't drag in tensorflow / pytorch3d / a conflicting torch.
-COPY groot/configs/requirements-sim.txt groot/configs/requirements.lock groot/configs/requirements-groot.txt /app/
-RUN python3 -m pip install -r /app/requirements-sim.txt -c /app/requirements.lock
+# NOTE: no -c requirements.lock here — that lock was pinned for the py3.11 robocasa-sim
+# base and includes py>=3.11-only pins (e.g. etils==1.14.0); this cu121 base is py3.10,
+# so we let pip resolve compatible transitive deps against the hard pins in the .txt.
+COPY groot/configs/requirements-sim.txt groot/configs/requirements-groot.txt /app/
+RUN python3 -m pip install -r /app/requirements-sim.txt
 RUN python3 -m pip install -r /app/requirements-groot.txt
 RUN python3 -m pip install --no-deps -e /opt/robosuite -e /opt/robocasa -e /opt/Isaac-GR00T
 
