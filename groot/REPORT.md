@@ -67,3 +67,10 @@ CloseBlenderLid를 우리 Xiaomi RoboCasa365와 **동일 task·동일 robot(sing
   server+client 단일 프로세스·단일 GPU, 정책 VRAM ~5.5GB.
 - 산출물: `groot/results/CloseBlenderLid/<split>/stats.json`(per-episode success 포함),
   MP4 50+개, SHA256 매니페스트(로컬 `videos/CloseBlenderLid/groot_eval/`).
+
+## 산출물 형식 차이 (한계)
+
+- 우리 Xiaomi 하네스의 `*_steps.jsonl`(성공시점·per-step predicate)은 GR00T 공식 eval 하네스가
+  생성하지 않는다. GR00T는 episode 단위 success(stats.json) + MP4만 저장한다. per-step predicate
+  타임라인이 필요하면 gym_wrapper.step에서 `env.predicates` 덤프를 추가하는 별도 계측이 필요하며,
+  이는 full-task 비교 목적 밖이라 미구현. 현재 성공 판정은 episode 단위(env._check_success)로 동일.
