@@ -1,0 +1,16 @@
+# GR00T N1.5 eval-path runtime deps NOT already in the xiaomi-cu121 base image or
+# requirements-sim.txt. Versions match the robocasa-benchmark/Isaac-GR00T pyproject
+# where the pin is load-bearing; torch/torchvision/transformers/flash-attn/accelerate/
+# huggingface_hub/scipy/imageio come from the base image and are intentionally omitted.
+pydantic==2.10.6
+numpydantic==1.6.7
+peft==0.17.0
+timm==1.0.14
+av==12.3.0
+pyzmq==26.2.0
+dm_tree==0.1.8
+albumentations==1.4.18
+pandas==2.2.3
+pyarrow==17.0.0
+tyro==0.9.5
+kornia==0.7.4
