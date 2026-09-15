@@ -73,6 +73,12 @@ class RewardConfig:
     terminal_decay_gamma: float = 0.998     # Z-1 success-aware decay
     horizon: int = 400                      # steps; used for the decay reference
     use_milestones: bool = True
+    settle_terminal: bool = True            # judge task success on the FINAL SETTLED state
+                                            # (after the gripper has released and moved away),
+                                            # not only during manipulation. A placement that
+                                            # wobbles while releasing but comes to rest properly
+                                            # closed (seated + upright + gripper away) still earns
+                                            # the terminal reward. Evaluated at done/truncated.
     milestone_bonus: dict = field(default_factory=lambda: dict(DEFAULT_MILESTONE_BONUS))
     vlm_weight: float = 0.0                 # >0 only in the simulator+vlm ablation
     collision_requires_grasp: bool = True   # a collision is "disallowed" only while carrying
@@ -159,15 +165,27 @@ class RewardManager:
         self._prev_grasped = bool(p.get("lid_grasped"))
 
         # --- terminal success (paid once) with Z-1 success-aware decay ---
+        # settle_terminal: the task is judged on the SETTLED state. official_success already
+        # requires the gripper to be far (>0.15 m), so it can only be true once the hand has
+        # released and moved away -- i.e. this is exactly "properly closed after manipulation
+        # is finished". A placement that wobbles while releasing but comes to rest seated +
+        # upright still becomes True here and is paid; one that ends tilted or off-position
+        # never does. At episode end (done/truncated) we RE-EVALUATE on the final predicates
+        # so a success that only stabilises on the very last step is not missed.
         success = official_success(p)
+        at_end = bool(truncated or done)
+        pay_now = success and not self._terminal_paid
+        if self.cfg.settle_terminal:
+            # only pay while the hand is clear of the lid (settled), or at episode end
+            pay_now = pay_now and (bool(p.get("gripper_lid_far_0.15")) or at_end)
         rb.success = success
-        if success and not self._terminal_paid:
+        if pay_now:
             self._terminal_paid = True
             decay = self.cfg.terminal_decay_gamma ** step_index
             rb.terminal += self.cfg.terminal_success * decay
 
         # timeout penalty at the end of a failed episode
-        if (truncated or done) and not success:
+        if at_end and not self._terminal_paid:
             rb.penalty += self.cfg.penalties["timeout"]
 
         # --- VLM auxiliary (diagnostic; added to total only if weight>0) ---
