@@ -1,0 +1,266 @@
+{
+  "reset": {
+    "N": 24,
+    "noise_floor_pairwise_L2": 3.5582,
+    "null_meandiff_scale": 0.7263,
+    "rows": [
+      {
+        "label": "correct_full",
+        "category": "correct",
+        "within_L2": 2.9383,
+        "d_means": 0.0,
+        "effect_size_vs_null": 0.0,
+        "cosine": 1.0,
+        "p": null
+      },
+      {
+        "label": "skill_grasp",
+        "category": "skill",
+        "within_L2": 2.1549,
+        "d_means": 7.6086,
+        "effect_size_vs_null": 10.476,
+        "cosine": 0.1447,
+        "p": 4.999750012499375e-05
+      },
+      {
+        "label": "skill_move",
+        "category": "skill",
+        "within_L2": 2.6484,
+        "d_means": 7.424,
+        "effect_size_vs_null": 10.221,
+        "cosine": 0.1569,
+        "p": 4.999750012499375e-05
+      },
+      {
+        "label": "skill_place",
+        "category": "skill",
+        "within_L2": 5.5246,
+        "d_means": 4.9134,
+        "effect_size_vs_null": 6.765,
+        "cosine": 0.5674,
+        "p": 4.999750012499375e-05
+      },
+      {
+        "label": "opposite_open_drawer",
+        "category": "opposite",
+        "within_L2": 2.1551,
+        "d_means": 8.036,
+        "effect_size_vs_null": 11.064,
+        "cosine": 0.1229,
+        "p": 4.999750012499375e-05
+      },
+      {
+        "label": "irrelevant_pick_cup",
+        "category": "irrelevant",
+        "within_L2": 4.9368,
+        "d_means": 5.4779,
+        "effect_size_vs_null": 7.542,
+        "cosine": 0.4512,
+        "p": 4.999750012499375e-05
+      },
+      {
+        "label": "irrelevant_turn_on_stove",
+        "category": "irrelevant",
+        "within_L2": 4.7118,
+        "d_means": 2.1221,
+        "effect_size_vs_null": 2.922,
+        "cosine": 0.9387,
+        "p": 4.999750012499375e-05
+      },
+      {
+        "label": "empty",
+        "category": "degenerate",
+        "within_L2": 4.8171,
+        "d_means": 5.4825,
+        "effect_size_vs_null": 7.548,
+        "cosine": 0.4564,
+        "p": 4.999750012499375e-05
+      },
+      {
+        "label": "nonsense",
+        "category": "degenerate",
+        "within_L2": 2.1369,
+        "d_means": 7.5642,
+        "effect_size_vs_null": 10.415,
+        "cosine": 0.1225,
+        "p": 4.999750012499375e-05
+      }
+    ]
+  },
+  "move": {
+    "N": 24,
+    "noise_floor_pairwise_L2": 1.0396,
+    "null_meandiff_scale": 0.2122,
+    "rows": [
+      {
+        "label": "correct_full",
+        "category": "correct",
+        "within_L2": 0.846,
+        "d_means": 0.0,
+        "effect_size_vs_null": 0.0,
+        "cosine": 1.0,
+        "p": null
+      },
+      {
+        "label": "skill_grasp",
+        "category": "skill",
+        "within_L2": 0.9377,
+        "d_means": 0.3297,
+        "effect_size_vs_null": 1.554,
+        "cosine": 0.9986,
+        "p": 0.031948402579871006
+      },
+      {
+        "label": "skill_move",
+        "category": "skill",
+        "within_L2": 0.7511,
+        "d_means": 0.3901,
+        "effect_size_vs_null": 1.838,
+        "cosine": 0.9981,
+        "p": 0.0019499025048747563
+      },
+      {
+        "label": "skill_place",
+        "category": "skill",
+        "within_L2": 0.761,
+        "d_means": 0.3972,
+        "effect_size_vs_null": 1.872,
+        "cosine": 0.998,
+        "p": 0.0028998550072496373
+      },
+      {
+        "label": "opposite_open_drawer",
+        "category": "opposite",
+        "within_L2": 1.579,
+        "d_means": 1.7616,
+        "effect_size_vs_null": 8.301,
+        "cosine": 0.9617,
+        "p": 4.999750012499375e-05
+      },
+      {
+        "label": "irrelevant_pick_cup",
+        "category": "irrelevant",
+        "within_L2": 1.0831,
+        "d_means": 1.4404,
+        "effect_size_vs_null": 6.788,
+        "cosine": 0.9752,
+        "p": 4.999750012499375e-05
+      },
+      {
+        "label": "irrelevant_turn_on_stove",
+        "category": "irrelevant",
+        "within_L2": 1.1603,
+        "d_means": 1.4516,
+        "effect_size_vs_null": 6.84,
+        "cosine": 0.9743,
+        "p": 4.999750012499375e-05
+      },
+      {
+        "label": "empty",
+        "category": "degenerate",
+        "within_L2": 1.1627,
+        "d_means": 1.3583,
+        "effect_size_vs_null": 6.401,
+        "cosine": 0.9782,
+        "p": 4.999750012499375e-05
+      },
+      {
+        "label": "nonsense",
+        "category": "degenerate",
+        "within_L2": 1.0758,
+        "d_means": 0.7439,
+        "effect_size_vs_null": 3.505,
+        "cosine": 0.9936,
+        "p": 4.999750012499375e-05
+      }
+    ]
+  },
+  "place": {
+    "N": 24,
+    "noise_floor_pairwise_L2": 2.0316,
+    "null_meandiff_scale": 0.4147,
+    "rows": [
+      {
+        "label": "correct_full",
+        "category": "correct",
+        "within_L2": 0.3635,
+        "d_means": 0.0,
+        "effect_size_vs_null": 0.0,
+        "cosine": 1.0,
+        "p": null
+      },
+      {
+        "label": "skill_grasp",
+        "category": "skill",
+        "within_L2": 0.3673,
+        "d_means": 0.356,
+        "effect_size_vs_null": 0.858,
+        "cosine": 0.998,
+        "p": 4.999750012499375e-05
+      },
+      {
+        "label": "skill_move",
+        "category": "skill",
+        "within_L2": 0.4035,
+        "d_means": 0.1177,
+        "effect_size_vs_null": 0.284,
+        "cosine": 0.9998,
+        "p": 0.032848357582120895
+      },
+      {
+        "label": "skill_place",
+        "category": "skill",
+        "within_L2": 0.3537,
+        "d_means": 0.1484,
+        "effect_size_vs_null": 0.358,
+        "cosine": 0.9997,
+        "p": 0.00014999250037498125
+      },
+      {
+        "label": "opposite_open_drawer",
+        "category": "opposite",
+        "within_L2": 2.1807,
+        "d_means": 1.1126,
+        "effect_size_vs_null": 2.683,
+        "cosine": 0.9806,
+        "p": 4.999750012499375e-05
+      },
+      {
+        "label": "irrelevant_pick_cup",
+        "category": "irrelevant",
+        "within_L2": 2.78,
+        "d_means": 0.9386,
+        "effect_size_vs_null": 2.263,
+        "cosine": 0.9897,
+        "p": 4.999750012499375e-05
+      },
+      {
+        "label": "irrelevant_turn_on_stove",
+        "category": "irrelevant",
+        "within_L2": 5.6891,
+        "d_means": 3.676,
+        "effect_size_vs_null": 8.864,
+        "cosine": 0.7613,
+        "p": 4.999750012499375e-05
+      },
+      {
+        "label": "empty",
+        "category": "degenerate",
+        "within_L2": 3.3532,
+        "d_means": 1.1389,
+        "effect_size_vs_null": 2.746,
+        "cosine": 0.9848,
+        "p": 4.999750012499375e-05
+      },
+      {
+        "label": "nonsense",
+        "category": "degenerate",
+        "within_L2": 2.7939,
+        "d_means": 1.027,
+        "effect_size_vs_null": 2.476,
+        "cosine": 0.9862,
+        "p": 4.999750012499375e-05
+      }
+    ]
+  }
+}

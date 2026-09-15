@@ -1,0 +1,33 @@
+{
+  "state": "reset",
+  "seed": 9,
+  "horizon": 120,
+  "mean_eef_traj_L2_vs_correct": {
+    "correct_full": 0.0,
+    "skill_grasp": 0.10794879820823929,
+    "opposite_open_drawer": 0.2542460008474162,
+    "irrelevant_pick_cup": 0.321496693690149
+  },
+  "records": {
+    "correct_full": {
+      "instruction": "Close the lid blender by securely placing the lid on top.",
+      "steps": 120,
+      "video": "div_reset_correct_full.mp4"
+    },
+    "skill_grasp": {
+      "instruction": "Pick up the blender lid securely.",
+      "steps": 120,
+      "video": "div_reset_skill_grasp.mp4"
+    },
+    "opposite_open_drawer": {
+      "instruction": "Open the drawer.",
+      "steps": 120,
+      "video": "div_reset_opposite_open_drawer.mp4"
+    },
+    "irrelevant_pick_cup": {
+      "instruction": "Pick up the cup.",
+      "steps": 120,
+      "video": "div_reset_irrelevant_pick_cup.mp4"
+    }
+  }
+}

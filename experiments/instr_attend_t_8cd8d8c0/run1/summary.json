@@ -1,0 +1,270 @@
+{
+  "seed": 9,
+  "samples": 16,
+  "compare_steps": 16,
+  "states": [
+    "reset",
+    "move",
+    "place"
+  ],
+  "results": {
+    "reset": {
+      "noise_floor": 3.705132494977226,
+      "rows": [
+        {
+          "label": "correct_full",
+          "category": "correct",
+          "instruction": "Close the lid blender by securely placing the lid on top.",
+          "within_instr_L2": 3.9402487948536873,
+          "L2_meanchunk_vs_correct": 0.0,
+          "cosine_meanchunk_vs_correct": 1.0000001192092896,
+          "ratio_between_over_noisefloor": 0.0
+        },
+        {
+          "label": "skill_grasp",
+          "category": "skill",
+          "instruction": "Pick up the blender lid securely.",
+          "within_instr_L2": 1.7786891733606656,
+          "L2_meanchunk_vs_correct": 7.196033000946045,
+          "cosine_meanchunk_vs_correct": 0.1912091225385666,
+          "ratio_between_over_noisefloor": 1.9421796685276906
+        },
+        {
+          "label": "skill_move",
+          "category": "skill",
+          "instruction": "Move the grasped blender lid above the blender without colliding with the surroundings.",
+          "within_instr_L2": 2.49371052334706,
+          "L2_meanchunk_vs_correct": 6.89305305480957,
+          "cosine_meanchunk_vs_correct": 0.2162279337644577,
+          "ratio_between_over_noisefloor": 1.8604066289542875
+        },
+        {
+          "label": "skill_place",
+          "category": "skill",
+          "instruction": "Place the grasped blender lid securely on top of the blender, release it, and move the gripper away.",
+          "within_instr_L2": 5.56290713896354,
+          "L2_meanchunk_vs_correct": 4.246153831481934,
+          "cosine_meanchunk_vs_correct": 0.6399798393249512,
+          "ratio_between_over_noisefloor": 1.1460194304085292
+        },
+        {
+          "label": "opposite_open_drawer",
+          "category": "opposite",
+          "instruction": "Open the drawer.",
+          "within_instr_L2": 2.232765496770541,
+          "L2_meanchunk_vs_correct": 7.549964904785156,
+          "cosine_meanchunk_vs_correct": 0.18694062530994415,
+          "ratio_between_over_noisefloor": 2.0377044316283115
+        },
+        {
+          "label": "irrelevant_pick_cup",
+          "category": "irrelevant",
+          "instruction": "Pick up the cup.",
+          "within_instr_L2": 5.298048136631648,
+          "L2_meanchunk_vs_correct": 4.353890419006348,
+          "cosine_meanchunk_vs_correct": 0.607138454914093,
+          "ratio_between_over_noisefloor": 1.1750970916447914
+        },
+        {
+          "label": "irrelevant_turn_on_stove",
+          "category": "irrelevant",
+          "instruction": "Turn on the stove.",
+          "within_instr_L2": 4.246269091467062,
+          "L2_meanchunk_vs_correct": 1.2152338027954102,
+          "cosine_meanchunk_vs_correct": 0.9739350080490112,
+          "ratio_between_over_noisefloor": 0.32798659816965053
+        },
+        {
+          "label": "empty",
+          "category": "degenerate",
+          "instruction": "",
+          "within_instr_L2": 5.439845397075017,
+          "L2_meanchunk_vs_correct": 4.320745468139648,
+          "cosine_meanchunk_vs_correct": 0.617221474647522,
+          "ratio_between_over_noisefloor": 1.166151405920561
+        },
+        {
+          "label": "nonsense",
+          "category": "degenerate",
+          "instruction": "asdf qwer zxcv lorem ipsum.",
+          "within_instr_L2": 2.3537087023258207,
+          "L2_meanchunk_vs_correct": 6.940312385559082,
+          "cosine_meanchunk_vs_correct": 0.19815577566623688,
+          "ratio_between_over_noisefloor": 1.8731617276757444
+        }
+      ]
+    },
+    "move": {
+      "noise_floor": 1.2615834351491044,
+      "rows": [
+        {
+          "label": "correct_full",
+          "category": "correct",
+          "instruction": "Close the lid blender by securely placing the lid on top.",
+          "within_instr_L2": 1.0562590395410856,
+          "L2_meanchunk_vs_correct": 0.0,
+          "cosine_meanchunk_vs_correct": 1.0,
+          "ratio_between_over_noisefloor": 0.0
+        },
+        {
+          "label": "skill_grasp",
+          "category": "skill",
+          "instruction": "Pick up the blender lid securely.",
+          "within_instr_L2": 0.7748979009687901,
+          "L2_meanchunk_vs_correct": 0.33110272884368896,
+          "cosine_meanchunk_vs_correct": 0.9986439943313599,
+          "ratio_between_over_noisefloor": 0.26245012388305217
+        },
+        {
+          "label": "skill_move",
+          "category": "skill",
+          "instruction": "Move the grasped blender lid above the blender without colliding with the surroundings.",
+          "within_instr_L2": 0.6707681740323702,
+          "L2_meanchunk_vs_correct": 0.3904254734516144,
+          "cosine_meanchunk_vs_correct": 0.9981006383895874,
+          "ratio_between_over_noisefloor": 0.3094725743648264
+        },
+        {
+          "label": "skill_place",
+          "category": "skill",
+          "instruction": "Place the grasped blender lid securely on top of the blender, release it, and move the gripper away.",
+          "within_instr_L2": 0.959280897428592,
+          "L2_meanchunk_vs_correct": 0.45804473757743835,
+          "cosine_meanchunk_vs_correct": 0.9974603056907654,
+          "ratio_between_over_noisefloor": 0.363071299777571
+        },
+        {
+          "label": "opposite_open_drawer",
+          "category": "opposite",
+          "instruction": "Open the drawer.",
+          "within_instr_L2": 1.8789854228496552,
+          "L2_meanchunk_vs_correct": 2.1991612911224365,
+          "cosine_meanchunk_vs_correct": 0.9373486638069153,
+          "ratio_between_over_noisefloor": 1.7431754649366662
+        },
+        {
+          "label": "irrelevant_pick_cup",
+          "category": "irrelevant",
+          "instruction": "Pick up the cup.",
+          "within_instr_L2": 1.9686758610109487,
+          "L2_meanchunk_vs_correct": 1.6921647787094116,
+          "cosine_meanchunk_vs_correct": 0.9662104845046997,
+          "ratio_between_over_noisefloor": 1.341302312287746
+        },
+        {
+          "label": "irrelevant_turn_on_stove",
+          "category": "irrelevant",
+          "instruction": "Turn on the stove.",
+          "within_instr_L2": 1.0607075261572996,
+          "L2_meanchunk_vs_correct": 1.4582998752593994,
+          "cosine_meanchunk_vs_correct": 0.9731689691543579,
+          "ratio_between_over_noisefloor": 1.1559282046906754
+        },
+        {
+          "label": "empty",
+          "category": "degenerate",
+          "instruction": "",
+          "within_instr_L2": 1.5213450054327646,
+          "L2_meanchunk_vs_correct": 1.2975798845291138,
+          "cosine_meanchunk_vs_correct": 0.9799284338951111,
+          "ratio_between_over_noisefloor": 1.028532753662666
+        },
+        {
+          "label": "nonsense",
+          "category": "degenerate",
+          "instruction": "asdf qwer zxcv lorem ipsum.",
+          "within_instr_L2": 1.4633310889204343,
+          "L2_meanchunk_vs_correct": 1.5209752321243286,
+          "cosine_meanchunk_vs_correct": 0.9712826609611511,
+          "ratio_between_over_noisefloor": 1.2056081189307681
+        }
+      ]
+    },
+    "place": {
+      "noise_floor": 2.647237458562961,
+      "rows": [
+        {
+          "label": "correct_full",
+          "category": "correct",
+          "instruction": "Close the lid blender by securely placing the lid on top.",
+          "within_instr_L2": 0.8494049766411383,
+          "L2_meanchunk_vs_correct": 0.0,
+          "cosine_meanchunk_vs_correct": 1.0000001192092896,
+          "ratio_between_over_noisefloor": 0.0
+        },
+        {
+          "label": "skill_grasp",
+          "category": "skill",
+          "instruction": "Pick up the blender lid securely.",
+          "within_instr_L2": 0.5174685089538494,
+          "L2_meanchunk_vs_correct": 0.32759204506874084,
+          "cosine_meanchunk_vs_correct": 0.9983347058296204,
+          "ratio_between_over_noisefloor": 0.12374864370745663
+        },
+        {
+          "label": "skill_move",
+          "category": "skill",
+          "instruction": "Move the grasped blender lid above the blender without colliding with the surroundings.",
+          "within_instr_L2": 0.6169530402868986,
+          "L2_meanchunk_vs_correct": 0.17742934823036194,
+          "cosine_meanchunk_vs_correct": 0.999523937702179,
+          "ratio_between_over_noisefloor": 0.06702434179315313
+        },
+        {
+          "label": "skill_place",
+          "category": "skill",
+          "instruction": "Place the grasped blender lid securely on top of the blender, release it, and move the gripper away.",
+          "within_instr_L2": 1.0407867225507894,
+          "L2_meanchunk_vs_correct": 0.3187015652656555,
+          "cosine_meanchunk_vs_correct": 0.998412549495697,
+          "ratio_between_over_noisefloor": 0.12039024464343331
+        },
+        {
+          "label": "opposite_open_drawer",
+          "category": "opposite",
+          "instruction": "Open the drawer.",
+          "within_instr_L2": 4.0638472924629845,
+          "L2_meanchunk_vs_correct": 1.7927573919296265,
+          "cosine_meanchunk_vs_correct": 0.9487401843070984,
+          "ratio_between_over_noisefloor": 0.6772182019903932
+        },
+        {
+          "label": "irrelevant_pick_cup",
+          "category": "irrelevant",
+          "instruction": "Pick up the cup.",
+          "within_instr_L2": 3.3922645022471745,
+          "L2_meanchunk_vs_correct": 1.1685492992401123,
+          "cosine_meanchunk_vs_correct": 0.9819584488868713,
+          "ratio_between_over_noisefloor": 0.4414221684043611
+        },
+        {
+          "label": "irrelevant_turn_on_stove",
+          "category": "irrelevant",
+          "instruction": "Turn on the stove.",
+          "within_instr_L2": 4.473599248131117,
+          "L2_meanchunk_vs_correct": 2.6412413120269775,
+          "cosine_meanchunk_vs_correct": 0.8828154802322388,
+          "ratio_between_over_noisefloor": 0.9977349419423679
+        },
+        {
+          "label": "empty",
+          "category": "degenerate",
+          "instruction": "",
+          "within_instr_L2": 5.4584816038608555,
+          "L2_meanchunk_vs_correct": 2.2795982360839844,
+          "cosine_meanchunk_vs_correct": 0.9350156188011169,
+          "ratio_between_over_noisefloor": 0.8611234435015332
+        },
+        {
+          "label": "nonsense",
+          "category": "degenerate",
+          "instruction": "asdf qwer zxcv lorem ipsum.",
+          "within_instr_L2": 3.4123312319318453,
+          "L2_meanchunk_vs_correct": 1.6578670740127563,
+          "cosine_meanchunk_vs_correct": 0.9562863111495972,
+          "ratio_between_over_noisefloor": 0.6262630761173653
+        }
+      ]
+    }
+  }
+}
