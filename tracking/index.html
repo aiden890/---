@@ -3,15 +3,27 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>RoboCasa · Xiaomi VLA 트래킹</title>
+<title>RoboCasa · Xiaomi VLA</title>
 <style>
-  :root{--bg:#0f1115;--card:#181b22;--bd:#262b36;--tx:#e6e9ef;--dim:#9aa4b2;--ok:#4ade80;--run:#facc15;--wait:#94a3b8;--rev:#60a5fa}
+  :root{--bg:#0f1115;--card:#181b22;--bd:#262b36;--tx:#e6e9ef;--dim:#9aa4b2;--ok:#4ade80;--run:#facc15;--wait:#94a3b8;--rev:#60a5fa;--red:#f87171;--acc:#818cf8}
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
-  .wrap{max-width:900px;margin:0 auto;padding:28px 20px 60px}
-  h1{font-size:22px;margin:0 0 4px}
-  .sub{color:var(--dim);font-size:13px;margin-bottom:24px}
-  .card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:18px 20px;margin:16px 0}
+  /* top bar */
+  header{position:sticky;top:0;z-index:10;background:#12141a;border-bottom:1px solid var(--bd);backdrop-filter:blur(6px)}
+  .nav{max-width:960px;margin:0 auto;display:flex;align-items:center;gap:4px;padding:0 16px;height:52px;flex-wrap:wrap}
+  .brand{font-weight:700;font-size:15px;margin-right:14px;white-space:nowrap}
+  .brand span{color:var(--acc)}
+  .nav button{background:none;border:none;color:var(--dim);font:inherit;font-size:14px;padding:8px 13px;border-radius:8px;cursor:pointer}
+  .nav button:hover{color:var(--tx);background:#1c1f27}
+  .nav button.active{color:var(--tx);background:#242835}
+  .live{margin-left:auto;font-size:12px;color:var(--dim);display:flex;align-items:center;gap:6px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--run);box-shadow:0 0 8px var(--run);animation:pulse 1.6s infinite}
+  @keyframes pulse{50%{opacity:.4}}
+  /* layout */
+  .wrap{max-width:960px;margin:0 auto;padding:24px 16px 70px}
+  .tab{display:none}.tab.active{display:block}
+  h1{font-size:21px;margin:0 0 16px}
+  .card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:18px 20px;margin:14px 0}
   h2{font-size:16px;margin:0 0 12px;padding-bottom:8px;border-bottom:1px solid var(--bd)}
   table{width:100%;border-collapse:collapse;font-size:14px}
   th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--bd);vertical-align:top}
@@ -23,79 +35,172 @@
   .b-run{background:rgba(250,204,21,.14);color:var(--run)}
   .b-wait{background:rgba(148,163,184,.15);color:var(--wait)}
   .b-rev{background:rgba(96,165,250,.15);color:var(--rev)}
-  .kpi{display:flex;gap:12px;flex-wrap:wrap;margin:6px 0 2px}
+  .b-blk{background:rgba(248,113,113,.14);color:var(--red)}
+  .kpi{display:flex;gap:12px;flex-wrap:wrap;margin:6px 0}
   .kpi div{flex:1;min-width:120px;background:#0c0e13;border:1px solid var(--bd);border-radius:9px;padding:12px}
-  .kpi .n{font-size:20px;font-weight:700}
-  .kpi .l{font-size:12px;color:var(--dim)}
+  .kpi .n{font-size:20px;font-weight:700}.kpi .l{font-size:12px;color:var(--dim)}
   ul{margin:6px 0;padding-left:20px}li{margin:3px 0}
-  .foot{color:var(--dim);font-size:12px;margin-top:24px;text-align:center}
+  .now{border-left:3px solid var(--run)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+  video{width:100%;border-radius:8px;background:#000;display:block}
+  .vcap{font-size:13px;margin:8px 0 2px}
+  .vsub{font-size:12px;color:var(--dim)}
+  .ok{color:var(--ok)}.no{color:var(--red)}
+  .dim{color:var(--dim);font-size:13px}
+  .foot{color:var(--dim);font-size:12px;margin-top:26px;text-align:center}
   a{color:var(--rev)}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>RoboCasa · Xiaomi-Robotics-1 실험 트래킹</h1>
-  <div class="sub">CloseBlenderLid skill-conditioned 평가·강화학습 · 최종 업데이트 2026-09-15 · 서버 v4 (RTX 3090)</div>
+<header>
+  <nav class="nav">
+    <div class="brand">Robo<span>Casa</span> · Xiaomi VLA</div>
+    <button data-tab="now" class="active">현재 작업</button>
+    <button data-tab="tasks">RoboCasa Task</button>
+    <button data-tab="demo">데모 영상</button>
+    <button data-tab="report">작업 보고</button>
+    <div class="live"><span class="dot"></span>v4 · RTX 3090</div>
+  </nav>
+</header>
 
-  <div class="card">
-    <h2>한눈에</h2>
+<div class="wrap">
+
+<!-- ===== 현재 작업 ===== -->
+<section id="now" class="tab active">
+  <h1>지금 진행 중</h1>
+  <div class="card now">
+    <h2>🔄 CloseBlenderLid GRPO pilot 학습 <span class="badge b-run">진행</span></h2>
+    <p class="dim" id="now-note">terminal-only ablation iter 12/30 진행 중 · run17 289/360 · 약 52분 남음</p>
     <div class="kpi">
-      <div><div class="n">6/9</div><div class="l">단계 완료</div></div>
-      <div><div class="n">19/19</div><div class="l">리워드 검증 통과</div></div>
-      <div><div class="n">0.20→0.20</div><div class="l">ARM B 공식 성공률</div></div>
-      <div><div class="n">Z-1</div><div class="l">기준 선례</div></div>
+      <div><div class="n">ARM B</div><div class="l">현재 학습 arm</div></div>
+      <div><div class="n">12/30</div><div class="l">iteration</div></div>
+      <div><div class="n">10.5 GB</div><div class="l">GPU 사용</div></div>
+      <div><div class="n">~52분</div><div class="l">예상 잔여</div></div>
     </div>
   </div>
 
   <div class="card">
+    <h2>작업 큐</h2>
+    <table>
+      <tr><th>작업</th><th>상태</th></tr>
+      <tr><td>CloseBlenderLid GRPO pilot 학습</td><td><span class="badge b-run">진행</span></td></tr>
+      <tr><td>로컬 구조 개편 · 중복 통합</td><td><span class="badge b-rev">리뷰</span></td></tr>
+      <tr><td>GRPO: sim+VLM 보조 reward ablation</td><td><span class="badge b-wait">대기</span></td></tr>
+      <tr><td>비교군 실험</td><td><span class="badge b-blk">블로커</span></td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ===== RoboCasa Task ===== -->
+<section id="tasks" class="tab">
+  <h1>RoboCasa Task 정보</h1>
+  <div class="card">
+    <h2>CloseBlenderLid (집중 task)</h2>
+    <table>
+      <tr><td class="dim">목표</td><td>블렌더 뚜껑을 집어 블렌더 위에 안전하게 닫기</td></tr>
+      <tr><td class="dim">성공 조건</td><td><code>lid_on_blender=true</code> AND gripper–lid 거리 &gt;0.15m AND 기울기 &lt;7°</td></tr>
+      <tr><td class="dim">분류</td><td>Composite (다단계 · 순서 제약)</td></tr>
+      <tr><td class="dim">공식 성공률</td><td>36% (18/50) — Xiaomi-Robotics-1-RoboCasa365</td></tr>
+      <tr><td class="dim">horizon</td><td>900 steps</td></tr>
+      <tr><td class="dim">에셋</td><td>Blender028_Lid (layout 32 / style 14)</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h2>skill 분해</h2>
+    <table>
+      <tr><th>skill</th><th>지시문</th><th>성공 조건</th></tr>
+      <tr><td>GRASP</td><td>"Pick up the blender lid securely."</td><td>안정적 grasp + 들어올림</td></tr>
+      <tr><td>MOVE_HOLDING</td><td>"Move the grasped lid above the blender…"</td><td>충돌 없이 pre-place 도달</td></tr>
+      <tr><td>PLACE</td><td>"Place … securely …, release …"</td><td>lid 안착 + release + retreat</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h2>공식 모델 성능 (참고)</h2>
+    <p class="dim">Xiaomi-Robotics-1-RoboCasa365 · target50 · 2500 episode 중 1432 성공 = <b>57.28%</b></p>
+    <table>
+      <tr><th>task</th><th>성공률</th></tr>
+      <tr><td>WashLettuce / TurnOnSinkFaucet</td><td>84%</td></tr>
+      <tr><td>KettleBoiling</td><td>74%</td></tr>
+      <tr><td>CloseBlenderLid</td><td>36%</td></tr>
+      <tr><td>HeatKebabSandwich</td><td>0% (planning 실패 후보)</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ===== 데모 영상 ===== -->
+<section id="demo" class="tab">
+  <h1>데모 영상</h1>
+  <p class="dim">skill별 지시문을 다르게 주고 현재 VLA가 실행한 영상. release/재생 가능.</p>
+  <div class="grid" id="demo-grid"></div>
+</section>
+
+<!-- ===== 작업 보고 ===== -->
+<section id="report" class="tab">
+  <h1>작업 보고</h1>
+  <div class="card">
     <h2>파이프라인 현황</h2>
     <table>
-      <tr><th>#</th><th>단계</th><th>상태</th><th>산출물</th></tr>
-      <tr><td>1</td><td>CUDA 12.1 포팅 · rollout 검증</td><td><span class="badge b-ok">완료</span></td><td><code>xiaomi-cu121/</code></td></tr>
-      <tr><td>2</td><td>종류별 rollout · 실패 분류</td><td><span class="badge b-ok">완료</span></td><td><code>rollouts/xiaomi-robotics-1/</code></td></tr>
-      <tr><td>3</td><td>CloseBlenderLid 추가 rollout (seed 7–12)</td><td><span class="badge b-ok">완료</span></td><td><code>rollouts/closeblenderlid-final-t_de8b0c1e/</code></td></tr>
-      <tr><td>4</td><td>skill 3종 분해 rollout</td><td><span class="badge b-ok">완료</span></td><td><code>videos/…/skill_instruction_eval/</code></td></tr>
-      <tr><td>5</td><td>RL 환경 구축 (flow-SDE · reward)</td><td><span class="badge b-ok">완료</span></td><td><code>rl-env-t_4f3f2b20/</code></td></tr>
-      <tr><td>6</td><td>리워드 정합성 검증</td><td><span class="badge b-ok">통과</span></td><td><code>reward_audit_viewer/</code></td></tr>
-      <tr><td>7</td><td>GRPO pilot 학습 (ARM A/B)</td><td><span class="badge b-run">진행</span></td><td><code>rl-train-t_3ed65912/</code></td></tr>
-      <tr><td>8</td><td>ARM C · 스케일 수렴 학습</td><td><span class="badge b-wait">대기</span></td><td>—</td></tr>
-      <tr><td>9</td><td>디렉토리 개편 · 중복 통합</td><td><span class="badge b-rev">리뷰</span></td><td><code>docs/MIGRATION.md</code></td></tr>
+      <tr><th>#</th><th>단계</th><th>상태</th></tr>
+      <tr><td>1</td><td>CUDA 12.1 포팅 · rollout 검증</td><td><span class="badge b-ok">완료</span></td></tr>
+      <tr><td>2</td><td>종류별 rollout · 실패 분류</td><td><span class="badge b-ok">완료</span></td></tr>
+      <tr><td>3</td><td>CloseBlenderLid 추가 rollout</td><td><span class="badge b-ok">완료</span></td></tr>
+      <tr><td>4</td><td>skill 3종 분해 rollout</td><td><span class="badge b-ok">완료</span></td></tr>
+      <tr><td>5</td><td>RL 환경 구축 (flow-SDE · reward)</td><td><span class="badge b-ok">완료</span></td></tr>
+      <tr><td>6</td><td>리워드 정합성 검증 (19/19)</td><td><span class="badge b-ok">통과</span></td></tr>
+      <tr><td>7</td><td>GRPO pilot 학습</td><td><span class="badge b-run">진행</span></td></tr>
+      <tr><td>8</td><td>ARM C · 스케일 학습</td><td><span class="badge b-wait">대기</span></td></tr>
+      <tr><td>9</td><td>디렉토리 개편 · 중복 통합</td><td><span class="badge b-rev">리뷰</span></td></tr>
     </table>
   </div>
-
   <div class="card">
-    <h2>skill 3종 (지시문 다르게 부여)</h2>
-    <table>
-      <tr><th>skill</th><th>지시문</th><th>결과</th></tr>
-      <tr><td>GRASP</td><td>"Pick up the blender lid securely."</td><td>❌ 빈 gripper로 후퇴</td></tr>
-      <tr><td>MOVE_HOLDING</td><td>"Move the grasped blender lid above the blender…"</td><td>✅ 74스텝, 충돌 없이 도달</td></tr>
-      <tr><td>PLACE</td><td>"Place … securely on top …, release …"</td><td>❌ release 시 7° 기울어짐</td></tr>
-    </table>
-  </div>
-
-  <div class="card">
-    <h2>GRPO pilot (N=50, 동일 seed)</h2>
+    <h2>GRPO pilot 결과 (N=50, 동일 seed)</h2>
     <table>
       <tr><th>Arm</th><th>방식</th><th>공식 성공률 전→후</th><th>held-out</th></tr>
       <tr><td>A</td><td>adapter만</td><td>0.20 → 0.16</td><td>0.08</td></tr>
       <tr><td>B</td><td>adapter+expert</td><td>0.20 → 0.20</td><td>0.16</td></tr>
       <tr><td>C</td><td>+VLM 일부</td><td>예산상 보류</td><td>—</td></tr>
     </table>
-    <p style="color:var(--dim);font-size:13px;margin:12px 0 0">pilot 규모에선 순 성능 향상 없음. 확보한 것은 검증된 재현 가능 GRPO 파이프라인 + 리워드 레이어. 한계는 샘플 예산.</p>
+    <p class="dim" style="margin-top:12px">pilot 규모(30 iter × group 4)에선 순 성능 향상 없음. 확보한 것은 검증된 재현 가능 GRPO 파이프라인 + 리워드 레이어.</p>
   </div>
-
   <div class="card">
-    <h2>다음 할 일</h2>
+    <h2>리워드 검증 게이트 (학습 전 필수)</h2>
     <ul>
-      <li>ARM B 완료 후 arm별 비교표 확정</li>
-      <li>ARM C (adapter+expert+VLM) 실행 (~2h)</li>
-      <li>simulator-only vs simulator+VLM 보조 리워드 ablation</li>
-      <li>스케일 수렴 학습 (larger group / more iters)</li>
-      <li>디렉토리 개편 리뷰 반영 (중복 실행 코드 통합)</li>
+      <li class="ok">✔ reward 단위 테스트 19/19 (13개 그룹) — PLACE tilt-on-release edge case 포함</li>
+      <li class="ok">✔ flow-SDE eta&gt;0 log-prob·gradient 유한, ratio=1.0</li>
+      <li class="ok">✔ 시뮬레이터 official_check와 0 불일치 (120스텝)</li>
     </ul>
   </div>
+  <div class="card">
+    <h2>선례 (RL 방법론)</h2>
+    <p><b>Z-1</b> (arXiv 2606.31846) — π0.5 flow VLA + task-wise GRPO, RoboCasa 24 task 80.6%(+13.2%p). shared-prefix rollout · tree branching · completion-aware reward · selective joint training.</p>
+    <p class="dim">Flow-GRPO / ReinFlow / πRL — LoRA · tighter clip · ratio guard 권고.</p>
+  </div>
+</section>
 
-  <div class="foot">source: <code>tracking/TRACKING.md</code> · 이 페이지는 초안입니다</div>
 </div>
+
+<div class="foot">source: <code>tracking/</code> (git) · 초안 · 메뉴는 필요에 따라 추가 예정</div>
+
+<script>
+// tab switch
+document.querySelectorAll('.nav button[data-tab]').forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    document.getElementById(b.dataset.tab).classList.add('active');
+  };
+});
+// load demos
+fetch('demos.json').then(r=>r.json()).then(ds=>{
+  const g=document.getElementById('demo-grid');
+  g.innerHTML=ds.map(d=>`
+    <div class="card" style="margin:0">
+      <video src="${d.file}" controls preload="metadata"></video>
+      <div class="vcap"><b>${d.skill}</b> ${d.success?'<span class="ok">성공</span>':'<span class="no">실패</span>'}</div>
+      <div class="vsub">${d.instr}${d.reason?'<br>사유: '+d.reason:''}</div>
+    </div>`).join('');
+}).catch(e=>{document.getElementById('demo-grid').innerHTML='<p class="dim">demos.json 로드 실패</p>'});
+</script>
 </body>
 </html>
