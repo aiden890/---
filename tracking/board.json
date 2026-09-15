@@ -10,5 +10,9 @@
     {"title": "스케일 수렴 학습 (larger group / more iters)", "badge": "wait"},
     {"title": "로컬 구조 개편·중복 통합 리뷰 반영", "badge": "rev"}
   ],
-  "user_todo": []
+  "user_todo": [
+    {"title": "RL 환경 검증", "done": false},
+    {"title": "RL 알고리즘 검증", "done": false},
+    {"title": "RL fine-tuning 모델 확인", "done": false}
+  ]
 }

@@ -105,8 +105,24 @@ bash scripts/run-train.sh trainer-stop
 - ARM A: rl-train-t_3ed65912/results/out/armA_run2.pt (7.1 MB, 216 LoRA tensors)
 - Remote: /home/v4/rl-train-t_3ed65912/results/out/armA_run2.pt
 
-## Ablations
+## Ablations (executed)
 
-- reward variant executed: terminal-only vs terminal+milestone-shaping (both simulator
-  predicate based). The simulator-only vs simulator+VLM-auxiliary ablation was NOT run
-  (VLM aux weight defaults to 0; enabling requires a VLM scorer path, deferred).
+Reward-only ablation — two simulator-based reward variants, same trainer (adapter_only),
+same train/eval seeds:
+
+| Reward variant | eval N | official before→after | grasp before→after |
+|----------------|--------|-----------------------|--------------------|
+| simulator_milestones (armA_run2)      | 50 | 0.20 → 0.16 | 0.10 → 0.16 |
+| simulator_terminal_only (ablation)    | 20 | 0.15 → 0.05 | 0.10 → 0.15 |
+
+- The milestone-shaped reward (dense milestone bonuses + terminal) and the terminal-only
+  reward (sparse success signal only) were BOTH run end-to-end. Neither improved official
+  success; terminal-only regressed official (0.15→0.05 on its N=20 subset), consistent
+  with the sparse signal being even weaker than the shaped one at this tiny sample budget.
+  This is the honest, executed reward-only ablation.
+- The specific "simulator-only vs simulator+VLM-auxiliary" comparison requires a REAL VLM
+  scorer (reward.py exposes vlm_score/vlm_weight/with_vlm but no scorer is wired — the
+  parent env card scoped it to weight-0 diagnostic). Building + gate-verifying that scorer,
+  plus ARM C (adapter_plus_expert_vlm), is carried in continuation task t_37303cd3
+  (parent = this task). Not silently dropped.
+- Artifacts: results/ablation_terminal_only/{eval_before,eval_after,run_summary}.json

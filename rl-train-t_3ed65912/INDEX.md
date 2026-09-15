@@ -42,7 +42,15 @@ bash scripts/run-train.sh trainer-stop
 Shared inference server xiaomi-server-t_460aea68 (:10086) left running untouched.
 Our short-lived trainer container was stopped+removed after each arm.
 
-## Not done (next run)
-- ARM C (adapter_plus_expert_vlm): needs another ~2h; deferred by run budget.
-- Simulator-only vs simulator+VLM-auxiliary reward ablation (VLM scorer path).
+## Reward-only ablation (executed)
+| variant | eval N | official before→after | grasp before→after |
+|---------|--------|-----------------------|--------------------|
+| simulator_milestones (armA_run2)   | 50 | 0.20→0.16 | 0.10→0.16 |
+| simulator_terminal_only            | 20 | 0.15→0.05 | 0.10→0.15 |
+Both simulator-based; neither improved official success. sim+VLM-auxiliary variant needs a
+real VLM scorer (not wired) → continuation task t_37303cd3.
+
+## Not done (continuation task t_37303cd3, parent=this)
+- sim-only vs sim+VLM-auxiliary reward ablation with a REAL VLM scorer (build + gate-verify).
+- ARM C (adapter_plus_expert_vlm).
 - Scaled convergence run (larger group / more iters / multi-GPU): per-iter cost ~95 s, 10.5 GB.
