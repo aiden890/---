@@ -399,7 +399,7 @@ fetch('rlenv.json').then(r=>r.json()).then(RL=>{
     vid.src=clip.mp4; vid.load();
     const maxf=clip.timeline[clip.timeline.length-1].f;
     seek.max=maxf; seek.value=0;
-    document.getElementById('rl-meta').innerHTML=`목표: ${clip.goal} · 지시문 ${clip.instr} · 판정 <b>${clip.outcome}</b> · 학습 리워드 합계 <b>${clip.total}</b>`;
+    document.getElementById('rl-meta').innerHTML=`<b>${clip.case||''}</b> · 목표: ${clip.goal} · 판정 <b>${clip.outcome}</b> · 학습 리워드 합계 <b>${clip.total}</b>`;
     paint(clip.timeline[0], clip, 0);
   }
   function idxFromFrame(clip, fidx){
@@ -408,7 +408,7 @@ fetch('rlenv.json').then(r=>r.json()).then(RL=>{
     return ans;
   }
   function syncFromFrame(fidx){ const clip=clips[cur]; const idx=idxFromFrame(clip,fidx); paint(clip.timeline[idx],clip,idx); }
-  tabs.innerHTML=''; clips.forEach((c,i)=>{const b=document.createElement('button');b.textContent=c.label;b.onclick=()=>load(i);tabs.appendChild(b);});
+  tabs.innerHTML=''; clips.forEach((c,i)=>{const b=document.createElement('button');b.innerHTML=`${c.label} <span style="opacity:.6;font-size:11px">${c.outcome}</span>`;b.title=c.case||'';b.onclick=()=>load(i);tabs.appendChild(b);});
   vid.addEventListener('timeupdate',()=>{ const clip=clips[cur]; const fidx=Math.round(vid.currentTime*clip.fps); seek.value=Math.min(fidx,seek.max); syncFromFrame(fidx); });
   seek.addEventListener('input',()=>{ const clip=clips[cur]; const fidx=+seek.value; vid.currentTime=fidx/clip.fps; syncFromFrame(fidx); });
   load(0);

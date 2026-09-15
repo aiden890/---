@@ -128,9 +128,11 @@ class TrainerClient:
         d["task_id"] = self.robot_type
         return d
 
-    def infer(self, states, images, instruction, *, eta, traj_id=None, seed=None, skill=None):
+    def infer(self, states, images, instruction, *, eta, traj_id=None, seed=None, skill=None,
+              chunk_index=0):
         inputs = self._build_inputs(states, images, instruction)
-        req = {"op": "sample", "inputs": inputs, "eta": eta, "traj_id": traj_id, "seed": seed, "skill": skill}
+        req = {"op": "sample", "inputs": inputs, "eta": eta, "traj_id": traj_id, "seed": seed,
+               "skill": skill, "chunk_index": chunk_index}
         resp = self._rpc(req)
         actions = resp["actions"]
         decoded = self.processor.decode_action(actions, robot_type=self.robot_type)
@@ -138,9 +140,11 @@ class TrainerClient:
         decoded = decoded.float().cpu().numpy() if hasattr(decoded, "float") else np.asarray(decoded)
         return np.asarray(decoded, dtype=np.float32), resp.get("logprob")
 
-    def update(self, advantages, clip=0.1, kl_coef=0.005, ratio_max=10.0, adv_clip=3.0):
+    def update(self, advantages, clip=0.1, kl_coef=0.005, ratio_max=10.0, adv_clip=3.0,
+               update_epochs=1):
         return self._rpc({"op": "update", "advantages": advantages, "clip": clip,
-                          "kl_coef": kl_coef, "ratio_max": ratio_max, "adv_clip": adv_clip})
+                          "kl_coef": kl_coef, "ratio_max": ratio_max, "adv_clip": adv_clip,
+                          "update_epochs": update_epochs})
 
     def save(self, path):
         return self._rpc({"op": "save", "path": path})
@@ -205,6 +209,7 @@ def _run_one_skill(sim, client, obs, args, skill, reward_mgr, *, eta, traj_id, s
     steps = 0
     outcome = None
     reward_sum = 0.0
+    chunk_idx = 0   # AUDIT FIX #2: monotonic per-skill chunk counter -> unique RNG per replan
     p = sim.predicates()
     prev_eef_lid_dist = float(p.get("eef_lid_dist", 0.0)) if approach_coef > 0.0 else None
     while steps < horizon:
@@ -213,7 +218,8 @@ def _run_one_skill(sim, client, obs, args, skill, reward_mgr, *, eta, traj_id, s
             images = {k: rollout.sample_history(q, args.obs_history, args.obs_interval)
                       for k, q in image_queues.items()}
             chunk, _ = client.infer(states, images, instruction, eta=eta, traj_id=traj_id,
-                                    seed=seed, skill=skill_key)
+                                    seed=seed, skill=skill_key, chunk_index=chunk_idx)
+            chunk_idx += 1
             if len(chunk) < args.replan_steps:
                 raise RuntimeError(f"chunk {len(chunk)} < replan {args.replan_steps}")
             action_plan.extend(chunk[: args.replan_steps])
@@ -266,9 +272,13 @@ def eval_episode(sim, client, args, reward_cfg, seed, out_dir=None, tag="", retu
         guard += 1
         frames = [] if (save_dir is not None and guard <= 3) else None
         vid = (save_dir / f"{tag}seed{seed}_call{guard}_{SKILL_KEY[call.skill]}.mp4") if frames is not None else None
+        # AUDIT FIX #1: give eta=0 eval a DETERMINISTIC action-noise seed derived from the
+        # env seed + skill-call index, so before/after eval on the same env seed shares the
+        # same x0 latent and the comparison is paired (was seed=None -> unseeded x0).
+        eval_action_seed = int(seed) * 131 + guard
         obs, outcome, r, steps, p = _run_one_skill(
             sim, client, obs, args, call.skill, reward_mgr, eta=0.0, traj_id=None,
-            seed=None, frames=frames, save_video=str(vid) if vid else None)
+            seed=eval_action_seed, frames=frames, save_video=str(vid) if vid else None)
         last_obs = obs
         total_reward += r
         if call.skill is Skill.GRASP and outcome is SkillOutcome.SUCCESS:
@@ -336,7 +346,8 @@ def train_iteration(client, args, reward_cfg, seed, it):
     adv = (arr - arr.mean()) / (arr.std() + 1e-8)
     advantages = {tid: float(a) for tid, a in zip(traj_ids, adv)}
     metrics = client.update(advantages, clip=args.clip, kl_coef=args.kl_coef,
-                            ratio_max=args.ratio_max, adv_clip=args.adv_clip)
+                            ratio_max=args.ratio_max, adv_clip=args.adv_clip,
+                            update_epochs=getattr(args, "update_epochs", 1))
     metrics["mean_return"] = float(arr.mean())
     metrics["max_return"] = float(arr.max())
     metrics["returns"] = [round(x, 4) for x in returns]
@@ -462,6 +473,9 @@ def build_parser():
     ap.add_argument("--vlm-weight", type=float, default=0.0,
                     help="Weight of the REAL Qwen3-VL VQA auxiliary score added to the GRPO "
                          "return during TRAINING. 0.0 = sim-only; >0 = sim+VLM ablation.")
+    ap.add_argument("--update-epochs", type=int, default=1,
+                    help="PPO/GRPO optimizer epochs per rollout batch (forwarded to trainer "
+                         "op=update). 1 = single-step group-relative REINFORCE; pi-RL uses 4.")
     ap.add_argument("--vlm-question", default="grasp",
                     choices=("grasp", "progress", "success"),
                     help="Which VQA question the auxiliary scorer asks each rollout.")
@@ -488,7 +502,7 @@ def main():
     for k in ("group", "eta", "clip", "kl_coef", "ratio_max", "adv_clip", "train_skill",
               "horizon_grasp", "horizon_move", "horizon_place",
               "max_skill_calls", "seed_base", "save_videos", "split",
-              "vlm_weight", "vlm_question"):
+              "vlm_weight", "vlm_question", "update_epochs"):
         setattr(args, k, getattr(my, k))
     out = Path(my.out); out.mkdir(parents=True, exist_ok=True)
 

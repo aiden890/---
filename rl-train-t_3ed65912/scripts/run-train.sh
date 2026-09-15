@@ -48,6 +48,29 @@ case "${1:-help}" in
     docker logs "$trainer" > "$train/results/trainer_server.log" 2>&1 || true
     docker stop "$trainer" && docker rm "$trainer" || true
     ;;
+  audit-p0)
+    # GPU regression for the P0 audit fixes (adapter-active-in-eval + checkpoint roundtrip).
+    # Own short-lived container; loads the model in-process (no trainer server, no shared server).
+    out="$train/results/audit"; mkdir -p "$out"
+    docker run --rm --gpus all --shm-size=2g --network none \
+      -v "$parent/checkpoint:/checkpoint:ro" -v "$rlenv:/rl_env:ro" -v "$train:/train" -v "$out:/out" \
+      --entrypoint python3 "$server_image" \
+      /train/scripts/audit_p0_verify.py --out /out/audit_p0_verify.json "${@:2}"
+    ;;
+  audit-branch)
+    # AUDIT item #4 integration test (client image = sim+assets, networked to trainer).
+    # Needs the trainer server up (for actions). Verifies real simulator state restore +
+    # shared-prefix group branching.
+    docker ps --format '{{.Names}}' | grep -q "^${trainer}$" || { echo "start trainer first: bash $0 trainer-start" >&2; exit 5; }
+    out="$train/results/audit"; mkdir -p "$out"
+    docker run --rm --name "xiaomi-client-audit-branch" --gpus all --shm-size=2g \
+      -e MUJOCO_GL=egl -e PYOPENGL_PLATFORM=egl -e NVIDIA_DRIVER_CAPABILITIES=compute,utility,graphics \
+      -v "$assets_volume:/opt/robocasa/robocasa/models/assets" -v "$parent:/work:ro" \
+      -v "$skilltools:/skill_eval_tools:ro" -v "$rlenv:/rl_env:ro" -v "$train:/train" -v "$out:/out" \
+      -v "$parent/checkpoint:/checkpoint:ro" --network "container:$trainer" \
+      --entrypoint python "$client_image" /train/scripts/audit_branch_verify.py \
+      --trainer-port $port --out /out/audit_branch_verify.json "${@:2}" 2>&1 | tee "$out/audit_branch.log"
+    ;;
   train)
     docker ps --format '{{.Names}}' | grep -q "^${trainer}$" || { echo "start trainer first: bash $0 trainer-start" >&2; exit 5; }
     run="${2:-run1}"; out="$train/results/$run"; mkdir -p "$out"

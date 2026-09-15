@@ -25,6 +25,7 @@ adapter, backprops the GRPO loss, steps, clears the store.
 from __future__ import annotations
 
 import argparse
+import math
 import pickle
 import socket
 import struct
@@ -46,6 +47,27 @@ from lora import (  # noqa: E402
 import vlm_scorer  # noqa: E402  (env card: single source of truth for the VQA prompt+math)
 
 
+def assert_no_active_dropout(model):
+    """AUDIT FIX #5: fail loudly if any Dropout with p>0 is in TRAIN mode anywhere in the
+    policy / action expert. pi-RL disables action-expert dropout so that the sampled
+    old-policy log-prob and the recomputed new-policy log-prob use the SAME deterministic
+    network; active dropout would make the importance ratio meaningless. Returns the list
+    of dropout modules with their (p, training) so the caller can log evidence.
+    """
+    found = []
+    active = []
+    for name, m in model.named_modules():
+        if isinstance(m, torch.nn.Dropout):
+            p = float(getattr(m, "p", 0.0))
+            found.append({"name": name, "p": p, "training": bool(m.training)})
+            if p > 0.0 and m.training:
+                active.append(name)
+    if active:
+        raise RuntimeError(f"AUDIT #5: {len(active)} active Dropout(p>0) modules during "
+                           f"rollout/recompute (first: {active[:3]})")
+    return found
+
+
 class GRPOTrainerServer:
     def __init__(self, a):
         from transformers import AutoModel
@@ -55,6 +77,13 @@ class GRPOTrainerServer:
             a.model, trust_remote_code=True, attn_implementation="flash_attention_2", dtype=torch.bfloat16
         ).cuda().to(torch.bfloat16)
         self.model.eval()
+        # AUDIT FIX #5: force every Dropout to eval mode and assert none is active, so the
+        # rollout old-logp and the recompute new-logp use the SAME deterministic network
+        # (pi-RL disables action-expert dropout; active dropout breaks the importance ratio).
+        for m in self.model.modules():
+            if isinstance(m, torch.nn.Dropout):
+                m.eval()
+        self.dropout_report = assert_no_active_dropout(self.model)
         targets = tuple(t.strip() for t in a.lora_targets.split(","))
         self.wrappers = inject_per_skill_lora(self.model, skills=SKILLS, rank=a.rank,
                                               alpha=a.alpha, targets=targets)
@@ -101,14 +130,38 @@ class GRPOTrainerServer:
         eta = float(req.get("eta", self.a.eta))
         skill = req.get("skill")
         state, action_mask, vlm = self._split(inputs)
-        set_active_skill(self.wrappers, skill if eta > 0 else None)
-        if eta == 0.0:
-            with torch.no_grad():
-                out = self.model(state=state, action_mask=action_mask, num_steps=self.a.num_steps, **vlm)
-            return {"actions": out.actions.cpu(), "logprob": None}
+        # AUDIT FIX #1: adapter activation is decoupled from eta. The trained per-skill
+        # LoRA MUST be active for BOTH the deterministic (eta=0) eval rollouts and the
+        # stochastic (eta>0) training rollouts -- otherwise before/after eval runs the
+        # BASE policy and cannot measure any adapter improvement. Activate whenever a
+        # skill is given; pass skill=None only to force the pretrained baseline.
+        set_active_skill(self.wrappers, skill)
+
+        # AUDIT FIX #1/#2: derive a UNIQUE, reproducible seed per (episode-seed, chunk).
+        # The client sends a stable per-rollout `seed` plus a monotonic `chunk_index`; we
+        # combine them so (a) eta=0 eval is fully replayable from a saved x0 seed and (b)
+        # successive replan chunks within a trajectory get DIFFERENT noise (the pre-fix
+        # bug re-seeded every chunk to the same value -> identical x0/SDE increments).
+        base_seed = req.get("seed")
+        chunk_index = int(req.get("chunk_index", 0))
+        derived_seed = None
         gen = None
-        if req.get("seed") is not None:
-            gen = torch.Generator(device="cuda").manual_seed(int(req["seed"]))
+        if base_seed is not None:
+            derived_seed = (int(base_seed) * 1_000_003 + chunk_index * 9_176 + 1) % (2**31 - 1)
+            gen = torch.Generator(device="cuda").manual_seed(derived_seed)
+
+        if eta == 0.0:
+            # AUDIT FIX #1: route deterministic eval through the seeded flow-SDE so the
+            # initial latent x0 is reproducible (the checkpoint's own forward draws x0 from
+            # the global unseeded RNG -> two identical env seeds got different actions). At
+            # eta=0 the flow-SDE equals the checkpoint's Euler ODE bit-for-bit (sde_probe),
+            # so this changes reproducibility, not behaviour.
+            with torch.no_grad():
+                vfield, shape, dev, dt = build_velocity_field(self.model, state, action_mask, **vlm)
+                res = flow_sde_sample(vfield, shape, num_steps=self.a.num_steps, eta=0.0, device=dev,
+                                      dtype=action_mask.dtype, generator=gen)
+            return {"actions": res.actions.cpu(), "logprob": None,
+                    "derived_seed": derived_seed, "chunk_index": chunk_index}
         with torch.no_grad():
             vfield, shape, dev, dt = build_velocity_field(self.model, state, action_mask, **vlm)
             exec_mask = make_executed_mask(shape[1], shape[2], self.a.replan_steps,
@@ -122,9 +175,12 @@ class GRPOTrainerServer:
             "exec_mask_cpu": exec_mask.cpu(),
             "old_logp": old_logp,
             "skill": skill,
+            "derived_seed": derived_seed,
+            "chunk_index": chunk_index,
         }
         self.store.setdefault(req["traj_id"], []).append(chunk)
-        return {"actions": res.actions.cpu(), "logprob": old_logp}
+        return {"actions": res.actions.cpu(), "logprob": old_logp,
+                "derived_seed": derived_seed, "chunk_index": chunk_index}
 
     def op_update(self, req):
         advantages = req["advantages"]           # {traj_id: advantage float}
@@ -132,61 +188,92 @@ class GRPOTrainerServer:
         kl_coef = float(req.get("kl_coef", self.a.kl_coef))
         ratio_max = float(req.get("ratio_max", self.a.ratio_max))
         adv_clip = float(req.get("adv_clip", self.a.adv_clip))
-        self.opt.zero_grad(set_to_none=True)
+        # AUDIT FIX #6: support multiple optimizer epochs over the stored batch so the
+        # PPO/GRPO clipping and KL actually engage. Epoch 0 recomputes with the SAME params
+        # that generated the rollout, so its ratio==1 exactly (a correctness probe); later
+        # epochs move ratio away from 1 and exercise the clip/KL. update_epochs=1 keeps the
+        # legacy single-step group-relative REINFORCE behaviour.
+        update_epochs = int(req.get("update_epochs", self.a.update_epochs))
+        assert_no_active_dropout(self.model)  # AUDIT FIX #5: no stochastic dropout in recompute
         torch.cuda.reset_peak_memory_stats()
-        total_loss = 0.0
-        n_chunks = 0
-        n_dropped = 0
-        ratios = []
-        kl_sum = 0.0
-        for traj_id, chunks in self.store.items():
-            adv = float(advantages.get(traj_id, 0.0))
-            if adv == 0.0:
-                continue
-            adv = max(-adv_clip, min(adv_clip, adv))
-            adv_t = torch.tensor(adv, device=self.model.device)
-            for chunk in chunks:
-                state, action_mask, vlm = self._split(dict(chunk["inputs_cpu"]))
-                set_active_skill(self.wrappers, chunk["skill"])
-                xs = [x.to(device=self.model.device, dtype=self.model.dtype) for x in chunk["xs_cpu"]]
-                exec_mask = chunk["exec_mask_cpu"].to(self.model.device)
-                old_logp = torch.tensor(chunk["old_logp"], device=self.model.device)
-                vfield, shape, dev, dt = build_velocity_field(self.model, state, action_mask, **vlm)
-                dtc = 1.0 / self.a.num_steps
-                means = []
-                for k in range(self.a.num_steps):
-                    t_k = torch.full((shape[0], 1, 1), k / self.a.num_steps, device=dev, dtype=action_mask.dtype)
-                    if self.a.grad_checkpoint:
-                        v = torch.utils.checkpoint.checkpoint(vfield, xs[k], t_k, use_reentrant=False)
-                    else:
-                        v = vfield(xs[k], t_k)
-                    means.append(xs[k] + v * dtc)
-                new_logp = transition_logprob(xs, means, eta=self.a.eta,
-                                              num_steps=self.a.num_steps, executed_mask=exec_mask)[0]
-                logratio = new_logp - old_logp
-                ratio = torch.exp(logratio)
-                # ratio-explosion guard (brief): skip pathological samples
-                if not torch.isfinite(ratio) or float(ratio) > ratio_max or float(ratio) < 1.0 / ratio_max:
-                    n_dropped += 1
-                    continue
-                pg = -torch.min(ratio * adv_t, torch.clamp(ratio, 1 - clip, 1 + clip) * adv_t)
-                # KL(new||old) approx toward the behaviour policy (stabiliser, brief 2.5)
-                kl = (torch.exp(logratio) - 1.0) - logratio
-                loss = pg + kl_coef * kl
-                loss.backward()
-                total_loss += float(pg.detach().cpu())
-                kl_sum += float(kl.detach().cpu())
-                ratios.append(float(ratio.detach().cpu()))
-                n_chunks += 1
+
+        active = [(tid, chunks, max(-adv_clip, min(adv_clip, float(advantages.get(tid, 0.0)))))
+                  for tid, chunks in self.store.items() if float(advantages.get(tid, 0.0)) != 0.0]
+        epoch_stats = []
         grad_norm = 0.0
-        if n_chunks > 0:
-            grad_norm = float(torch.nn.utils.clip_grad_norm_(
-                self.trainable_params, max_norm=self.a.grad_clip))
-            self.opt.step()
+        n_chunks_last = 0
+        for epoch in range(update_epochs):
+            self.opt.zero_grad(set_to_none=True)
+            total_loss = 0.0; n_chunks = 0; n_dropped = 0; n_nonfinite = 0
+            ratios = []; logratios = []; kl_sum = 0.0; n_clipped = 0
+            for traj_id, chunks, adv in active:
+                adv_t = torch.tensor(adv, device=self.model.device)
+                for chunk in chunks:
+                    state, action_mask, vlm = self._split(dict(chunk["inputs_cpu"]))
+                    set_active_skill(self.wrappers, chunk["skill"])
+                    xs = [x.to(device=self.model.device, dtype=self.model.dtype) for x in chunk["xs_cpu"]]
+                    exec_mask = chunk["exec_mask_cpu"].to(self.model.device)
+                    old_logp = torch.tensor(chunk["old_logp"], device=self.model.device)
+                    vfield, shape, dev, dt = build_velocity_field(self.model, state, action_mask, **vlm)
+                    dtc = 1.0 / self.a.num_steps
+                    means = []
+                    for k in range(self.a.num_steps):
+                        t_k = torch.full((shape[0], 1, 1), k / self.a.num_steps, device=dev, dtype=action_mask.dtype)
+                        if self.a.grad_checkpoint:
+                            v = torch.utils.checkpoint.checkpoint(vfield, xs[k], t_k, use_reentrant=False)
+                        else:
+                            v = vfield(xs[k], t_k)
+                        means.append(xs[k] + v * dtc)
+                    new_logp = transition_logprob(xs, means, eta=self.a.eta,
+                                                  num_steps=self.a.num_steps, executed_mask=exec_mask)[0]
+                    logratio = new_logp - old_logp
+                    if not torch.isfinite(logratio):
+                        n_nonfinite += 1
+                        continue
+                    # AUDIT FIX #6: clamp the log-ratio BEFORE exp so a large excursion cannot
+                    # overflow to inf; the ratio-explosion guard then drops the sample.
+                    logratio_c = torch.clamp(logratio, math.log(1.0 / ratio_max), math.log(ratio_max))
+                    ratio = torch.exp(logratio_c)
+                    if not torch.isfinite(ratio) or float(ratio) > ratio_max or float(ratio) < 1.0 / ratio_max:
+                        n_dropped += 1
+                        continue
+                    pg = -torch.min(ratio * adv_t, torch.clamp(ratio, 1 - clip, 1 + clip) * adv_t)
+                    kl = (torch.exp(logratio_c) - 1.0) - logratio_c   # KL(new||old) approx
+                    loss = pg + kl_coef * kl
+                    loss.backward()
+                    total_loss += float(pg.detach().cpu())
+                    kl_sum += float(kl.detach().cpu())
+                    r = float(ratio.detach().cpu())
+                    ratios.append(r); logratios.append(float(logratio.detach().cpu()))
+                    if abs(r - 1.0) > clip:
+                        n_clipped += 1
+                    n_chunks += 1
+            gn = 0.0
+            if n_chunks > 0:
+                gn = float(torch.nn.utils.clip_grad_norm_(self.trainable_params, max_norm=self.a.grad_clip))
+                self.opt.step()
+            # ESS-like weight diagnostic: (sum w)^2 / sum(w^2), normalized to [0,1]
+            ess = None
+            if ratios:
+                import numpy as _np
+                w = _np.asarray(ratios, dtype=_np.float64)
+                ess = float((w.sum() ** 2) / ((w ** 2).sum() * len(w))) if (w ** 2).sum() > 0 else None
+            epoch_stats.append({
+                "epoch": epoch, "loss": total_loss / max(n_chunks, 1), "n_chunks": n_chunks,
+                "n_dropped": n_dropped, "n_nonfinite": n_nonfinite,
+                "mean_ratio": (sum(ratios) / len(ratios) if ratios else 0.0),
+                "mean_abs_logratio": (sum(abs(x) for x in logratios) / len(logratios) if logratios else 0.0),
+                "clip_fraction": (n_clipped / n_chunks if n_chunks else 0.0),
+                "mean_kl": kl_sum / max(n_chunks, 1), "grad_norm": gn, "ess": ess,
+            })
+            grad_norm = gn; n_chunks_last = n_chunks
         self.store.clear()
-        return {"loss": total_loss / max(n_chunks, 1), "n_chunks": n_chunks, "n_dropped": n_dropped,
-                "grad_norm": grad_norm, "mean_ratio": (sum(ratios) / len(ratios) if ratios else 0.0),
-                "mean_kl": kl_sum / max(n_chunks, 1),
+        first, last = epoch_stats[0], epoch_stats[-1]
+        return {"loss": last["loss"], "n_chunks": n_chunks_last, "n_dropped": last["n_dropped"],
+                "grad_norm": grad_norm, "mean_ratio": last["mean_ratio"], "mean_kl": last["mean_kl"],
+                "update_epochs": update_epochs, "epoch0_mean_ratio": first["mean_ratio"],
+                "epochLast_mean_ratio": last["mean_ratio"], "epochLast_clip_fraction": last["clip_fraction"],
+                "epoch_stats": epoch_stats,
                 "peak_mem_gb": round(torch.cuda.max_memory_allocated() / 1e9, 2)}
 
     def op_save(self, req):
@@ -210,7 +297,24 @@ class GRPOTrainerServer:
                 for s in w.skills:
                     w.lora_A[s].copy_(sd[f"w{i}.lora_A.{s}"].to(w.lora_A[s].dtype))
                     w.lora_B[s].copy_(sd[f"w{i}.lora_B.{s}"].to(w.lora_B[s].dtype))
-        return {"loaded": req["path"], "n_tensors": len(sd)}
+            # AUDIT FIX #2: also restore the non-LoRA trainable slice (arms B/C open the
+            # action-expert projections and a VLM slice via extra_trainable). Without this
+            # a saved ARM B/C checkpoint loads only its LoRA and silently reverts the
+            # expert/VLM weights to pretrained -> a post-hoc eval measures the wrong model.
+            extra = blob.get("extra_trainable", {}) or {}
+            named = dict(self.model.named_parameters())
+            n_extra = 0
+            missing = []
+            for name, tensor in extra.items():
+                if name in named:
+                    named[name].copy_(tensor.to(named[name].dtype))
+                    n_extra += 1
+                else:
+                    missing.append(name)
+            if missing:
+                raise RuntimeError(f"op_load: {len(missing)} extra_trainable params not found "
+                                   f"in model (first: {missing[:3]})")
+        return {"loaded": req["path"], "n_tensors": len(sd), "n_extra": n_extra}
 
     def op_metrics(self, req):
         return {"n_trajs": len(self.store), "n_chunks": sum(len(v) for v in self.store.values()),
@@ -305,6 +409,10 @@ def main():
     ap.add_argument("--ratio-max", type=float, default=10.0)
     ap.add_argument("--adv-clip", type=float, default=3.0)
     ap.add_argument("--grad-clip", type=float, default=0.5)
+    ap.add_argument("--update-epochs", type=int, default=1,
+                    help="PPO/GRPO optimizer epochs over each stored rollout batch. 1 = "
+                         "single-step group-relative REINFORCE (ratio==1, no clipping); "
+                         ">1 exercises the clipped objective + KL (pi-RL uses 4).")
     ap.add_argument("--no-grad-checkpoint", dest="grad_checkpoint", action="store_false")
     ap.set_defaults(grad_checkpoint=True)
     a = ap.parse_args()
