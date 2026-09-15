@@ -1,0 +1,36 @@
+# pi0.5 (openpi) POLICY SERVER image (+robocasa registry).
+# The vendor serve_policy.Dockerfile venv has JAX/orbax/flax but openpi's config.py
+# hard-imports robocasa (DATASET_SOUP_REGISTRY / groot_utils) even for checkpoint
+# inference. We add robosuite+robocasa (SAME pinned commits as the sim/groot images)
+# with --no-deps so the config registry loads; the server never renders (no EGL needed),
+# it only imports these for the dataset-soup registry. openpi itself is installed at
+# runtime by `uv run --frozen` against the mounted /app source.
+ARG BASE_IMAGE=openpi-server:t_ee702b9c
+FROM ${BASE_IMAGE}
+
+ARG ROBOCASA_COMMIT=4f8a2980def75a55dff96b990745b83540425f09
+ARG ROBOSUITE_COMMIT=5ce6643f3092639d08f7b0f90ed1c6a84f50552c
+WORKDIR /opt
+RUN git clone https://github.com/robocasa/robocasa.git && cd robocasa && git checkout "$ROBOCASA_COMMIT"
+RUN git clone https://github.com/ARISE-Initiative/robosuite.git && cd robosuite && git checkout "$ROBOSUITE_COMMIT"
+
+# Install into the uv-managed venv with `uv pip` (the venv has no bundled pip).
+# --no-deps so we don't disturb the JAX pin set. robocasa/robosuite import needs a
+# few small libs the JAX venv may lack.
+RUN uv pip install --python /.venv/bin/python --no-deps -e /opt/robosuite -e /opt/robocasa \
+ && uv pip install --python /.venv/bin/python termcolor pynput hidapi mujoco==3.3.1 pytest
+
+# robocasa's __init__ hard-asserts numpy==2.2.5, but the JAX serving venv is pinned to
+# numpy 1.26.4 (orbax/jax resolution) and the server never runs the MuJoCo sim — it only
+# needs robocasa's dataset-soup REGISTRY dict for config lookup. Neutralize the numpy
+# version assert so the registry imports; sim correctness lives in the client image.
+RUN sed -i 's/^assert numpy.__version__ in \[/assert True or numpy.__version__ in [/' /opt/robocasa/robocasa/__init__.py
+
+# Create the private macro files that setup_macros would (it just copies macros.py).
+# We cp directly instead of running setup_macros, which needs stdin and hits the same
+# circular import in this venv. With macros_private.py present, macros.py takes the
+# `try: from ...macros_private import *` branch and never reaches the circular except.
+RUN cp /opt/robosuite/robosuite/macros.py /opt/robosuite/robosuite/macros_private.py \
+ && cp /opt/robocasa/robocasa/macros.py /opt/robocasa/robocasa/macros_private.py
+RUN /.venv/bin/python -c "from robocasa.utils.dataset_registry import DATASET_SOUP_REGISTRY; print('server+robocasa registry ok', len(DATASET_SOUP_REGISTRY))"
+WORKDIR /app

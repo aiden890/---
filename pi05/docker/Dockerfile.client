@@ -1,0 +1,13 @@
+# pi0.5 (openpi) RoboCasa eval CLIENT image.
+# The vendor eval loop needs openpi_client (websocket + image_tools) on top of the
+# already-proven groot-eval image (robocasa/robosuite pinned + EGL GPU render + the sim
+# stack). We install ONLY the tiny pure-python openpi-client package (msgpack/websockets/
+# tree/dm-tree) — NO JAX here; inference is remote on the openpi-server image.
+ARG BASE_IMAGE=groot-eval:t_ff372eea
+FROM ${BASE_IMAGE}
+
+# openpi-client source is copied from the vendor checkout at build time.
+COPY openpi/packages/openpi-client /opt/openpi-client
+RUN python3 -m pip install --no-cache-dir /opt/openpi-client
+
+RUN python3 -c "from openpi_client import image_tools, websocket_client_policy; import robocasa; print('pi05 client image ok')"

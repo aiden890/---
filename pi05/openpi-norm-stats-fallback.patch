@@ -1,0 +1,26 @@
+diff --git a/src/openpi/training/config.py b/src/openpi/training/config.py
+index 7f2770c..097cf26 100644
+--- a/src/openpi/training/config.py
++++ b/src/openpi/training/config.py
+@@ -573,7 +573,12 @@ class LeRobotRobocasaDataConfig(DataConfigFactory):
+ 
+         # Fallback: if norm_stats not found via assets/repo meta, combine from all data_dirs
+         fallback_norm_stats = None
++        # PATCH(pi05 eval t_ee702b9c): the raw pretrain_human300 datasets are NOT on disk
++        # for inference-only eval; the checkpoint ships its own assets/norm_stats.json.
++        # Guard this raw-dataset fallback so a missing dataset returns None instead of
++        # crashing, letting create_trained_policy load the checkpoint's own flat norm stats.
+         if base.norm_stats is None and self.data_dirs and len(self.data_dirs) > 0:
++          try:
+             if len(self.data_dirs) == 1:
+                 d = self.data_dirs[0]
+                 norm_stats = _groot_openpi_dataset._load_norm_stats_from_groot_dataset(d)
+@@ -585,6 +590,8 @@ class LeRobotRobocasaDataConfig(DataConfigFactory):
+                 if norm_stats is not None:
+                     fallback_norm_stats = norm_stats
+                     logging.info(f"Loaded combined norm stats from {len(self.data_dirs)} data dirs")
++          except FileNotFoundError as e:
++            logging.warning(f"Raw dataset norm stats unavailable ({e}); using checkpoint assets norm_stats")
+  
+         return dataclasses.replace(
+             base,

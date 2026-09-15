@@ -41,7 +41,9 @@ logs/
 rl-train-*/results/skill_sft/hf_cache/
 rl-train-*/data/skill_sft/hf_cache/
 
-# instruction-attendance probe: keep code/report/stats + probe_*.json summaries,
+# eval rollout artifacts: keep small stats + SHA256SUMS as durable record,
+# ignore heavy regenerable per-step jsonl (mp4 already ignored above)
+videos/**/*_steps.jsonl
 # ignore heavy regenerable dumps (raw per-sample chunks, per-step jsonl)
 experiments/*/run*/probe_*_raw_full.json
 experiments/*/*/*.jsonl

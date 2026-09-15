@@ -1,0 +1,466 @@
+{
+  "task": "CloseBlenderLid",
+  "split": "pretrain",
+  "model": "pi05_pretrain_human300/multitask_learning/75000",
+  "vendor": "robocasa-benchmark/openpi@5a6beda9",
+  "embodiment": "panda_omron",
+  "n_episodes": 50,
+  "n_successes": 7,
+  "success_rate": 0.14,
+  "replan_steps": 16,
+  "seed": 7,
+  "horizon": 900,
+  "generated_at": "2026-09-15T12:54:46.632832Z",
+  "episodes": [
+    {
+      "episode": 0,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep00_failure.mp4",
+      "video_sha256": "af7a13f00bbb25413e3b75053300dfffdde98095377ee373ce046e01870a2ba1",
+      "steps_sha256": "754d7d7c82b27ed8271a555971520c07c1f90a0ca5f7591adb2891bde4849d91"
+    },
+    {
+      "episode": 1,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep01_failure.mp4",
+      "video_sha256": "4f7dfded892bc3d87c0af7bef4bd9714b8d35916e3f035a58cecbc827d003594",
+      "steps_sha256": "0d390202879a3ff8bbdccdf56cd5d53a7a3da72768db87885188734b0cb34e28"
+    },
+    {
+      "episode": 2,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep02_failure.mp4",
+      "video_sha256": "eff4991b05047cbecc396c8a0c474d5b5f3b553890833c10f131be2ae6698e6c",
+      "steps_sha256": "7a67e84f796d8cdf7ba4d6e692345b46898996c4093da1ed9df598f7e08ab3e4"
+    },
+    {
+      "episode": 3,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep03_failure.mp4",
+      "video_sha256": "2b4c13fe1849e1965fdac27060a3d1c8b5d70c0e9c1ecb707976e7dd52fd774f",
+      "steps_sha256": "f0a1af6baeb6806f7c67652d8462fc0be2d8d936efbbc2190e8b07fd1967e5f4"
+    },
+    {
+      "episode": 4,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep04_failure.mp4",
+      "video_sha256": "e5a30028a0d380edf0887ab3cdb9c23852f345d29e7c62c0f06a9cfc0e4ecaa8",
+      "steps_sha256": "dd13d6a24cc9ca887c88a95157912b6c50f3b080db3a4fdbb365c15707909f72"
+    },
+    {
+      "episode": 5,
+      "success": true,
+      "success_step": 426,
+      "n_steps": 427,
+      "video": "CloseBlenderLid_ep05_success.mp4",
+      "video_sha256": "492e5e32dd5186228b0deafba572b3b96963ba585e873e366cab46e4b2c265ba",
+      "steps_sha256": "8fa735374f1191c8e65f4b6430803e9940a4f2f4694b16a0a8b7d1e366c856c9"
+    },
+    {
+      "episode": 6,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep06_failure.mp4",
+      "video_sha256": "88376abca1eece62517b51c4a98ed2e1c2baecb0d11533d52953998588aa0db9",
+      "steps_sha256": "ce7bd8e2572c45ddace75991157ab2c4eb6ff4dfce83c68b471908a04d812126"
+    },
+    {
+      "episode": 7,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep07_failure.mp4",
+      "video_sha256": "0f988d4560701c8b995d070e8a21b4e1c60cc6b6aedc1ffe225bf1bf3f130c47",
+      "steps_sha256": "e340033e52cebdceaa9ff77e85625b719d37bec9d0e1c74c796da83034f1dcf1"
+    },
+    {
+      "episode": 8,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep08_failure.mp4",
+      "video_sha256": "6587e7b659854ebca1d4b8014d671cc994d69ef89e28efb5871fd8319e388c4c",
+      "steps_sha256": "642c05d68ec7ad27c1da8f7f5d98d3dcd9b03fb4aa4c11f86f15ba98ee84e2cb"
+    },
+    {
+      "episode": 9,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep09_failure.mp4",
+      "video_sha256": "51522b2b8826d5bc8caba4e09c2642140885842190f2a6ff3e5b9a515d6e3438",
+      "steps_sha256": "ff9ea68cb0313e8277ddb2fac5d68c7cb1247847a059dc3e6d0e3a6b93f7a5eb"
+    },
+    {
+      "episode": 10,
+      "success": true,
+      "success_step": 697,
+      "n_steps": 698,
+      "video": "CloseBlenderLid_ep10_success.mp4",
+      "video_sha256": "1f9956cfd522631c6409c81ddee7a7de601a94f9f23ca9f4398beea0ba690d64",
+      "steps_sha256": "21984af93e087aacd41c75a99899b85407c5674463fc381b5d731fcfb96475fa"
+    },
+    {
+      "episode": 11,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep11_failure.mp4",
+      "video_sha256": "7e5f9f263e35dd4102e926c91f3975714d4c2da384eba07c631ad114ef6971b8",
+      "steps_sha256": "b8f87229e912616b92369877ea86d16edc7f24bd25e5274f5c2ad4930994339c"
+    },
+    {
+      "episode": 12,
+      "success": true,
+      "success_step": 412,
+      "n_steps": 413,
+      "video": "CloseBlenderLid_ep12_success.mp4",
+      "video_sha256": "15cf5a904bb62a218d3e33675938e2a552246881fdbeeed0a354101118c2fdd1",
+      "steps_sha256": "54eb6485dfaa657a2f61054855c0b7cf6de39afffa894363f47deed00dc4705c"
+    },
+    {
+      "episode": 13,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep13_failure.mp4",
+      "video_sha256": "766cec7c9b363fe3481dc7d737c1616e9fa4393fac456ca28c164aed0f3cc393",
+      "steps_sha256": "501ad6f2aff6100ec0c57bd7a52b5ea53aa20675a0d64c8e64847875f82b02e4"
+    },
+    {
+      "episode": 14,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep14_failure.mp4",
+      "video_sha256": "02e723527efad43c83cf2241c9345fc7b594916efb69677245d8dcde2013d8cd",
+      "steps_sha256": "6d67f3f6eb7d55f58516988817260bb5698ec67241b19c0ab08102b319fb791f"
+    },
+    {
+      "episode": 15,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep15_failure.mp4",
+      "video_sha256": "4049c356f5605936cc4306fb170871c55d9200d33cca627cba1a49e2c98c0723",
+      "steps_sha256": "26d7029cb1510008ddde5ea98e325419200b25853b145bdb41c38c8a64a2ade2"
+    },
+    {
+      "episode": 16,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep16_failure.mp4",
+      "video_sha256": "adf6a54bfed3e945b5ba24cebfb31fb5eb3abb29d7a5e321a6c9157edb329ab9",
+      "steps_sha256": "abc7ba74b1d905580ce7bbe08a079f023778c742973911c3800e5f48fa8d50d0"
+    },
+    {
+      "episode": 17,
+      "success": true,
+      "success_step": 686,
+      "n_steps": 687,
+      "video": "CloseBlenderLid_ep17_success.mp4",
+      "video_sha256": "ecae1724f5bc92631ffc6f3dccb9a2b8878dec3a1d752d6cd0c850c4c5ad1caf",
+      "steps_sha256": "64238200abb744a412d7474baa2bcc06325a9ce7c54cd2cb1d2a4329860e9dbf"
+    },
+    {
+      "episode": 18,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep18_failure.mp4",
+      "video_sha256": "d8575318a2956ee84ac951866dbf17b0f7f943bbe75192abb7145d02cea994f0",
+      "steps_sha256": "89fe5b7c28a56c37c13d63e6f0dbc57cb811714bec22f7b8cab9844dfa978ee0"
+    },
+    {
+      "episode": 19,
+      "success": true,
+      "success_step": 459,
+      "n_steps": 460,
+      "video": "CloseBlenderLid_ep19_success.mp4",
+      "video_sha256": "878c4c8fa236617215d8717753443838f12e08d50d5d1abac9e799027ac25b06",
+      "steps_sha256": "42d6c564cafd184cf65f8af0b3356eccda128674956ea9491857f6b7f7207617"
+    },
+    {
+      "episode": 20,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep20_failure.mp4",
+      "video_sha256": "69f4f009e618ddda7adfaf6a60fe5cc2b2865bd174648c6a8b88a63d3f8561de",
+      "steps_sha256": "034251d61d8ac9f0c5b8b942f29ecc3124ebf65e8e1305aa01e3ce7788c55700"
+    },
+    {
+      "episode": 21,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep21_failure.mp4",
+      "video_sha256": "e4dc26287aa0d2f4e1c2832765eed8d0bb8e625ab5a3d92dc7122dc1a90471e7",
+      "steps_sha256": "521febb3cb06b87e4db7e389eb598d1735560f2bc0c340ec70c90db766ba4c2a"
+    },
+    {
+      "episode": 22,
+      "success": true,
+      "success_step": 478,
+      "n_steps": 479,
+      "video": "CloseBlenderLid_ep22_success.mp4",
+      "video_sha256": "25953a69185223c7b22c7be3deea03aac72cf4e274b5614ef3051ad601f30413",
+      "steps_sha256": "820d2339fb784554795cc29b213a2a8c9135857a49bf44daebca5aa9fafd0730"
+    },
+    {
+      "episode": 23,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep23_failure.mp4",
+      "video_sha256": "5a8807da4ec634600489e9ebdd29dc90359481178336e62a2cad295d63b08cdc",
+      "steps_sha256": "89dc64f091fe6b61e3d9a2fb20b2ff06a38abdb189fdab6ee5ff2664232c8140"
+    },
+    {
+      "episode": 24,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep24_failure.mp4",
+      "video_sha256": "1e0bd20b157dc857adc800cc41001c835a8e29635e28e9a1c13b3f711d6a34dd",
+      "steps_sha256": "f2fac20d2962164e9f750d92748f81f5e9823afbffebe8b84fa11a65ded67da8"
+    },
+    {
+      "episode": 25,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep25_failure.mp4",
+      "video_sha256": "71f492aec42865e20b25ddd82f44694adeebea24bea93ce8e875acc22b8ccfb6",
+      "steps_sha256": "06ea760d455a3f10a6fe229b2291a407eef6290461d09e950f916b62e4cd0596"
+    },
+    {
+      "episode": 26,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep26_failure.mp4",
+      "video_sha256": "60730133e4f12343b186faa12537b1c189942bbdbcfe3d2fb49e162a30c0df46",
+      "steps_sha256": "616173aa4234753a3b9dc916b56cc0530a18e5cbd4be2d64b6c02179f40c5a33"
+    },
+    {
+      "episode": 27,
+      "success": true,
+      "success_step": 671,
+      "n_steps": 672,
+      "video": "CloseBlenderLid_ep27_success.mp4",
+      "video_sha256": "672ad3b30691a31eac6e259bf6d952ffd81be09395d18538afab8376da90936b",
+      "steps_sha256": "8dedfe021daad554fa02af534ab0ad0bbf82d740f91b52a6ebfb6645a350e257"
+    },
+    {
+      "episode": 28,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep28_failure.mp4",
+      "video_sha256": "e541c3eeb93e5493c9053cccdd738ad34db51308138b249e78386347b3139ba1",
+      "steps_sha256": "dfd5bca41abf93cff26c43e32cbb5b236fe75c7a06857cf4264d17b0bd9442ca"
+    },
+    {
+      "episode": 29,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep29_failure.mp4",
+      "video_sha256": "6de6566d999aa65526097c948109357b4e0ac1ccf8ba78fbc793c717ff612882",
+      "steps_sha256": "e493c33d85ec8d3130bbd45c406db5d99d48dba164b7017a78f069197d362333"
+    },
+    {
+      "episode": 30,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep30_failure.mp4",
+      "video_sha256": "be4fa906f62d9ca1ba3b1ccc1cba1c8dacb6d4d8e482035ac26a062f020f0e95",
+      "steps_sha256": "da638126c67235ddba61452ce0ea314c2216b21e5adf794f94f0146f7b2f8c7a"
+    },
+    {
+      "episode": 31,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep31_failure.mp4",
+      "video_sha256": "dc5144eb80cf8d524f1e2427d37a23f5239f59ea38257d26028273a860860374",
+      "steps_sha256": "a7c57ff59f7c3ca0b5e01f410391a0c32b14daa0231298e7bd9a00d0e5211c21"
+    },
+    {
+      "episode": 32,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep32_failure.mp4",
+      "video_sha256": "1cf35ca07513c873dd85d629290b892f3344f08c42ef3d8cf6d33260fe20daba",
+      "steps_sha256": "1260cdd5a01a242c760e90d225f4abf444b63f85052b91567c009e7793f08446"
+    },
+    {
+      "episode": 33,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep33_failure.mp4",
+      "video_sha256": "6c3b9b74604787e13f1a60a8ba0adb3b07a6ac7bdd24bc7e6e124ba4dd58c26f",
+      "steps_sha256": "14baeae4bcc7d426d7a6fcff6a85e80f3ab0e46d134b056b8276ad19a7878748"
+    },
+    {
+      "episode": 34,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep34_failure.mp4",
+      "video_sha256": "2380949dcd7cc56cbca7617df3fc11321c222821561f15eba50f60aad460d314",
+      "steps_sha256": "497cfa8e3e84f2899e1d39038701c1dd05426e51b318959830fec1f103859de4"
+    },
+    {
+      "episode": 35,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep35_failure.mp4",
+      "video_sha256": "dc926f2ca6b7194ecae06c3161b48580b572f798caba0d8bb0ba539ce43e611d",
+      "steps_sha256": "463d6c3b495d75b287489eb0ce7bce32a70827511264c63aed6f8ef867669bff"
+    },
+    {
+      "episode": 36,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep36_failure.mp4",
+      "video_sha256": "9b944159036057f3f91d07279bed8074e9feda741df20658fe9d0c8460365ca7",
+      "steps_sha256": "d2cee7b02a83cd0e65c8b2d935711796d62a2a7b7d4a644d728654c84d2a95e4"
+    },
+    {
+      "episode": 37,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep37_failure.mp4",
+      "video_sha256": "c28cdcdd43e36315b66a093537cf18cf03c5d4b60dc372d01c57304a21be50fc",
+      "steps_sha256": "ecb78e3a5676d2560d159d794274e1522c4a480fcccc65dc43136338b0e2bdef"
+    },
+    {
+      "episode": 38,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep38_failure.mp4",
+      "video_sha256": "3a9516d08f073e15d1e26290ad083c05dda5de1bc93d0f1090f7c2a2ceee35fc",
+      "steps_sha256": "43b996da540cf92f7534067cfa7f6d35caa2757c63556c098a5914060f08b026"
+    },
+    {
+      "episode": 39,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep39_failure.mp4",
+      "video_sha256": "cd09c37d65f3880a9f12500a16fda6ba074363698994f85db2485feed5772687",
+      "steps_sha256": "f382159226c6119f25d265dcf66fca710315857ff3e0e97b966ccfdd4cc7e493"
+    },
+    {
+      "episode": 40,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep40_failure.mp4",
+      "video_sha256": "31e50fc93838d6316e51b23aa672e59f52dc4a45d416c2135985516a14a69ac3",
+      "steps_sha256": "05cc2fd6d2eda243b8fc802340a6d87e38e142a1f512cbff4d038fc601e41c15"
+    },
+    {
+      "episode": 41,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep41_failure.mp4",
+      "video_sha256": "61329f124217b73470ac1f2e4aea5e0ba5a524b499225b14cd456b0f476e1a2a",
+      "steps_sha256": "101a5921d359be4c2b1ac07ea7d8babe632a870afc66ff0b9bfe927ebde713dd"
+    },
+    {
+      "episode": 42,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep42_failure.mp4",
+      "video_sha256": "ac0736330bc91ff4eec3d1ef1054e954c5c6a0127d88f4b257ccce775025c385",
+      "steps_sha256": "6af321569d8545258ca97fd25f5fce8448e311dbeed84210534923bc3aa5c23e"
+    },
+    {
+      "episode": 43,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep43_failure.mp4",
+      "video_sha256": "1270bc199b2bb62ccee63fbc3aa773939253baee02768c32157c4cffab509805",
+      "steps_sha256": "bd5530fb570e6641ad2b092729e6ad8e1f18940c71a981bc54ea5b5e95a98421"
+    },
+    {
+      "episode": 44,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep44_failure.mp4",
+      "video_sha256": "a51dcf195ece4c2f6fc266555c7f40075b0f8b8c2baa933fac018273adc3ccce",
+      "steps_sha256": "21342570ac599b474b6c4b6c7f308dbf37d21eba22ae8baba32644214289fdf5"
+    },
+    {
+      "episode": 45,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep45_failure.mp4",
+      "video_sha256": "93471031b2aafa5db2187268ec10f1385cc877b40dab57b756562a492632e6d1",
+      "steps_sha256": "a1237be7f3b51def92f5684711026a8335813afffb2c1fa1b77b0e380256d090"
+    },
+    {
+      "episode": 46,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep46_failure.mp4",
+      "video_sha256": "14d841ca3dfd9aa8b8a4d718bd6c623dc1f531d345d45fdb13903d88b3ec605c",
+      "steps_sha256": "e77a39bee02ecece21a6ddef6c74493c7709c67369b83e0763dbe92dc99ac662"
+    },
+    {
+      "episode": 47,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep47_failure.mp4",
+      "video_sha256": "33167835c3cb0e2b281bad680d2d543fd5e615c9d5d8d7876ffdec9960d1fab1",
+      "steps_sha256": "1aa8a36e88018aaaba5362c111547632f58742f31118da1b02fd15c67498b857"
+    },
+    {
+      "episode": 48,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep48_failure.mp4",
+      "video_sha256": "f06a2990e9dedca5762470b88e2972c05f032b3bbbb8623551c96628592342cf",
+      "steps_sha256": "9eee41dde8103a26252a039958018aeb69f76f1541b1516e4ea6d84113aa4664"
+    },
+    {
+      "episode": 49,
+      "success": false,
+      "success_step": null,
+      "n_steps": 901,
+      "video": "CloseBlenderLid_ep49_failure.mp4",
+      "video_sha256": "f3058df4636c916f21ab72beecb2ec685ee021ef8776e7255543cc5419c32fd0",
+      "steps_sha256": "8b0a4e1b5d4d7d6db1724b57102b9449281f4f39214a0c5ce52aba9e4f4101a8"
+    }
+  ]
+}

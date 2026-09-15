@@ -1,0 +1,50 @@
+{
+  "updated": "2026-09-15",
+  "task": "CloseBlenderLid",
+  "note": "π0.5 (openpi, Physical Intelligence의 RoboCasa365 공개 파인튜닝 체크포인트 pi05_pretrain_human300/75000)를 그대로 로드해 추론. base 파인튜닝/직접 학습 없음. 동일 robot(Panda+Omron)·동일 predicate·replan 16·split=pretrain. JAX 기반이라 서버(openpi-server-rc)/클라이언트(pi05-client) 2-part.",
+  "comparison": [
+    {
+      "model": "Xiaomi-Robotics-1-RoboCasa365",
+      "split": "pretrain",
+      "n_episodes": 50,
+      "successes": 18,
+      "success_rate": 0.36,
+      "source": "vendor/xiaomi-robotics-1/eval_robocasa365/summary.json (공식)"
+    },
+    {
+      "model": "GR00T N1.5 (RoboCasa365 multitask ckpt)",
+      "split": "pretrain",
+      "n_episodes": 50,
+      "successes": 10,
+      "success_rate": 0.20,
+      "source": "groot eval-task, split=pretrain"
+    },
+    {
+      "model": "π0.5-RoboCasa365 (openpi)",
+      "split": "pretrain",
+      "n_episodes": 50,
+      "successes": 7,
+      "success_rate": 0.14,
+      "source": "pi05 eval, split=pretrain (apples-to-apples 정식 비교)"
+    }
+  ],
+  "leaderboard_ref": "공식 리더보드 π0.5 RoboCasa365 평균 16.9% (Xiaomi 논문 Table 3). CloseBlenderLid 14%는 평균보다 약간 낮은 hard task로 정합적.",
+  "success_episodes": [5, 10, 12, 17, 19, 22, 27],
+  "success_steps": {"5": 426, "10": 697, "12": 412, "17": 686, "19": 459, "22": 478, "27": 671},
+  "skill_hold_support": "미지원(openpi 공식 eval 하네스도 full-task instruction만; obs['annotation.human.task_description'] 사용. skill 단위 지시·post-success hold 경로 없음). GR00T 카드와 동일 결론.",
+  "provenance": {
+    "checkpoint": "robocasa/robocasa365_checkpoints pi05_pretrain_human300/multitask_learning/75000",
+    "vendor": "robocasa-benchmark/openpi@5a6beda9ff99da30b4e1b59320f6a32971d7c397 (main)",
+    "config": "pi05_pretrain_human300",
+    "robocasa": "4f8a2980",
+    "robosuite": "5ce6643",
+    "server_image": "openpi-server-rc:t_ee702b9c",
+    "client_image": "pi05-client:t_ee702b9c",
+    "base_client_image": "groot-eval:t_ff372eea",
+    "asset_volume": "robocasa-assets-t_9f03a613",
+    "vendor_patches": "pi05/openpi-norm-stats-fallback.patch (raw-dataset norm-stats fallback 가드 + server robocasa registry)"
+  },
+  "predicate": "벤더 robocasa CloseBlenderLid fixture info['success'] (lid_on_blender: 닫힘 <0.04m AND upright ≤7°). Xiaomi/GR00T와 동일 소스.",
+  "gpu_note": "v4 단일 RTX3090(24GB). π0.5 JAX 추론은 XLA autotuning에 큰 VRAM 필요 — xiaomi-server 동시 점유 시 OOM(INTERNAL not supported)로 실패. 사용자 승인 하에 xiaomi-server 잠시 stop→전량 확보 후 추론→eval 종료 후 docker start로 원복.",
+  "artifacts_local": "videos/CloseBlenderLid/pi05_eval/ (50 mp4 + 50 *_steps.jsonl + stats + SHA256SUMS, 101개 전부 로컬 검증 통과)"
+}
