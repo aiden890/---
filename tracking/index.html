@@ -100,23 +100,8 @@
   <h1>RoboCasa · CloseBlenderLid 실험</h1>
 
   <div class="card">
-    <h2>실험 요약</h2>
-    <div class="kpi">
-      <div><div class="n">CloseBlenderLid</div><div class="l">집중 task (공식 36%)</div></div>
-      <div><div class="n">flow-SDE</div><div class="l">GRPO RL 파이프라인</div></div>
-      <div><div class="n">19/19</div><div class="l">리워드 검증</div></div>
-      <div><div class="n">v4 · 3090</div><div class="l">실행 환경</div></div>
-    </div>
-  </div>
-
-  <div class="card">
-    <h2>🔎 주요 발견 (Key Findings)</h2>
-    <div id="b-findings"></div>
-  </div>
-
-  <div class="card now">
-    <h2>🔄 진행 중</h2>
-    <div id="b-running"></div>
+    <h2>🙋 내 TODO</h2>
+    <div id="b-user"></div>
   </div>
 
   <div class="card">
@@ -125,8 +110,13 @@
   </div>
 
   <div class="card">
-    <h2>🙋 내 TODO</h2>
-    <div id="b-user"></div>
+    <h2>📝 Note</h2>
+    <div id="b-note"></div>
+  </div>
+
+  <div class="card">
+    <h2>🔎 주요 발견 (Key Findings)</h2>
+    <div id="b-findings"></div>
   </div>
 </section>
 
@@ -320,13 +310,11 @@ fetch('board.json').then(r=>r.json()).then(b=>{
     const go=x.link?` <a href="#" onclick="document.querySelector('[data-tab=${x.link}]').click();return false" style="font-size:12px">→ 보기</a>`:'';
     return `<div class="item"><span style="color:${f.c};font-weight:700;flex:none">●</span><div class="tt"><b>${x.title}</b>${go}<div class="nt">${x.detail||''}</div></div></div>`;
   }).join('')||'<div class="dim">없음</div>';
-  document.getElementById('b-running').innerHTML=(b.running||[]).map(x=>`
-    <div class="item"><div class="tt"><b>${x.title}</b> <span class="badge ${BADGE[x.badge]||'b-run'}">${BLABEL[x.badge]||''}</span>
-    ${x.note?`<div class="nt">${x.note}</div>`:''}</div></div>`).join('')||'<div class="dim">현재 실행 중인 작업 없음</div>';
   document.getElementById('b-agent').innerHTML=(b.agent_todo||[]).map(x=>`
-    <div class="item"><div class="tt">${x.title}</div><span class="badge ${BADGE[x.badge]||'b-wait'}">${BLABEL[x.badge]||''}</span></div>`).join('')||'<div class="dim">없음</div>';
+    <div class="item"><div class="tt">${x.title}${x.note?`<div class="nt">${x.note}</div>`:''}</div><span class="badge ${BADGE[x.badge]||'b-wait'}">${BLABEL[x.badge]||''}</span></div>`).join('')||'<div class="dim">없음</div>';
   document.getElementById('b-user').innerHTML=(b.user_todo||[]).map(x=>`
     <div class="item"><span class="chk ${x.done?'on':''}"></span><div class="tt" style="${x.done?'text-decoration:line-through;color:var(--dim)':''}">${x.title}</div></div>`).join('')||'<div class="dim">없음</div>';
+  document.getElementById('b-note').innerHTML=(b.note||[]).map(n=>`<div class="item"><span style="color:var(--acc);flex:none">•</span><div class="tt nt" style="font-size:13px">${n}</div></div>`).join('')||'<div class="dim">없음</div>';
 }).catch(e=>{});
 // load demos (grouped by task) then benchmark tasks
 let TASKS=[], DEMOS={}, filt='all', sortK=null, sortDir=1;

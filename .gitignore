@@ -13,6 +13,13 @@ rollouts/
 rollouts-xiaomi-*/
 rl-train-*/results/
 reward_audit_viewer/*.mp4
+# 새 모델 실험 대용량 (체크포인트·결과·vendor) — 코드/설정/REPORT만 git
+groot/checkpoints/
+groot/results/
+pi05/checkpoints/
+pi05/results/
+*.safetensors
+checkpoints/
 
 # 파이썬 캐시
 __pycache__/
