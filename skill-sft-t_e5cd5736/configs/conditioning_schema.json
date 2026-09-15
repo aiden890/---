@@ -1,0 +1,53 @@
+{
+  "_comment": "Goal-2 conditioning schema for CloseBlenderLid skill-conditioned SFT/RL. Maps a stable skill_id + overall task goal + natural-language instruction + structured object/destination/constraints onto the Xiaomi policy's ACTUAL conditioning surface, which is the single `instruction` text slot of client.infer(states, images, instruction) plus (for the learned-embedding arm) a skill embedding added to the DiT.",
+  "task": "CloseBlenderLid",
+  "overall_task_goal": "Close the blender by placing its lid securely on top, then release and retreat.",
+  "policy_prompt_template": "Left camera: <video>\nRight camera: <video>\nWrist camera: <video>\n\nGenerate robot actions for the task:\n{instruction} /no_cot",
+  "prompt_template_note": "Verbatim from deploy/client.py _build_messages; {instruction} is the only text conditioning slot. The pretrained 365 checkpoint was trained on FULL-task instructions, so partial-skill prompts are out-of-distribution (see skill model-provenance).",
+  "skills": {
+    "GRASP_HANDLE": {
+      "skill_id": 0,
+      "instruction_natural_language": "Pick up the blender lid securely by its handle.",
+      "object": "blender lid",
+      "destination": null,
+      "constraints": ["do not knock the lid off the counter", "achieve a secure grasp before lifting"],
+      "success_predicate": "lid_grasped (gripper-lid contact AND lid lifted above rest)",
+      "monitor_fsm": "GRASP = N-step continuous grasp (SkillMonitor)"
+    },
+    "MOVE_LID_TO_CLOSED": {
+      "skill_id": 1,
+      "instruction_natural_language": "Move the grasped blender lid above the blender without colliding with the surroundings.",
+      "object": "blender lid (held)",
+      "destination": "closed position on top of the blender",
+      "constraints": ["keep holding the lid", "avoid collisions during transfer", "reach the pre-place region above the closed pose"],
+      "success_predicate": "lid_grasped AND in_preplace_region",
+      "monitor_fsm": "MOVE_HOLDING = N-step in pre-place region (SkillMonitor)"
+    },
+    "RELEASE_HANDLE": {
+      "skill_id": 2,
+      "instruction_natural_language": "Place the grasped blender lid securely on top of the blender, release it, and move the gripper away.",
+      "object": "blender lid (held)",
+      "destination": "seated on the blender",
+      "constraints": ["seat the lid upright (<=7 deg tilt)", "release the gripper", "retreat >0.15m from the lid"],
+      "success_predicate": "lid_on_blender AND gripper_lid_far_0.15 (== official CloseBlenderLid success)",
+      "monitor_fsm": "PLACE = official success (settle_terminal)"
+    }
+  },
+  "conditioning_arms": {
+    "nl_only": {
+      "description": "Arm 1 (Goal 5): instruction = the skill's natural-language string only. No skill_id token, no structured fields. Isolates whether NL alone conditions the policy.",
+      "instruction_builder": "skills[skill].instruction_natural_language"
+    },
+    "nl_plus_skill_id": {
+      "description": "Arm 2 (Goal 5): instruction = overall goal + a stable skill tag + NL + structured object/destination/constraints, all folded into the single text slot (the only text channel the checkpoint exposes).",
+      "instruction_builder": "compose_structured_instruction(skill)"
+    },
+    "shared_lora_learned_embedding": {
+      "description": "Arm 3 (Goal 5): a SINGLE shared LoRA on the DiT plus a learned per-skill embedding (skill_id -> vector) added to the DiT conditioning, with NL instruction held to the overall goal. Tests whether a learned skill code beats text tokens. Do NOT assume it wins; select by heldout.",
+      "instruction_builder": "overall_task_goal",
+      "embedding": {"num_skills": 3, "dim": "match DiT hidden size", "added_to": "state_embed / DiT conditioning stream"}
+    }
+  },
+  "structured_instruction_format": "Task goal: {overall_task_goal}\nSkill [{skill_id}:{skill_name}]: {instruction_natural_language}\nObject: {object}. Destination: {destination}. Constraints: {constraints}.",
+  "provenance_caveat": "Per-skill LoRA adapters are keyed by skill_id (0/1/2); the ACTIVE adapter is set whenever a skill is supplied (decoupled from eta, per the audited eta/adapter-coupling fix). skill=None forces the pretrained baseline."
+}

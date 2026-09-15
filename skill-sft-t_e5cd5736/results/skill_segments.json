@@ -1,0 +1,2964 @@
+[
+  {
+    "n": 347,
+    "close_start": 85,
+    "release_start": 305,
+    "reward_onset": 331,
+    "opening_in_hold_min": 0.0255,
+    "opening_min": 0.0255,
+    "opening_max": 0.0798,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        85
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        85,
+        305
+      ],
+      "RELEASE_HANDLE": [
+        305,
+        347
+      ]
+    },
+    "flags": [],
+    "episode_index": 314,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 0,
+    "split": "val"
+  },
+  {
+    "n": 268,
+    "close_start": 84,
+    "release_start": 228,
+    "reward_onset": 252,
+    "opening_in_hold_min": 0.0346,
+    "opening_min": 0.0343,
+    "opening_max": 0.0798,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        84
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        84,
+        228
+      ],
+      "RELEASE_HANDLE": [
+        228,
+        268
+      ]
+    },
+    "flags": [],
+    "episode_index": 315,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 1,
+    "split": "test"
+  },
+  {
+    "n": 363,
+    "close_start": 168,
+    "release_start": 317,
+    "reward_onset": 347,
+    "opening_in_hold_min": 0.0332,
+    "opening_min": 0.0332,
+    "opening_max": 0.0803,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        168
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        168,
+        317
+      ],
+      "RELEASE_HANDLE": [
+        317,
+        363
+      ]
+    },
+    "flags": [],
+    "episode_index": 316,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 2,
+    "split": "train"
+  },
+  {
+    "n": 339,
+    "close_start": 106,
+    "release_start": 295,
+    "reward_onset": 323,
+    "opening_in_hold_min": 0.0643,
+    "opening_min": 0.0411,
+    "opening_max": 0.08,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        106
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        106,
+        295
+      ],
+      "RELEASE_HANDLE": [
+        295,
+        339
+      ]
+    },
+    "flags": [],
+    "episode_index": 317,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 3,
+    "split": "test"
+  },
+  {
+    "n": 281,
+    "close_start": 93,
+    "release_start": 233,
+    "reward_onset": 265,
+    "opening_in_hold_min": 0.074,
+    "opening_min": 0.0405,
+    "opening_max": 0.0803,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        93
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        93,
+        233
+      ],
+      "RELEASE_HANDLE": [
+        233,
+        281
+      ]
+    },
+    "flags": [],
+    "episode_index": 318,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 4,
+    "split": "val"
+  },
+  {
+    "n": 381,
+    "close_start": 151,
+    "release_start": 336,
+    "reward_onset": 365,
+    "opening_in_hold_min": 0.0695,
+    "opening_min": 0.0411,
+    "opening_max": 0.0802,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        151
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        151,
+        336
+      ],
+      "RELEASE_HANDLE": [
+        336,
+        381
+      ]
+    },
+    "flags": [],
+    "episode_index": 319,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 5,
+    "split": "train"
+  },
+  {
+    "n": 637,
+    "close_start": 182,
+    "release_start": 586,
+    "reward_onset": 621,
+    "opening_in_hold_min": 0.0733,
+    "opening_min": 0.0411,
+    "opening_max": 0.0805,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        182
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        182,
+        586
+      ],
+      "RELEASE_HANDLE": [
+        586,
+        637
+      ]
+    },
+    "flags": [],
+    "episode_index": 320,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 6,
+    "split": "train"
+  },
+  {
+    "n": 360,
+    "close_start": 139,
+    "release_start": 317,
+    "reward_onset": 344,
+    "opening_in_hold_min": 0.0575,
+    "opening_min": 0.0411,
+    "opening_max": 0.08,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        139
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        139,
+        317
+      ],
+      "RELEASE_HANDLE": [
+        317,
+        360
+      ]
+    },
+    "flags": [],
+    "episode_index": 321,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 7,
+    "split": "val"
+  },
+  {
+    "n": 299,
+    "close_start": 116,
+    "release_start": 256,
+    "reward_onset": 283,
+    "opening_in_hold_min": 0.0536,
+    "opening_min": 0.0411,
+    "opening_max": 0.0804,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        116
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        116,
+        256
+      ],
+      "RELEASE_HANDLE": [
+        256,
+        299
+      ]
+    },
+    "flags": [],
+    "episode_index": 322,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 8,
+    "split": "test"
+  },
+  {
+    "n": 315,
+    "close_start": 91,
+    "release_start": 249,
+    "reward_onset": 299,
+    "opening_in_hold_min": 0.0302,
+    "opening_min": 0.0302,
+    "opening_max": 0.0804,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        91
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        91,
+        249
+      ],
+      "RELEASE_HANDLE": [
+        249,
+        315
+      ]
+    },
+    "flags": [],
+    "episode_index": 323,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 9,
+    "split": "train"
+  },
+  {
+    "n": 360,
+    "close_start": 113,
+    "release_start": 310,
+    "reward_onset": 344,
+    "opening_in_hold_min": 0.0258,
+    "opening_min": 0.0258,
+    "opening_max": 0.08,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        113
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        113,
+        310
+      ],
+      "RELEASE_HANDLE": [
+        310,
+        360
+      ]
+    },
+    "flags": [],
+    "episode_index": 324,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 10,
+    "split": "train"
+  },
+  {
+    "n": 334,
+    "close_start": 99,
+    "release_start": 267,
+    "reward_onset": 318,
+    "opening_in_hold_min": 0.0329,
+    "opening_min": 0.0329,
+    "opening_max": 0.0805,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        99
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        99,
+        267
+      ],
+      "RELEASE_HANDLE": [
+        267,
+        334
+      ]
+    },
+    "flags": [],
+    "episode_index": 325,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 11,
+    "split": "train"
+  },
+  {
+    "n": 296,
+    "close_start": 99,
+    "release_start": 254,
+    "reward_onset": 280,
+    "opening_in_hold_min": 0.0591,
+    "opening_min": 0.0411,
+    "opening_max": 0.0806,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        99
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        99,
+        254
+      ],
+      "RELEASE_HANDLE": [
+        254,
+        296
+      ]
+    },
+    "flags": [],
+    "episode_index": 326,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 12,
+    "split": "train"
+  },
+  {
+    "n": 427,
+    "close_start": 192,
+    "release_start": 379,
+    "reward_onset": 411,
+    "opening_in_hold_min": 0.0612,
+    "opening_min": 0.0411,
+    "opening_max": 0.0799,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        192
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        192,
+        379
+      ],
+      "RELEASE_HANDLE": [
+        379,
+        427
+      ]
+    },
+    "flags": [],
+    "episode_index": 327,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 13,
+    "split": "train"
+  },
+  {
+    "n": 251,
+    "close_start": 81,
+    "release_start": 201,
+    "reward_onset": 235,
+    "opening_in_hold_min": 0.0472,
+    "opening_min": 0.0411,
+    "opening_max": 0.0799,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        81
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        81,
+        201
+      ],
+      "RELEASE_HANDLE": [
+        201,
+        251
+      ]
+    },
+    "flags": [],
+    "episode_index": 328,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 14,
+    "split": "test"
+  },
+  {
+    "n": 252,
+    "close_start": 81,
+    "release_start": 203,
+    "reward_onset": 236,
+    "opening_in_hold_min": 0.0333,
+    "opening_min": 0.0333,
+    "opening_max": 0.0798,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        81
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        81,
+        203
+      ],
+      "RELEASE_HANDLE": [
+        203,
+        252
+      ]
+    },
+    "flags": [],
+    "episode_index": 329,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 15,
+    "split": "train"
+  },
+  {
+    "n": 259,
+    "close_start": 95,
+    "release_start": 215,
+    "reward_onset": 243,
+    "opening_in_hold_min": 0.0717,
+    "opening_min": 0.0411,
+    "opening_max": 0.0805,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        95
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        95,
+        215
+      ],
+      "RELEASE_HANDLE": [
+        215,
+        259
+      ]
+    },
+    "flags": [],
+    "episode_index": 330,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 16,
+    "split": "train"
+  },
+  {
+    "n": 484,
+    "close_start": 164,
+    "release_start": 431,
+    "reward_onset": 468,
+    "opening_in_hold_min": 0.047,
+    "opening_min": 0.0411,
+    "opening_max": 0.0796,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        164
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        164,
+        431
+      ],
+      "RELEASE_HANDLE": [
+        431,
+        484
+      ]
+    },
+    "flags": [],
+    "episode_index": 331,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 17,
+    "split": "train"
+  },
+  {
+    "n": 316,
+    "close_start": 140,
+    "release_start": 272,
+    "reward_onset": 300,
+    "opening_in_hold_min": 0.0703,
+    "opening_min": 0.0405,
+    "opening_max": 0.0802,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        140
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        140,
+        272
+      ],
+      "RELEASE_HANDLE": [
+        272,
+        316
+      ]
+    },
+    "flags": [],
+    "episode_index": 332,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 18,
+    "split": "val"
+  },
+  {
+    "n": 335,
+    "close_start": 109,
+    "release_start": 285,
+    "reward_onset": 319,
+    "opening_in_hold_min": 0.0485,
+    "opening_min": 0.0411,
+    "opening_max": 0.08,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        109
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        109,
+        285
+      ],
+      "RELEASE_HANDLE": [
+        285,
+        335
+      ]
+    },
+    "flags": [],
+    "episode_index": 333,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 19,
+    "split": "test"
+  },
+  {
+    "n": 303,
+    "close_start": 121,
+    "release_start": 259,
+    "reward_onset": 287,
+    "opening_in_hold_min": 0.001,
+    "opening_min": 0.001,
+    "opening_max": 0.08,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        121
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        121,
+        259
+      ],
+      "RELEASE_HANDLE": [
+        259,
+        303
+      ]
+    },
+    "flags": [],
+    "episode_index": 334,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 20,
+    "split": "train"
+  },
+  {
+    "n": 369,
+    "close_start": 112,
+    "release_start": 277,
+    "reward_onset": 353,
+    "opening_in_hold_min": 0.0577,
+    "opening_min": 0.0411,
+    "opening_max": 0.0799,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        112
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        112,
+        277
+      ],
+      "RELEASE_HANDLE": [
+        277,
+        369
+      ]
+    },
+    "flags": [],
+    "episode_index": 335,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 21,
+    "split": "train"
+  },
+  {
+    "n": 338,
+    "close_start": 91,
+    "release_start": 298,
+    "reward_onset": 322,
+    "opening_in_hold_min": 0.0258,
+    "opening_min": 0.0248,
+    "opening_max": 0.08,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        91
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        91,
+        298
+      ],
+      "RELEASE_HANDLE": [
+        298,
+        338
+      ]
+    },
+    "flags": [],
+    "episode_index": 336,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 22,
+    "split": "train"
+  },
+  {
+    "n": 287,
+    "close_start": 90,
+    "release_start": 237,
+    "reward_onset": 271,
+    "opening_in_hold_min": 0.0711,
+    "opening_min": 0.0411,
+    "opening_max": 0.0798,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        90
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        90,
+        237
+      ],
+      "RELEASE_HANDLE": [
+        237,
+        287
+      ]
+    },
+    "flags": [],
+    "episode_index": 337,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 23,
+    "split": "train"
+  },
+  {
+    "n": 331,
+    "close_start": 98,
+    "release_start": 281,
+    "reward_onset": 315,
+    "opening_in_hold_min": 0.072,
+    "opening_min": 0.0411,
+    "opening_max": 0.0801,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        98
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        98,
+        281
+      ],
+      "RELEASE_HANDLE": [
+        281,
+        331
+      ]
+    },
+    "flags": [],
+    "episode_index": 338,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 24,
+    "split": "train"
+  },
+  {
+    "n": 420,
+    "close_start": 129,
+    "release_start": 350,
+    "reward_onset": 404,
+    "opening_in_hold_min": 0.0757,
+    "opening_min": 0.0411,
+    "opening_max": 0.0824,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        129
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        129,
+        350
+      ],
+      "RELEASE_HANDLE": [
+        350,
+        420
+      ]
+    },
+    "flags": [],
+    "episode_index": 339,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 25,
+    "split": "train"
+  },
+  {
+    "n": 356,
+    "close_start": 135,
+    "release_start": 314,
+    "reward_onset": 340,
+    "opening_in_hold_min": 0.072,
+    "opening_min": 0.0411,
+    "opening_max": 0.0802,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        135
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        135,
+        314
+      ],
+      "RELEASE_HANDLE": [
+        314,
+        356
+      ]
+    },
+    "flags": [],
+    "episode_index": 340,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 26,
+    "split": "train"
+  },
+  {
+    "n": 336,
+    "close_start": 119,
+    "release_start": 293,
+    "reward_onset": 320,
+    "opening_in_hold_min": 0.0517,
+    "opening_min": 0.0411,
+    "opening_max": 0.0807,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        119
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        119,
+        293
+      ],
+      "RELEASE_HANDLE": [
+        293,
+        336
+      ]
+    },
+    "flags": [],
+    "episode_index": 341,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 27,
+    "split": "train"
+  },
+  {
+    "n": 314,
+    "close_start": 91,
+    "release_start": 266,
+    "reward_onset": 298,
+    "opening_in_hold_min": 0.0556,
+    "opening_min": 0.0411,
+    "opening_max": 0.0799,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        91
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        91,
+        266
+      ],
+      "RELEASE_HANDLE": [
+        266,
+        314
+      ]
+    },
+    "flags": [],
+    "episode_index": 342,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 28,
+    "split": "train"
+  },
+  {
+    "n": 298,
+    "close_start": 139,
+    "release_start": 248,
+    "reward_onset": 282,
+    "opening_in_hold_min": 0.0472,
+    "opening_min": 0.0411,
+    "opening_max": 0.0799,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        139
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        139,
+        248
+      ],
+      "RELEASE_HANDLE": [
+        248,
+        298
+      ]
+    },
+    "flags": [],
+    "episode_index": 343,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 29,
+    "split": "train"
+  },
+  {
+    "n": 342,
+    "close_start": 152,
+    "release_start": 286,
+    "reward_onset": 326,
+    "opening_in_hold_min": 0.073,
+    "opening_min": 0.0411,
+    "opening_max": 0.0809,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        152
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        152,
+        286
+      ],
+      "RELEASE_HANDLE": [
+        286,
+        342
+      ]
+    },
+    "flags": [],
+    "episode_index": 344,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 30,
+    "split": "train"
+  },
+  {
+    "n": 382,
+    "close_start": 146,
+    "release_start": 316,
+    "reward_onset": 366,
+    "opening_in_hold_min": 0.0723,
+    "opening_min": 0.0411,
+    "opening_max": 0.0801,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        146
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        146,
+        316
+      ],
+      "RELEASE_HANDLE": [
+        316,
+        382
+      ]
+    },
+    "flags": [],
+    "episode_index": 345,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 31,
+    "split": "val"
+  },
+  {
+    "n": 278,
+    "close_start": 75,
+    "release_start": 229,
+    "reward_onset": 262,
+    "opening_in_hold_min": 0.0703,
+    "opening_min": 0.0411,
+    "opening_max": 0.0798,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        75
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        75,
+        229
+      ],
+      "RELEASE_HANDLE": [
+        229,
+        278
+      ]
+    },
+    "flags": [],
+    "episode_index": 346,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 32,
+    "split": "val"
+  },
+  {
+    "n": 276,
+    "close_start": 113,
+    "release_start": 232,
+    "reward_onset": 260,
+    "opening_in_hold_min": 0.0545,
+    "opening_min": 0.0411,
+    "opening_max": 0.0801,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        113
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        113,
+        232
+      ],
+      "RELEASE_HANDLE": [
+        232,
+        276
+      ]
+    },
+    "flags": [],
+    "episode_index": 347,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 33,
+    "split": "train"
+  },
+  {
+    "n": 289,
+    "close_start": 139,
+    "release_start": 248,
+    "reward_onset": 273,
+    "opening_in_hold_min": 0.0652,
+    "opening_min": 0.0411,
+    "opening_max": 0.0809,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        139
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        139,
+        248
+      ],
+      "RELEASE_HANDLE": [
+        248,
+        289
+      ]
+    },
+    "flags": [],
+    "episode_index": 348,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 34,
+    "split": "train"
+  },
+  {
+    "n": 297,
+    "close_start": 93,
+    "release_start": 245,
+    "reward_onset": 281,
+    "opening_in_hold_min": 0.0722,
+    "opening_min": 0.0411,
+    "opening_max": 0.0799,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        93
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        93,
+        245
+      ],
+      "RELEASE_HANDLE": [
+        245,
+        297
+      ]
+    },
+    "flags": [],
+    "episode_index": 349,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 35,
+    "split": "train"
+  },
+  {
+    "n": 288,
+    "close_start": 95,
+    "release_start": 239,
+    "reward_onset": 272,
+    "opening_in_hold_min": 0.0721,
+    "opening_min": 0.0411,
+    "opening_max": 0.0799,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        95
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        95,
+        239
+      ],
+      "RELEASE_HANDLE": [
+        239,
+        288
+      ]
+    },
+    "flags": [],
+    "episode_index": 350,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 36,
+    "split": "train"
+  },
+  {
+    "n": 289,
+    "close_start": 99,
+    "release_start": 242,
+    "reward_onset": 273,
+    "opening_in_hold_min": 0.0721,
+    "opening_min": 0.0411,
+    "opening_max": 0.081,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        99
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        99,
+        242
+      ],
+      "RELEASE_HANDLE": [
+        242,
+        289
+      ]
+    },
+    "flags": [],
+    "episode_index": 351,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 37,
+    "split": "test"
+  },
+  {
+    "n": 547,
+    "close_start": 198,
+    "release_start": 496,
+    "reward_onset": 531,
+    "opening_in_hold_min": 0.0646,
+    "opening_min": 0.0411,
+    "opening_max": 0.0809,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        198
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        198,
+        496
+      ],
+      "RELEASE_HANDLE": [
+        496,
+        547
+      ]
+    },
+    "flags": [],
+    "episode_index": 352,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 38,
+    "split": "test"
+  },
+  {
+    "n": 358,
+    "close_start": 91,
+    "release_start": 308,
+    "reward_onset": 342,
+    "opening_in_hold_min": 0.0461,
+    "opening_min": 0.0411,
+    "opening_max": 0.0799,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        91
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        91,
+        308
+      ],
+      "RELEASE_HANDLE": [
+        308,
+        358
+      ]
+    },
+    "flags": [],
+    "episode_index": 353,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 39,
+    "split": "train"
+  },
+  {
+    "n": 342,
+    "close_start": 126,
+    "release_start": 283,
+    "reward_onset": 326,
+    "opening_in_hold_min": 0.0502,
+    "opening_min": 0.0411,
+    "opening_max": 0.0798,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        126
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        126,
+        283
+      ],
+      "RELEASE_HANDLE": [
+        283,
+        342
+      ]
+    },
+    "flags": [],
+    "episode_index": 354,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 40,
+    "split": "train"
+  },
+  {
+    "n": 430,
+    "close_start": 107,
+    "release_start": 376,
+    "reward_onset": 414,
+    "opening_in_hold_min": 0.0642,
+    "opening_min": 0.0411,
+    "opening_max": 0.0802,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        107
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        107,
+        376
+      ],
+      "RELEASE_HANDLE": [
+        376,
+        430
+      ]
+    },
+    "flags": [],
+    "episode_index": 355,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 41,
+    "split": "test"
+  },
+  {
+    "n": 305,
+    "close_start": 109,
+    "release_start": 263,
+    "reward_onset": 289,
+    "opening_in_hold_min": 0.0261,
+    "opening_min": 0.0261,
+    "opening_max": 0.0799,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        109
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        109,
+        263
+      ],
+      "RELEASE_HANDLE": [
+        263,
+        305
+      ]
+    },
+    "flags": [],
+    "episode_index": 356,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 42,
+    "split": "train"
+  },
+  {
+    "n": 387,
+    "close_start": 106,
+    "release_start": 334,
+    "reward_onset": 371,
+    "opening_in_hold_min": 0.0212,
+    "opening_min": 0.0211,
+    "opening_max": 0.0799,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        106
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        106,
+        334
+      ],
+      "RELEASE_HANDLE": [
+        334,
+        387
+      ]
+    },
+    "flags": [],
+    "episode_index": 357,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 43,
+    "split": "val"
+  },
+  {
+    "n": 299,
+    "close_start": 109,
+    "release_start": 253,
+    "reward_onset": 283,
+    "opening_in_hold_min": 0.0301,
+    "opening_min": 0.0301,
+    "opening_max": 0.08,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        109
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        109,
+        253
+      ],
+      "RELEASE_HANDLE": [
+        253,
+        299
+      ]
+    },
+    "flags": [],
+    "episode_index": 358,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 44,
+    "split": "train"
+  },
+  {
+    "n": 237,
+    "close_start": 93,
+    "release_start": null,
+    "reward_onset": 221,
+    "opening_in_hold_min": 0.0011,
+    "opening_min": 0.0011,
+    "opening_max": 0.0806,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        93
+      ]
+    },
+    "flags": [
+      "no_release_command"
+    ],
+    "episode_index": 359,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 45,
+    "split": "val"
+  },
+  {
+    "n": 312,
+    "close_start": 97,
+    "release_start": 274,
+    "reward_onset": 296,
+    "opening_in_hold_min": 0.034,
+    "opening_min": 0.0339,
+    "opening_max": 0.0799,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        97
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        97,
+        274
+      ],
+      "RELEASE_HANDLE": [
+        274,
+        312
+      ]
+    },
+    "flags": [],
+    "episode_index": 360,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 46,
+    "split": "train"
+  },
+  {
+    "n": 303,
+    "close_start": 100,
+    "release_start": 263,
+    "reward_onset": 287,
+    "opening_in_hold_min": 0.0372,
+    "opening_min": 0.0372,
+    "opening_max": 0.08,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        100
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        100,
+        263
+      ],
+      "RELEASE_HANDLE": [
+        263,
+        303
+      ]
+    },
+    "flags": [],
+    "episode_index": 361,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 47,
+    "split": "train"
+  },
+  {
+    "n": 332,
+    "close_start": 113,
+    "release_start": 277,
+    "reward_onset": 316,
+    "opening_in_hold_min": 0.0618,
+    "opening_min": 0.0411,
+    "opening_max": 0.0798,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        113
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        113,
+        277
+      ],
+      "RELEASE_HANDLE": [
+        277,
+        332
+      ]
+    },
+    "flags": [],
+    "episode_index": 362,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 48,
+    "split": "train"
+  },
+  {
+    "n": 344,
+    "close_start": 140,
+    "release_start": 294,
+    "reward_onset": 328,
+    "opening_in_hold_min": 0.0497,
+    "opening_min": 0.0411,
+    "opening_max": 0.0801,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        140
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        140,
+        294
+      ],
+      "RELEASE_HANDLE": [
+        294,
+        344
+      ]
+    },
+    "flags": [],
+    "episode_index": 363,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 49,
+    "split": "train"
+  },
+  {
+    "n": 370,
+    "close_start": 145,
+    "release_start": 325,
+    "reward_onset": 354,
+    "opening_in_hold_min": 0.0327,
+    "opening_min": 0.0326,
+    "opening_max": 0.0799,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        145
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        145,
+        325
+      ],
+      "RELEASE_HANDLE": [
+        325,
+        370
+      ]
+    },
+    "flags": [],
+    "episode_index": 364,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 50,
+    "split": "train"
+  },
+  {
+    "n": 329,
+    "close_start": 97,
+    "release_start": 285,
+    "reward_onset": 313,
+    "opening_in_hold_min": 0.0742,
+    "opening_min": 0.0406,
+    "opening_max": 0.0802,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        97
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        97,
+        285
+      ],
+      "RELEASE_HANDLE": [
+        285,
+        329
+      ]
+    },
+    "flags": [],
+    "episode_index": 365,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 51,
+    "split": "train"
+  },
+  {
+    "n": 266,
+    "close_start": 75,
+    "release_start": 220,
+    "reward_onset": 250,
+    "opening_in_hold_min": 0.0576,
+    "opening_min": 0.0411,
+    "opening_max": 0.0803,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        75
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        75,
+        220
+      ],
+      "RELEASE_HANDLE": [
+        220,
+        266
+      ]
+    },
+    "flags": [],
+    "episode_index": 366,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 52,
+    "split": "val"
+  },
+  {
+    "n": 350,
+    "close_start": 157,
+    "release_start": 307,
+    "reward_onset": 334,
+    "opening_in_hold_min": 0.0568,
+    "opening_min": 0.0411,
+    "opening_max": 0.0803,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        157
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        157,
+        307
+      ],
+      "RELEASE_HANDLE": [
+        307,
+        350
+      ]
+    },
+    "flags": [],
+    "episode_index": 367,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 53,
+    "split": "train"
+  },
+  {
+    "n": 448,
+    "close_start": 203,
+    "release_start": 394,
+    "reward_onset": 431,
+    "opening_in_hold_min": 0.025,
+    "opening_min": 0.025,
+    "opening_max": 0.0802,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        203
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        203,
+        394
+      ],
+      "RELEASE_HANDLE": [
+        394,
+        448
+      ]
+    },
+    "flags": [],
+    "episode_index": 368,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 54,
+    "split": "val"
+  },
+  {
+    "n": 297,
+    "close_start": 101,
+    "release_start": 257,
+    "reward_onset": 281,
+    "opening_in_hold_min": 0.0331,
+    "opening_min": 0.0331,
+    "opening_max": 0.0799,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        101
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        101,
+        257
+      ],
+      "RELEASE_HANDLE": [
+        257,
+        297
+      ]
+    },
+    "flags": [],
+    "episode_index": 369,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 55,
+    "split": "train"
+  },
+  {
+    "n": 276,
+    "close_start": 90,
+    "release_start": 224,
+    "reward_onset": 260,
+    "opening_in_hold_min": 0.0484,
+    "opening_min": 0.0411,
+    "opening_max": 0.0799,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        90
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        90,
+        224
+      ],
+      "RELEASE_HANDLE": [
+        224,
+        276
+      ]
+    },
+    "flags": [],
+    "episode_index": 370,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 56,
+    "split": "train"
+  },
+  {
+    "n": 255,
+    "close_start": 70,
+    "release_start": 197,
+    "reward_onset": 239,
+    "opening_in_hold_min": 0.0469,
+    "opening_min": 0.0411,
+    "opening_max": 0.0798,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        70
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        70,
+        197
+      ],
+      "RELEASE_HANDLE": [
+        197,
+        255
+      ]
+    },
+    "flags": [],
+    "episode_index": 371,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 57,
+    "split": "train"
+  },
+  {
+    "n": 313,
+    "close_start": 94,
+    "release_start": 244,
+    "reward_onset": 297,
+    "opening_in_hold_min": 0.0308,
+    "opening_min": 0.0308,
+    "opening_max": 0.0807,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        94
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        94,
+        244
+      ],
+      "RELEASE_HANDLE": [
+        244,
+        313
+      ]
+    },
+    "flags": [],
+    "episode_index": 372,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 58,
+    "split": "val"
+  },
+  {
+    "n": 430,
+    "close_start": 123,
+    "release_start": 370,
+    "reward_onset": 414,
+    "opening_in_hold_min": 0.0128,
+    "opening_min": 0.0128,
+    "opening_max": 0.0799,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        123
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        123,
+        370
+      ],
+      "RELEASE_HANDLE": [
+        370,
+        430
+      ]
+    },
+    "flags": [],
+    "episode_index": 373,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 59,
+    "split": "test"
+  },
+  {
+    "n": 327,
+    "close_start": 87,
+    "release_start": 279,
+    "reward_onset": 311,
+    "opening_in_hold_min": 0.0569,
+    "opening_min": 0.0411,
+    "opening_max": 0.0798,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        87
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        87,
+        279
+      ],
+      "RELEASE_HANDLE": [
+        279,
+        327
+      ]
+    },
+    "flags": [],
+    "episode_index": 374,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 60,
+    "split": "train"
+  },
+  {
+    "n": 325,
+    "close_start": 100,
+    "release_start": 279,
+    "reward_onset": 309,
+    "opening_in_hold_min": 0.0255,
+    "opening_min": 0.0255,
+    "opening_max": 0.0797,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        100
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        100,
+        279
+      ],
+      "RELEASE_HANDLE": [
+        279,
+        325
+      ]
+    },
+    "flags": [],
+    "episode_index": 375,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 61,
+    "split": "train"
+  },
+  {
+    "n": 362,
+    "close_start": 97,
+    "release_start": 259,
+    "reward_onset": 346,
+    "opening_in_hold_min": 0.0302,
+    "opening_min": 0.0302,
+    "opening_max": 0.0809,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        97
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        97,
+        259
+      ],
+      "RELEASE_HANDLE": [
+        259,
+        362
+      ]
+    },
+    "flags": [],
+    "episode_index": 376,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 62,
+    "split": "train"
+  },
+  {
+    "n": 317,
+    "close_start": 86,
+    "release_start": 271,
+    "reward_onset": 301,
+    "opening_in_hold_min": 0.075,
+    "opening_min": 0.0411,
+    "opening_max": 0.0812,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        86
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        86,
+        271
+      ],
+      "RELEASE_HANDLE": [
+        271,
+        317
+      ]
+    },
+    "flags": [],
+    "episode_index": 377,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 63,
+    "split": "train"
+  },
+  {
+    "n": 302,
+    "close_start": 87,
+    "release_start": 257,
+    "reward_onset": 286,
+    "opening_in_hold_min": 0.0514,
+    "opening_min": 0.0411,
+    "opening_max": 0.0803,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        87
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        87,
+        257
+      ],
+      "RELEASE_HANDLE": [
+        257,
+        302
+      ]
+    },
+    "flags": [],
+    "episode_index": 378,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 64,
+    "split": "val"
+  },
+  {
+    "n": 330,
+    "close_start": 110,
+    "release_start": 283,
+    "reward_onset": 314,
+    "opening_in_hold_min": 0.0485,
+    "opening_min": 0.0411,
+    "opening_max": 0.0802,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        110
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        110,
+        283
+      ],
+      "RELEASE_HANDLE": [
+        283,
+        330
+      ]
+    },
+    "flags": [],
+    "episode_index": 379,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 65,
+    "split": "train"
+  },
+  {
+    "n": 337,
+    "close_start": 136,
+    "release_start": 281,
+    "reward_onset": 321,
+    "opening_in_hold_min": 0.075,
+    "opening_min": 0.0411,
+    "opening_max": 0.0811,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        136
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        136,
+        281
+      ],
+      "RELEASE_HANDLE": [
+        281,
+        337
+      ]
+    },
+    "flags": [],
+    "episode_index": 380,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 66,
+    "split": "val"
+  },
+  {
+    "n": 336,
+    "close_start": 110,
+    "release_start": 285,
+    "reward_onset": 320,
+    "opening_in_hold_min": 0.0259,
+    "opening_min": 0.0259,
+    "opening_max": 0.08,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        110
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        110,
+        285
+      ],
+      "RELEASE_HANDLE": [
+        285,
+        336
+      ]
+    },
+    "flags": [],
+    "episode_index": 381,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 67,
+    "split": "train"
+  },
+  {
+    "n": 346,
+    "close_start": 151,
+    "release_start": 282,
+    "reward_onset": 330,
+    "opening_in_hold_min": 0.0609,
+    "opening_min": 0.0411,
+    "opening_max": 0.08,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        151
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        151,
+        282
+      ],
+      "RELEASE_HANDLE": [
+        282,
+        346
+      ]
+    },
+    "flags": [],
+    "episode_index": 382,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 68,
+    "split": "train"
+  },
+  {
+    "n": 460,
+    "close_start": 124,
+    "release_start": 403,
+    "reward_onset": 444,
+    "opening_in_hold_min": 0.0256,
+    "opening_min": 0.0256,
+    "opening_max": 0.08,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        124
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        124,
+        403
+      ],
+      "RELEASE_HANDLE": [
+        403,
+        460
+      ]
+    },
+    "flags": [],
+    "episode_index": 383,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 69,
+    "split": "train"
+  },
+  {
+    "n": 440,
+    "close_start": 188,
+    "release_start": 389,
+    "reward_onset": 424,
+    "opening_in_hold_min": 0.0639,
+    "opening_min": 0.0411,
+    "opening_max": 0.0804,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        188
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        188,
+        389
+      ],
+      "RELEASE_HANDLE": [
+        389,
+        440
+      ]
+    },
+    "flags": [],
+    "episode_index": 384,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 70,
+    "split": "train"
+  },
+  {
+    "n": 298,
+    "close_start": 114,
+    "release_start": 253,
+    "reward_onset": 282,
+    "opening_in_hold_min": 0.0647,
+    "opening_min": 0.0411,
+    "opening_max": 0.0799,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        114
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        114,
+        253
+      ],
+      "RELEASE_HANDLE": [
+        253,
+        298
+      ]
+    },
+    "flags": [],
+    "episode_index": 385,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 71,
+    "split": "train"
+  },
+  {
+    "n": 422,
+    "close_start": 138,
+    "release_start": 369,
+    "reward_onset": 406,
+    "opening_in_hold_min": 0.0639,
+    "opening_min": 0.0411,
+    "opening_max": 0.0813,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        138
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        138,
+        369
+      ],
+      "RELEASE_HANDLE": [
+        369,
+        422
+      ]
+    },
+    "flags": [],
+    "episode_index": 386,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 72,
+    "split": "val"
+  },
+  {
+    "n": 339,
+    "close_start": 105,
+    "release_start": 274,
+    "reward_onset": 323,
+    "opening_in_hold_min": 0.0723,
+    "opening_min": 0.0411,
+    "opening_max": 0.0802,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        105
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        105,
+        274
+      ],
+      "RELEASE_HANDLE": [
+        274,
+        339
+      ]
+    },
+    "flags": [],
+    "episode_index": 387,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 73,
+    "split": "train"
+  },
+  {
+    "n": 429,
+    "close_start": 104,
+    "release_start": 377,
+    "reward_onset": 413,
+    "opening_in_hold_min": 0.0259,
+    "opening_min": 0.0259,
+    "opening_max": 0.0798,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        104
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        104,
+        377
+      ],
+      "RELEASE_HANDLE": [
+        377,
+        429
+      ]
+    },
+    "flags": [],
+    "episode_index": 388,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 74,
+    "split": "train"
+  },
+  {
+    "n": 360,
+    "close_start": 132,
+    "release_start": 284,
+    "reward_onset": 344,
+    "opening_in_hold_min": 0.0715,
+    "opening_min": 0.0411,
+    "opening_max": 0.0799,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        132
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        132,
+        284
+      ],
+      "RELEASE_HANDLE": [
+        284,
+        360
+      ]
+    },
+    "flags": [],
+    "episode_index": 389,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 75,
+    "split": "train"
+  },
+  {
+    "n": 416,
+    "close_start": 125,
+    "release_start": 374,
+    "reward_onset": 400,
+    "opening_in_hold_min": 0.0324,
+    "opening_min": 0.0324,
+    "opening_max": 0.0817,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        125
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        125,
+        374
+      ],
+      "RELEASE_HANDLE": [
+        374,
+        416
+      ]
+    },
+    "flags": [],
+    "episode_index": 390,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 76,
+    "split": "train"
+  },
+  {
+    "n": 299,
+    "close_start": 123,
+    "release_start": 247,
+    "reward_onset": 283,
+    "opening_in_hold_min": 0.0715,
+    "opening_min": 0.0411,
+    "opening_max": 0.0797,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        123
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        123,
+        247
+      ],
+      "RELEASE_HANDLE": [
+        247,
+        299
+      ]
+    },
+    "flags": [],
+    "episode_index": 391,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 77,
+    "split": "test"
+  },
+  {
+    "n": 386,
+    "close_start": 99,
+    "release_start": 327,
+    "reward_onset": 370,
+    "opening_in_hold_min": 0.0248,
+    "opening_min": 0.0248,
+    "opening_max": 0.0798,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        99
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        99,
+        327
+      ],
+      "RELEASE_HANDLE": [
+        327,
+        386
+      ]
+    },
+    "flags": [],
+    "episode_index": 392,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 78,
+    "split": "train"
+  },
+  {
+    "n": 356,
+    "close_start": 110,
+    "release_start": 290,
+    "reward_onset": 340,
+    "opening_in_hold_min": 0.0738,
+    "opening_min": 0.0408,
+    "opening_max": 0.0802,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        110
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        110,
+        290
+      ],
+      "RELEASE_HANDLE": [
+        290,
+        356
+      ]
+    },
+    "flags": [],
+    "episode_index": 393,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 79,
+    "split": "test"
+  },
+  {
+    "n": 443,
+    "close_start": 121,
+    "release_start": 384,
+    "reward_onset": 427,
+    "opening_in_hold_min": 0.0227,
+    "opening_min": 0.0227,
+    "opening_max": 0.0797,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        121
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        121,
+        384
+      ],
+      "RELEASE_HANDLE": [
+        384,
+        443
+      ]
+    },
+    "flags": [],
+    "episode_index": 394,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 80,
+    "split": "test"
+  },
+  {
+    "n": 352,
+    "close_start": 119,
+    "release_start": 302,
+    "reward_onset": 336,
+    "opening_in_hold_min": 0.02,
+    "opening_min": 0.017,
+    "opening_max": 0.0799,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        119
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        119,
+        302
+      ],
+      "RELEASE_HANDLE": [
+        302,
+        352
+      ]
+    },
+    "flags": [],
+    "episode_index": 395,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 81,
+    "split": "test"
+  },
+  {
+    "n": 350,
+    "close_start": 104,
+    "release_start": 292,
+    "reward_onset": 334,
+    "opening_in_hold_min": 0.0417,
+    "opening_min": 0.0411,
+    "opening_max": 0.0798,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        104
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        104,
+        292
+      ],
+      "RELEASE_HANDLE": [
+        292,
+        350
+      ]
+    },
+    "flags": [],
+    "episode_index": 396,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 82,
+    "split": "train"
+  },
+  {
+    "n": 416,
+    "close_start": 155,
+    "release_start": 368,
+    "reward_onset": 400,
+    "opening_in_hold_min": 0.0723,
+    "opening_min": 0.0411,
+    "opening_max": 0.0802,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        155
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        155,
+        368
+      ],
+      "RELEASE_HANDLE": [
+        368,
+        416
+      ]
+    },
+    "flags": [],
+    "episode_index": 397,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 83,
+    "split": "train"
+  },
+  {
+    "n": 285,
+    "close_start": 84,
+    "release_start": 232,
+    "reward_onset": 269,
+    "opening_in_hold_min": 0.0704,
+    "opening_min": 0.0411,
+    "opening_max": 0.0798,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        84
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        84,
+        232
+      ],
+      "RELEASE_HANDLE": [
+        232,
+        285
+      ]
+    },
+    "flags": [],
+    "episode_index": 398,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 84,
+    "split": "train"
+  },
+  {
+    "n": 360,
+    "close_start": 121,
+    "release_start": 306,
+    "reward_onset": 344,
+    "opening_in_hold_min": 0.0455,
+    "opening_min": 0.0411,
+    "opening_max": 0.0798,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        121
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        121,
+        306
+      ],
+      "RELEASE_HANDLE": [
+        306,
+        360
+      ]
+    },
+    "flags": [],
+    "episode_index": 399,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 85,
+    "split": "train"
+  },
+  {
+    "n": 452,
+    "close_start": 125,
+    "release_start": 332,
+    "reward_onset": 436,
+    "opening_in_hold_min": 0.0736,
+    "opening_min": 0.0411,
+    "opening_max": 0.08,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        125
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        125,
+        332
+      ],
+      "RELEASE_HANDLE": [
+        332,
+        452
+      ]
+    },
+    "flags": [],
+    "episode_index": 400,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 86,
+    "split": "test"
+  },
+  {
+    "n": 361,
+    "close_start": 138,
+    "release_start": 313,
+    "reward_onset": 345,
+    "opening_in_hold_min": 0.0318,
+    "opening_min": 0.0318,
+    "opening_max": 0.0811,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        138
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        138,
+        313
+      ],
+      "RELEASE_HANDLE": [
+        313,
+        361
+      ]
+    },
+    "flags": [],
+    "episode_index": 401,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 87,
+    "split": "train"
+  },
+  {
+    "n": 415,
+    "close_start": 97,
+    "release_start": 321,
+    "reward_onset": 399,
+    "opening_in_hold_min": 0.0739,
+    "opening_min": 0.041,
+    "opening_max": 0.08,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        97
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        97,
+        321
+      ],
+      "RELEASE_HANDLE": [
+        321,
+        415
+      ]
+    },
+    "flags": [],
+    "episode_index": 402,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 88,
+    "split": "train"
+  },
+  {
+    "n": 373,
+    "close_start": 135,
+    "release_start": 320,
+    "reward_onset": 357,
+    "opening_in_hold_min": 0.06,
+    "opening_min": 0.0411,
+    "opening_max": 0.0806,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        135
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        135,
+        320
+      ],
+      "RELEASE_HANDLE": [
+        320,
+        373
+      ]
+    },
+    "flags": [],
+    "episode_index": 403,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 89,
+    "split": "test"
+  },
+  {
+    "n": 323,
+    "close_start": 90,
+    "release_start": 276,
+    "reward_onset": 307,
+    "opening_in_hold_min": 0.0577,
+    "opening_min": 0.0411,
+    "opening_max": 0.0805,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        90
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        90,
+        276
+      ],
+      "RELEASE_HANDLE": [
+        276,
+        323
+      ]
+    },
+    "flags": [],
+    "episode_index": 404,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 90,
+    "split": "train"
+  },
+  {
+    "n": 363,
+    "close_start": 128,
+    "release_start": 319,
+    "reward_onset": 347,
+    "opening_in_hold_min": 0.0323,
+    "opening_min": 0.0301,
+    "opening_max": 0.0799,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        128
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        128,
+        319
+      ],
+      "RELEASE_HANDLE": [
+        319,
+        363
+      ]
+    },
+    "flags": [],
+    "episode_index": 405,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 91,
+    "split": "val"
+  },
+  {
+    "n": 395,
+    "close_start": 196,
+    "release_start": 339,
+    "reward_onset": 379,
+    "opening_in_hold_min": 0.064,
+    "opening_min": 0.0411,
+    "opening_max": 0.0807,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        196
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        196,
+        339
+      ],
+      "RELEASE_HANDLE": [
+        339,
+        395
+      ]
+    },
+    "flags": [],
+    "episode_index": 406,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 92,
+    "split": "train"
+  },
+  {
+    "n": 308,
+    "close_start": 98,
+    "release_start": 269,
+    "reward_onset": 292,
+    "opening_in_hold_min": 0.0362,
+    "opening_min": 0.0362,
+    "opening_max": 0.0798,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        98
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        98,
+        269
+      ],
+      "RELEASE_HANDLE": [
+        269,
+        308
+      ]
+    },
+    "flags": [],
+    "episode_index": 407,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 93,
+    "split": "train"
+  },
+  {
+    "n": 362,
+    "close_start": 123,
+    "release_start": 301,
+    "reward_onset": 346,
+    "opening_in_hold_min": 0.0641,
+    "opening_min": 0.0411,
+    "opening_max": 0.0799,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        123
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        123,
+        301
+      ],
+      "RELEASE_HANDLE": [
+        301,
+        362
+      ]
+    },
+    "flags": [],
+    "episode_index": 408,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 94,
+    "split": "train"
+  },
+  {
+    "n": 439,
+    "close_start": 187,
+    "release_start": 381,
+    "reward_onset": 423,
+    "opening_in_hold_min": 0.0608,
+    "opening_min": 0.0411,
+    "opening_max": 0.0817,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        187
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        187,
+        381
+      ],
+      "RELEASE_HANDLE": [
+        381,
+        439
+      ]
+    },
+    "flags": [],
+    "episode_index": 409,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 95,
+    "split": "train"
+  },
+  {
+    "n": 325,
+    "close_start": 77,
+    "release_start": 274,
+    "reward_onset": 309,
+    "opening_in_hold_min": 0.0372,
+    "opening_min": 0.0372,
+    "opening_max": 0.0798,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        77
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        77,
+        274
+      ],
+      "RELEASE_HANDLE": [
+        274,
+        325
+      ]
+    },
+    "flags": [],
+    "episode_index": 410,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 96,
+    "split": "val"
+  },
+  {
+    "n": 299,
+    "close_start": 94,
+    "release_start": 253,
+    "reward_onset": 283,
+    "opening_in_hold_min": 0.0278,
+    "opening_min": 0.0278,
+    "opening_max": 0.0801,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        94
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        94,
+        253
+      ],
+      "RELEASE_HANDLE": [
+        253,
+        299
+      ]
+    },
+    "flags": [],
+    "episode_index": 411,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 97,
+    "split": "train"
+  },
+  {
+    "n": 397,
+    "close_start": 116,
+    "release_start": 308,
+    "reward_onset": 381,
+    "opening_in_hold_min": 0.0232,
+    "opening_min": 0.0232,
+    "opening_max": 0.0798,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        116
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        116,
+        308
+      ],
+      "RELEASE_HANDLE": [
+        308,
+        397
+      ]
+    },
+    "flags": [],
+    "episode_index": 412,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 98,
+    "split": "train"
+  },
+  {
+    "n": 375,
+    "close_start": 114,
+    "release_start": 332,
+    "reward_onset": 359,
+    "opening_in_hold_min": 0.0641,
+    "opening_min": 0.0411,
+    "opening_max": 0.0805,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        114
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        114,
+        332
+      ],
+      "RELEASE_HANDLE": [
+        332,
+        375
+      ]
+    },
+    "flags": [],
+    "episode_index": 413,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 99,
+    "split": "train"
+  },
+  {
+    "n": 394,
+    "close_start": 165,
+    "release_start": 349,
+    "reward_onset": 378,
+    "opening_in_hold_min": 0.0751,
+    "opening_min": 0.0378,
+    "opening_max": 0.0801,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        165
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        165,
+        349
+      ],
+      "RELEASE_HANDLE": [
+        349,
+        394
+      ]
+    },
+    "flags": [],
+    "episode_index": 414,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 100,
+    "split": "train"
+  },
+  {
+    "n": 395,
+    "close_start": 163,
+    "release_start": 336,
+    "reward_onset": 379,
+    "opening_in_hold_min": 0.0702,
+    "opening_min": 0.0411,
+    "opening_max": 0.0799,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        163
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        163,
+        336
+      ],
+      "RELEASE_HANDLE": [
+        336,
+        395
+      ]
+    },
+    "flags": [],
+    "episode_index": 415,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 101,
+    "split": "train"
+  },
+  {
+    "n": 390,
+    "close_start": 83,
+    "release_start": 339,
+    "reward_onset": 374,
+    "opening_in_hold_min": 0.0741,
+    "opening_min": 0.0411,
+    "opening_max": 0.0799,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        83
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        83,
+        339
+      ],
+      "RELEASE_HANDLE": [
+        339,
+        390
+      ]
+    },
+    "flags": [],
+    "episode_index": 416,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 102,
+    "split": "train"
+  },
+  {
+    "n": 335,
+    "close_start": 93,
+    "release_start": 279,
+    "reward_onset": 319,
+    "opening_in_hold_min": 0.0643,
+    "opening_min": 0.0411,
+    "opening_max": 0.0799,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        93
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        93,
+        279
+      ],
+      "RELEASE_HANDLE": [
+        279,
+        335
+      ]
+    },
+    "flags": [],
+    "episode_index": 417,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 103,
+    "split": "train"
+  },
+  {
+    "n": 313,
+    "close_start": 106,
+    "release_start": 260,
+    "reward_onset": 297,
+    "opening_in_hold_min": 0.0714,
+    "opening_min": 0.0411,
+    "opening_max": 0.0809,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        106
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        106,
+        260
+      ],
+      "RELEASE_HANDLE": [
+        260,
+        313
+      ]
+    },
+    "flags": [],
+    "episode_index": 418,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 104,
+    "split": "train"
+  },
+  {
+    "n": 299,
+    "close_start": 98,
+    "release_start": 248,
+    "reward_onset": 283,
+    "opening_in_hold_min": 0.0642,
+    "opening_min": 0.0411,
+    "opening_max": 0.0801,
+    "spans": {
+      "GRASP_HANDLE": [
+        0,
+        98
+      ],
+      "MOVE_LID_TO_CLOSED": [
+        98,
+        248
+      ],
+      "RELEASE_HANDLE": [
+        248,
+        299
+      ]
+    },
+    "flags": [],
+    "episode_index": 419,
+    "source_prefix": "pretrain/atomic/CloseBlenderLid/20250822",
+    "source_episode_index": 105,
+    "split": "test"
+  }
+]

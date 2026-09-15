@@ -1,0 +1,63 @@
+{
+  "task": "CloseBlenderLid",
+  "dataset_repo": "ember-lab-berkeley/robocasa365-pretrain-atomic",
+  "dataset_codebase_version": "v3.0",
+  "n_demos": 106,
+  "instruction_text": "Close the lid blender by securely placing the lid on top.",
+  "obs_state_dim": 16,
+  "action_dim": 12,
+  "fps": 20,
+  "obs_note": "observation.state is robot proprioception only (base+EE pose+gripper), NO object pose",
+  "segmentation": {
+    "method": "policy-visible signals: finger-opening state machine (hysteresis) + gripper command cross-check + next.reward terminal onset",
+    "OPEN_TH": 0.065,
+    "CLOSED_TH": 0.05,
+    "HOLD": 5,
+    "CLOSE_CMD": 0.5,
+    "OPEN_CMD": -0.5,
+    "skills": [
+      "GRASP_HANDLE",
+      "MOVE_LID_TO_CLOSED",
+      "RELEASE_HANDLE"
+    ]
+  },
+  "split": {
+    "seed": 20260915,
+    "fractions": {
+      "train": 0.7,
+      "val": 0.15,
+      "test": 0.15
+    },
+    "counts": {
+      "train": 74,
+      "val": 16,
+      "test": 16
+    }
+  },
+  "per_skill_available_counts": {
+    "GRASP_HANDLE": {
+      "train": 74,
+      "val": 16,
+      "test": 16
+    },
+    "MOVE_LID_TO_CLOSED": {
+      "train": 74,
+      "val": 15,
+      "test": 16
+    },
+    "RELEASE_HANDLE": {
+      "train": 74,
+      "val": 15,
+      "test": 16
+    }
+  },
+  "flagged_episodes": [
+    359
+  ],
+  "action_loss_mask": "for a per-skill training example, actions OUTSIDE the skill's [start,end) span are masked out of the flow-matching loss",
+  "data_hashes": {
+    "data/chunk-000/file-000.parquet": "c76d5148d77b928afc41e024ea06faf4bf8c7c724e0302e26973496bfebb5b48",
+    "meta/info.json": "6651e9885590925c44e1f05d8ab22a60f59cc2fc609c677a204dbf2d8d20ea21",
+    "meta/tasks.parquet": "49be42103606d159561601b4f31cf080fe714937ae5207638ebd4ca56f945bfb"
+  }
+}

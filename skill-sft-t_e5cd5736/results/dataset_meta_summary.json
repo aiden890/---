@@ -1,0 +1,230 @@
+{
+  "info": {
+    "codebase_version": "v3.0",
+    "robot_type": "PandaOmron",
+    "total_episodes": 7356,
+    "total_frames": 1495313,
+    "total_tasks": 617,
+    "chunks_size": 1000,
+    "fps": 20,
+    "splits": {
+      "train": "0:7356"
+    },
+    "data_path": "data/chunk-{chunk_index:03d}/file-{file_index:03d}.parquet",
+    "video_path": "videos/{video_key}/chunk-{chunk_index:03d}/file-{file_index:03d}.mp4",
+    "features": {
+      "observation.images.robot0_eye_in_hand": {
+        "dtype": "video",
+        "shape": [
+          256,
+          256,
+          3
+        ],
+        "names": [
+          "height",
+          "width",
+          "channel"
+        ],
+        "video_info": {
+          "video.fps": 20.0,
+          "video.codec": "h264",
+          "video.pix_fmt": "yuv420p",
+          "video.is_depth_map": false,
+          "has_audio": false
+        }
+      },
+      "observation.images.robot0_agentview_left": {
+        "dtype": "video",
+        "shape": [
+          256,
+          256,
+          3
+        ],
+        "names": [
+          "height",
+          "width",
+          "channel"
+        ],
+        "video_info": {
+          "video.fps": 20.0,
+          "video.codec": "h264",
+          "video.pix_fmt": "yuv420p",
+          "video.is_depth_map": false,
+          "has_audio": false
+        }
+      },
+      "observation.images.robot0_agentview_right": {
+        "dtype": "video",
+        "shape": [
+          256,
+          256,
+          3
+        ],
+        "names": [
+          "height",
+          "width",
+          "channel"
+        ],
+        "video_info": {
+          "video.fps": 20.0,
+          "video.codec": "h264",
+          "video.pix_fmt": "yuv420p",
+          "video.is_depth_map": false,
+          "has_audio": false
+        }
+      },
+      "annotation.human.task_description": {
+        "dtype": "int64",
+        "shape": [
+          1
+        ],
+        "fps": 20
+      },
+      "annotation.human.task_name": {
+        "dtype": "int64",
+        "shape": [
+          1
+        ],
+        "fps": 20
+      },
+      "observation.state": {
+        "dtype": "float64",
+        "shape": [
+          16
+        ],
+        "fps": 20
+      },
+      "action": {
+        "dtype": "float64",
+        "shape": [
+          12
+        ],
+        "fps": 20
+      },
+      "next.reward": {
+        "dtype": "float32",
+        "shape": [
+          1
+        ],
+        "fps": 20
+      },
+      "next.done": {
+        "dtype": "bool",
+        "shape": [
+          1
+        ],
+        "fps": 20
+      },
+      "timestamp": {
+        "dtype": "float32",
+        "shape": [
+          1
+        ],
+        "fps": 20
+      },
+      "frame_index": {
+        "dtype": "int64",
+        "shape": [
+          1
+        ]
+      },
+      "episode_index": {
+        "dtype": "int64",
+        "shape": [
+          1
+        ],
+        "fps": 20
+      },
+      "index": {
+        "dtype": "int64",
+        "shape": [
+          1
+        ],
+        "fps": 20
+      },
+      "task_index": {
+        "dtype": "int64",
+        "shape": [
+          1
+        ],
+        "fps": 20
+      }
+    },
+    "data_files_size_in_mb": 100,
+    "video_files_size_in_mb": 200
+  },
+  "tasks_columns": [
+    "task_index",
+    "task"
+  ],
+  "blender_task_rows": [
+    {
+      "task_index": 8,
+      "task": "Close the lid blender by securely placing the lid on top."
+    },
+    {
+      "task_index": 9,
+      "task": "CloseBlenderLid"
+    },
+    {
+      "task_index": 55,
+      "task": "Open the blender by taking off the lid and placing it on the counter."
+    },
+    {
+      "task_index": 56,
+      "task": "OpenBlenderLid"
+    }
+  ],
+  "episodes_columns": [
+    "episode_index",
+    "dataset_from_index",
+    "dataset_to_index",
+    "length",
+    "tasks",
+    "data/chunk_index",
+    "data/file_index",
+    "source_prefix",
+    "source_episode_index",
+    "videos/observation.images.robot0_agentview_right/chunk_index",
+    "videos/observation.images.robot0_agentview_right/file_index",
+    "videos/observation.images.robot0_agentview_right/from_timestamp",
+    "videos/observation.images.robot0_agentview_right/to_timestamp",
+    "videos/observation.images.robot0_agentview_left/chunk_index",
+    "videos/observation.images.robot0_agentview_left/file_index",
+    "videos/observation.images.robot0_agentview_left/from_timestamp",
+    "videos/observation.images.robot0_agentview_left/to_timestamp",
+    "videos/observation.images.robot0_eye_in_hand/chunk_index",
+    "videos/observation.images.robot0_eye_in_hand/file_index",
+    "videos/observation.images.robot0_eye_in_hand/from_timestamp",
+    "videos/observation.images.robot0_eye_in_hand/to_timestamp",
+    "meta/episodes/chunk_index",
+    "meta/episodes/file_index"
+  ],
+  "episodes_first_row": {
+    "episode_index": 0,
+    "dataset_from_index": 0,
+    "dataset_to_index": 234,
+    "length": 234,
+    "tasks": [
+      "Increase the toaster oven temperature."
+    ],
+    "data/chunk_index": 0,
+    "data/file_index": 0,
+    "source_prefix": "pretrain/atomic/AdjustToasterOvenTemperature/20250820",
+    "source_episode_index": 0,
+    "videos/observation.images.robot0_agentview_right/chunk_index": 0,
+    "videos/observation.images.robot0_agentview_right/file_index": 0,
+    "videos/observation.images.robot0_agentview_right/from_timestamp": 0.0,
+    "videos/observation.images.robot0_agentview_right/to_timestamp": 11.7,
+    "videos/observation.images.robot0_agentview_left/chunk_index": 0,
+    "videos/observation.images.robot0_agentview_left/file_index": 0,
+    "videos/observation.images.robot0_agentview_left/from_timestamp": 0.0,
+    "videos/observation.images.robot0_agentview_left/to_timestamp": 11.7,
+    "videos/observation.images.robot0_eye_in_hand/chunk_index": 0,
+    "videos/observation.images.robot0_eye_in_hand/file_index": 0,
+    "videos/observation.images.robot0_eye_in_hand/from_timestamp": 0.0,
+    "videos/observation.images.robot0_eye_in_hand/to_timestamp": 11.7,
+    "meta/episodes/chunk_index": 0,
+    "meta/episodes/file_index": 0
+  }
+}

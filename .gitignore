@@ -12,6 +12,10 @@ vendor/
 rollouts/
 rollouts-xiaomi-*/
 rl-train-*/results/
+# skill-SFT: heavy caches/checkpoints ignored; small manifests/segments kept
+skill-sft-*/results/hf_cache/
+skill-sft-*/results/out/
+skill-sft-*/results/**/*.mp4
 reward_audit_viewer/*.mp4
 # 새 모델 실험 대용량 (체크포인트·결과·vendor) — 코드/설정/REPORT만 git
 groot/checkpoints/
