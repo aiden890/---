@@ -64,8 +64,11 @@ PY
   eval-full)
     n_ep=${2:-50}
     n_action=${GROOT_N_ACTION_STEPS:-16}
-    # Combined server+client (one process, one GPU). split=pretrain matches the leaderboard
-    # multitask_learning setting; CloseBlenderLid is in atomic_seen.
+    split=${GROOT_SPLIT:-target}
+    task_set=${GROOT_TASK_SET:-atomic_seen}
+    model_path=${GROOT_MODEL_PATH:-/ckpt/model}
+    # Combined server+client (one process, one GPU). --split target matches Xiaomi's
+    # RoboCasa365 target50 protocol; CloseBlenderLid is in atomic_seen.
     docker run --rm --gpus all --shm-size=2g \
       -e MUJOCO_GL=egl -e PYOPENGL_PLATFORM=egl \
       -e NVIDIA_DRIVER_CAPABILITIES=compute,utility,graphics \
@@ -74,11 +77,11 @@ PY
       -v "$ckpt_dir:/ckpt:ro" -v "$out_dir:/output" \
       -v "$root/groot:/groot:ro" "$image" \
       python3 /opt/Isaac-GR00T/scripts/run_eval.py \
-        --model_path /ckpt/model \
+        --model_path "$model_path" \
         --embodiment_tag new_embodiment \
         --data_config panda_omron \
-        --task_set atomic_seen \
-        --split pretrain \
+        --task_set "$task_set" \
+        --split "$split" \
         --video_dir /output/CloseBlenderLid \
         --n_episodes "$n_ep" --n_envs 1 --n_action_steps "$n_action" \
       2>&1 | tee "$root/groot/logs/eval-full.log"
