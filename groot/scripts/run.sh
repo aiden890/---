@@ -61,6 +61,31 @@ PY
       python3 /groot/scripts/smoke_eval.py 2>&1 | tee "$root/groot/logs/smoke.log"
     ;;
 
+  eval-task)
+    # Single-task eval (default CloseBlenderLid) — narrow, apples-to-apples vs Xiaomi.
+    n_ep=${2:-50}
+    task=${GROOT_TASK:-CloseBlenderLid}
+    n_action=${GROOT_N_ACTION_STEPS:-16}
+    split=${GROOT_SPLIT:-target}
+    model_path=${GROOT_MODEL_PATH:-/ckpt/model}
+    docker run --rm --gpus all --shm-size=2g \
+      -e MUJOCO_GL=egl -e PYOPENGL_PLATFORM=egl \
+      -e NVIDIA_DRIVER_CAPABILITIES=compute,utility,graphics \
+      -e HF_HUB_OFFLINE=1 \
+      -v "$asset_volume:/opt/robocasa/robocasa/models/assets:ro" \
+      -v "$ckpt_dir:/ckpt:ro" -v "$out_dir:/output" \
+      -v "$root/groot:/groot:ro" "$image" \
+      python3 /groot/scripts/eval_closeblenderlid.py \
+        --model_path "$model_path" \
+        --embodiment_tag new_embodiment \
+        --data_config panda_omron \
+        --task "$task" \
+        --split "$split" \
+        --n_episodes "$n_ep" --n_envs 1 --n_action_steps "$n_action" \
+        --video_dir /output \
+      2>&1 | tee "$root/groot/logs/eval-$task.log"
+    ;;
+
   eval-full)
     n_ep=${2:-50}
     n_action=${GROOT_N_ACTION_STEPS:-16}
