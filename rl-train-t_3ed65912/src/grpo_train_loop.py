@@ -756,6 +756,11 @@ def build_parser():
                     help="For --train-skill move_holding: reach a deterministic (eta=0) "
                          "GRASP-success entry-state before MOVE train/eval (snapshot once, "
                          "restore per group member). No-op for grasp/place.")
+    ap.add_argument("--entry-scan-cap", type=int, default=0,
+                    help="With --entry-from-grasp: scan up to this many candidate seeds per "
+                         "band to prefilter grasp-entry-reaching seeds for the eval/train "
+                         "pools (cached to entry_seeds.json). 0 = no prefilter (raw seeds, "
+                         "non-entering ones are SKIPPED).")
     return ap
 
 
@@ -813,6 +818,35 @@ def main():
                                    train_skill_enum, True, out / subdir, tag)
         return eval_pool(factory, client, args, reward_cfg, seeds, out / subdir, tag)
 
+    # ---- Entry-seed prefilter (MOVE-first) ----
+    # In entry_mode, most raw seeds do NOT reach the deterministic grasp entry-state
+    # (base grasp ~17%), so a raw eval/train pool is mostly SKIPPED and n_entered is
+    # tiny/noisy. Prefilter: scan candidate seeds, keep only grasp-entry-reaching ones,
+    # split disjointly into eval (paired before/after) and train pools. Cache the found
+    # pool to entry_seeds.json for reproducibility + rerun skip. Only when --entry-scan-cap>0.
+    if entry_mode and my.entry_scan_cap > 0:
+        cache = out / "entry_seeds.json"
+        if cache.exists():
+            pool = json.loads(cache.read_text())
+            eval_seeds, train_seeds = pool["eval_seeds"], pool["train_seeds"]
+            print(f"[entry-prefilter] reuse cache: {len(eval_seeds)} eval + {len(train_seeds)} train", flush=True)
+        else:
+            need_eval, need_train = my.eval_n, my.iters
+            # eval pool from the eval-seed band, train pool from the train-seed band (disjoint bands)
+            eval_cands = [my.eval_seed_base + i for i in range(my.entry_scan_cap)]
+            train_cands = [my.seed_base + i for i in range(my.entry_scan_cap)]
+            eval_seeds = build_entry_seed_pool(eval_factory, client, args, eval_cands,
+                                               train_skill_enum, need_eval, tag="_eval")
+            train_seeds = build_entry_seed_pool(train_factory, client, args, train_cands,
+                                                train_skill_enum, need_train, tag="_train")
+            cache.write_text(json.dumps({"eval_seeds": eval_seeds, "train_seeds": train_seeds,
+                                         "scan_cap": my.entry_scan_cap}, indent=2))
+            print(f"[entry-prefilter] found {len(eval_seeds)}/{need_eval} eval + "
+                  f"{len(train_seeds)}/{need_train} train grasp-entry seeds (cap {my.entry_scan_cap})", flush=True)
+        log["entry_prefilter"] = {"eval_seeds": eval_seeds, "train_seeds": train_seeds}
+    else:
+        train_seeds = None  # non-entry mode: train uses seed_base+it inline
+
     # ---- VLM-scorer verification GATE (standing gate: run BEFORE any ablation train) ----
     if my.vlm_gate_n > 0:
         gate_seeds = [my.eval_seed_base + i for i in range(my.vlm_gate_n)]
@@ -835,7 +869,13 @@ def main():
     curve = []
     with open(out / "train_log.jsonl", "a") as fh:
         for it in range(my.iters):
-            seed = my.seed_base + it
+            # In entry_mode with a prefiltered pool, iterate over grasp-entry seeds
+            # (cycled if fewer were found than iters) so every train step gets a real
+            # entry-state instead of being SKIPPED. Otherwise seed_base+it as before.
+            if train_seeds:
+                seed = train_seeds[it % len(train_seeds)]
+            else:
+                seed = my.seed_base + it
             m = train_iteration(client, args, reward_cfg, seed, it)
             m["iter"] = it
             m["seed"] = seed
