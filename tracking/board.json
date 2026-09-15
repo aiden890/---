@@ -1,9 +1,6 @@
 {
   "updated": "2026-09-15",
   "user_todo": [
-    {"title": "RL 환경 검증", "done": false},
-    {"title": "RL 알고리즘 검증", "done": false},
-    {"title": "RL fine-tuning 모델 확인", "done": false},
     {"title": "모델 선정 (Xiaomi vs GR00T N1.5 vs π0.5 추론 비교 후 base 모델 결정)", "done": false}
   ],
   "agent_todo": [
