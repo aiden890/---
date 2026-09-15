@@ -56,6 +56,17 @@ from robocasa.utils.env_utils import convert_action  # noqa: E402
 SKILL_KEY = {Skill.GRASP: "grasp", Skill.MOVE_HOLDING: "move_holding", Skill.PLACE: "place"}
 
 
+def _scoring_image(obs):
+    """The RGB frame handed to the VLM scorer: the 3-camera panorama the POLICY itself
+    sees (left + right agentview + wrist), concatenated. The wrist view is what makes the
+    official predicate legible to a vision model -- it shows whether the gripper is still
+    holding the lid or has retreated (the >0.15m clearance the terminal predicate needs),
+    which a single agentview cannot disambiguate. Using the policy's own visual input keeps
+    the scorer honest (no privileged camera) and maximises evidence.
+    """
+    return rollout.make_video_frame(obs)
+
+
 # --------------------------------------------------------------------------- #
 # Client speaking the trainer server's op-protocol.
 # --------------------------------------------------------------------------- #
@@ -136,6 +147,19 @@ class TrainerClient:
 
     def load(self, path):
         return self._rpc({"op": "load", "path": path})
+
+    def vlm_score(self, image, question_key):
+        """Real VQA score P(yes) for an image + yes/no question, via the trainer server.
+
+        Builds the VLM inputs with THIS client's processor (single source of truth for
+        the prompt lives in the env card vlm_scorer), sends op=vlm_score, returns P(yes).
+        """
+        import vlm_scorer  # /rl_env/src on sys.path
+        inputs = vlm_scorer.build_vqa_inputs(self.processor, image, question_key,
+                                             robot_type=self.robot_type,
+                                             state_dim=self.STATE_DIM)
+        resp = self._rpc({"op": "vlm_score", "inputs": inputs, "question": question_key})
+        return float(resp["prob"])
 
     def close(self):
         try:
@@ -221,8 +245,11 @@ def _run_one_skill(sim, client, obs, args, skill, reward_mgr, *, eta, traj_id, s
     return obs, outcome, reward_sum, steps, p
 
 
-def eval_episode(sim, client, args, reward_cfg, seed, out_dir=None, tag=""):
-    """Deterministic full-plan rollout; returns official + grasp-stage success."""
+def eval_episode(sim, client, args, reward_cfg, seed, out_dir=None, tag="", return_final_obs=False):
+    """Deterministic full-plan rollout; returns official + grasp-stage success.
+
+    If return_final_obs, also returns the last observation (for the VLM-scorer gate).
+    """
     obs, _ = rollout.reset_env(sim.genv, seed)
     sim.rest_lid_pos = sim.lid_pos()
     planner = OraclePlanner(max_skill_calls=args.max_skill_calls)
@@ -232,6 +259,7 @@ def eval_episode(sim, client, args, reward_cfg, seed, out_dir=None, tag=""):
     grasp_ok = False
     total_reward = 0.0
     save_dir = None
+    last_obs = obs
     if out_dir is not None:
         save_dir = Path(out_dir); save_dir.mkdir(parents=True, exist_ok=True)
     while call is not None and guard < args.max_skill_calls:
@@ -241,13 +269,17 @@ def eval_episode(sim, client, args, reward_cfg, seed, out_dir=None, tag=""):
         obs, outcome, r, steps, p = _run_one_skill(
             sim, client, obs, args, call.skill, reward_mgr, eta=0.0, traj_id=None,
             seed=None, frames=frames, save_video=str(vid) if vid else None)
+        last_obs = obs
         total_reward += r
         if call.skill is Skill.GRASP and outcome is SkillOutcome.SUCCESS:
             grasp_ok = True
         call = planner.propose(call, outcome, p)
     success = bool(sim.predicates().get("official_check_success"))
-    return {"seed": seed, "official_success": success, "grasp_success": grasp_ok,
-            "total_reward": round(total_reward, 4)}
+    res = {"seed": seed, "official_success": success, "grasp_success": grasp_ok,
+           "total_reward": round(total_reward, 4)}
+    if return_final_obs:
+        return res, last_obs
+    return res
 
 
 def train_iteration(client, args, reward_cfg, seed, it):
@@ -268,8 +300,11 @@ def train_iteration(client, args, reward_cfg, seed, it):
     # approach shaping only makes sense for GRASP (lid proximity); other skills use milestone variety
     train_approach_coef = 0.1 if skill is Skill.GRASP else 0.0
     train_timeout_penalty = 0.5  # flat cost for timing out a skill
+    vlm_weight = float(getattr(args, "vlm_weight", 0.0))
+    vlm_question = getattr(args, "vlm_question", "grasp")
     returns = []
     traj_ids = []
+    vlm_scores = []
     for m in range(args.group):
         genv, sim = _make_env(args.split, seed)
         try:
@@ -277,7 +312,7 @@ def train_iteration(client, args, reward_cfg, seed, it):
             sim.rest_lid_pos = sim.lid_pos()
             reward_mgr = RewardManager(reward_cfg)
             traj_id = f"iter{it}_m{m}"
-            _, outcome, r, steps, p = _run_one_skill(
+            final_obs, outcome, r, steps, p = _run_one_skill(
                 sim, client, obs, args, skill, reward_mgr, eta=args.eta,
                 traj_id=traj_id, seed=args.seed_base + it * 100 + m,
                 approach_coef=train_approach_coef,
@@ -285,6 +320,14 @@ def train_iteration(client, args, reward_cfg, seed, it):
             # terminal shaping for the skill unit: bonus if the skill's predicate is met
             if outcome is SkillOutcome.SUCCESS:
                 r += 1.0
+            # --- REAL VLM-auxiliary channel (sim+VLM ablation only; weight>0) ---
+            # A genuine Qwen3-VL VQA judgement of the FINAL frame: P(yes) that the grasp/
+            # closing progressed. Added to the GRPO return, never replacing the simulator
+            # reward. weight==0 => pure sim-only (identical to the executed baseline).
+            if vlm_weight > 0.0:
+                vscore = client.vlm_score(_scoring_image(final_obs), vlm_question)
+                vlm_scores.append(vscore)
+                r += vlm_weight * vscore
             returns.append(r)
             traj_ids.append(traj_id)
         finally:
@@ -298,7 +341,82 @@ def train_iteration(client, args, reward_cfg, seed, it):
     metrics["max_return"] = float(arr.max())
     metrics["returns"] = [round(x, 4) for x in returns]
     metrics["reward_std"] = float(arr.std())
+    if vlm_scores:
+        metrics["vlm_mean"] = round(float(np.mean(vlm_scores)), 4)
+        metrics["vlm_scores"] = [round(x, 4) for x in vlm_scores]
     return metrics
+
+
+def vlm_gate(client, args, reward_cfg, seeds, out_dir, eval_split="target"):
+    """Verification GATE for the real VLM scorer (task standing gate, run BEFORE training).
+
+    Rolls out deterministic oracle-planner eval episodes, captures each FINAL frame plus
+    the simulator's official-success label, then scores every final frame with the real
+    Qwen3-VL VQA scorer under all three questions. A valid auxiliary scorer must assign a
+    HIGHER P(yes) to genuinely-successful episodes than to failed ones (positive/negative
+    separation). We report per-question mean P(yes | success) vs mean P(yes | fail), the
+    separation margin, and a threshold-free ROC-AUC. The gate PASSES if the primary
+    'success' question separates the two classes (AUC >= 0.65 and margin > 0).
+    """
+    out = Path(out_dir); out.mkdir(parents=True, exist_ok=True)
+    questions = ["success", "grasp", "progress"]
+    rows = []
+    for i, seed in enumerate(seeds):
+        genv, sim = _make_env(eval_split, seed)
+        try:
+            res, final_obs = eval_episode(sim, client, args, reward_cfg, seed,
+                                          return_final_obs=True)
+            img = _scoring_image(final_obs)
+            scores = {q: client.vlm_score(img, q) for q in questions}
+        finally:
+            genv.close()
+        row = {"seed": seed, "official_success": res["official_success"],
+               "grasp_success": res["grasp_success"], "vlm": scores}
+        rows.append(row)
+        print(f"[vlm-gate] {i+1}/{len(seeds)} seed={seed} succ={res['official_success']} "
+              f"grasp={res['grasp_success']} P(yes)={ {q: round(scores[q],3) for q in questions} }",
+              flush=True)
+
+    def _auc(pos, neg):
+        if not pos or not neg:
+            return None
+        wins = sum((p > n) + 0.5 * (p == n) for p in pos for n in neg)
+        return wins / (len(pos) * len(neg))
+
+    report = {"n": len(rows), "questions": {}}
+    for q in questions:
+        # success-vs-fail on the OFFICIAL predicate, and grasp-vs-nograsp for the grasp Q
+        succ = [r["vlm"][q] for r in rows if r["official_success"]]
+        fail = [r["vlm"][q] for r in rows if not r["official_success"]]
+        gyes = [r["vlm"][q] for r in rows if r["grasp_success"]]
+        gno = [r["vlm"][q] for r in rows if not r["grasp_success"]]
+        mean = lambda xs: (round(sum(xs) / len(xs), 4) if xs else None)
+        report["questions"][q] = {
+            "n_success": len(succ), "n_fail": len(fail),
+            "mean_P_success": mean(succ), "mean_P_fail": mean(fail),
+            "success_margin": (round(mean(succ) - mean(fail), 4) if succ and fail else None),
+            "auc_success_vs_fail": (round(_auc(succ, fail), 4) if _auc(succ, fail) is not None else None),
+            "n_grasp": len(gyes), "n_nograsp": len(gno),
+            "mean_P_grasp": mean(gyes), "mean_P_nograsp": mean(gno),
+            "grasp_margin": (round(mean(gyes) - mean(gno), 4) if gyes and gno else None),
+            "auc_grasp_vs_nograsp": (round(_auc(gyes, gno), 4) if _auc(gyes, gno) is not None else None),
+        }
+    # PASS criterion: the primary success question separates success from failure.
+    sq = report["questions"]["success"]
+    gq = report["questions"]["grasp"]
+    success_ok = (sq["auc_success_vs_fail"] is not None and sq["auc_success_vs_fail"] >= 0.65
+                  and sq["success_margin"] is not None and sq["success_margin"] > 0)
+    grasp_ok = (gq["auc_grasp_vs_nograsp"] is not None and gq["auc_grasp_vs_nograsp"] >= 0.65
+                and gq["grasp_margin"] is not None and gq["grasp_margin"] > 0)
+    report["gate_pass"] = bool(success_ok or grasp_ok)
+    report["gate_detail"] = {"success_question_separates": success_ok,
+                             "grasp_question_separates": grasp_ok}
+    report["rows"] = rows
+    (out / "vlm_gate.json").write_text(json.dumps(report, indent=2))
+    print("=== VLM GATE:", "PASS" if report["gate_pass"] else "FAIL",
+          "| success AUC", sq["auc_success_vs_fail"], "margin", sq["success_margin"],
+          "| grasp AUC", gq["auc_grasp_vs_nograsp"], "margin", gq["grasp_margin"], flush=True)
+    return report
 
 
 def eval_pool(sim_factory, client, args, reward_cfg, seeds, out_dir, tag):
@@ -341,12 +459,21 @@ def build_parser():
     ap.add_argument("--heldout-seed-base", type=int, default=9000)
     ap.add_argument("--reward-variant", default="simulator_milestones",
                     choices=("simulator_milestones", "simulator_terminal_only"))
+    ap.add_argument("--vlm-weight", type=float, default=0.0,
+                    help="Weight of the REAL Qwen3-VL VQA auxiliary score added to the GRPO "
+                         "return during TRAINING. 0.0 = sim-only; >0 = sim+VLM ablation.")
+    ap.add_argument("--vlm-question", default="grasp",
+                    choices=("grasp", "progress", "success"),
+                    help="Which VQA question the auxiliary scorer asks each rollout.")
     ap.add_argument("--horizon-grasp", type=int, default=120)
     ap.add_argument("--horizon-move", type=int, default=120)
     ap.add_argument("--horizon-place", type=int, default=150)
     ap.add_argument("--max-skill-calls", type=int, default=3)
     ap.add_argument("--save-videos", type=int, default=6)
     ap.add_argument("--skip-eval", action="store_true")
+    ap.add_argument("--vlm-gate-n", type=int, default=0,
+                    help="If >0, run ONLY the VLM-scorer verification gate on this many "
+                         "eval seeds (no training), write vlm_gate.json, and exit.")
     ap.add_argument("--ckpt-name", default="grpo_trained.pt")
     ap.add_argument("--load-ckpt", default=None,
                     help="Load a saved LoRA checkpoint before AFTER-eval phase. "
@@ -360,7 +487,8 @@ def main():
     rollout.validate_args(args)
     for k in ("group", "eta", "clip", "kl_coef", "ratio_max", "adv_clip", "train_skill",
               "horizon_grasp", "horizon_move", "horizon_place",
-              "max_skill_calls", "seed_base", "save_videos", "split"):
+              "max_skill_calls", "seed_base", "save_videos", "split",
+              "vlm_weight", "vlm_question"):
         setattr(args, k, getattr(my, k))
     out = Path(my.out); out.mkdir(parents=True, exist_ok=True)
 
@@ -379,11 +507,22 @@ def main():
     def heldout_factory(seed):
         return _make_env(my.eval_split, seed)
 
-    log = {"config": {**vars(my), "reward_variant": my.reward_variant}, "phases": {}}
+    log = {"config": {**vars(my), "reward_variant": my.reward_variant,
+                      "vlm_weight": my.vlm_weight, "vlm_question": my.vlm_question},
+           "phases": {}}
     (out / "train_log.jsonl").write_text("")
 
     eval_seeds = [my.eval_seed_base + i for i in range(my.eval_n)]
     heldout_seeds = [my.heldout_seed_base + i for i in range(my.heldout_n)]
+
+    # ---- VLM-scorer verification GATE (standing gate: run BEFORE any ablation train) ----
+    if my.vlm_gate_n > 0:
+        gate_seeds = [my.eval_seed_base + i for i in range(my.vlm_gate_n)]
+        rep = vlm_gate(client, args, reward_cfg, gate_seeds, out, eval_split=my.eval_split)
+        (out / "run_summary.json").write_text(json.dumps({"vlm_gate": rep}, indent=2, default=str))
+        client.close()
+        print("=== DONE (vlm-gate) ===", flush=True)
+        return
 
     # ---- EVAL(before) ----
     if not my.skip_eval:

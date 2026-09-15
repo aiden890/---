@@ -74,6 +74,10 @@
   .rl-pred td:last-child{text-align:right;font-variant-numeric:tabular-nums}
   .pt{color:var(--ok);font-weight:600}.pf{color:var(--dim)}
   .fire{color:var(--run);font-weight:600}
+  .tgt{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px}
+  .tgt .tk{width:15px;height:15px;border:1.5px solid var(--dim);border-radius:5px;flex:none}
+  .tgt .tk.on{background:var(--ok);border-color:var(--ok)}
+  .tgt .tb{margin-left:auto;color:var(--dim);font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body>
@@ -156,7 +160,18 @@
 <!-- ===== RL 환경 ===== -->
 <section id="rlenv" class="tab">
   <h1>RL 환경 · 리워드 동기화 뷰어</h1>
-  <p class="dim">영상을 재생하거나 슬라이더를 움직이면, 그 순간 로봇팔 상태(predicate)와 리워드가 함께 표시됩니다. 리워드는 <b>시뮬레이터 실제 상태</b>에서 계산됩니다.</p>
+  <p class="dim">영상을 재생하거나 슬라이더를 움직이면, 그 순간 로봇팔 상태(predicate)와 <b>그 스킬의 학습 리워드</b>가 함께 표시됩니다. 각 스킬은 자기 리워드만 <b>0에서 시작</b>해 계산합니다.</p>
+
+  <div class="card">
+    <h2>각 스킬이 학습 때 받는 리워드</h2>
+    <table>
+      <tr><th>스킬</th><th>목표 보너스 (1회)</th><th>스킬 성공 판정</th><th>성공 보너스</th><th>학습 전용 shaping</th></tr>
+      <tr><td><b>grasp</b></td><td>안정적으로 집음 +0.15 · 들어올림 +0.10</td><td>20스텝 연속 파지</td><td>+1.0</td><td>접근 shaping +0.1·(거리감소)/스텝</td></tr>
+      <tr><td><b>move_holding</b></td><td>충돌 없이 운반 +0.10 · 놓기직전 도달 +0.20</td><td>3스텝 연속 preplace 영역</td><td>+1.0</td><td>—</td></tr>
+      <tr><td><b>place</b></td><td>안착 +0.25 · release +0.10 · 물러남 +0.10</td><td>official 성공(안착+이격+수평)</td><td>+1.0, terminal +1.0×0.998<sup>step</sup></td><td>—</td></tr>
+    </table>
+    <p class="dim" style="margin-top:10px">공통 감점: 파지 중 뚜껑 떨어뜨림 −0.25 · 운반 중 금지 충돌 −0.05 · <b>스킬 타임아웃 −0.5</b>. shaping과 타임아웃 감점은 <b>학습에서만</b> 적용되고 평가(eval)에서는 순수 시뮬레이터 리워드만 씁니다. VLM 보조 점수는 기본 가중치 0.</p>
+  </div>
 
   <div class="card">
     <div class="rl-tabs" id="rl-clip-tabs"></div>
@@ -169,10 +184,13 @@
       </div>
       <div class="rl-right">
         <div class="rl-rewardbox">
-          <div class="dim" style="font-size:12px">누적 리워드</div>
+          <div class="dim" style="font-size:12px">이 스킬 누적 리워드 (0에서 시작)</div>
           <div id="rl-cum" class="rl-cum">0.00</div>
           <div id="rl-delta" style="font-size:12px;min-height:16px"></div>
         </div>
+        <div class="dim" style="font-size:12px;margin:4px 0 6px">이 스킬의 리워드 목표</div>
+        <div id="rl-targets" style="margin-bottom:14px"></div>
+        <div class="dim" style="font-size:12px;margin-bottom:4px">현재 로봇팔 상태</div>
         <table class="rl-pred"><tbody id="rl-pred"></tbody></table>
       </div>
     </div>
@@ -354,14 +372,23 @@ fetch('rlenv.json').then(r=>r.json()).then(RL=>{
     while(lo<=hi){const m=(lo+hi)>>1; if(clip.timeline[m].f<=fidx){ans=m;lo=m+1;}else hi=m-1;}
     return clip.timeline[ans];
   }
-  function paint(row, clip){
+  function paint(row, clip, idx){
     document.getElementById('rl-cum').textContent=row.t.toFixed(2);
-    document.getElementById('rl-cum').style.color = row.t>=0?'var(--ok)':'var(--red)';
+    document.getElementById('rl-cum').style.color = row.t>0?'var(--ok)':(row.t<0?'var(--red)':'var(--tx)');
     let dl=[];
-    if(row.d.term)dl.push(`terminal +${row.d.term}`);
-    if(row.d.mile)dl.push(`<span class="fire">milestone +${row.d.mile} (${row.fire.join(', ')})</span>`);
-    if(row.d.pen)dl.push(`penalty ${row.d.pen}`);
-    document.getElementById('rl-delta').innerHTML=dl.join(' · ')||'<span class="dim">이 스텝 변화 없음 (−0.05 timeout 압력)</span>';
+    if(row.d.term)dl.push(`<span class="fire">작업 성공 +${row.d.term}</span>`);
+    if(row.d.mile)dl.push(`<span class="fire">목표 달성 +${row.d.mile} (${row.fire.join(', ')})</span>`);
+    if(row.d.shape)dl.push(`접근 shaping ${row.d.shape>0?'+':''}${row.d.shape}`);
+    if(row.d.pen)dl.push(`감점 ${row.d.pen}`);
+    if(row.end)dl.push(`<span class="fire">${row.end.note} → 스킬 종료 (최종 ${row.end.total})</span>`);
+    document.getElementById('rl-delta').innerHTML=dl.join(' · ')||'<span class="dim">이 스텝 리워드 변화 없음</span>';
+    // live target checklist: a target is "done" once its bonus appeared at or before current step
+    const firedByNow={};
+    for(let j=0;j<=idx;j++){ clip.timeline[j].fire.forEach(f=>firedByNow[f]=true); if(clip.timeline[j].d.term) firedByNow['__term']=true; }
+    document.getElementById('rl-targets').innerHTML=clip.targets.map(t=>{
+      const on = t.name==='작업 성공(terminal)' ? firedByNow['__term'] : firedByNow[t.name];
+      return `<div class="tgt"><span class="tk ${on?'on':''}"></span><span>${t.name}</span><span class="tb">+${t.bonus}</span></div>`;
+    }).join('');
     document.getElementById('rl-pred').innerHTML=Object.entries(row.p).map(([k,v])=>
       `<tr><td>${LAB[k]||k}</td><td>${fmt(v)}</td></tr>`).join('');
     document.getElementById('rl-stepinfo').textContent=`step ${row.s} / ${clip.n} · frame ${row.f}`;
@@ -372,10 +399,15 @@ fetch('rlenv.json').then(r=>r.json()).then(RL=>{
     vid.src=clip.mp4; vid.load();
     const maxf=clip.timeline[clip.timeline.length-1].f;
     seek.max=maxf; seek.value=0;
-    document.getElementById('rl-meta').innerHTML=`${clip.instr} · ${clip.success?'<span class="pt">성공</span>':'<span class="pf">실패</span>'} · 최종 누적 리워드 <b>${clip.total}</b>`;
-    paint(clip.timeline[0], clip);
+    document.getElementById('rl-meta').innerHTML=`목표: ${clip.goal} · 지시문 ${clip.instr} · 판정 <b>${clip.outcome}</b> · 학습 리워드 합계 <b>${clip.total}</b>`;
+    paint(clip.timeline[0], clip, 0);
   }
-  function syncFromFrame(fidx){ const clip=clips[cur]; const row=nearest(clip,fidx); paint(row,clip); }
+  function idxFromFrame(clip, fidx){
+    let lo=0,hi=clip.timeline.length-1,ans=0;
+    while(lo<=hi){const m=(lo+hi)>>1; if(clip.timeline[m].f<=fidx){ans=m;lo=m+1;}else hi=m-1;}
+    return ans;
+  }
+  function syncFromFrame(fidx){ const clip=clips[cur]; const idx=idxFromFrame(clip,fidx); paint(clip.timeline[idx],clip,idx); }
   tabs.innerHTML=''; clips.forEach((c,i)=>{const b=document.createElement('button');b.textContent=c.label;b.onclick=()=>load(i);tabs.appendChild(b);});
   vid.addEventListener('timeupdate',()=>{ const clip=clips[cur]; const fidx=Math.round(vid.currentTime*clip.fps); seek.value=Math.min(fidx,seek.max); syncFromFrame(fidx); });
   seek.addEventListener('input',()=>{ const clip=clips[cur]; const fidx=+seek.value; vid.currentTime=fidx/clip.fps; syncFromFrame(fidx); });

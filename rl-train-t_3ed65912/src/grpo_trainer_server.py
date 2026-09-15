@@ -43,6 +43,7 @@ from flow_sde import flow_sde_sample, transition_logprob, make_executed_mask  # 
 from lora import (  # noqa: E402
     SKILLS, inject_per_skill_lora, set_active_skill, lora_parameters, select_trainable,
 )
+import vlm_scorer  # noqa: E402  (env card: single source of truth for the VQA prompt+math)
 
 
 class GRPOTrainerServer:
@@ -215,9 +216,40 @@ class GRPOTrainerServer:
         return {"n_trajs": len(self.store), "n_chunks": sum(len(v) for v in self.store.values()),
                 "free_gb": round(torch.cuda.mem_get_info()[0] / 1e9, 2)}
 
+    def _yes_no_ids(self):
+        """Lazily resolve+cache the yes/no answer token ids from the model's tokenizer."""
+        if getattr(self, "_yn_ids", None) is None:
+            from transformers import AutoTokenizer
+            tok = AutoTokenizer.from_pretrained(self.a.model, trust_remote_code=True)
+            self._yn_ids = vlm_scorer.resolve_yes_no_ids(tok)
+        return self._yn_ids
+
+    def op_vlm_score(self, req):
+        """Real VQA success/progress score from the policy's own frozen Qwen3-VL backbone.
+
+        Runs one VLM forward over (image + yes/no question) and returns P(yes) read from
+        the first-answer-position logits. Auxiliary/diagnostic only -- NEVER a primary
+        reward. The VLM is frozen and this runs under no_grad, so it does not perturb any
+        adapter/optimizer state (the LoRA wrappers live in the DiT, not the VLM).
+        """
+        inputs = req["inputs"]
+        data = {k: self._to_dev(v) for k, v in inputs.items()}
+        yes_ids, no_ids = self._yes_no_ids()
+        with torch.no_grad():
+            out = self.model.vlm(
+                input_ids=data["input_ids"],
+                attention_mask=data.get("attention_mask"),
+                pixel_values=data.get("pixel_values"),
+                image_grid_thw=data.get("image_grid_thw"),
+            )
+            logits_last = out.logits[0, -1, :]
+            prob = vlm_scorer.answer_probability(logits_last, yes_ids, no_ids)
+        return {"prob": prob, "question": req.get("question")}
+
     def handle(self, req):
         fn = {"sample": self.op_sample, "update": self.op_update, "save": self.op_save,
-              "load": self.op_load, "metrics": self.op_metrics}.get(req.get("op"))
+              "load": self.op_load, "metrics": self.op_metrics,
+              "vlm_score": self.op_vlm_score}.get(req.get("op"))
         return fn(req) if fn else {"error": f"unknown op {req.get('op')}"}
 
     def serve(self):
