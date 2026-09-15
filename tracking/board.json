@@ -1,24 +1,22 @@
 {
  "updated": "2026-09-15",
  "purpose": {
-  "north_star": "Skill-conditioned VLA를 훈련한다 — 집기/옮기기/놓기 같은 skill을 각각의 지시로 제어할 수 있는 정책을 만든다 (base Xiaomi-RoboCasa365 기반, SFT로 skill 조건화 → RL로 강화).",
-  "why_now": "지금은 SFT 학습 데이터셋을 검토하는 단계. skill 단위로 자른 데이터(구간 영상+target action)가 올바른지 확인해야, 그 위에 SFT/RL이 제대로 올라간다.",
-  "why_sft": "왜 SFT? base 모델은 '전체-task 지시'로만 학습돼 부분 skill 지시가 OOD(→ hold 실험의 '지시 무시·표류'). SFT는 각 skill 구간 데이터로 '이 지시엔 이 skill 행동'을 가르쳐, skill로 제어 가능한 정책을 만든다. 그래야 이후 RL(GRPO)이 skill 경계를 아는 정책을 시작점으로 성공률을 강화할 수 있다. (SFT=지시 알아듣게, RL=그 skill을 잘하게)"
+  "north_star": "Skill-conditioned VLA 훈련 — 집기/옮기기/놓기 같은 skill을 각각의 지시로 제어하는 정책을 만든다 (base: Xiaomi-RoboCasa365)."
  },
  "user_todo": [
   {
-   "title": "SFT 학습 데이터셋 검토 (skill 조각: 구간 영상 + target action이 올바른가)",
-   "why": "skill-conditioned VLA의 첫 단추. 잘못 잘린 데이터로 SFT하면 그 위 RL까지 전부 무너지므로, 학습 전에 조각이 맞는지 눈으로 확인. → 데이터셋 탭.",
+   "title": "SFT 학습 데이터셋 검토",
+   "why": "skill 단위로 자른 데이터(구간 영상 + target action)가 올바른지 학습 전에 확인. 잘못 잘린 데이터로 SFT하면 그 위 RL까지 무너지므로. → 데이터셋 탭",
    "done": false
   },
   {
    "title": "모델 선정: Xiaomi-Robotics-1-RoboCasa365 확정",
-   "why": "skill-SFT/RL의 base를 하나로 고정해야 비교가 성립. 3모델 비교(36% 최상)+skill/probe 하네스 유일 지원이 근거.",
+   "why": "SFT/RL의 base를 하나로 고정해야 비교가 성립. 3모델 비교(36% 최상) + skill/probe 하네스 유일 지원이 근거.",
    "done": true
   },
   {
-   "title": "결정 필요: skill-SFT Gate3 회귀 대응 방향",
-   "why": "SFT loss는 줄지만 실제 성공률이 안 오르는 벽(BC→closed-loop 전이 실패). 방향을 못 정하면 파이프라인 전체가 멈춤. (A)레시피 재설계 (B)SFT 건너뛰고 GRPO (C)축소보고 중 → 현재 A로 진행 중.",
+   "title": "결정: skill-SFT Gate3 회귀 대응",
+   "why": "SFT loss는 줄지만 실제 성공률이 안 오르는 벽. 방향을 못 정하면 파이프라인이 멈춤 → 현재 (A)레시피 재설계로 진행 중.",
    "done": false
   }
  ],
