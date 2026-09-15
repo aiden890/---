@@ -1,0 +1,219 @@
+{
+ "model": "Xiaomi-Robotics-1-RoboCasa365",
+ "task": "CloseBlenderLid",
+ "seed": 9,
+ "method": "obs 고정 · instruction만 변경 · 지시당 24샘플 · 192-D 액션청크 순열검정 + 효과크기(vs noise floor)",
+ "verdict": "instruction에 실제로 어텐드하나 state-의존적 (obs-only 아님)",
+ "states": [
+  {
+   "state": "task 시작 (reset)",
+   "key": "reset",
+   "noise_floor": 3.56,
+   "rows": [
+    {
+     "label": "정답 지시 (기준)",
+     "cat": "correct",
+     "es": 0.0,
+     "cos": 1.0,
+     "sig": false
+    },
+    {
+     "label": "skill: 집기",
+     "cat": "skill",
+     "es": 10.48,
+     "cos": 0.145,
+     "sig": true
+    },
+    {
+     "label": "skill: 옮기기",
+     "cat": "skill",
+     "es": 10.22,
+     "cos": 0.157,
+     "sig": true
+    },
+    {
+     "label": "skill: 놓기",
+     "cat": "skill",
+     "es": 6.76,
+     "cos": 0.567,
+     "sig": true
+    },
+    {
+     "label": "반대: 서랍 열기",
+     "cat": "opposite",
+     "es": 11.06,
+     "cos": 0.123,
+     "sig": true
+    },
+    {
+     "label": "무관: 컵 집기",
+     "cat": "irrelevant",
+     "es": 7.54,
+     "cos": 0.451,
+     "sig": true
+    },
+    {
+     "label": "무관: 스토브 켜기",
+     "cat": "irrelevant",
+     "es": 2.92,
+     "cos": 0.939,
+     "sig": true
+    },
+    {
+     "label": "빈 지시",
+     "cat": "degenerate",
+     "es": 7.55,
+     "cos": 0.456,
+     "sig": true
+    },
+    {
+     "label": "무의미 토큰",
+     "cat": "degenerate",
+     "es": 10.41,
+     "cos": 0.122,
+     "sig": true
+    }
+   ]
+  },
+  {
+   "state": "진행 중 (옮기는 중)",
+   "key": "move",
+   "noise_floor": 1.04,
+   "rows": [
+    {
+     "label": "정답 지시 (기준)",
+     "cat": "correct",
+     "es": 0.0,
+     "cos": 1.0,
+     "sig": false
+    },
+    {
+     "label": "skill: 집기",
+     "cat": "skill",
+     "es": 1.55,
+     "cos": 0.999,
+     "sig": true
+    },
+    {
+     "label": "skill: 옮기기",
+     "cat": "skill",
+     "es": 1.84,
+     "cos": 0.998,
+     "sig": true
+    },
+    {
+     "label": "skill: 놓기",
+     "cat": "skill",
+     "es": 1.87,
+     "cos": 0.998,
+     "sig": true
+    },
+    {
+     "label": "반대: 서랍 열기",
+     "cat": "opposite",
+     "es": 8.3,
+     "cos": 0.962,
+     "sig": true
+    },
+    {
+     "label": "무관: 컵 집기",
+     "cat": "irrelevant",
+     "es": 6.79,
+     "cos": 0.975,
+     "sig": true
+    },
+    {
+     "label": "무관: 스토브 켜기",
+     "cat": "irrelevant",
+     "es": 6.84,
+     "cos": 0.974,
+     "sig": true
+    },
+    {
+     "label": "빈 지시",
+     "cat": "degenerate",
+     "es": 6.4,
+     "cos": 0.978,
+     "sig": true
+    },
+    {
+     "label": "무의미 토큰",
+     "cat": "degenerate",
+     "es": 3.5,
+     "cos": 0.994,
+     "sig": true
+    }
+   ]
+  },
+  {
+   "state": "진행 중 (놓기 직전)",
+   "key": "place",
+   "noise_floor": 2.03,
+   "rows": [
+    {
+     "label": "정답 지시 (기준)",
+     "cat": "correct",
+     "es": 0.0,
+     "cos": 1.0,
+     "sig": false
+    },
+    {
+     "label": "skill: 집기",
+     "cat": "skill",
+     "es": 0.86,
+     "cos": 0.998,
+     "sig": true
+    },
+    {
+     "label": "skill: 옮기기",
+     "cat": "skill",
+     "es": 0.28,
+     "cos": 1.0,
+     "sig": true
+    },
+    {
+     "label": "skill: 놓기",
+     "cat": "skill",
+     "es": 0.36,
+     "cos": 1.0,
+     "sig": true
+    },
+    {
+     "label": "반대: 서랍 열기",
+     "cat": "opposite",
+     "es": 2.68,
+     "cos": 0.981,
+     "sig": true
+    },
+    {
+     "label": "무관: 컵 집기",
+     "cat": "irrelevant",
+     "es": 2.26,
+     "cos": 0.99,
+     "sig": true
+    },
+    {
+     "label": "무관: 스토브 켜기",
+     "cat": "irrelevant",
+     "es": 8.86,
+     "cos": 0.761,
+     "sig": true
+    },
+    {
+     "label": "빈 지시",
+     "cat": "degenerate",
+     "es": 2.75,
+     "cos": 0.985,
+     "sig": true
+    },
+    {
+     "label": "무의미 토큰",
+     "cat": "degenerate",
+     "es": 2.48,
+     "cos": 0.986,
+     "sig": true
+    }
+   ]
+  }
+ ]
+}

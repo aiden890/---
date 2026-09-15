@@ -87,6 +87,7 @@
     <button data-tab="now" class="active">현재 작업</button>
     <button data-tab="tasks">RoboCasa Task</button>
     <button data-tab="rlenv">RL 환경</button>
+    <button data-tab="attend">실험 결과</button>
     <button data-tab="dataset">데이터셋</button>
     <button data-tab="report">작업 보고</button>
     <a href="http://100.86.183.64:8898/" style="color:var(--dim);text-decoration:none;font-size:13px;padding:8px 10px">↩ Hub</a>
@@ -223,6 +224,30 @@
       <li>release 때 뚜껑이 7° 넘게 기울면 성공 리워드가 <b>지급되지 않는지</b> (place 클립에서 확인)</li>
       <li>매 스텝 아주 작은 timeout 압력(−0.05)만 있고, 밀집 penalty가 리워드를 포화시키지 않는지</li>
     </ul>
+  </div>
+</section>
+
+<!-- ===== 실험 결과 (instruction-attendance) ===== -->
+<section id="attend" class="tab">
+  <h1>실험 결과 · Instruction Attendance</h1>
+  <p class="dim" id="at-sub"></p>
+
+  <div class="card" style="border-left:3px solid var(--acc)">
+    <h2>❓ 질문 &amp; 결론</h2>
+    <div id="at-verdict"></div>
+  </div>
+
+  <div class="card">
+    <h2>🔬 방법</h2>
+    <p class="dim" id="at-method"></p>
+    <p class="dim" style="margin-top:8px"><b>읽는 법:</b> <b style="color:var(--ok)">효과크기(ES)</b>가 클수록 그 지시로 액션이 크게 달라짐 = instruction에 반응. ES가 0에 가까우면 지시를 바꿔도 액션이 그대로 = 무시. <b>cos</b>는 정답 지시와의 방향 유사도(1=동일, 0=직교, 낮을수록 다른 행동).</p>
+  </div>
+
+  <div id="at-states"></div>
+
+  <div class="card">
+    <h2>🎬 발산 사례 영상</h2>
+    <p class="dim" style="margin:0 0 10px">같은 obs(task 시작)에서 지시만 바꿨을 때 궤적이 갈라지는 사례. → 영상은 <a href="#" onclick="document.querySelector('[data-tab=rlenv]').click();return false">RL 환경 탭</a> 참고 또는 로컬 <code>videos/CloseBlenderLid/instr_attend/</code></p>
   </div>
 </section>
 
@@ -476,6 +501,35 @@ fetch('rlenv_hold.json').then(r=>r.json()).then(RL=>{
   seek.addEventListener('input',()=>{const clip=clips[cur];const fidx=+seek.value;vid.currentTime=fidx/clip.fps;sync(fidx);});
   load(0);
 }).catch(e=>{});
+
+// ===== attend tab: instruction-attendance =====
+fetch('attend.json').then(r=>r.json()).then(a=>{
+  const CATC={correct:'#9aa4b2',skill:'#818cf8',opposite:'#f87171',irrelevant:'#facc15',degenerate:'#60a5fa'};
+  document.getElementById('at-sub').innerHTML=`모델 <b>${a.model}</b> · ${a.task} · seed ${a.seed}`;
+  document.getElementById('at-method').innerHTML=a.method;
+  document.getElementById('at-verdict').innerHTML=`
+    <div class="item"><div class="tt"><b style="color:var(--acc)">질문</b><div style="margin-top:2px">모델이 지시(instruction)를 실제로 보고 행동하나, 아니면 지시를 무시하고 obs(화면)만 보고 행동하나?</div></div></div>
+    <div class="item"><div class="tt"><b style="color:var(--acc)">결론</b><div style="margin-top:2px"><b>${a.verdict}</b></div>
+      <div class="nt" style="font-size:13px;margin-top:4px">• <b>task 시작</b>: 지시가 지배 — 지시를 바꾸면 액션이 크게 달라짐(ES 6~11). 즉 지시를 잘 따름.<br>• <b>진행 중</b>: obs가 우세 — 현재 단계와 맞는 지시는 정답과 거의 동일(cos≈1), 모순되는 지시만 액션을 흔듦.<br>→ hold 실험의 '성공 후 표류'는 <b>지시 무시가 아니라</b>, 진행 중 obs가 부분지시(OOD)를 눌러서 생긴 것.</div></div></div>`;
+  document.getElementById('at-states').innerHTML=a.states.map(s=>{
+    const maxes=Math.max(...s.rows.map(r=>r.es),1);
+    const rows=s.rows.filter(r=>r.cat!=='correct').map(r=>`
+      <div class="item"><div class="tt">
+        <div style="display:flex;gap:8px;align-items:center;font-size:13px">
+          <span style="flex:none;width:130px">${r.label}</span>
+          <div style="flex:1;position:relative;height:16px;background:#0c0e13;border-radius:4px;overflow:hidden">
+            <div style="position:absolute;left:0;top:0;bottom:0;width:${Math.round(r.es/maxes*100)}%;background:${CATC[r.cat]||'#818cf8'};opacity:.85"></div>
+          </div>
+          <span style="flex:none;width:56px;text-align:right;font-variant-numeric:tabular-nums">ES ${r.es}</span>
+          <span style="flex:none;width:64px;text-align:right;color:var(--dim);font-variant-numeric:tabular-nums">cos ${r.cos}</span>
+        </div>
+      </div></div>`).join('');
+    const dom = s.key==='reset' ? '<span style="color:var(--ok)">지시 지배</span>' : '<span style="color:var(--run)">obs 우세</span>';
+    return `<div class="card">
+      <h2>${s.state} <span class="dim" style="font-size:13px">· ${dom} · noise floor ${s.noise_floor}</span></h2>
+      ${rows}
+    </div>`;}).join('');
+}).catch(e=>{document.getElementById('at-states').innerHTML='<div class="dim">로드 실패</div>';});
 
 // ===== dataset tab: SFT skill clips =====
 fetch('dataset.json').then(r=>r.json()).then(d=>{
