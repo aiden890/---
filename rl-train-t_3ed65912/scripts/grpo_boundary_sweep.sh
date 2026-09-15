@@ -18,6 +18,9 @@ OUT=results/grpo_sweep
 mkdir -p "$OUT"
 REPORT=REPORT/grpo_boundary_sweep.md
 TABLE="$OUT/sweep_table.tsv"
+# run-train.sh `train <run>` writes to results/<run> (NOT under $OUT); the sweep reads from
+# there. $OUT holds only the driver log + accumulated table.
+RESULTS=results
 run_train() { bash scripts/run-train.sh "$@"; }
 
 ts() { date -u +%FT%TZ; }
@@ -88,8 +91,8 @@ run_train train grpo_base_eval --iters 0 --eval-n "$EVAL_N" --heldout-n 0 \
   --eval-split target --train-skill grasp --eval-seed-base "$SEED_EVAL" \
   > "$OUT/base_eval.log" 2>&1
 run_train trainer-stop >/dev/null 2>&1
-BASE_SUCC=$(python3 -c "import json;d=json.load(open('$OUT/grpo_base_eval/eval_before.json'));print(d['official_success_rate'])" 2>/dev/null || echo NA)
-BASE_GRASP=$(python3 -c "import json;d=json.load(open('$OUT/grpo_base_eval/eval_before.json'));print(d['grasp_success_rate'])" 2>/dev/null || echo NA)
+BASE_SUCC=$(python3 -c "import json;d=json.load(open('$RESULTS/grpo_base_eval/eval_before.json'));print(d['official_success_rate'])" 2>/dev/null || echo NA)
+BASE_GRASP=$(python3 -c "import json;d=json.load(open('$RESULTS/grpo_base_eval/eval_before.json'));print(d['grasp_success_rate'])" 2>/dev/null || echo NA)
 log "BASE succ=$BASE_SUCC grasp=$BASE_GRASP"
 
 for spec in "${CONFIGS[@]}"; do
@@ -115,7 +118,7 @@ for spec in "${CONFIGS[@]}"; do
   fi
   STRIKES=0; LAST_ERR=""
   # parse trained eval + hold stats
-  python3 - "$name" "$lr" "$kl" "$clip" "$grp" "$iters" "$BASE_SUCC" "$BASE_GRASP" "$OUT" "$REPORT" << 'PYEOF'
+  python3 - "$name" "$lr" "$kl" "$clip" "$grp" "$iters" "$BASE_SUCC" "$BASE_GRASP" "$RESULTS" "$REPORT" << 'PYEOF'
 import json, sys
 name, lr, kl, clip, grp, iters, bsucc, bgrasp, out, report = sys.argv[1:11]
 d = f"{out}/grpo_{name}"
