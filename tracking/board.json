@@ -36,6 +36,12 @@
  "note": [],
  "findings": [
   {
+   "title": "GR00T N1.5 vs Xiaomi — CloseBlenderLid 동일조건 20% vs 36%",
+   "tag": "info",
+   "detail": "공개 RoboCasa365 파인튜닝 체크포인트(gr00t_n1-5 multitask-120000) 그대로 추론(base 학습 없음). 동일 robot(Panda+Omron)·predicate·replan16·split=pretrain 50-ep: GR00T 10/50=20% < Xiaomi 18/50=36% (+16%p Xiaomi 우세). target split도 22%로 유사. skill/hold는 GR00T 하네스가 full-task instruction만 지원해 미지원.",
+   "link": ""
+  },
+  {
    "title": "RoboCasa365 CloseBlenderLid demos 확보·분할 완료 (106 demos)",
    "tag": "ok",
    "detail": "공개 LeRobot 미러 ember-lab-berkeley/robocasa365-pretrain-atomic (토큰불요). GRASP_HANDLE/MOVE_LID_TO_CLOSED/RELEASE_HANDLE 3-skill 분할, 74/16/16 traj split, action loss mask, SHA-256 manifest. RELEASE 데이터 존재.",

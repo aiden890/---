@@ -9,13 +9,15 @@ CloseBlenderLid를 우리 Xiaomi RoboCasa365와 **동일 task·동일 robot(sing
 | 모델 | task | split | robot | n_ep | 성공 | 성공률 |
 |------|------|-------|-------|------|------|--------|
 | **Xiaomi-Robotics-1-RoboCasa365** | CloseBlenderLid | pretrain | Panda+Omron | 50 | 18 | **36.0%** |
-| **GR00T N1.5 (RoboCasa365 multitask ckpt)** | CloseBlenderLid | target | Panda+Omron | 50 | 11 | **22.0%** |
-| **GR00T N1.5 (RoboCasa365 multitask ckpt)** | CloseBlenderLid | pretrain | Panda+Omron | 50 | (실행 중) | (실행 중) |
+| **GR00T N1.5 (RoboCasa365 multitask ckpt)** | CloseBlenderLid | pretrain | Panda+Omron | 50 | 10 | **20.0%** |
+| GR00T N1.5 (동일 ckpt, 참고) | CloseBlenderLid | target | Panda+Omron | 50 | 11 | 22.0% |
 
-> 주의: Xiaomi 공식 CloseBlenderLid 36%는 **split=pretrain scenes** 기준(target50 task 집합,
-> pretrain scene에서 평가). 직접 비교를 위해 GR00T도 **split=pretrain**을 별도로 돌리는 중이다.
-> split=target(위 22%)은 target scene(다른 씬 randomization) 기준이라 Xiaomi 36%와 scene 조건이 달라
-> 1:1 비교가 아니다. pretrain 결과가 진짜 apples-to-apples.
+**핵심 결론(apples-to-apples):** 동일 task·동일 robot·동일 predicate·동일 replan(16)·**동일 split(pretrain)**
+조건에서 **Xiaomi 36% vs GR00T N1.5 20%**. Xiaomi가 CloseBlenderLid 단일 task에서 +16%p 우세.
+(성공 episode index — pretrain: GR00T {6,9,18,22,23,27,28,30,36,49} / target: {1,3,5,11,23,33,35,40,44,46,47}.)
+
+> 참고: split=target(다른 scene randomization)에서는 GR00T 22%로 pretrain과 큰 차이 없음.
+> Xiaomi 공식 수치가 pretrain scene 기준이므로 **pretrain 행이 정식 비교**다.
 
 ## 무엇을 확인했나 (검증된 사실)
 
@@ -32,13 +34,14 @@ CloseBlenderLid를 우리 Xiaomi RoboCasa365와 **동일 task·동일 robot(sing
 
 ## 성능 해석 (정직 보고)
 
-- split=target(다른 scene 조건)에서 GR00T N1.5 = 22%(11/50). 리더보드의 GR00T N1.5
-  Atomic-Seen 50.7%는 18개 atomic task **평균**이고, CloseBlenderLid 단일 task 수치는 아니다.
-  단일 task는 task 난이도 편차가 커서 평균보다 낮을 수 있다.
-- Xiaomi(36%, pretrain) vs GR00T(22%, target)은 **scene split이 달라** 이 표만으로 우열을
-  단정하면 안 된다. pretrain split GR00T 결과가 나오면 그 값으로 비교/갱신한다.
-- 성공 포장 없음: GR00T가 RoboCasa365 파인튜닝 후에도 CloseBlenderLid 단일 task에서
-  Xiaomi보다 낮게 나올 개연성이 있으며, 최종 수치로 정직히 보고한다.
+- **동일 조건(pretrain split)에서 GR00T N1.5 = 20%(10/50) < Xiaomi 36%(18/50).**
+  RoboCasa365 파인튜닝 체크포인트를 그대로 썼음에도 CloseBlenderLid 단일 task에서 Xiaomi가 +16%p 우세.
+- 리더보드의 GR00T N1.5 Atomic-Seen 50.7%는 18개 atomic task **평균**이지 CloseBlenderLid 단일값이 아니다.
+  단일 task는 난이도 편차가 커서 평균보다 낮을 수 있고, CloseBlenderLid는 그런 어려운 축에 속한다
+  (Xiaomi조차 36%로, target50 전체 평균 57.28%보다 한참 낮은 hard task).
+- split(pretrain 20% vs target 22%)에 따른 차이는 작다 → GR00T의 이 task 성능은 scene 조건에 크게
+  의존하지 않고 대체로 낮다.
+- 성공 포장 없음: 공개 365 파인튜닝 체크포인트로도 CloseBlenderLid는 Xiaomi 대비 낮게 나왔다.
 
 ## skill별 + 성공 후 hold — 지원 범위 (한계 명시)
 

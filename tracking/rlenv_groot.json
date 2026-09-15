@@ -1,0 +1,44 @@
+{
+  "updated": "2026-09-15",
+  "task": "CloseBlenderLid",
+  "note": "GR00T N1.5 (공개 RoboCasa365 multitask checkpoint-120000)를 그대로 로드해 추론. base 파인튜닝/직접 학습 없음. 동일 robot(Panda+Omron)·동일 predicate·replan 16.",
+  "comparison": [
+    {
+      "model": "Xiaomi-Robotics-1-RoboCasa365",
+      "split": "pretrain",
+      "n_episodes": 50,
+      "successes": 18,
+      "success_rate": 0.36,
+      "source": "vendor/xiaomi-robotics-1/eval_robocasa365/summary.json (공식)"
+    },
+    {
+      "model": "GR00T N1.5 (RoboCasa365 multitask ckpt)",
+      "split": "pretrain",
+      "n_episodes": 50,
+      "successes": 10,
+      "success_rate": 0.20,
+      "source": "groot eval-task, split=pretrain (apples-to-apples 정식 비교)"
+    },
+    {
+      "model": "GR00T N1.5 (동일 ckpt, 참고)",
+      "split": "target",
+      "n_episodes": 50,
+      "successes": 11,
+      "success_rate": 0.22,
+      "source": "groot eval-task, split=target (scene 조건 다름)"
+    }
+  ],
+  "skill_hold_support": "미지원(GR00T 공식 eval 하네스는 full-task instruction만; skill 단위 지시·post-success hold 경로 없음). GR00T를 skill_eval.py에 얹으려면 action space/normalization 어댑터 별도 필요.",
+  "provenance": {
+    "checkpoint": "robocasa/robocasa365_checkpoints gr00t_n1-5/multitask_learning/checkpoint-120000",
+    "embodiment_tag": "new_embodiment",
+    "data_config": "panda_omron",
+    "groot_fork": "robocasa-benchmark/Isaac-GR00T@9d7d7a9",
+    "robocasa": "4f8a2980",
+    "robosuite": "5ce6643",
+    "image": "groot-eval:t_ff372eea",
+    "base_image": "xiaomi-cu121:t_9f03a613",
+    "driver": "535.183.01",
+    "gpu": "RTX 3090 24GB"
+  }
+}
