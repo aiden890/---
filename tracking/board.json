@@ -1,12 +1,18 @@
 {
  "updated": "2026-09-15",
+ "purpose": {
+  "north_star": "Xiaomi VLA(RoboCasa365)가 CloseBlenderLid 같은 조작을 왜 실패하는지 규명하고, skill 단위 학습(SFT→RL)으로 조작 능력을 실제로 끌어올린다.",
+  "why_now": "실패가 '계획(planning)' 문제인지 '조작(manipulation)' 문제인지 구분해야 올바른 개선책이 나오기 때문. 지금은 그 구분과, skill 단위로 나눠 학습하면 조작이 나아지는지 검증하는 단계."
+ },
  "user_todo": [
   {
-   "title": "모델 선정: Xiaomi-Robotics-1-RoboCasa365 확정 (3모델 비교 36% 최상 + skill/probe 하네스 유일 지원)",
+   "title": "모델 선정: Xiaomi-Robotics-1-RoboCasa365 확정",
+   "why": "이후 모든 skill-SFT/RL 실험의 base를 하나로 고정해야 비교가 성립. 3모델 비교(36% 최상)+skill/probe 하네스 유일 지원이 근거.",
    "done": true
   },
   {
-   "title": "결정 필요: skill-SFT Gate3 회귀 대응 — (A) SFT 레시피 재설계(KL-to-base/arm B/lr 스윕) (B) SFT 건너뛰고 base 위 GRPO 직접 (C) Goal5를 heldout CFM loss로만 축소보고",
+   "title": "결정 필요: skill-SFT Gate3 회귀 대응 방향",
+   "why": "SFT loss는 줄지만 실제 성공률이 안 오르는 벽(BC→closed-loop 전이 실패). 여기서 방향을 못 정하면 파이프라인 전체가 멈춤. (A)레시피 재설계 (B)SFT 건너뛰고 GRPO (C)축소보고 중 택 → 현재 A로 진행 중.",
    "done": false
   }
  ],
@@ -14,7 +20,7 @@
   {
    "title": "skill-SFT 파이프라인 (t_e5cd5736): per-skill CFM SFT 학습",
    "badge": "wait",
-   "note": "Goal1 데이터·Goal2 conditioning·Goal3 구현 완료. GPU 게이트: Gate1·2 PASS, Gate3(entry-state rollout) 미통과(회귀). SFT 레시피 재설계 or GRPO-직접 결정 필요(operator)."
+   "note": "Goal1 데이터·Goal2 conditioning·Goal3 구현 완료. GPU 게이트: Gate1·2 PASS, Gate3(entry-state rollout) 미통과(회귀). SFT 레시피 재설계(A) 진행."
   },
   {
    "title": "Goal4 skill-control eval (baseline vs per-skill)",

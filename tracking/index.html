@@ -100,6 +100,11 @@
 <section id="now" class="tab active">
   <h1>RoboCasa · CloseBlenderLid 실험</h1>
 
+  <div class="card" style="border-left:3px solid var(--acc)">
+    <h2>🎯 목적 (왜 이걸 하나)</h2>
+    <div id="b-purpose"></div>
+  </div>
+
   <div class="card">
     <h2>🙋 내 TODO</h2>
     <div id="b-user"></div>
@@ -307,10 +312,12 @@ document.querySelectorAll('.nav button[data-tab]').forEach(b=>{
 const BADGE={run:'b-run',wait:'b-wait',rev:'b-rev',blk:'b-blk',ok:'b-ok'};
 const BLABEL={run:'진행',wait:'대기',rev:'리뷰',blk:'블로커',ok:'완료'};
 fetch('board.json').then(r=>r.json()).then(b=>{
+  const P=b.purpose||{};
+  document.getElementById('b-purpose').innerHTML=(P.north_star?`<div class="item"><div class="tt"><b style="color:var(--acc)">최종 목적</b><div style="margin-top:2px">${P.north_star}</div></div></div>`:'')+(P.why_now?`<div class="item"><div class="tt"><b style="color:var(--acc)">지금 왜</b><div class="nt" style="font-size:13px">${P.why_now}</div></div></div>`:'')||'<div class="dim">없음</div>';
   document.getElementById('b-agent').innerHTML=(b.agent_todo||[]).map(x=>`
     <div class="item"><div class="tt">${x.title}${x.note?`<div class="nt">${x.note}</div>`:''}</div><span class="badge ${BADGE[x.badge]||'b-wait'}">${BLABEL[x.badge]||''}</span></div>`).join('')||'<div class="dim">없음</div>';
   document.getElementById('b-user').innerHTML=(b.user_todo||[]).map(x=>`
-    <div class="item"><span class="chk ${x.done?'on':''}"></span><div class="tt" style="${x.done?'text-decoration:line-through;color:var(--dim)':''}">${x.title}</div></div>`).join('')||'<div class="dim">없음</div>';
+    <div class="item"><span class="chk ${x.done?'on':''}"></span><div class="tt" style="${x.done?'color:var(--dim)':''}"><span style="${x.done?'text-decoration:line-through':''}">${x.title}</span>${x.why?`<div class="nt" style="font-size:12px"><b style="color:var(--acc)">왜:</b> ${x.why}</div>`:''}</div></div>`).join('')||'<div class="dim">없음</div>';
   document.getElementById('b-note').innerHTML=(b.note||[]).map(n=>`<div class="item"><span style="color:var(--acc);flex:none">•</span><div class="tt nt" style="font-size:13px">${n}</div></div>`).join('')||'<div class="dim">없음</div>';
 }).catch(e=>{});
 // load demos (grouped by task) then benchmark tasks
