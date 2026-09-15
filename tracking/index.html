@@ -197,6 +197,29 @@
   </div>
 
   <div class="card">
+    <h2>스킬 경계 실험: 성공 후에도 계속 롤아웃 (hold)</h2>
+    <p class="dim" style="margin:0 0 12px">스킬 성공 판정이 나도 <b>멈추지 않고 같은 instruction으로 100스텝 더</b> 굴립니다. 지시를 이행한 뒤 <b>멈추는지</b>(경계 존중) 아니면 <b>다음 동작으로 표류</b>하는지(오버피팅/obs-조건화) 관찰. 성공 시점 이후 구간은 <span style="color:var(--run)">노란 배경</span>으로 표시됩니다.</p>
+    <div class="rl-tabs" id="hold-tabs"></div>
+    <div id="hold-meta" class="dim" style="margin:6px 0 14px"></div>
+    <div class="rl-view">
+      <div class="rl-left">
+        <video id="hold-video" controls preload="metadata" style="width:100%;border-radius:10px;background:#000"></video>
+        <input id="hold-seek" type="range" min="0" value="0" step="1" style="width:100%;margin-top:10px">
+        <div class="dim" id="hold-stepinfo" style="font-size:12px"></div>
+      </div>
+      <div class="rl-right">
+        <div class="rl-rewardbox">
+          <div class="dim" style="font-size:12px">현재 구간</div>
+          <div id="hold-phase" class="rl-cum" style="font-size:22px">—</div>
+          <div id="hold-verdict" style="font-size:12px;min-height:16px"></div>
+        </div>
+        <div class="dim" style="font-size:12px;margin-bottom:4px">현재 로봇팔 상태</div>
+        <table class="rl-pred"><tbody id="hold-pred"></tbody></table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
     <h2>이 뷰어로 무엇을 검증하나</h2>
     <ul class="dim" style="margin:0;padding-left:18px;line-height:1.7">
       <li>영상 속 팔이 뚜껑을 <b>실제로 집는 순간</b> predicate <code>lid_grasped</code>가 true로 바뀌고 milestone 리워드가 붙는지</li>
@@ -411,6 +434,43 @@ fetch('rlenv.json').then(r=>r.json()).then(RL=>{
   tabs.innerHTML=''; clips.forEach((c,i)=>{const b=document.createElement('button');b.innerHTML=`${c.label} <span style="opacity:.6;font-size:11px">${c.outcome}</span>`;b.title=c.case||'';b.onclick=()=>load(i);tabs.appendChild(b);});
   vid.addEventListener('timeupdate',()=>{ const clip=clips[cur]; const fidx=Math.round(vid.currentTime*clip.fps); seek.value=Math.min(fidx,seek.max); syncFromFrame(fidx); });
   seek.addEventListener('input',()=>{ const clip=clips[cur]; const fidx=+seek.value; vid.currentTime=fidx/clip.fps; syncFromFrame(fidx); });
+  load(0);
+}).catch(e=>{});
+
+// ===== 스킬 경계(hold) 뷰어 =====
+fetch('rlenv_hold.json').then(r=>r.json()).then(RL=>{
+  const LAB=RL.predicate_labels, clips=RL.clips;
+  const tabs=document.getElementById('hold-tabs');
+  const vid=document.getElementById('hold-video'), seek=document.getElementById('hold-seek');
+  let cur=0;
+  function fmt(v){ if(v===true)return'<span class="pt">true</span>'; if(v===false)return'<span class="pf">false</span>'; return v; }
+  function idxFromFrame(clip,fidx){let lo=0,hi=clip.timeline.length-1,ans=0;while(lo<=hi){const m=(lo+hi)>>1;if(clip.timeline[m].f<=fidx){ans=m;lo=m+1;}else hi=m-1;}return ans;}
+  function paint(row,clip){
+    const post = row.phase==='post' || row.s>(clip.success_step||1e9);
+    const ph=document.getElementById('hold-phase');
+    ph.textContent = clip.success_step==null ? '성공 없음' : (post?'성공 후 (hold)':'스킬 수행 중');
+    ph.style.color = post?'var(--run)':'var(--tx)';
+    document.getElementById('hold-verdict').innerHTML = post && clip.verdict==='KEEPS_MOVING'
+      ? `<span class="fire">계속 움직임 → ${clip.drift||'다음 동작으로 표류'}</span>`
+      : (post?'<span class="pt">정지 유지</span>':'<span class="dim">성공 지점 이후를 보세요</span>');
+    document.getElementById('hold-pred').innerHTML=Object.entries(row.p).map(([k,v])=>`<tr><td>${LAB[k]||k}</td><td>${fmt(v)}</td></tr>`).join('');
+    const tag = row.s===clip.success_step ? ' · ★성공 판정' : (post?' · hold':'');
+    document.getElementById('hold-stepinfo').textContent=`step ${row.s} / ${clip.n}${tag}  (성공 step ${clip.success_step??'-'})`;
+    document.getElementById('hold-video').style.boxShadow = post ? '0 0 0 3px var(--run)' : 'none';
+  }
+  function load(i){
+    cur=i; const clip=clips[i];
+    [...tabs.children].forEach((b,j)=>b.classList.toggle('active',j===i));
+    vid.src=clip.mp4; vid.load();
+    seek.max=clip.timeline[clip.timeline.length-1].f; seek.value=0;
+    const vv = clip.success_step==null ? '이 클립은 성공하지 못함' : (clip.verdict==='KEEPS_MOVING'?`<b style="color:var(--run)">판정: 성공 후 계속 움직임</b> — ${clip.drift}`:'<b class="pt">판정: 정지 유지</b>');
+    document.getElementById('hold-meta').innerHTML=`<b>${clip.label}</b> · ${clip.case} · 지시 ${clip.instr} · ${vv}`;
+    paint(clip.timeline[0],clip);
+  }
+  function sync(fidx){const clip=clips[cur];paint(clip.timeline[idxFromFrame(clip,fidx)],clip);}
+  tabs.innerHTML=''; clips.forEach((c,i)=>{const b=document.createElement('button');b.innerHTML=`${c.label}${c.label==='place'?' '+(c.success_step!=null?'✓':'✗'):''}`;b.title=c.case||'';b.onclick=()=>load(i);tabs.appendChild(b);});
+  vid.addEventListener('timeupdate',()=>{const clip=clips[cur];const fidx=Math.round(vid.currentTime*clip.fps);seek.value=Math.min(fidx,seek.max);sync(fidx);});
+  seek.addEventListener('input',()=>{const clip=clips[cur];const fidx=+seek.value;vid.currentTime=fidx/clip.fps;sync(fidx);});
   load(0);
 }).catch(e=>{});
 </script>
