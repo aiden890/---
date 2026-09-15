@@ -61,7 +61,6 @@
     <div class="brand">Robo<span>Casa</span> · Xiaomi VLA</div>
     <button data-tab="now" class="active">현재 작업</button>
     <button data-tab="tasks">RoboCasa Task</button>
-    <button data-tab="demo">데모 영상</button>
     <button data-tab="report">작업 보고</button>
     <div class="live"><span class="dot"></span>v4 · RTX 3090</div>
   </nav>
@@ -98,12 +97,12 @@
 <!-- ===== RoboCasa Task (벤치마크 전체) ===== -->
 <section id="tasks" class="tab">
   <h1>RoboCasa 벤치마크 Task</h1>
-  <p class="dim">RoboCasa365 <code>target50</code> 평가 세트 · 성공률은 Xiaomi-Robotics-1-RoboCasa365 공식 결과 (task당 50 episode, base seed 7).</p>
+  <p class="dim">RoboCasa365 벤치마크 · 데이터가 있는 전체 <b>316개</b> task. 이 중 <code>target50</code> 50개만 공식 task별 성공률(Xiaomi-Robotics-1)이 공개됨. 나머지는 목록·분류 참고용.</p>
   <div class="kpi">
-    <div><div class="n" id="k-total">50</div><div class="l">task</div></div>
-    <div><div class="n" id="k-overall">57.3%</div><div class="l">전체 성공률</div></div>
-    <div><div class="n" id="k-atomic">18</div><div class="l">atomic</div></div>
-    <div><div class="n" id="k-comp">32</div><div class="l">composite</div></div>
+    <div><div class="n" id="k-total">316</div><div class="l">전체 task</div></div>
+    <div><div class="n" id="k-eval">50</div><div class="l">평가(target50)</div></div>
+    <div><div class="n" id="k-atomic">65</div><div class="l">atomic</div></div>
+    <div><div class="n" id="k-comp">251</div><div class="l">composite</div></div>
   </div>
   <div class="card">
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
@@ -111,19 +110,17 @@
       <button class="filt active" data-f="all">전체</button>
       <button class="filt" data-f="atomic">atomic</button>
       <button class="filt" data-f="composite">composite</button>
+      <button class="filt" data-f="eval">target50</button>
     </div>
     <table>
-      <thead><tr><th>#</th><th>task</th><th>분류</th><th>공식 성공률</th><th>horizon</th></tr></thead>
+      <thead><tr><th>#</th><th>task</th><th>분류</th><th>공식 성공률</th><th>horizon</th><th>데모</th></tr></thead>
       <tbody id="task-body"></tbody>
     </table>
   </div>
-</section>
-
-<!-- ===== 데모 영상 ===== -->
-<section id="demo" class="tab">
-  <h1>데모 영상</h1>
-  <p class="dim">skill별 지시문을 다르게 주고 현재 VLA가 실행한 영상. release/재생 가능.</p>
-  <div class="grid" id="demo-grid"></div>
+  <div id="task-demo" style="display:none" class="card">
+    <h2 id="td-title">데모</h2>
+    <div class="grid" id="td-grid"></div>
+  </div>
 </section>
 
 <!-- ===== 작업 보고 ===== -->
@@ -183,40 +180,47 @@ document.querySelectorAll('.nav button[data-tab]').forEach(b=>{
     document.getElementById(b.dataset.tab).classList.add('active');
   };
 });
-// load demos
-fetch('demos.json').then(r=>r.json()).then(ds=>{
-  const g=document.getElementById('demo-grid');
-  g.innerHTML=ds.map(d=>`
+// load demos (grouped by task) then benchmark tasks
+let TASKS=[], DEMOS={}, filt='all';
+function srColor(sr){ if(sr>=70)return'var(--ok)'; if(sr>=40)return'var(--run)'; if(sr>=15)return'#fb923c'; return'var(--red)'; }
+function renderTasks(){
+  const q=(document.getElementById('tsearch').value||'').toLowerCase();
+  const rows=TASKS.filter(t=>{
+    if(filt==='eval') return t.eval && t.name.toLowerCase().includes(q);
+    return (filt==='all'||t.cat===filt)&&t.name.toLowerCase().includes(q);
+  });
+  document.getElementById('task-body').innerHTML=rows.map((t,i)=>{
+    const sr = t.sr==null ? '<span class="dim">—</span>'
+      : `<span class="bar" style="width:${Math.max(t.sr*0.6,2)}px;background:${srColor(t.sr)}"></span>${t.sr.toFixed(0)}%`;
+    const nd=(DEMOS[t.name]||[]).length;
+    const demo = nd ? `<a href="#" onclick="showDemo('${t.name}');return false">▶ ${nd}</a>` : '<span class="dim">—</span>';
+    return `<tr><td class="dim">${i+1}</td><td>${t.name}</td><td><span class="dim">${t.cat}</span></td>
+      <td class="sr">${sr}</td><td class="dim">${t.h||'—'}</td><td>${demo}</td></tr>`;
+  }).join('');
+}
+function showDemo(name){
+  const ds=DEMOS[name]||[]; const box=document.getElementById('task-demo');
+  document.getElementById('td-title').textContent=name+' 데모';
+  document.getElementById('td-grid').innerHTML=ds.map(d=>`
     <div class="card" style="margin:0">
       <video src="${d.file}" controls preload="metadata"></video>
       <div class="vcap"><b>${d.skill}</b> ${d.success?'<span class="ok">성공</span>':'<span class="no">실패</span>'}</div>
       <div class="vsub">${d.instr}${d.reason?'<br>사유: '+d.reason:''}</div>
     </div>`).join('');
-}).catch(e=>{document.getElementById('demo-grid').innerHTML='<p class="dim">demos.json 로드 실패</p>'});
-
-// load RoboCasa benchmark tasks
-let TASKS=[], filt='all';
-function srColor(sr){ if(sr>=70)return'var(--ok)'; if(sr>=40)return'var(--run)'; if(sr>=15)return'#fb923c'; return'var(--red)'; }
-function renderTasks(){
-  const q=(document.getElementById('tsearch').value||'').toLowerCase();
-  const rows=TASKS.filter(t=>(filt==='all'||t.cat===filt)&&t.name.toLowerCase().includes(q));
-  document.getElementById('task-body').innerHTML=rows.map((t,i)=>`
-    <tr>
-      <td class="dim">${i+1}</td>
-      <td>${t.name}</td>
-      <td><span class="dim">${t.cat}</span></td>
-      <td class="sr"><span class="bar" style="width:${Math.max(t.sr*0.6,2)}px;background:${srColor(t.sr)}"></span>${t.sr.toFixed(0)}%</td>
-      <td class="dim">${t.h}</td>
-    </tr>`).join('');
+  box.style.display='block'; box.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
-fetch('robocasa_tasks.json').then(r=>r.json()).then(d=>{
+Promise.all([
+  fetch('demos.json').then(r=>r.json()).catch(()=>[]),
+  fetch('robocasa_tasks.json').then(r=>r.json())
+]).then(([demos,d])=>{
+  demos.forEach(x=>{(DEMOS[x.task]=DEMOS[x.task]||[]).push(x);});
   TASKS=d.tasks;
-  document.getElementById('k-total').textContent=d.num_tasks;
-  document.getElementById('k-overall').textContent=d.overall+'%';
-  document.getElementById('k-atomic').textContent=TASKS.filter(t=>t.cat==='atomic').length;
-  document.getElementById('k-comp').textContent=TASKS.filter(t=>t.cat==='composite').length;
+  document.getElementById('k-total').textContent=d.total;
+  document.getElementById('k-eval').textContent=d.eval_count;
+  document.getElementById('k-atomic').textContent=d.atomic;
+  document.getElementById('k-comp').textContent=d.composite;
   renderTasks();
-}).catch(e=>{document.getElementById('task-body').innerHTML='<tr><td colspan=5 class="dim">robocasa_tasks.json 로드 실패</td></tr>'});
+}).catch(e=>{document.getElementById('task-body').innerHTML='<tr><td colspan=6 class="dim">데이터 로드 실패</td></tr>'});
 document.getElementById('tsearch').addEventListener('input',renderTasks);
 document.querySelectorAll('.filt').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('.filt').forEach(x=>x.classList.remove('active'));
