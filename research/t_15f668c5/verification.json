@@ -1,0 +1,226 @@
+{
+  "task_id": "t_15f668c5",
+  "scope": "Read-only verification after user cancellation of planning-candidate reruns; no new episodes",
+  "new_rollouts": 0,
+  "manifest_checks": [
+    {
+      "path": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/xiaomi-robotics-1-t_f22ea8b3/remote/closeblenderlid/seed10/rollout/CloseBlenderLid/episode_000_seed_10_failure.mp4",
+      "bytes": 1400813,
+      "sha256": "798bd6f65f2a1846a4d8d8e2f2ee1e9fab1b5af274debfddf650064a07b2f838"
+    },
+    {
+      "path": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/xiaomi-robotics-1-t_f22ea8b3/remote/closeblenderlid/seed11/rollout/CloseBlenderLid/episode_000_seed_11_failure.mp4",
+      "bytes": 1019892,
+      "sha256": "57f9c132156646ecdeb460ce1f2c59530f0f4d5f008b241a22b2e209479b8d03"
+    },
+    {
+      "path": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/xiaomi-robotics-1-t_f22ea8b3/remote/closeblenderlid/seed12/rollout/CloseBlenderLid/episode_000_seed_12_failure.mp4",
+      "bytes": 950766,
+      "sha256": "4fed51f5084e4c529dde9e82a55bd0fcb09221f06636980c55426a5c60fe5985"
+    },
+    {
+      "path": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/xiaomi-robotics-1-t_f22ea8b3/remote/closeblenderlid/seed8/rollout/CloseBlenderLid/episode_000_seed_8_failure.mp4",
+      "bytes": 1236227,
+      "sha256": "47f1d232422f91725dc96bc04c067ad440c098198342746998c742db32b285dc"
+    },
+    {
+      "path": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/xiaomi-robotics-1-t_f22ea8b3/remote/closeblenderlid/seed9/rollout/CloseBlenderLid/episode_000_seed_9_success.mp4",
+      "bytes": 1226116,
+      "sha256": "f40e362ad6a1630f609128058b885e636e5c40ef90098817f339e798aeaa620c"
+    },
+    {
+      "path": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/xiaomi-robotics-1-t_f22ea8b3/remote/closeblenderlid/seed10/rollout/CloseBlenderLid/stats.json",
+      "bytes": 453,
+      "sha256": "601ffc01b04c3252945c3b0462a67fb6ad8d248faa4756d631ef986ef1f64d60"
+    },
+    {
+      "path": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/xiaomi-robotics-1-t_f22ea8b3/remote/closeblenderlid/seed11/rollout/CloseBlenderLid/stats.json",
+      "bytes": 453,
+      "sha256": "44034b65f150fd588e8a78056f4186b137b1df2d908b124afe2defebba308682"
+    },
+    {
+      "path": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/xiaomi-robotics-1-t_f22ea8b3/remote/closeblenderlid/seed12/rollout/CloseBlenderLid/stats.json",
+      "bytes": 453,
+      "sha256": "cb10e870889df17efed7d54b5d98179bdb8afee76454b98dff693a70d27f1122"
+    },
+    {
+      "path": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/xiaomi-robotics-1-t_f22ea8b3/remote/closeblenderlid/seed8/rollout/CloseBlenderLid/stats.json",
+      "bytes": 452,
+      "sha256": "00a3cfb3219e1c8e4bb5f6aeb4f67f92fd7e8ed35df154f71c7999330ac5d830"
+    },
+    {
+      "path": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/xiaomi-robotics-1-t_f22ea8b3/remote/closeblenderlid/seed9/rollout/CloseBlenderLid/stats.json",
+      "bytes": 451,
+      "sha256": "821af9b22e9419a5e59d5ffe8b48746a614038c2392b82183d4773c2cfa46a50"
+    },
+    {
+      "path": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/xiaomi-robotics-1-t_f22ea8b3/remote/closeblenderlid/seed10/rollout/summary.json",
+      "bytes": 872,
+      "sha256": "8b9a7e7fb1886e6c1cace3540ada2dbccb9f7d53c72c9dfa6a4cf3e2efdcdb5c"
+    },
+    {
+      "path": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/xiaomi-robotics-1-t_f22ea8b3/remote/closeblenderlid/seed11/rollout/summary.json",
+      "bytes": 872,
+      "sha256": "b70a075cddb52fe67603c5c0382093188e8b3a942a9f20d41e4ed606b4337c4b"
+    },
+    {
+      "path": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/xiaomi-robotics-1-t_f22ea8b3/remote/closeblenderlid/seed12/rollout/summary.json",
+      "bytes": 872,
+      "sha256": "17bbe16a63cc339bc16da8f79b6469f2249963f98a361a012fcb8b76002c9241"
+    },
+    {
+      "path": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/xiaomi-robotics-1-t_f22ea8b3/remote/closeblenderlid/seed8/rollout/summary.json",
+      "bytes": 871,
+      "sha256": "72048cc68fca6d2c90af24175c00c0e1029fb592f67b9b2947ad11248ff4d3e6"
+    },
+    {
+      "path": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/xiaomi-robotics-1-t_f22ea8b3/remote/closeblenderlid/seed9/rollout/summary.json",
+      "bytes": 870,
+      "sha256": "187a6a151566d4db4c8582089d0ced30966c7470e8261712e03426129b035992"
+    },
+    {
+      "path": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/xiaomi-robotics-1-t_f22ea8b3/remote/closeblenderlid/seed10/rollout.log",
+      "bytes": 3628,
+      "sha256": "bee12f9c0db3c68e4d4245820072ae259a036c3487c6ca7fc02b332ec220dde5"
+    },
+    {
+      "path": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/xiaomi-robotics-1-t_f22ea8b3/remote/closeblenderlid/seed11/rollout.log",
+      "bytes": 3628,
+      "sha256": "19a06f95e30e358a12bbe7d52f5bf309f3e51978f5a3ff2f6953a5424f60eadd"
+    },
+    {
+      "path": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/xiaomi-robotics-1-t_f22ea8b3/remote/closeblenderlid/seed12/rollout.log",
+      "bytes": 3628,
+      "sha256": "c27414229ab374afc3e57ccb9a0aeb82529ac14349992d0ea66aab5cc36dde1a"
+    },
+    {
+      "path": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/xiaomi-robotics-1-t_f22ea8b3/remote/closeblenderlid/seed8/rollout.log",
+      "bytes": 3628,
+      "sha256": "ac7d11c4e3ad9b455ff28e96b094d5126784c310cc72ef69db81ae252006812a"
+    },
+    {
+      "path": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/xiaomi-robotics-1-t_f22ea8b3/remote/closeblenderlid/seed9/rollout.log",
+      "bytes": 3630,
+      "sha256": "30579c3ad0d6954f102acc6eadb1f89f23476f27ea8a7cbaa005736d374c907b"
+    }
+  ],
+  "manifest_matches": 20,
+  "episodes": [
+    {
+      "episode": 0,
+      "global_episode_index": 0,
+      "seed": 7,
+      "success": false,
+      "steps": 900,
+      "instruction": "Close the lid blender by securely placing the lid on top.",
+      "termination_reason": "horizon",
+      "done": false,
+      "truncated": false,
+      "horizon": 900,
+      "stats_path": "/home/aiden/Desktop/lab/robot/robocasa-docker/xiaomi-cu121/output/rollout/CloseBlenderLid/stats.json",
+      "video": "/home/aiden/Desktop/lab/robot/robocasa-docker/xiaomi-cu121/output/rollout/CloseBlenderLid/episode_000_seed_7_failure.mp4",
+      "decoded_frames": 451,
+      "fps": 20.0,
+      "sha256": "a1d929eeb1141569d490ec5242ac8e7dff9d58be5f35f75e0fc74d7745f98909"
+    },
+    {
+      "episode": 0,
+      "global_episode_index": 0,
+      "seed": 8,
+      "success": false,
+      "steps": 900,
+      "instruction": "Close the lid blender by securely placing the lid on top.",
+      "termination_reason": "horizon",
+      "done": false,
+      "truncated": false,
+      "horizon": 900,
+      "stats_path": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/xiaomi-robotics-1-t_f22ea8b3/remote/closeblenderlid/seed8/rollout/CloseBlenderLid/stats.json",
+      "video": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/xiaomi-robotics-1-t_f22ea8b3/remote/closeblenderlid/seed8/rollout/CloseBlenderLid/episode_000_seed_8_failure.mp4",
+      "decoded_frames": 451,
+      "fps": 20.0,
+      "sha256": "47f1d232422f91725dc96bc04c067ad440c098198342746998c742db32b285dc"
+    },
+    {
+      "episode": 0,
+      "global_episode_index": 0,
+      "seed": 9,
+      "success": true,
+      "steps": 885,
+      "instruction": "Close the lid blender by securely placing the lid on top.",
+      "termination_reason": "success",
+      "done": false,
+      "truncated": false,
+      "horizon": 900,
+      "stats_path": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/xiaomi-robotics-1-t_f22ea8b3/remote/closeblenderlid/seed9/rollout/CloseBlenderLid/stats.json",
+      "video": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/xiaomi-robotics-1-t_f22ea8b3/remote/closeblenderlid/seed9/rollout/CloseBlenderLid/episode_000_seed_9_success.mp4",
+      "decoded_frames": 444,
+      "fps": 20.0,
+      "sha256": "f40e362ad6a1630f609128058b885e636e5c40ef90098817f339e798aeaa620c"
+    },
+    {
+      "episode": 0,
+      "global_episode_index": 0,
+      "seed": 10,
+      "success": false,
+      "steps": 900,
+      "instruction": "Close the lid blender by securely placing the lid on top.",
+      "termination_reason": "horizon",
+      "done": false,
+      "truncated": false,
+      "horizon": 900,
+      "stats_path": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/xiaomi-robotics-1-t_f22ea8b3/remote/closeblenderlid/seed10/rollout/CloseBlenderLid/stats.json",
+      "video": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/xiaomi-robotics-1-t_f22ea8b3/remote/closeblenderlid/seed10/rollout/CloseBlenderLid/episode_000_seed_10_failure.mp4",
+      "decoded_frames": 451,
+      "fps": 20.0,
+      "sha256": "798bd6f65f2a1846a4d8d8e2f2ee1e9fab1b5af274debfddf650064a07b2f838"
+    },
+    {
+      "episode": 0,
+      "global_episode_index": 0,
+      "seed": 11,
+      "success": false,
+      "steps": 900,
+      "instruction": "Close the lid blender by securely placing the lid on top.",
+      "termination_reason": "horizon",
+      "done": false,
+      "truncated": false,
+      "horizon": 900,
+      "stats_path": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/xiaomi-robotics-1-t_f22ea8b3/remote/closeblenderlid/seed11/rollout/CloseBlenderLid/stats.json",
+      "video": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/xiaomi-robotics-1-t_f22ea8b3/remote/closeblenderlid/seed11/rollout/CloseBlenderLid/episode_000_seed_11_failure.mp4",
+      "decoded_frames": 451,
+      "fps": 20.0,
+      "sha256": "57f9c132156646ecdeb460ce1f2c59530f0f4d5f008b241a22b2e209479b8d03"
+    },
+    {
+      "episode": 0,
+      "global_episode_index": 0,
+      "seed": 12,
+      "success": false,
+      "steps": 900,
+      "instruction": "Close the lid blender by securely placing the lid on top.",
+      "termination_reason": "horizon",
+      "done": false,
+      "truncated": false,
+      "horizon": 900,
+      "stats_path": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/xiaomi-robotics-1-t_f22ea8b3/remote/closeblenderlid/seed12/rollout/CloseBlenderLid/stats.json",
+      "video": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/xiaomi-robotics-1-t_f22ea8b3/remote/closeblenderlid/seed12/rollout/CloseBlenderLid/episode_000_seed_12_failure.mp4",
+      "decoded_frames": 451,
+      "fps": 20.0,
+      "sha256": "4fed51f5084e4c529dde9e82a55bd0fcb09221f06636980c55426a5c60fe5985"
+    }
+  ],
+  "additional": {
+    "episodes": 5,
+    "successes": 1
+  },
+  "combined": {
+    "episodes": 6,
+    "successes": 1
+  },
+  "remote_comparison": "Compared local bytes to preserved upstream remote manifest and decode report; no fresh SSH query",
+  "limitations": [
+    "No behavior or causal failure classification from integrity checks.",
+    "Horizon termination does not establish planning failure.",
+    "Original multi-task planning-candidate reruns cancelled by user, not completed and not a no-candidate finding."
+  ]
+}

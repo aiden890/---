@@ -1,0 +1,1 @@
+docs/XIAOMI_STATUS.md

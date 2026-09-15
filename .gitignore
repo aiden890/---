@@ -1,0 +1,30 @@
+# --- Heavy / generated artifacts (git으로 관리하지 않음) ---
+# 대용량 vendor 소스
+vendor/
+
+# 렌더링 영상 · 체크포인트 · 아카이브
+*.mp4
+*.pt
+*.tar.gz
+*.pkl
+
+# rollout 결과물 (재현 가능, 원본은 서버/아카이브 보존)
+rollouts/
+rollouts-xiaomi-*/
+rl-train-*/results/
+reward_audit_viewer/*.mp4
+
+# 파이썬 캐시
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# 로그
+logs/
+*.log
+
+# OS
+.DS_Store
+
+# 트래킹 페이지는 별도 git 저장소로 관리
+tracking/

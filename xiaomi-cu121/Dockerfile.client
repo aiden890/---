@@ -1,0 +1,5 @@
+FROM robocasa-sim:t_04bf4fb7
+RUN python -m pip install torch==2.5.1 torchvision==0.20.1 --index-url https://download.pytorch.org/whl/cpu
+RUN python -m pip install transformers==4.57.1 imageio==2.37.0 imageio-ffmpeg==0.6.0
+RUN python -m pip freeze > /app/client.resolved.txt
+WORKDIR /app

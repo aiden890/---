@@ -1,0 +1,165 @@
+{
+  "before": [
+    ".dockerignore",
+    "10_nvidia.json",
+    "Dockerfile",
+    "README.md",
+    "VERIFICATION.md",
+    "XIAOMI_STATUS.md",
+    "__pycache__",
+    "assets-log.tar",
+    "build-log.tar",
+    "context.tar",
+    "diagnose_egl.py",
+    "logs",
+    "output",
+    "preflight",
+    "remote.sh",
+    "requirements-sim.txt",
+    "requirements.lock",
+    "research",
+    "results.tar",
+    "robocasa-docker-t_04bf4fb7.tar.gz",
+    "rollouts",
+    "rollouts-xiaomi-t_460aea68",
+    "run.sh",
+    "smoke_test.py",
+    "vendor",
+    "verify_results.py",
+    "xiaomi-cu121"
+  ],
+  "after": [
+    ".dockerignore",
+    "10_nvidia.json",
+    "DIRECTORY_GUIDE.md",
+    "Dockerfile",
+    "README.md",
+    "VERIFICATION.md",
+    "XIAOMI_STATUS.md",
+    "__pycache__",
+    "archives",
+    "diagnose_egl.py",
+    "experiments",
+    "logs",
+    "output",
+    "preflight",
+    "remote.sh",
+    "requirements-sim.txt",
+    "requirements.lock",
+    "research",
+    "rollouts",
+    "rollouts-xiaomi-t_460aea68",
+    "run.sh",
+    "smoke_test.py",
+    "vendor",
+    "verify_results.py",
+    "videos",
+    "xiaomi-cu121"
+  ],
+  "moved": [
+    {
+      "from": "/home/aiden/Desktop/lab/robot/robocasa-docker/assets-log.tar",
+      "to": "/home/aiden/Desktop/lab/robot/robocasa-docker/archives/simulation/assets-log.tar"
+    },
+    {
+      "from": "/home/aiden/Desktop/lab/robot/robocasa-docker/build-log.tar",
+      "to": "/home/aiden/Desktop/lab/robot/robocasa-docker/archives/simulation/build-log.tar"
+    },
+    {
+      "from": "/home/aiden/Desktop/lab/robot/robocasa-docker/context.tar",
+      "to": "/home/aiden/Desktop/lab/robot/robocasa-docker/archives/simulation/context.tar"
+    },
+    {
+      "from": "/home/aiden/Desktop/lab/robot/robocasa-docker/results.tar",
+      "to": "/home/aiden/Desktop/lab/robot/robocasa-docker/archives/simulation/results.tar"
+    },
+    {
+      "from": "/home/aiden/Desktop/lab/robot/robocasa-docker/robocasa-docker-t_04bf4fb7.tar.gz",
+      "to": "/home/aiden/Desktop/lab/robot/robocasa-docker/archives/simulation/robocasa-docker-t_04bf4fb7.tar.gz"
+    },
+    {
+      "from": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/xiaomi-robotics-1/report-sync.tar",
+      "to": "/home/aiden/Desktop/lab/robot/robocasa-docker/archives/prior-rollouts/report-sync.tar"
+    },
+    {
+      "from": "/home/aiden/Desktop/lab/robot/robocasa-docker/xiaomi-cu121/build-progress.tar",
+      "to": "/home/aiden/Desktop/lab/robot/robocasa-docker/archives/xiaomi-cu121/build-progress.tar"
+    },
+    {
+      "from": "/home/aiden/Desktop/lab/robot/robocasa-docker/xiaomi-cu121/client-context.tar",
+      "to": "/home/aiden/Desktop/lab/robot/robocasa-docker/archives/xiaomi-cu121/client-context.tar"
+    },
+    {
+      "from": "/home/aiden/Desktop/lab/robot/robocasa-docker/xiaomi-cu121/context.tar",
+      "to": "/home/aiden/Desktop/lab/robot/robocasa-docker/archives/xiaomi-cu121/context.tar"
+    },
+    {
+      "from": "/home/aiden/Desktop/lab/robot/robocasa-docker/xiaomi-cu121/cuda-check.tar",
+      "to": "/home/aiden/Desktop/lab/robot/robocasa-docker/archives/xiaomi-cu121/cuda-check.tar"
+    },
+    {
+      "from": "/home/aiden/Desktop/lab/robot/robocasa-docker/xiaomi-cu121/final-context.tar",
+      "to": "/home/aiden/Desktop/lab/robot/robocasa-docker/archives/xiaomi-cu121/final-context.tar"
+    },
+    {
+      "from": "/home/aiden/Desktop/lab/robot/robocasa-docker/xiaomi-cu121/final-evidence-with-status.bin",
+      "to": "/home/aiden/Desktop/lab/robot/robocasa-docker/archives/xiaomi-cu121/final-evidence-with-status.bin"
+    },
+    {
+      "from": "/home/aiden/Desktop/lab/robot/robocasa-docker/xiaomi-cu121/final-evidence.tar",
+      "to": "/home/aiden/Desktop/lab/robot/robocasa-docker/archives/xiaomi-cu121/final-evidence.tar"
+    },
+    {
+      "from": "/home/aiden/Desktop/lab/robot/robocasa-docker/xiaomi-cu121/final-logs.tar",
+      "to": "/home/aiden/Desktop/lab/robot/robocasa-docker/archives/xiaomi-cu121/final-logs.tar"
+    },
+    {
+      "from": "/home/aiden/Desktop/lab/robot/robocasa-docker/xiaomi-cu121/freeze.tar",
+      "to": "/home/aiden/Desktop/lab/robot/robocasa-docker/archives/xiaomi-cu121/freeze.tar"
+    },
+    {
+      "from": "/home/aiden/Desktop/lab/robot/robocasa-docker/xiaomi-cu121/handoff.tar",
+      "to": "/home/aiden/Desktop/lab/robot/robocasa-docker/archives/xiaomi-cu121/handoff.tar"
+    },
+    {
+      "from": "/home/aiden/Desktop/lab/robot/robocasa-docker/xiaomi-cu121/import.tar",
+      "to": "/home/aiden/Desktop/lab/robot/robocasa-docker/archives/xiaomi-cu121/import.tar"
+    },
+    {
+      "from": "/home/aiden/Desktop/lab/robot/robocasa-docker/xiaomi-cu121/observe.tar",
+      "to": "/home/aiden/Desktop/lab/robot/robocasa-docker/archives/xiaomi-cu121/observe.tar"
+    },
+    {
+      "from": "/home/aiden/Desktop/lab/robot/robocasa-docker/xiaomi-cu121/processor.tar",
+      "to": "/home/aiden/Desktop/lab/robot/robocasa-docker/archives/xiaomi-cu121/processor.tar"
+    },
+    {
+      "from": "/home/aiden/Desktop/lab/robot/robocasa-docker/xiaomi-cu121/progress.tar",
+      "to": "/home/aiden/Desktop/lab/robot/robocasa-docker/archives/xiaomi-cu121/progress.tar"
+    },
+    {
+      "from": "/home/aiden/Desktop/lab/robot/robocasa-docker/xiaomi-cu121/run-update.tar",
+      "to": "/home/aiden/Desktop/lab/robot/robocasa-docker/archives/xiaomi-cu121/run-update.tar"
+    },
+    {
+      "from": "/home/aiden/Desktop/lab/robot/robocasa-docker/xiaomi-cu121/scripts.tar",
+      "to": "/home/aiden/Desktop/lab/robot/robocasa-docker/archives/xiaomi-cu121/scripts.tar"
+    },
+    {
+      "from": "/home/aiden/Desktop/lab/robot/robocasa-docker/xiaomi-cu121/stats.tar",
+      "to": "/home/aiden/Desktop/lab/robot/robocasa-docker/archives/xiaomi-cu121/stats.tar"
+    },
+    {
+      "from": "/home/aiden/Desktop/lab/robot/robocasa-docker/xiaomi-cu121/update.tar",
+      "to": "/home/aiden/Desktop/lab/robot/robocasa-docker/archives/xiaomi-cu121/update.tar"
+    },
+    {
+      "from": "/home/aiden/Desktop/lab/robot/robocasa-docker/xiaomi-cu121/verify.tar",
+      "to": "/home/aiden/Desktop/lab/robot/robocasa-docker/archives/xiaomi-cu121/verify.tar"
+    },
+    {
+      "from": "/home/aiden/Desktop/lab/robot/robocasa-docker/xiaomi-cu121/xiaomi-cu121-t_9f03a613.tar.gz",
+      "to": "/home/aiden/Desktop/lab/robot/robocasa-docker/archives/xiaomi-cu121/xiaomi-cu121-t_9f03a613.tar.gz"
+    }
+  ]
+}

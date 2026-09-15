@@ -1,0 +1,182 @@
+"""Reward specification for CloseBlenderLid skill-conditioned RL.
+
+Reward hierarchy (task t_4f3f2b20, strictly enforced here):
+
+  PRIMARY  = simulator ground-truth predicates only. The official terminal success
+             is  lid_on_blender == True  AND  gripper-lid distance > 0.15 m.
+  SKILL    = per-skill predicate milestones (stable grasp, lid lifted, grasp
+             maintained, collision-free transfer, pre-place reached, lid seated,
+             released, retreated). Each milestone is paid AT MOST ONCE per episode
+             (first time it becomes true), so the policy cannot farm a milestone by
+             oscillating on its boundary.
+  BASELINE = the Z-1-compatible signal: terminal 1/0 with success-aware temporal
+             decay gamma = 0.998 (a late success is worth slightly less), kept so
+             results are directly comparable to the Z-1 baseline runs.
+  VLM      = auxiliary diagnostic score ONLY. It is recorded for analysis and can be
+             added as a small shaped bonus in the "simulator+VLM" ablation, but it is
+             NEVER the primary reward and its weight defaults to 0.
+
+The class returns a structured RewardBreakdown per step so every component is
+auditable and the reward-only ablation (simulator-only vs simulator+VLM) is a pure
+config switch, no code change.
+
+Predicate names match rollouts-xiaomi-t_4a072806/tools/skill_eval.py Sim.predicates()
+so this module consumes that exact dict without adaptation (single source of truth
+for predicates -- we do not re-derive geometry here).
+"""
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from typing import Any, Optional
+
+# Official CloseBlenderLid success threshold constants (from robocasa source, mirrored
+# in skill_eval.py): lid seated AND gripper far by >= 0.15 m AND lid upright.
+GRIPPER_FAR_THRESH_M = 0.15
+
+
+# Skill-milestone predicates: name -> function(predicate_dict) -> bool.
+# These are the transition predicates the task enumerates.
+SKILL_MILESTONES = {
+    "stable_grasp": lambda p: bool(p.get("lid_grasped")),
+    "lid_lifted": lambda p: bool(p.get("lid_lifted")),
+    "grasp_maintained": lambda p: bool(p.get("lid_grasped")),  # tracked for duration in aggregator
+    "collision_free_transfer": lambda p: bool(p.get("lid_grasped")) and not p.get("lid_other_contacts"),
+    "pre_place_reached": lambda p: bool(p.get("in_preplace_region")),
+    "lid_seated": lambda p: bool(p.get("lid_on_blender")),
+    "released": lambda p: (not p.get("gripper_lid_contact")) and bool(p.get("lid_on_blender")),
+    "retreated": lambda p: bool(p.get("gripper_lid_far_0.15")) and bool(p.get("lid_on_blender")),
+}
+
+# Default per-milestone bonus (dimensionless, small relative to terminal reward).
+DEFAULT_MILESTONE_BONUS = {
+    "stable_grasp": 0.15,
+    "lid_lifted": 0.10,
+    "collision_free_transfer": 0.10,
+    "pre_place_reached": 0.20,
+    "lid_seated": 0.25,
+    "released": 0.10,
+    "retreated": 0.10,
+}
+
+
+def official_success(p: dict[str, Any]) -> bool:
+    """The one true terminal predicate. Prefers the env's own check when present."""
+    if "official_check_success" in p:
+        return bool(p["official_check_success"])
+    return bool(p.get("lid_on_blender")) and bool(p.get("gripper_lid_far_0.15")) and bool(p.get("lid_upright_7deg", True))
+
+
+@dataclass
+class RewardConfig:
+    mode: str = "simulator"                 # "simulator" | "simulator+vlm"
+    terminal_success: float = 1.0
+    terminal_decay_gamma: float = 0.998     # Z-1 success-aware decay
+    horizon: int = 400                      # steps; used for the decay reference
+    use_milestones: bool = True
+    milestone_bonus: dict = field(default_factory=lambda: dict(DEFAULT_MILESTONE_BONUS))
+    vlm_weight: float = 0.0                 # >0 only in the simulator+vlm ablation
+    collision_requires_grasp: bool = True   # a collision is "disallowed" only while carrying
+                                            # the lid; a resting lid touching its support
+                                            # surface is NOT a collision (else a dense
+                                            # per-step penalty saturates the RL reward and
+                                            # kills GRPO advantage variance).
+    penalties: dict = field(default_factory=lambda: {
+        "object_dropped": -0.25,
+        "disallowed_collision": -0.05,
+        "timeout": -0.10,
+    })
+
+    def with_vlm(self, weight: float = 0.05) -> "RewardConfig":
+        c = RewardConfig(**{**self.__dict__})
+        c.mode = "simulator+vlm"
+        c.vlm_weight = weight
+        return c
+
+
+@dataclass
+class RewardBreakdown:
+    step: int
+    terminal: float = 0.0
+    milestone: float = 0.0
+    penalty: float = 0.0
+    vlm_aux: float = 0.0            # recorded; only added to total if vlm_weight>0
+    milestones_fired: list[str] = field(default_factory=list)
+    success: bool = False
+
+    @property
+    def primary(self) -> float:
+        """Simulator-only reward (terminal + milestone + penalty). No VLM."""
+        return self.terminal + self.milestone + self.penalty
+
+    def total(self, vlm_weight: float) -> float:
+        return self.primary + vlm_weight * self.vlm_aux
+
+
+class RewardManager:
+    """Stateful per-episode reward computer. Enforces once-per-episode milestones."""
+
+    def __init__(self, config: RewardConfig):
+        self.cfg = config
+        self.reset()
+
+    def reset(self) -> None:
+        self._fired: set[str] = set()
+        self._terminal_paid = False
+        self._prev_grasped = False
+
+    def step_reward(
+        self,
+        step_index: int,
+        predicates: dict[str, Any],
+        *,
+        done: bool = False,
+        truncated: bool = False,
+        vlm_score: Optional[float] = None,
+    ) -> RewardBreakdown:
+        p = predicates
+        rb = RewardBreakdown(step=step_index)
+
+        # --- milestones (once each) ---
+        if self.cfg.use_milestones:
+            for name, fn in SKILL_MILESTONES.items():
+                if name == "grasp_maintained":
+                    continue  # duration-based, handled by the aggregator, not paid here
+                if name not in self._fired and fn(p):
+                    self._fired.add(name)
+                    bonus = self.cfg.milestone_bonus.get(name, 0.0)
+                    rb.milestone += bonus
+                    if bonus:
+                        rb.milestones_fired.append(name)
+
+        # --- penalties ---
+        # object dropped: was grasped, now neither grasped nor seated nor in contact.
+        dropped = self._prev_grasped and not p.get("lid_grasped") and not p.get("lid_on_blender") \
+            and not p.get("gripper_lid_contact")
+        if dropped:
+            rb.penalty += self.cfg.penalties["object_dropped"]
+        if p.get("lid_other_contacts") and (not self.cfg.collision_requires_grasp or p.get("lid_grasped")):
+            rb.penalty += self.cfg.penalties["disallowed_collision"]
+        self._prev_grasped = bool(p.get("lid_grasped"))
+
+        # --- terminal success (paid once) with Z-1 success-aware decay ---
+        success = official_success(p)
+        rb.success = success
+        if success and not self._terminal_paid:
+            self._terminal_paid = True
+            decay = self.cfg.terminal_decay_gamma ** step_index
+            rb.terminal += self.cfg.terminal_success * decay
+
+        # timeout penalty at the end of a failed episode
+        if (truncated or done) and not success:
+            rb.penalty += self.cfg.penalties["timeout"]
+
+        # --- VLM auxiliary (diagnostic; added to total only if weight>0) ---
+        if vlm_score is not None:
+            rb.vlm_aux = float(vlm_score)
+
+        return rb
+
+
+def z1_baseline_reward(success: bool, steps: int, gamma: float = 0.998) -> float:
+    """The pure Z-1-compatible terminal reward: 1/0 with success-aware decay."""
+    return (gamma ** steps) if success else 0.0

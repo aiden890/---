@@ -1,0 +1,83 @@
+{
+  "version": 1,
+  "sources": [
+    {
+      "id": 1,
+      "url": "https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/utils/dataset_registry.py",
+      "title": "",
+      "accessed": "2026-09-14"
+    },
+    {
+      "id": 2,
+      "url": "https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/utils/dataset_registry_utils.py",
+      "title": "",
+      "accessed": "2026-09-14"
+    },
+    {
+      "id": 3,
+      "url": "https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/utils/object_utils.py",
+      "title": "",
+      "accessed": "2026-09-14"
+    },
+    {
+      "id": 4,
+      "url": "https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/models/fixtures/sink.py",
+      "title": "",
+      "accessed": "2026-09-14"
+    },
+    {
+      "id": 5,
+      "url": "https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/models/fixtures/microwave.py",
+      "title": "",
+      "accessed": "2026-09-14"
+    },
+    {
+      "id": 6,
+      "url": "https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/environments/kitchen/composite/making_toast/bread_selection.py",
+      "title": "",
+      "accessed": "2026-09-14"
+    },
+    {
+      "id": 7,
+      "url": "https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/environments/kitchen/composite/arranging_condiments/categorize_condiments.py",
+      "title": "",
+      "accessed": "2026-09-14"
+    },
+    {
+      "id": 8,
+      "url": "https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/environments/kitchen/composite/packing_lunches/pack_identical_lunches.py",
+      "title": "",
+      "accessed": "2026-09-14"
+    },
+    {
+      "id": 9,
+      "url": "https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/environments/kitchen/composite/steaming_food/steam_in_microwave.py",
+      "title": "",
+      "accessed": "2026-09-14"
+    },
+    {
+      "id": 10,
+      "url": "https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/environments/kitchen/composite/making_salads/wash_lettuce.py",
+      "title": "",
+      "accessed": "2026-09-14"
+    },
+    {
+      "id": 11,
+      "url": "https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/environments/kitchen/composite/washing_dishes/pre_soak_pan.py",
+      "title": "",
+      "accessed": "2026-09-14"
+    },
+    {
+      "id": 12,
+      "url": "https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/environments/kitchen/composite/adding_ice_to_beverages/make_ice_lemonade.py",
+      "title": "",
+      "accessed": "2026-09-14"
+    },
+    {
+      "id": 13,
+      "url": "https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/environments/kitchen/composite/washing_fruits_and_vegetables/wash_fruit_colander.py",
+      "title": "",
+      "accessed": "2026-09-14"
+    }
+  ]
+}

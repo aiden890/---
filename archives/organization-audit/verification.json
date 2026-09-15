@@ -1,0 +1,23 @@
+{
+  "preserved_files_sha256": 245,
+  "moved_archives": 26,
+  "relative_symlinks": 18,
+  "video_links": 12,
+  "markdown_relative_links": 95,
+  "bash_n_passed": [
+    "run.sh",
+    "remote.sh",
+    "rollouts/xiaomi-robotics-1/run-t_5af7225b.sh",
+    "rollouts/xiaomi-robotics-1/run-readonly-initial.sh",
+    "rollouts-xiaomi-t_460aea68/run-t_460aea68.sh",
+    "rollouts-xiaomi-t_460aea68/parent-runner.sh",
+    "xiaomi-cu121/run.sh",
+    "research/t_1d1b4ded/sources/prior/run-t_5af7225b.sh"
+  ],
+  "excluded": [
+    "vendor",
+    "xiaomi-cu121/checkpoint",
+    "research/t_1d1b4ded/sources/robocasa/models"
+  ],
+  "status": "passed"
+}

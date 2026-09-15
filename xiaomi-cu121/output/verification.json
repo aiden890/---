@@ -1,0 +1,38 @@
+{
+  "verified": true,
+  "video": "rollout/CloseBlenderLid/episode_000_seed_7_failure.mp4",
+  "bytes": 1309724,
+  "sha256": "a1d929eeb1141569d490ec5242ac8e7dff9d58be5f35f75e0fc74d7745f98909",
+  "decoded_frames": 451,
+  "fps": 20.0,
+  "frame_shape": [
+    256,
+    768,
+    3
+  ],
+  "first_last_mean_abs_difference": 46.943603515625,
+  "episode": {
+    "episode": 0,
+    "global_episode_index": 0,
+    "seed": 7,
+    "success": false,
+    "steps": 900,
+    "instruction": "Close the lid blender by securely placing the lid on top.",
+    "termination_reason": "horizon",
+    "done": false,
+    "truncated": false
+  },
+  "inference": {
+    "stage": "REAL_OBSERVATION_INFERENCE_OK",
+    "shape": [
+      16,
+      12
+    ],
+    "seconds": 1.2635686860012356,
+    "vram_allocated": 10177654784,
+    "vram_peak": 10398234624,
+    "task": "CloseBlenderLid",
+    "seed": 7,
+    "instruction": "Close the lid blender by securely placing the lid on top."
+  }
+}

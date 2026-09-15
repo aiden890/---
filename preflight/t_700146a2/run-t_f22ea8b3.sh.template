@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# Template for t_f22ea8b3. Derived from /home/v4/rollouts-xiaomi-t_460aea68/run-t_460aea68.sh
+# with ONLY root/server/client naming changed. Not installed on v4; copy to
+# /home/v4/rollouts-xiaomi-t_f22ea8b3/run-t_f22ea8b3.sh in the executing task.
+# Policy, checkpoint, images, evaluator flags and horizons are unchanged.
+set -euo pipefail
+parent=/home/v4/robocasa-docker-t_9f03a613
+root=/home/v4/rollouts-xiaomi-t_f22ea8b3
+# Reuse the already-running server if present (same image + checkpoint); else use our own.
+server=${XIAOMI_SERVER:-xiaomi-server-t_460aea68}
+own_server=xiaomi-server-t_f22ea8b3
+assets_volume=robocasa-assets-t_5af7225b
+mkdir -p "$root"
+case "${1:-}" in
+start)
+ # Only if no xiaomi-server-* is running. Never stop another task's server.
+ docker run -d --name "$own_server" --gpus all --network none --shm-size=2g -v "$parent/checkpoint:/checkpoint:ro" -v "$parent:/work:ro" xiaomi-cu121:t_9f03a613 python3 /work/upstream/deploy/server.py --model /checkpoint --host 127.0.0.1 --port 10086
+ ;;
+episode)
+ category=$2; task=$3; seed=$4; attempt=$5
+ taskset=${category//-/_}
+ dir="$root/$category/$attempt"
+ test ! -e "$dir"
+ docker ps --format '{{.Names}}' | grep -q "^$server$" || { echo "server $server not running" >&2; exit 3; }
+ mkdir -p "$dir"
+ printf '{"category":"%s","task":"%s","base_seed":%s,"attempt":"%s","split":"target","task_set":"%s","server":"%s","replan_steps":16,"obs_history":4,"obs_interval":2,"crop_ratio":0.95,"video_stride":2,"video_fps":20,"horizon":"official task default"}\n' "$category" "$task" "$seed" "$attempt" "$taskset" "$server" > "$dir/config.json"
+ start_utc=$(date -u +%FT%TZ)
+ set +e
+ docker run --rm --name "xiaomi-client-t_f22ea8b3-$attempt" --gpus all --shm-size=2g -e MUJOCO_GL=egl -e PYOPENGL_PLATFORM=egl -e NVIDIA_DRIVER_CAPABILITIES=compute,utility,graphics -v "$assets_volume:/opt/robocasa/robocasa/models/assets" -v "$parent:/work:ro" -v "$root:/output" -v "$parent/checkpoint:/checkpoint:ro" --network "container:$server" xiaomi-client:t_9f03a613 python /work/rollout.py --model-path /checkpoint --server-addr 127.0.0.1 --server-port 10086 --split target --task-set "$taskset" --task-name "$task" --num-trials 1 --seed "$seed" --save-videos --save-root-dir "/output/$category/$attempt" --run-id rollout 2>&1 | tee "$dir/rollout.log"
+ rc=${PIPESTATUS[0]}
+ set -e
+ printf '{"utc_start":"%s","utc_end":"%s","rc":%s,"task":"%s","category":"%s","base_seed":%s,"attempt":"%s","server":"%s","argv":"%s"}\n' "$start_utc" "$(date -u +%FT%TZ)" "$rc" "$task" "$category" "$seed" "$attempt" "$server" "$0 $*" >> "$root/commands.jsonl"
+ exit "$rc"
+ ;;
+stop)
+ # Stops ONLY this task's own server, never the shared one.
+ docker logs "$own_server" > "$root/server.log" 2>&1
+ docker stop "$own_server"
+ ;;
+*) printf '%s\n' 'Usage: bash run-t_f22ea8b3.sh start|stop|episode CATEGORY TASK BASE_SEED UNIQUE_ATTEMPT'; exit 2;;
+esac

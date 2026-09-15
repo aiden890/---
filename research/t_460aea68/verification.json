@@ -1,0 +1,66 @@
+{
+  "task_id": "t_460aea68",
+  "scope": "CloseBlenderLid additional seeds8-12 plus existing seed7 only",
+  "verified_episodes": [
+    {
+      "seed": 7,
+      "success": false,
+      "steps": 900,
+      "frames": 451,
+      "video": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/closeblenderlid-final-t_de8b0c1e/episodes/baseline/episode_000_seed_7_failure.mp4"
+    },
+    {
+      "seed": 8,
+      "success": false,
+      "steps": 900,
+      "frames": 451,
+      "video": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/closeblenderlid-final-t_de8b0c1e/episodes/additional/seed8/rollout/CloseBlenderLid/episode_000_seed_8_failure.mp4"
+    },
+    {
+      "seed": 9,
+      "success": true,
+      "steps": 885,
+      "frames": 444,
+      "video": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/closeblenderlid-final-t_de8b0c1e/episodes/additional/seed9/rollout/CloseBlenderLid/episode_000_seed_9_success.mp4"
+    },
+    {
+      "seed": 10,
+      "success": false,
+      "steps": 900,
+      "frames": 451,
+      "video": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/closeblenderlid-final-t_de8b0c1e/episodes/additional/seed10/rollout/CloseBlenderLid/episode_000_seed_10_failure.mp4"
+    },
+    {
+      "seed": 11,
+      "success": false,
+      "steps": 900,
+      "frames": 451,
+      "video": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/closeblenderlid-final-t_de8b0c1e/episodes/additional/seed11/rollout/CloseBlenderLid/episode_000_seed_11_failure.mp4"
+    },
+    {
+      "seed": 12,
+      "success": false,
+      "steps": 900,
+      "frames": 451,
+      "video": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/closeblenderlid-final-t_de8b0c1e/episodes/additional/seed12/rollout/CloseBlenderLid/episode_000_seed_12_failure.mp4"
+    }
+  ],
+  "additional": {
+    "episodes": 5,
+    "successes": 1
+  },
+  "combined": {
+    "episodes": 6,
+    "successes": 1
+  },
+  "checks": [
+    "final package SHA256 and size 6/6",
+    "stats metadata 6/6",
+    "full local MP4 decode 6/6"
+  ],
+  "limitations": [
+    "No new episodes or fresh remote verification",
+    "No causal planning-failure analysis; cancelled by user",
+    "Shared server preserved; live state not checked"
+  ]
+}

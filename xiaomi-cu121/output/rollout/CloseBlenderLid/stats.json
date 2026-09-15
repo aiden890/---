@@ -1,0 +1,21 @@
+{
+  "env_name": "CloseBlenderLid",
+  "split": "pretrain",
+  "num_episodes": 1,
+  "successes": 0,
+  "success_rate": 0.0,
+  "horizon": 900,
+  "episodes": [
+    {
+      "episode": 0,
+      "global_episode_index": 0,
+      "seed": 7,
+      "success": false,
+      "steps": 900,
+      "instruction": "Close the lid blender by securely placing the lid on top.",
+      "termination_reason": "horizon",
+      "done": false,
+      "truncated": false
+    }
+  ]
+}

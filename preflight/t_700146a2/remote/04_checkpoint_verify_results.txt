@@ -1,0 +1,72 @@
+### sha256 -c checkpoint.sha256 (all lines)
+checkpoint/LICENSE: OK
+checkpoint/README.md: OK
+checkpoint/added_tokens.json: OK
+checkpoint/chat_template.jinja: OK
+checkpoint/config.json: OK
+checkpoint/configuration_mibot.py: OK
+checkpoint/merges.txt: OK
+checkpoint/model-00001-of-00003.safetensors: OK
+checkpoint/model-00002-of-00003.safetensors: OK
+checkpoint/model-00003-of-00003.safetensors: OK
+checkpoint/model.safetensors.index.json: OK
+checkpoint/modeling_mibot.py: OK
+checkpoint/preprocessor_config.json: OK
+checkpoint/processing_mibot.py: OK
+checkpoint/processor_config.json: OK
+checkpoint/special_tokens_map.json: OK
+checkpoint/tokenizer.json: OK
+checkpoint/tokenizer_config.json: OK
+checkpoint/video_preprocessor_config.json: OK
+checkpoint/vocab.json: OK
+rc=0
+### source.sha256
+15
+^ non-OK lines
+### inference-image-id / client-image-id
+sha256:aac5e8e597636dc80df55a3150da68f2fb5897e28bfb02836319578fba477c87
+sha256:c52e01c1048c46fe0fef0ed535fad3b5067f97b3d5fc397e92a8e96f9702cd19
+### upstream revs
+deploy
+eval_robocasa365
+upstream/deploy/ 
+upstream/eval_robocasa365/ 
+### output dir collision check
+ls: cannot access '/home/v4/rollouts-xiaomi-t_f22ea8b3': No such file or directory
+### t_460aea68 stats
+/home/v4/rollouts-xiaomi-t_460aea68/composite-seen/lettuce-01/rollout/WashLettuce/stats.json
+{'env_name': 'WashLettuce', 'split': 'target', 'num_episodes': 1, 'successes': 0, 'success_rate': 0.0, 'horizon': 1650, 'episodes': [{'episode': 0, 'global_episode_index': 15, 'seed': 22, 'success': False, 'steps': 1650, 'instruction': 'Wash the lettuce in the sink by running water over it.', 'termination_reason': 'horizon', 'done': False, 'truncated': False}]}
+/home/v4/rollouts-xiaomi-t_460aea68/composite-seen/lunches-01/rollout/PackIdenticalLunches/stats.json
+{'env_name': 'PackIdenticalLunches', 'split': 'target', 'num_episodes': 1, 'successes': 0, 'success_rate': 0.0, 'horizon': 3900, 'episodes': [{'episode': 0, 'global_episode_index': 4, 'seed': 11, 'success': False, 'steps': 3900, 'instruction': 'Place one broccoli and one fish in each tupperware on the nearby counter, to pack two identical lunches.', 'termination_reason': 'horizon', 'done': False, 'truncated': False}]}
+/home/v4/rollouts-xiaomi-t_460aea68/composite-seen/steam-01/rollout/SteamInMicrowave/stats.json
+{'env_name': 'SteamInMicrowave', 'split': 'target', 'num_episodes': 1, 'successes': 0, 'success_rate': 0.0, 'horizon': 2100, 'episodes': [{'episode': 0, 'global_episode_index': 12, 'seed': 19, 'success': False, 'steps': 2100, 'instruction': 'Pick the onion from the sink and place it in the bowl. Then pick the bowl and place it in the microwave. Then close the microwave door and press the start button.', 'termination_reason': 'horizon', 'done': False, 'truncated': False}]}
+/home/v4/rollouts-xiaomi-t_460aea68/composite-unseen/bread-01/rollout/BreadSelection/stats.json
+{'env_name': 'BreadSelection', 'split': 'target', 'num_episodes': 1, 'successes': 0, 'success_rate': 0.0, 'horizon': 1950, 'episodes': [{'episode': 0, 'global_episode_index': 2, 'seed': 9, 'success': False, 'steps': 1950, 'instruction': 'From the different types of pastries on the counter, select a croissant and place it on the cutting board. Then retrieve a jar of jam from the cabinet and place it alongside the croissant on the cutting board.', 'termination_reason': 'horizon', 'done': False, 'truncated': False}]}
+/home/v4/rollouts-xiaomi-t_460aea68/composite-unseen/condiments-01/rollout/CategorizeCondiments/stats.json
+{'env_name': 'CategorizeCondiments', 'split': 'target', 'num_episodes': 1, 'successes': 0, 'success_rate': 0.0, 'horizon': 1650, 'episodes': [{'episode': 0, 'global_episode_index': 3, 'seed': 10, 'success': False, 'steps': 1650, 'instruction': 'Put the shaker and condiment bottle from the counter next to their counterparts in the cabinet.', 'termination_reason': 'horizon', 'done': False, 'truncated': False}]}
+### heads of run-t_460aea68.sh
+#!/usr/bin/env bash
+set -euo pipefail
+parent=/home/v4/robocasa-docker-t_9f03a613
+root=/home/v4/rollouts-xiaomi-t_460aea68
+server=xiaomi-server-t_460aea68
+mkdir -p "$root"
+case "${1:-}" in
+start)
+ docker run -d --name "$server" --gpus all --network none --shm-size=2g -v "$parent/checkpoint:/checkpoint:ro" -v "$parent:/work:ro" xiaomi-cu121:t_9f03a613 python3 /work/upstream/deploy/server.py --model /checkpoint --host 127.0.0.1 --port 10086
+ ;;
+episode)
+ category=$2; task=$3; seed=$4; attempt=$5
+ taskset=${category//-/_}
+ dir="$root/$category/$attempt"
+ test ! -e "$dir"
+ mkdir -p "$dir"
+ printf '{"category":"%s","task":"%s","base_seed":%s,"attempt":"%s","split":"target","task_set":"%s","replan_steps":16,"obs_history":4,"obs_interval":2,"crop_ratio":0.95,"video_stride":2,"video_fps":20,"horizon":"official task default"}\n' "$category" "$task" "$seed" "$attempt" "$taskset" > "$dir/config.json"
+ docker run --rm --name "xiaomi-client-t_460aea68-$attempt" --gpus all --shm-size=2g -e MUJOCO_GL=egl -e PYOPENGL_PLATFORM=egl -e NVIDIA_DRIVER_CAPABILITIES=compute,utility,graphics -v robocasa-assets-t_5af7225b:/opt/robocasa/robocasa/models/assets -v "$parent:/work:ro" -v "$root:/output" -v "$parent/checkpoint:/checkpoint:ro" --network "container:$server" xiaomi-client:t_9f03a613 python /work/rollout.py --model-path /checkpoint --server-addr 127.0.0.1 --server-port 10086 --split target --task-set "$taskset" --task-name "$task" --num-trials 1 --seed "$seed" --save-videos --save-root-dir "/output/$category/$attempt" --run-id rollout 2>&1 | tee "$dir/rollout.log"
+ ;;
+stop)
+ docker logs "$server" > "$root/server.log" 2>&1
+ docker stop "$server"
+ ;;
+*) printf '%s\n' 'Usage: bash run-t_5af7225b.sh start|stop|episode CATEGORY TASK BASE_SEED UNIQUE_ATTEMPT'; exit 2;;
+esac

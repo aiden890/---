@@ -1,0 +1,154 @@
+{
+ "moves": [
+  {
+   "from": "smoke_test.py",
+   "to": "scripts/smoke_test.py",
+   "status": "moved",
+   "files": 1
+  },
+  {
+   "from": "diagnose_egl.py",
+   "to": "scripts/diagnose_egl.py",
+   "status": "moved",
+   "files": 1
+  },
+  {
+   "from": "verify_results.py",
+   "to": "scripts/verify_results.py",
+   "status": "moved",
+   "files": 1
+  },
+  {
+   "from": "run.sh",
+   "to": "scripts/run.sh",
+   "status": "moved",
+   "files": 1
+  },
+  {
+   "from": "remote.sh",
+   "to": "scripts/remote.sh",
+   "status": "moved",
+   "files": 1
+  },
+  {
+   "from": "requirements-sim.txt",
+   "to": "configs/requirements-sim.txt",
+   "status": "moved",
+   "files": 1
+  },
+  {
+   "from": "requirements.lock",
+   "to": "configs/requirements.lock",
+   "status": "moved",
+   "files": 1
+  },
+  {
+   "from": "10_nvidia.json",
+   "to": "configs/10_nvidia.json",
+   "status": "moved",
+   "files": 1
+  },
+  {
+   "from": "Dockerfile",
+   "to": "docker/sim/Dockerfile",
+   "status": "moved",
+   "files": 1
+  },
+  {
+   "from": "VERIFICATION.md",
+   "to": "docs/VERIFICATION.md",
+   "status": "moved",
+   "files": 1
+  },
+  {
+   "from": "XIAOMI_STATUS.md",
+   "to": "docs/XIAOMI_STATUS.md",
+   "status": "moved",
+   "files": 1
+  },
+  {
+   "from": "DIRECTORY_GUIDE.md",
+   "to": "docs/DIRECTORY_GUIDE.md",
+   "status": "moved",
+   "files": 1
+  },
+  {
+   "from": "output",
+   "to": "results/sim/output",
+   "status": "moved",
+   "files": 5
+  },
+  {
+   "from": "logs",
+   "to": "results/sim/logs",
+   "status": "moved",
+   "files": 19
+  }
+ ],
+ "compat_symlinks": [
+  {
+   "link": "smoke_test.py",
+   "target": "scripts/smoke_test.py"
+  },
+  {
+   "link": "diagnose_egl.py",
+   "target": "scripts/diagnose_egl.py"
+  },
+  {
+   "link": "verify_results.py",
+   "target": "scripts/verify_results.py"
+  },
+  {
+   "link": "run.sh",
+   "target": "scripts/run.sh"
+  },
+  {
+   "link": "remote.sh",
+   "target": "scripts/remote.sh"
+  },
+  {
+   "link": "requirements-sim.txt",
+   "target": "configs/requirements-sim.txt"
+  },
+  {
+   "link": "requirements.lock",
+   "target": "configs/requirements.lock"
+  },
+  {
+   "link": "10_nvidia.json",
+   "target": "configs/10_nvidia.json"
+  },
+  {
+   "link": "Dockerfile",
+   "target": "docker/sim/Dockerfile"
+  },
+  {
+   "link": "VERIFICATION.md",
+   "target": "docs/VERIFICATION.md"
+  },
+  {
+   "link": "XIAOMI_STATUS.md",
+   "target": "docs/XIAOMI_STATUS.md"
+  },
+  {
+   "link": "DIRECTORY_GUIDE.md",
+   "target": "docs/DIRECTORY_GUIDE.md"
+  },
+  {
+   "link": "output",
+   "target": "results/sim/output"
+  },
+  {
+   "link": "logs",
+   "target": "results/sim/logs"
+  }
+ ],
+ "repointed": [
+  {
+   "link": "experiments/simulation",
+   "old_target": "../output",
+   "new_target": "../results/sim/output",
+   "status": "repointed"
+  }
+ ]
+}

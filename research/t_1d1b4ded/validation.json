@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "unique_selected_tasks": 8,
+  "primary_tasks": 5,
+  "primary_unseen": 2,
+  "category_counts": {
+    "composite_unseen": 4,
+    "composite_seen": 4
+  },
+  "source_snapshots_verified": 17,
+  "checks": [
+    "unique IDs and exclusion set",
+    "official TARGET_TASKS categories",
+    "original registry horizons and target availability",
+    "seed computation",
+    "per-task instruction/evidence/source sections",
+    "all snapshots SHA256 and original byte identity",
+    "official source bytes equal pinned git commit"
+  ],
+  "policy_executed": false,
+  "remote_files_transferred": false,
+  "limitations": [
+    "Static source audit only; remote runtime results are not validated here."
+  ]
+}

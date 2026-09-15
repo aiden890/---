@@ -1,0 +1,51 @@
+{
+  "planner": "oracle",
+  "mode": "rl",
+  "eta": 0.6,
+  "seed": 9,
+  "success": false,
+  "total_steps": 360,
+  "total_reward": -18.00000000000012,
+  "skill_calls": [
+    {
+      "skill": "GRASP",
+      "obj": "blender_lid",
+      "destination": null,
+      "relation_or_constraints": null,
+      "outcome": "timeout",
+      "steps": 120,
+      "chunks": 8
+    },
+    {
+      "skill": "GRASP",
+      "obj": "blender_lid",
+      "destination": null,
+      "relation_or_constraints": null,
+      "outcome": "timeout",
+      "steps": 120,
+      "chunks": 8
+    },
+    {
+      "skill": "GRASP",
+      "obj": "blender_lid",
+      "destination": null,
+      "relation_or_constraints": null,
+      "outcome": "timeout",
+      "steps": 120,
+      "chunks": 8
+    }
+  ],
+  "per_skill": {
+    "GRASP": {
+      "attempts": 3,
+      "successes": 0,
+      "chunks": 24,
+      "steps": 360,
+      "failure_reasons": {
+        "timeout": 3
+      },
+      "success_rate": 0.0
+    }
+  },
+  "num_branch_states": 3
+}

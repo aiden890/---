@@ -1,0 +1,611 @@
+{
+  "splits_disjoint": {
+    "lid_variant_train_test_disjoint": true,
+    "scene_seed_train_test_disjoint": true
+  },
+  "samples": {
+    "train": [
+      {
+        "split": "train",
+        "episode_index": 0,
+        "scene_seed": 565,
+        "lid_variant": "Blender028",
+        "values": {
+          "lid_pose": {
+            "xy_offset_m": [
+              -0.0025619735750479905,
+              0.010502325879974732
+            ],
+            "z_offset_m": 0.00482763026221032,
+            "yaw_rad": 0.05462060310969763
+          },
+          "blender_pose": {
+            "xy_offset_m": [
+              -0.02803060769848329,
+              -0.028131305760567462
+            ],
+            "yaw_rad": -0.1206663718205217
+          },
+          "robot_base": {
+            "xy_offset_m": [
+              -0.0330348494603919,
+              -0.011836157491828446
+            ],
+            "yaw_rad": 0.020410670394643116
+          },
+          "robot_eef": {
+            "xyz_offset_m": [
+              0.0197543516344599,
+              -0.01831373721532852,
+              0.015220454220286134
+            ]
+          },
+          "camera": {
+            "pos_noise_m": [
+              0.0016161832995832855,
+              -0.0017708521806730857,
+              0.0022536906598037178
+            ],
+            "rot_noise_rad": [
+              -0.007051118062670605,
+              0.011537077075491967,
+              -0.010433064736688313
+            ],
+            "fov_noise_deg": -0.03357001777128832
+          },
+          "lighting": {
+            "intensity_scale": 0.9923651794149582,
+            "ambient_scale": 0.7089471418258119
+          },
+          "physics": {
+            "lid_mass_scale": 1.0234265738281882,
+            "friction_scale": 0.8985238507723727,
+            "contact_damping_scale": 0.9157378257216533
+          },
+          "clutter": {
+            "num_distractors": 2
+          }
+        },
+        "ranges_digest": "4327d2427e787cdd",
+        "asset_digest": "22f3d0feaa69df72",
+        "valid": true,
+        "rejections": []
+      },
+      {
+        "split": "train",
+        "episode_index": 1,
+        "scene_seed": 449,
+        "lid_variant": "Blender028",
+        "values": {
+          "lid_pose": {
+            "xy_offset_m": [
+              0.012973013329296242,
+              -0.03380056560730638
+            ],
+            "z_offset_m": 0.012280554834730303,
+            "yaw_rad": -0.007526788402938411
+          },
+          "blender_pose": {
+            "xy_offset_m": [
+              -0.022165691723249864,
+              0.01998895374320781
+            ],
+            "yaw_rad": -0.12499890110973522
+          },
+          "robot_base": {
+            "xy_offset_m": [
+              -0.008134474532625946,
+              0.04458962792409536
+            ],
+            "yaw_rad": -0.14599504781945755
+          },
+          "robot_eef": {
+            "xyz_offset_m": [
+              0.018383724724156756,
+              -0.007122981550436393,
+              -0.006204371230662465
+            ]
+          },
+          "camera": {
+            "pos_noise_m": [
+              -0.0013944994116991023,
+              0.002625275686723924,
+              -0.00761683200209065
+            ],
+            "rot_noise_rad": [
+              -0.002213564143583511,
+              0.0032764209844004903,
+              -0.012140762920830528
+            ],
+            "fov_noise_deg": -0.5686231429871547
+          },
+          "lighting": {
+            "intensity_scale": 1.1199454665974222,
+            "ambient_scale": 0.8836451725272653
+          },
+          "physics": {
+            "lid_mass_scale": 1.0874259268635973,
+            "friction_scale": 0.9927561169739518,
+            "contact_damping_scale": 1.135583096467763
+          },
+          "clutter": {
+            "num_distractors": 1
+          }
+        },
+        "ranges_digest": "4327d2427e787cdd",
+        "asset_digest": "22f3d0feaa69df72",
+        "valid": true,
+        "rejections": []
+      },
+      {
+        "split": "train",
+        "episode_index": 2,
+        "scene_seed": 362,
+        "lid_variant": "Blender003",
+        "values": {
+          "lid_pose": {
+            "xy_offset_m": [
+              -0.014814887333702984,
+              -0.008902965409121551
+            ],
+            "z_offset_m": 0.02176532900425255,
+            "yaw_rad": -0.48959317737050745
+          },
+          "blender_pose": {
+            "xy_offset_m": [
+              -0.0008228022536764731,
+              -0.028513219596013335
+            ],
+            "yaw_rad": 0.12325211801769653
+          },
+          "robot_base": {
+            "xy_offset_m": [
+              -0.00013414847208350483,
+              -0.0337135618042759
+            ],
+            "yaw_rad": -0.06287170380835475
+          },
+          "robot_eef": {
+            "xyz_offset_m": [
+              0.013552325790364628,
+              -0.015655659742080132,
+              0.019183713566765525
+            ]
+          },
+          "camera": {
+            "pos_noise_m": [
+              0.0023242438416973352,
+              8.635628070444677e-05,
+              -0.005229334680709237
+            ],
+            "rot_noise_rad": [
+              0.016160816627065797,
+              0.0047644240133815005,
+              0.008084002768594018
+            ],
+            "fov_noise_deg": -0.7973338581678355
+          },
+          "lighting": {
+            "intensity_scale": 1.1007165855075915,
+            "ambient_scale": 1.2190757375275028
+          },
+          "physics": {
+            "lid_mass_scale": 1.123953946558796,
+            "friction_scale": 1.067395823931138,
+            "contact_damping_scale": 0.803467966905442
+          },
+          "clutter": {
+            "num_distractors": 0
+          }
+        },
+        "ranges_digest": "4327d2427e787cdd",
+        "asset_digest": "22f3d0feaa69df72",
+        "valid": true,
+        "rejections": []
+      }
+    ],
+    "validation": [
+      {
+        "split": "validation",
+        "episode_index": 0,
+        "scene_seed": 838,
+        "lid_variant": "Blender028",
+        "values": {
+          "lid_pose": {
+            "xy_offset_m": [
+              -0.008392763667959068,
+              -0.01351337043030151
+            ],
+            "z_offset_m": 0.009382609690785644,
+            "yaw_rad": -0.07856644783294586
+          },
+          "blender_pose": {
+            "xy_offset_m": [
+              0.021993405597399818,
+              0.0034668308843378154
+            ],
+            "yaw_rad": -0.2571276665049042
+          },
+          "robot_base": {
+            "xy_offset_m": [
+              -0.035016997243895634,
+              0.04880191177798772
+            ],
+            "yaw_rad": 0.03461214399106319
+          },
+          "robot_eef": {
+            "xyz_offset_m": [
+              -0.01566430507681702,
+              0.017192462011438054,
+              0.012946463284992705
+            ]
+          },
+          "camera": {
+            "pos_noise_m": [
+              0.0033843987113000903,
+              -0.002564696105219033,
+              -0.004075590551124306
+            ],
+            "rot_noise_rad": [
+              0.015336377734482091,
+              -0.0001964412299992127,
+              0.003672785973844104
+            ],
+            "fov_noise_deg": 0.09580535930097889
+          },
+          "lighting": {
+            "intensity_scale": 0.8287293597393383,
+            "ambient_scale": 0.9611914183838044
+          },
+          "physics": {
+            "lid_mass_scale": 1.1053565935064624,
+            "friction_scale": 1.0303438806741951,
+            "contact_damping_scale": 0.9008699936522048
+          },
+          "clutter": {
+            "num_distractors": 1
+          }
+        },
+        "ranges_digest": "4327d2427e787cdd",
+        "asset_digest": "22f3d0feaa69df72",
+        "valid": true,
+        "rejections": []
+      },
+      {
+        "split": "validation",
+        "episode_index": 1,
+        "scene_seed": 810,
+        "lid_variant": "Blender028",
+        "values": {
+          "lid_pose": {
+            "xy_offset_m": [
+              -0.028028668886369824,
+              0.007646655442232364
+            ],
+            "z_offset_m": 0.004412335108538871,
+            "yaw_rad": 0.015427879900352215
+          },
+          "blender_pose": {
+            "xy_offset_m": [
+              0.00036076363946506776,
+              -0.016682751073562457
+            ],
+            "yaw_rad": 0.07504905924426786
+          },
+          "robot_base": {
+            "xy_offset_m": [
+              0.006685530830061313,
+              -0.023596141208639412
+            ],
+            "yaw_rad": 0.13578209165511745
+          },
+          "robot_eef": {
+            "xyz_offset_m": [
+              -0.019152703620799585,
+              0.002523620791575431,
+              -0.011432706534275422
+            ]
+          },
+          "camera": {
+            "pos_noise_m": [
+              0.008401177896542893,
+              0.007925621673036653,
+              -5.08575117193627e-05
+            ],
+            "rot_noise_rad": [
+              0.008625906751633342,
+              0.007530989623418187,
+              0.0037812028057749927
+            ],
+            "fov_noise_deg": -0.5671307207196443
+          },
+          "lighting": {
+            "intensity_scale": 1.1392175350918128,
+            "ambient_scale": 1.2617911202740382
+          },
+          "physics": {
+            "lid_mass_scale": 0.8841205596492939,
+            "friction_scale": 1.056391865167386,
+            "contact_damping_scale": 1.091639113064553
+          },
+          "clutter": {
+            "num_distractors": 1
+          }
+        },
+        "ranges_digest": "4327d2427e787cdd",
+        "asset_digest": "22f3d0feaa69df72",
+        "valid": true,
+        "rejections": []
+      },
+      {
+        "split": "validation",
+        "episode_index": 2,
+        "scene_seed": 827,
+        "lid_variant": "Blender028",
+        "values": {
+          "lid_pose": {
+            "xy_offset_m": [
+              0.026176481885073634,
+              0.02044671509118763
+            ],
+            "z_offset_m": 0.02028982835651488,
+            "yaw_rad": -0.299875169310562
+          },
+          "blender_pose": {
+            "xy_offset_m": [
+              0.02153654940546041,
+              -0.0026004111674813556
+            ],
+            "yaw_rad": 0.25194004232635064
+          },
+          "robot_base": {
+            "xy_offset_m": [
+              -0.02030708556469434,
+              0.00814816503515662
+            ],
+            "yaw_rad": 0.11749470583042881
+          },
+          "robot_eef": {
+            "xyz_offset_m": [
+              0.003993275271517344,
+              0.0019048229359094372,
+              -0.016110156703414452
+            ]
+          },
+          "camera": {
+            "pos_noise_m": [
+              0.0017323214770221945,
+              0.004377609729670091,
+              -0.003373339446984658
+            ],
+            "rot_noise_rad": [
+              -0.0009541037001422059,
+              0.016202139287332266,
+              -0.004957779667929058
+            ],
+            "fov_noise_deg": -0.04767835786569141
+          },
+          "lighting": {
+            "intensity_scale": 0.9875906774546821,
+            "ambient_scale": 1.2752975920180352
+          },
+          "physics": {
+            "lid_mass_scale": 1.144050423780632,
+            "friction_scale": 0.9119576198507356,
+            "contact_damping_scale": 1.1311383856847859
+          },
+          "clutter": {
+            "num_distractors": 2
+          }
+        },
+        "ranges_digest": "4327d2427e787cdd",
+        "asset_digest": "22f3d0feaa69df72",
+        "valid": true,
+        "rejections": []
+      }
+    ],
+    "test": [
+      {
+        "split": "test",
+        "episode_index": 0,
+        "scene_seed": 925,
+        "lid_variant": "Blender023",
+        "values": {
+          "lid_pose": {
+            "xy_offset_m": [
+              -0.0011794603753180963,
+              0.005111857538725555
+            ],
+            "z_offset_m": 0.017329397921899973,
+            "yaw_rad": -0.17805355504206405
+          },
+          "blender_pose": {
+            "xy_offset_m": [
+              -0.019626858878976403,
+              -0.01636181577472648
+            ],
+            "yaw_rad": 0.20678689223960262
+          },
+          "robot_base": {
+            "xy_offset_m": [
+              0.02188692408458709,
+              0.020522638675509325
+            ],
+            "yaw_rad": 0.03614352718334088
+          },
+          "robot_eef": {
+            "xyz_offset_m": [
+              0.007339486760388026,
+              -0.018715185381103144,
+              0.005578632497220588
+            ]
+          },
+          "camera": {
+            "pos_noise_m": [
+              -0.003283651349322316,
+              0.008795644016912728,
+              -0.0009403582443967638
+            ],
+            "rot_noise_rad": [
+              0.012607237854277337,
+              0.001892050257944481,
+              0.016682893690552376
+            ],
+            "fov_noise_deg": 0.32392840699272263
+          },
+          "lighting": {
+            "intensity_scale": 0.9186784050592404,
+            "ambient_scale": 0.9064097069824786
+          },
+          "physics": {
+            "lid_mass_scale": 1.1306952497762044,
+            "friction_scale": 1.1518017998910812,
+            "contact_damping_scale": 1.176795006154569
+          },
+          "clutter": {
+            "num_distractors": 1
+          }
+        },
+        "ranges_digest": "4327d2427e787cdd",
+        "asset_digest": "22f3d0feaa69df72",
+        "valid": true,
+        "rejections": [
+          "low_mass_high_friction_unstable"
+        ]
+      },
+      {
+        "split": "test",
+        "episode_index": 1,
+        "scene_seed": 961,
+        "lid_variant": "Blender005",
+        "values": {
+          "lid_pose": {
+            "xy_offset_m": [
+              0.007439733029884155,
+              -0.003861105740756071
+            ],
+            "z_offset_m": 0.01554243264155757,
+            "yaw_rad": -0.32928000229663523
+          },
+          "blender_pose": {
+            "xy_offset_m": [
+              0.021855046068443976,
+              0.02600967484409864
+            ],
+            "yaw_rad": -0.08056050101954598
+          },
+          "robot_base": {
+            "xy_offset_m": [
+              0.008297700900792862,
+              0.025934924319259714
+            ],
+            "yaw_rad": -0.06753683924900943
+          },
+          "robot_eef": {
+            "xyz_offset_m": [
+              -0.010482344321256512,
+              0.004028000229002009,
+              -0.018080731754126927
+            ]
+          },
+          "camera": {
+            "pos_noise_m": [
+              0.002146119025329749,
+              0.0027282200386384205,
+              -0.0007270016679614636
+            ],
+            "rot_noise_rad": [
+              0.010922104074059868,
+              -0.004426391868096085,
+              -0.006150980333208775
+            ],
+            "fov_noise_deg": -0.776796213569453
+          },
+          "lighting": {
+            "intensity_scale": 1.1529011728197756,
+            "ambient_scale": 0.9998645275858016
+          },
+          "physics": {
+            "lid_mass_scale": 1.130541970558546,
+            "friction_scale": 1.0695390792183839,
+            "contact_damping_scale": 0.8928029049566201
+          },
+          "clutter": {
+            "num_distractors": 0
+          }
+        },
+        "ranges_digest": "4327d2427e787cdd",
+        "asset_digest": "22f3d0feaa69df72",
+        "valid": true,
+        "rejections": []
+      },
+      {
+        "split": "test",
+        "episode_index": 2,
+        "scene_seed": 992,
+        "lid_variant": "Blender005",
+        "values": {
+          "lid_pose": {
+            "xy_offset_m": [
+              -0.016204278997285188,
+              -0.010764977054999295
+            ],
+            "z_offset_m": 0.0021154794530881317,
+            "yaw_rad": 0.08899803675035856
+          },
+          "blender_pose": {
+            "xy_offset_m": [
+              -0.017816187067676466,
+              -0.015130464585317256
+            ],
+            "yaw_rad": 0.1589221077350494
+          },
+          "robot_base": {
+            "xy_offset_m": [
+              0.03500635922855555,
+              0.037491867682058075
+            ],
+            "yaw_rad": 0.14870624606912225
+          },
+          "robot_eef": {
+            "xyz_offset_m": [
+              0.019948019940290124,
+              0.004390003824605745,
+              -0.0018906218111684504
+            ]
+          },
+          "camera": {
+            "pos_noise_m": [
+              -0.007312368955267863,
+              0.0005185301524298098,
+              -0.004487515746586152
+            ],
+            "rot_noise_rad": [
+              0.005010747481744949,
+              -0.016271516139794186,
+              -0.016763046833945486
+            ],
+            "fov_noise_deg": -0.5587532614416217
+          },
+          "lighting": {
+            "intensity_scale": 1.0810913148717916,
+            "ambient_scale": 1.007267750913787
+          },
+          "physics": {
+            "lid_mass_scale": 0.9669543169799673,
+            "friction_scale": 0.9525600387077868,
+            "contact_damping_scale": 1.1855290707395065
+          },
+          "clutter": {
+            "num_distractors": 1
+          }
+        },
+        "ranges_digest": "4327d2427e787cdd",
+        "asset_digest": "22f3d0feaa69df72",
+        "valid": true,
+        "rejections": []
+      }
+    ]
+  },
+  "reproducible_train5": true
+}

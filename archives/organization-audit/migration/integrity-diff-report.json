@@ -1,0 +1,20 @@
+{
+  "preserved_byte_identical": 388,
+  "changed": [
+    ".dockerignore",
+    "DIRECTORY_GUIDE.md",
+    "Dockerfile",
+    "run.sh",
+    "verify_results.py"
+  ],
+  "vanished": [],
+  "declared_changed": [
+    ".dockerignore",
+    "DIRECTORY_GUIDE.md",
+    "Dockerfile",
+    "run.sh",
+    "verify_results.py"
+  ],
+  "undeclared_changes": [],
+  "vanished_count": 0
+}

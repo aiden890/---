@@ -1,0 +1,27 @@
+{
+  "_comment": "Multi-GPU scale-out config. Same environment contract as the pilot; widens group size, batch, and randomization ranges. Distribution/sharding is the successor training card's concern -- this file only records the intended scale so the env is built for it.",
+  "hardware": {"target": "multi_gpu", "min_gpus": 4, "gpu_mem_gb": 40, "notes": "one server replica + N rollout workers; GRPO group rollouts sharded across GPUs."},
+  "model": {"checkpoint": "/checkpoint", "robot_type": "robocasa365", "attn_implementation": "flash_attention_2", "dtype": "bfloat16"},
+  "rollout": {
+    "replan_steps": 16, "obs_history": 4, "obs_interval": 2, "crop_ratio": 0.95,
+    "video_stride": 2, "video_fps": 20,
+    "horizon_grasp": 300, "horizon_move": 300, "horizon_place": 400, "max_skill_calls": 8
+  },
+  "flow_sde": {"num_steps": 5, "eta": 0.6, "executed_only_in_loss": true, "real_action_dim": 12},
+  "grpo": {
+    "group_size": 16,
+    "vlm_backbone_frozen": true,
+    "trainable": ["action_expert", "skill_adapter", "termination_head"],
+    "branch_at_each_skill_start": true,
+    "shared_prefix_branching": true,
+    "rollout_workers_per_gpu": 2
+  },
+  "reward": {"mode": "simulator", "terminal_success": 1.0, "terminal_decay_gamma": 0.998, "use_milestones": true, "vlm_weight": 0.0},
+  "randomization_override": {
+    "_comment": "wider ranges for scale training; leaves the disjoint held-out pools intact",
+    "lid_pose": {"xy_offset_m": [-0.06, 0.06], "z_offset_m": [0.0, 0.05], "yaw_rad": [-0.7854, 0.7854]},
+    "blender_pose": {"xy_offset_m": [-0.05, 0.05], "yaw_rad": [-0.3927, 0.3927]},
+    "clutter": {"num_distractors": [0, 4]}
+  },
+  "seeds": {"train_seed_pool": [0, 799], "validation_seed_pool": [800, 899], "test_seed_pool": [900, 999]}
+}

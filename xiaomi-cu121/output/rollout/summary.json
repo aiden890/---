@@ -1,0 +1,37 @@
+{
+  "model_path": "/checkpoint",
+  "robot_type": "robocasa365",
+  "split": "pretrain",
+  "task_set": "target50",
+  "num_tasks": 1,
+  "num_episodes": 1,
+  "successes": 0,
+  "episode_success_rate": 0.0,
+  "mean_task_success_rate": 0.0,
+  "replan_steps": 16,
+  "obs_history": 4,
+  "obs_interval": 2,
+  "tasks": {
+    "CloseBlenderLid": {
+      "env_name": "CloseBlenderLid",
+      "split": "pretrain",
+      "num_episodes": 1,
+      "successes": 0,
+      "success_rate": 0.0,
+      "horizon": 900,
+      "episodes": [
+        {
+          "episode": 0,
+          "global_episode_index": 0,
+          "seed": 7,
+          "success": false,
+          "steps": 900,
+          "instruction": "Close the lid blender by securely placing the lid on top.",
+          "termination_reason": "horizon",
+          "done": false,
+          "truncated": false
+        }
+      ]
+    }
+  }
+}

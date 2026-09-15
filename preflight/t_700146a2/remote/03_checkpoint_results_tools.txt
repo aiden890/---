@@ -1,0 +1,114 @@
+### server container inspect
+a5f3649ffb7fadcb7e4dda084be0cd56e8ffaf9715ecf1144962645dbc1859ea image=sha256:aac5e8e597636dc80df55a3150da68f2fb5897e28bfb02836319578fba477c87 started=2026-09-14T11:44:00.877371018Z pid=55248 cmd=[python3 /work/upstream/deploy/server.py --model /checkpoint --host 127.0.0.1 --port 10086] mounts=/home/v4/robocasa-docker-t_9f03a613/checkpoint->/checkpoint; /home/v4/robocasa-docker-t_9f03a613->/work;  ports=map[] net=none
+### server log tail (progress-bar spam removed; summary: Model loaded, serving 127.0.0.1:10086, 5 request bursts of 104-132 req)
+### checkpoint dir
+total 2124
+drwxrwxr-x  7 v4   v4      4096 Sep 14 07:00 .
+drwxr-xr-x 26 v4   v4      4096 Sep 14 07:43 ..
+-rw-rw-r--  1 v4   v4        56 Sep 14 06:01 .dockerignore
+-rw-rw-r--  1 v4   v4      1064 Sep 14 05:59 Dockerfile
+-rw-rw-r--  1 v4   v4       287 Sep 14 06:01 Dockerfile.client
+-rw-rw-r--  1 v4   v4      5049 Sep 14 06:58 README.md
+-rw-rw-r--  1 v4   v4      5921 Sep 14 06:59 REPORT.md
+-rw-rw-r--  1 v4   v4       687 Sep 14 06:23 build_stats.py
+drwxrwxr-x  3 v4   v4      4096 Sep 14 05:59 checkpoint
+-rw-rw-r--  1 v4   v4      1958 Sep 14 06:19 checkpoint.sha256
+-rw-rw-r--  1 v4   v4        72 Sep 14 06:19 client-image-id.txt
+-rw-rw-r--  1 v4   v4      1151 Sep 14 06:19 client.requirements.lock
+-rw-rw-r--  1 v4   v4       361 Sep 14 06:10 cuda_check.py
+-rw-rw-r--  1 v4   v4       198 Sep 14 05:56 download.py
+drwxr-xr-x  3 root root    4096 Sep 14 06:01 extra-assets
+-rw-rw-r--  1 v4   v4       416 Sep 14 06:27 import_check.py
+-rw-rw-r--  1 v4   v4        72 Sep 14 06:53 inference-image-id.txt
+-rw-rw-r--  1 v4   v4       990 Sep 14 06:58 inference.requirements.lock
+-rw-rw-r--  1 v4   v4    133120 Sep 14 06:14 log-progress.tar
+drwxrwxr-x  2 v4   v4      4096 Sep 14 06:57 logs
+-rw-rw-r--  1 v4   v4      1339 Sep 14 05:58 observe.py
+-rw-rw-r--  1 v4   v4       335 Sep 14 06:02 outcome.py
+drwxrwxr-x  3 v4   v4      4096 Sep 14 06:55 output
+-rw-rw-r--  1 v4   v4      2978 Sep 14 06:45 probe.py
+-rw-rw-r--  1 v4   v4      1167 Sep 14 06:09 processor_check.py
+-rw-rw-r--  1 v4   v4     17991 Sep 14 06:02 rollout.py
+-rw-rw-r--  1 v4   v4      2686 Sep 14 06:45 run.sh
+-rw-rw-r--  1 v4   v4       774 Sep 14 07:00 source.sha256
+-rw-rw-r--  1 v4   v4       998 Sep 14 06:02 test_outcome.py
+-rw-rw-r--  1 v4   v4       395 Sep 14 06:00 textures.py
+drwxrwxr-x  4 v4   v4      4096 Sep 14 06:00 upstream
+-rw-rw-r--  1 v4   v4      1876 Sep 14 06:20 verify.py
+-rw-rw-r--  1 v4   v4   1887773 Sep 14 07:00 xiaomi-cu121-t_9f03a613.tar.gz
+total 9885408
+drwxrwxr-x 3 v4   v4         4096 Sep 14 05:59 .
+drwxrwxr-x 7 v4   v4         4096 Sep 14 07:00 ..
+drwxr-xr-x 3 root root       4096 Sep 14 05:57 .cache
+-rw-r--r-- 1 root root        101 Sep 14 05:57 .gitattributes
+-rw-r--r-- 1 root root      11347 Sep 14 05:57 LICENSE
+-rw-r--r-- 1 root root       1820 Sep 14 05:57 README.md
+-rw-r--r-- 1 root root        707 Sep 14 05:57 added_tokens.json
+-rw-r--r-- 1 root root       5292 Sep 14 05:57 chat_template.jinja
+-rw-r--r-- 1 root root       5580 Sep 14 05:57 config.json
+-rw-r--r-- 1 root root      17645 Sep 14 05:57 configuration_mibot.py
+-rw-r--r-- 1 root root    1671853 Sep 14 05:57 merges.txt
+-rw-r--r-- 1 root root 4990499880 Sep 14 05:59 model-00001-of-00003.safetensors
+-rw-r--r-- 1 root root 4999627848 Sep 14 05:59 model-00002-of-00003.safetensors
+-rw-r--r-- 1 root root  116305608 Sep 14 05:57 model-00003-of-00003.safetensors
+-rw-r--r-- 1 root root      98622 Sep 14 05:57 model.safetensors.index.json
+-rw-r--r-- 1 root root      82384 Sep 14 05:57 modeling_mibot.py
+-rw-r--r-- 1 root root      30430 Sep 14 05:57 preprocessor_config.json
+-rw-r--r-- 1 root root      19815 Sep 14 05:57 processing_mibot.py
+-rw-r--r-- 1 root root        118 Sep 14 05:57 processor_config.json
+-rw-r--r-- 1 root root        613 Sep 14 05:57 special_tokens_map.json
+-rw-r--r-- 1 root root   11422654 Sep 14 05:57 tokenizer.json
+-rw-r--r-- 1 root root       5519 Sep 14 05:57 tokenizer_config.json
+-rw-r--r-- 1 root root        892 Sep 14 05:57 video_preprocessor_config.json
+-rw-r--r-- 1 root root    2776833 Sep 14 05:57 vocab.json
+### checkpoint.sha256 verify
+./checkpoint.sha256
+checkpoint/special_tokens_map.json: OK
+checkpoint/tokenizer.json: OK
+checkpoint/tokenizer_config.json: OK
+checkpoint/video_preprocessor_config.json: OK
+checkpoint/vocab.json: OK
+### versions files
+/home/v4/robocasa-docker-t_9f03a613/REPORT.md
+/home/v4/robocasa-docker-t_9f03a613/checkpoint.sha256
+/home/v4/robocasa-docker-t_9f03a613/source.sha256
+/home/v4/rollouts-xiaomi-t_5af7225b/sources/checkpoint.sha256
+### t_460aea68 results tree
+/home/v4/rollouts-xiaomi-t_460aea68/composite-seen/lettuce-01/config.json
+/home/v4/rollouts-xiaomi-t_460aea68/composite-seen/lettuce-01/rollout.log
+/home/v4/rollouts-xiaomi-t_460aea68/composite-seen/lettuce-01/rollout/WashLettuce/episode_000_seed_22_failure.mp4
+/home/v4/rollouts-xiaomi-t_460aea68/composite-seen/lettuce-01/rollout/WashLettuce/stats.json
+/home/v4/rollouts-xiaomi-t_460aea68/composite-seen/lettuce-01/rollout/summary.json
+/home/v4/rollouts-xiaomi-t_460aea68/composite-seen/lunches-01/config.json
+/home/v4/rollouts-xiaomi-t_460aea68/composite-seen/lunches-01/rollout.log
+/home/v4/rollouts-xiaomi-t_460aea68/composite-seen/lunches-01/rollout/PackIdenticalLunches/episode_000_seed_11_failure.mp4
+/home/v4/rollouts-xiaomi-t_460aea68/composite-seen/lunches-01/rollout/PackIdenticalLunches/stats.json
+/home/v4/rollouts-xiaomi-t_460aea68/composite-seen/lunches-01/rollout/summary.json
+/home/v4/rollouts-xiaomi-t_460aea68/composite-seen/steam-01/config.json
+/home/v4/rollouts-xiaomi-t_460aea68/composite-seen/steam-01/rollout.log
+/home/v4/rollouts-xiaomi-t_460aea68/composite-seen/steam-01/rollout/SteamInMicrowave/episode_000_seed_19_failure.mp4
+/home/v4/rollouts-xiaomi-t_460aea68/composite-seen/steam-01/rollout/SteamInMicrowave/stats.json
+/home/v4/rollouts-xiaomi-t_460aea68/composite-seen/steam-01/rollout/summary.json
+/home/v4/rollouts-xiaomi-t_460aea68/composite-unseen/bread-01/config.json
+/home/v4/rollouts-xiaomi-t_460aea68/composite-unseen/bread-01/rollout.log
+/home/v4/rollouts-xiaomi-t_460aea68/composite-unseen/bread-01/rollout/BreadSelection/episode_000_seed_9_failure.mp4
+/home/v4/rollouts-xiaomi-t_460aea68/composite-unseen/bread-01/rollout/BreadSelection/stats.json
+/home/v4/rollouts-xiaomi-t_460aea68/composite-unseen/bread-01/rollout/summary.json
+/home/v4/rollouts-xiaomi-t_460aea68/composite-unseen/condiments-01/config.json
+/home/v4/rollouts-xiaomi-t_460aea68/composite-unseen/condiments-01/rollout.log
+/home/v4/rollouts-xiaomi-t_460aea68/composite-unseen/condiments-01/rollout/CategorizeCondiments/episode_000_seed_10_failure.mp4
+/home/v4/rollouts-xiaomi-t_460aea68/composite-unseen/condiments-01/rollout/CategorizeCondiments/stats.json
+/home/v4/rollouts-xiaomi-t_460aea68/composite-unseen/condiments-01/rollout/summary.json
+/home/v4/rollouts-xiaomi-t_460aea68/parent-runner.sh
+/home/v4/rollouts-xiaomi-t_460aea68/rollout.py
+/home/v4/rollouts-xiaomi-t_460aea68/run-t_460aea68.sh
+### tools
+ffmpeg: MISSING
+ffprobe: MISSING
+rsync: /usr/bin/rsync
+scp: /usr/bin/scp
+python3: /usr/bin/python3
+nvidia-container-toolkit: /usr/bin/nvidia-container-toolkit
+map[io.containerd.runc.v2:{runc [] <nil>} io.containerd.runtime.v1.linux:{runc [] <nil>} nvidia:{nvidia-container-runtime [] <nil>} runc:{runc [] <nil>}]
+### client image decoders
+2.37.0 /usr/local/lib/python3.11/site-packages/imageio_ffmpeg/binaries/ffmpeg-linux-x86_64-v7.0.2

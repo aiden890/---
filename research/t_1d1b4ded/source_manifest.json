@@ -1,0 +1,126 @@
+[
+  {
+    "path": "robocasa/utils/dataset_registry.py",
+    "local_original": "/home/aiden/Desktop/lab/robot/robocasa-docker/vendor/robocasa/robocasa/utils/dataset_registry.py",
+    "snapshot": "sources/robocasa/utils/dataset_registry.py",
+    "url": "https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/utils/dataset_registry.py",
+    "sha256": "23e8e31bb56bae80de86c34eafadfe32dd1e1eba6608376152ba9fdda5532a4b",
+    "ledger_result": "[1] https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/utils/dataset_registry.py"
+  },
+  {
+    "path": "robocasa/utils/dataset_registry_utils.py",
+    "local_original": "/home/aiden/Desktop/lab/robot/robocasa-docker/vendor/robocasa/robocasa/utils/dataset_registry_utils.py",
+    "snapshot": "sources/robocasa/utils/dataset_registry_utils.py",
+    "url": "https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/utils/dataset_registry_utils.py",
+    "sha256": "9ea74602711ab9c499314bc3d94c4b61db6fe85bebf616cce573b9d39ba02e3b",
+    "ledger_result": "[2] https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/utils/dataset_registry_utils.py"
+  },
+  {
+    "path": "robocasa/utils/object_utils.py",
+    "local_original": "/home/aiden/Desktop/lab/robot/robocasa-docker/vendor/robocasa/robocasa/utils/object_utils.py",
+    "snapshot": "sources/robocasa/utils/object_utils.py",
+    "url": "https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/utils/object_utils.py",
+    "sha256": "3a7ddb8ba503c5f397baa1513b7b5f370c3c3b2a6a67fa723e83c9472c58af4a",
+    "ledger_result": "[3] https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/utils/object_utils.py"
+  },
+  {
+    "path": "robocasa/models/fixtures/sink.py",
+    "local_original": "/home/aiden/Desktop/lab/robot/robocasa-docker/vendor/robocasa/robocasa/models/fixtures/sink.py",
+    "snapshot": "sources/robocasa/models/fixtures/sink.py",
+    "url": "https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/models/fixtures/sink.py",
+    "sha256": "714d0e2962d3cb7cfcecbe2268e5c0db969c38168c959e6d066a0acae8de86d4",
+    "ledger_result": "[4] https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/models/fixtures/sink.py"
+  },
+  {
+    "path": "robocasa/models/fixtures/microwave.py",
+    "local_original": "/home/aiden/Desktop/lab/robot/robocasa-docker/vendor/robocasa/robocasa/models/fixtures/microwave.py",
+    "snapshot": "sources/robocasa/models/fixtures/microwave.py",
+    "url": "https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/models/fixtures/microwave.py",
+    "sha256": "8f1c8ffd1c3643a70fa55931f0fa85a285eb3e7605ea4f1ce0d6ad082d4843b9",
+    "ledger_result": "[5] https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/models/fixtures/microwave.py"
+  },
+  {
+    "path": "robocasa/environments/kitchen/composite/making_toast/bread_selection.py",
+    "local_original": "/home/aiden/Desktop/lab/robot/robocasa-docker/vendor/robocasa/robocasa/environments/kitchen/composite/making_toast/bread_selection.py",
+    "snapshot": "sources/robocasa/environments/kitchen/composite/making_toast/bread_selection.py",
+    "url": "https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/environments/kitchen/composite/making_toast/bread_selection.py",
+    "sha256": "b6fbc972d63c3329249f2806b2352813c7d0c17f578cb3235b4ac54ee674dcb5",
+    "ledger_result": "[6] https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/environments/kitchen/composite/making_toast/bread_selection.py"
+  },
+  {
+    "path": "robocasa/environments/kitchen/composite/arranging_condiments/categorize_condiments.py",
+    "local_original": "/home/aiden/Desktop/lab/robot/robocasa-docker/vendor/robocasa/robocasa/environments/kitchen/composite/arranging_condiments/categorize_condiments.py",
+    "snapshot": "sources/robocasa/environments/kitchen/composite/arranging_condiments/categorize_condiments.py",
+    "url": "https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/environments/kitchen/composite/arranging_condiments/categorize_condiments.py",
+    "sha256": "46029f35e42d25f7bf63623e50771a2c5b63ab3de90db38698f9960b52f1b354",
+    "ledger_result": "[7] https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/environments/kitchen/composite/arranging_condiments/categorize_condiments.py"
+  },
+  {
+    "path": "robocasa/environments/kitchen/composite/packing_lunches/pack_identical_lunches.py",
+    "local_original": "/home/aiden/Desktop/lab/robot/robocasa-docker/vendor/robocasa/robocasa/environments/kitchen/composite/packing_lunches/pack_identical_lunches.py",
+    "snapshot": "sources/robocasa/environments/kitchen/composite/packing_lunches/pack_identical_lunches.py",
+    "url": "https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/environments/kitchen/composite/packing_lunches/pack_identical_lunches.py",
+    "sha256": "22f96ad3195e29107814ad678600827bd5e95c4cce1fe61fb50058a404948e92",
+    "ledger_result": "[8] https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/environments/kitchen/composite/packing_lunches/pack_identical_lunches.py"
+  },
+  {
+    "path": "robocasa/environments/kitchen/composite/steaming_food/steam_in_microwave.py",
+    "local_original": "/home/aiden/Desktop/lab/robot/robocasa-docker/vendor/robocasa/robocasa/environments/kitchen/composite/steaming_food/steam_in_microwave.py",
+    "snapshot": "sources/robocasa/environments/kitchen/composite/steaming_food/steam_in_microwave.py",
+    "url": "https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/environments/kitchen/composite/steaming_food/steam_in_microwave.py",
+    "sha256": "6809b6017d0d34b55668a4344c68a19a8b9b09712210ca239503621572a64c31",
+    "ledger_result": "[9] https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/environments/kitchen/composite/steaming_food/steam_in_microwave.py"
+  },
+  {
+    "path": "robocasa/environments/kitchen/composite/making_salads/wash_lettuce.py",
+    "local_original": "/home/aiden/Desktop/lab/robot/robocasa-docker/vendor/robocasa/robocasa/environments/kitchen/composite/making_salads/wash_lettuce.py",
+    "snapshot": "sources/robocasa/environments/kitchen/composite/making_salads/wash_lettuce.py",
+    "url": "https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/environments/kitchen/composite/making_salads/wash_lettuce.py",
+    "sha256": "52a7d871e8db62f961974c5c260ca5ba06adcefb30e65024fd807640e2899cf1",
+    "ledger_result": "[10] https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/environments/kitchen/composite/making_salads/wash_lettuce.py"
+  },
+  {
+    "path": "robocasa/environments/kitchen/composite/washing_dishes/pre_soak_pan.py",
+    "local_original": "/home/aiden/Desktop/lab/robot/robocasa-docker/vendor/robocasa/robocasa/environments/kitchen/composite/washing_dishes/pre_soak_pan.py",
+    "snapshot": "sources/robocasa/environments/kitchen/composite/washing_dishes/pre_soak_pan.py",
+    "url": "https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/environments/kitchen/composite/washing_dishes/pre_soak_pan.py",
+    "sha256": "897edf9b4cd02b8c3898df660114850307a280943829206e1c5f226c9d3bbe70",
+    "ledger_result": "[11] https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/environments/kitchen/composite/washing_dishes/pre_soak_pan.py"
+  },
+  {
+    "path": "robocasa/environments/kitchen/composite/adding_ice_to_beverages/make_ice_lemonade.py",
+    "local_original": "/home/aiden/Desktop/lab/robot/robocasa-docker/vendor/robocasa/robocasa/environments/kitchen/composite/adding_ice_to_beverages/make_ice_lemonade.py",
+    "snapshot": "sources/robocasa/environments/kitchen/composite/adding_ice_to_beverages/make_ice_lemonade.py",
+    "url": "https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/environments/kitchen/composite/adding_ice_to_beverages/make_ice_lemonade.py",
+    "sha256": "696ccadd163e2a1751e28f5f0bb1d7a042f4adcd2a577b1f84464d89b0292395",
+    "ledger_result": "[12] https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/environments/kitchen/composite/adding_ice_to_beverages/make_ice_lemonade.py"
+  },
+  {
+    "path": "robocasa/environments/kitchen/composite/washing_fruits_and_vegetables/wash_fruit_colander.py",
+    "local_original": "/home/aiden/Desktop/lab/robot/robocasa-docker/vendor/robocasa/robocasa/environments/kitchen/composite/washing_fruits_and_vegetables/wash_fruit_colander.py",
+    "snapshot": "sources/robocasa/environments/kitchen/composite/washing_fruits_and_vegetables/wash_fruit_colander.py",
+    "url": "https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/environments/kitchen/composite/washing_fruits_and_vegetables/wash_fruit_colander.py",
+    "sha256": "e4633c9122f77cdce8f5a3dae2f62ddee86cb79d9c44186c9139f439627013c9",
+    "ledger_result": "[13] https://github.com/robocasa/robocasa/blob/4f8a2980def75a55dff96b990745b83540425f09/robocasa/environments/kitchen/composite/washing_fruits_and_vegetables/wash_fruit_colander.py"
+  },
+  {
+    "local_original": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/xiaomi-robotics-1/INDEX.md",
+    "snapshot": "sources/prior/INDEX.md",
+    "sha256": "021cb0d0c9ab7f6fa568190cbebad8bf8602700238e197314539ab03c01c6431"
+  },
+  {
+    "local_original": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/xiaomi-robotics-1/summary.json",
+    "snapshot": "sources/prior/summary.json",
+    "sha256": "be89b2532364662292d0f264894b4e58914e5e2070e3d885133cc1b97f4a4e79"
+  },
+  {
+    "local_original": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/xiaomi-robotics-1/run-t_5af7225b.sh",
+    "snapshot": "sources/prior/run-t_5af7225b.sh",
+    "sha256": "5c925e4134bc210fe64b93c8f527f46dae6e04f32085606efdb658b0f8f7e589"
+  },
+  {
+    "local_original": "/home/aiden/Desktop/lab/robot/robocasa-docker/xiaomi-cu121/rollout.py",
+    "snapshot": "sources/prior/rollout.py",
+    "sha256": "cd83a86a93a5dac97b7933a77414d3b0c1763171f51625e855017ed405a972e8"
+  }
+]

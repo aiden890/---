@@ -1,0 +1,33 @@
+{
+  "_comment": "Domain-randomization ranges + asset pools for CloseBlenderLid. Edit here to change ranges without touching code (src/randomization.py loads defaults; a driver may pass this file). Held-out pools (lid_variants.test, scene_seed_pools.test) are DISJOINT from train for generalization evaluation.",
+  "master_seed": 0,
+  "ranges": {
+    "lid_pose": {"xy_offset_m": [-0.04, 0.04], "z_offset_m": [0.0, 0.03], "yaw_rad": [-0.5236, 0.5236]},
+    "blender_pose": {"xy_offset_m": [-0.03, 0.03], "yaw_rad": [-0.2618, 0.2618]},
+    "robot_base": {"xy_offset_m": [-0.05, 0.05], "yaw_rad": [-0.1745, 0.1745]},
+    "robot_eef": {"xyz_offset_m": [-0.02, 0.02]},
+    "camera": {"pos_noise_m": [-0.01, 0.01], "rot_noise_rad": [-0.0175, 0.0175], "fov_noise_deg": [-1.0, 1.0]},
+    "lighting": {"intensity_scale": [0.8, 1.2], "ambient_scale": [0.7, 1.3]},
+    "physics": {"lid_mass_scale": [0.85, 1.15], "friction_scale": [0.8, 1.2], "contact_damping_scale": [0.8, 1.25]},
+    "clutter": {"num_distractors": [0, 2]}
+  },
+  "asset_pools": {
+    "lid_variants": {
+      "train": ["Blender001", "Blender003", "Blender010", "Blender019", "Blender028"],
+      "validation": ["Blender001", "Blender010", "Blender028"],
+      "test": ["Blender005", "Blender023", "Blender041"]
+    },
+    "scene_seed_pools": {
+      "train": {"seed_lo": 0, "seed_hi": 799},
+      "validation": {"seed_lo": 800, "seed_hi": 899},
+      "test": {"seed_lo": 900, "seed_hi": 999}
+    }
+  },
+  "validation_rules": [
+    "lid_z_below_rest: lid start z must be >= rest height",
+    "nonpositive_{mass,friction,contact_damping}: physics scales must be > 0",
+    "low_mass_high_friction_unstable: reject lid_mass_scale<0.9 with friction_scale>1.15",
+    "blender_base_out_of_reach: |blender_xy| + |base_xy| must be <= 0.12 m",
+    "nonpositive_lighting: lighting scales must be > 0"
+  ]
+}

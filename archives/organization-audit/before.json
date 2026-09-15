@@ -1,0 +1,2281 @@
+{
+  "root": "/home/aiden/Desktop/lab/robot/robocasa-docker",
+  "entries": [
+    {
+      "path": ".dockerignore",
+      "size": 46,
+      "mtime_ns": 1789377574552153364,
+      "mode": 33204,
+      "sha256": "0f935cbb64f8696cc8816dfb90e0d8340ce5d698a82ccd912fa7790993e43112"
+    },
+    {
+      "path": "10_nvidia.json",
+      "size": 86,
+      "mtime_ns": 1789378413251023690,
+      "mode": 33204,
+      "sha256": "b007d23230b6289d28445a0047301101c21ba735b58ad8b2409504639b3fd535"
+    },
+    {
+      "path": "Dockerfile",
+      "size": 1317,
+      "mtime_ns": 1789378413261023611,
+      "mode": 33204,
+      "sha256": "4d6a42b3d56a6b7bf52ef640006f40ba5b6bc76ae94fdf104ea11229f945cd82"
+    },
+    {
+      "path": "README.md",
+      "size": 6982,
+      "mtime_ns": 1789378893911259449,
+      "mode": 33204,
+      "sha256": "df0ee15dafdc016eb3760094c650b262a14e58c2f0e47abe87df52e19df665cc"
+    },
+    {
+      "path": "VERIFICATION.md",
+      "size": 5461,
+      "mtime_ns": 1789378828487766423,
+      "mode": 33204,
+      "sha256": "78eb856e11492c8d7d4316395ced883e1de8be141f70038342048f8561e4f07a"
+    },
+    {
+      "path": "XIAOMI_STATUS.md",
+      "size": 4682,
+      "mtime_ns": 1789378884443332741,
+      "mode": 33204,
+      "sha256": "362a855f30062713624931b5fd94585f5076dd56d00d880c1709006a55846c05"
+    },
+    {
+      "path": "assets-log.tar",
+      "size": 153600,
+      "mtime_ns": 1789378106904501247,
+      "mode": 33204,
+      "sha256": "683de74506084a63ba76438a41fcea62fbe72b3cad37ef886825d28fe31e5ee4"
+    },
+    {
+      "path": "build-log.tar",
+      "size": 122880,
+      "mtime_ns": 1789377838720767690,
+      "mode": 33204,
+      "sha256": "d168c5a1b056ef367eafad1964e98242d7ed08ee49a08383cd87b2d95e7e7750"
+    },
+    {
+      "path": "context.tar",
+      "size": 40960,
+      "mtime_ns": 1789378907835151705,
+      "mode": 33204,
+      "sha256": "dc87a513152c24e1205968d352801cb505a05834f8a3e54202b77197c39a0839"
+    },
+    {
+      "path": "diagnose_egl.py",
+      "size": 504,
+      "mtime_ns": 1789378363777418197,
+      "mode": 33204,
+      "sha256": "39c5e2b30537591ab908212076bff221308eae43e50b27b71e1c6f4c83c48c86"
+    },
+    {
+      "path": "remote.sh",
+      "size": 264,
+      "mtime_ns": 1789377499027876420,
+      "mode": 33204,
+      "sha256": "573adfeec9f8d101f36ec02e1e290e92fde3c226cc222f2dcb155596da715dcf"
+    },
+    {
+      "path": "requirements-sim.txt",
+      "size": 366,
+      "mtime_ns": 1789377574552153364,
+      "mode": 33204,
+      "sha256": "516069e382519e09dcda92c5d795403061e7cb83b9af8662f0199634a7e48727"
+    },
+    {
+      "path": "requirements.lock",
+      "size": 579,
+      "mtime_ns": 1789377819766932851,
+      "mode": 33204,
+      "sha256": "2c39ec3bef175f7597aefeb6d89f1cf50ae16c7656658f43563d13bb4b206460"
+    },
+    {
+      "path": "results.tar",
+      "size": 460800,
+      "mtime_ns": 1789378467899589881,
+      "mode": 33204,
+      "sha256": "8034ab4d772ac9adb8d6d19a4efb1250c089267900c55c322471ffe20be8b272"
+    },
+    {
+      "path": "robocasa-docker-t_04bf4fb7.tar.gz",
+      "size": 100593,
+      "mtime_ns": 1789378908025150236,
+      "mode": 33204,
+      "sha256": "33eb260fee37dbad0ae9a8c81efd21597e620fc0b9ca47aef0c217cb3fd44093"
+    },
+    {
+      "path": "run.sh",
+      "size": 1257,
+      "mtime_ns": 1789378413262023602,
+      "mode": 33204,
+      "sha256": "3f3903d3bd7d9a1c474b7d1acb3dd2ec02b03605f3356370e76fb63b0e612db2"
+    },
+    {
+      "path": "smoke_test.py",
+      "size": 2890,
+      "mtime_ns": 1789378383960257042,
+      "mode": 33204,
+      "sha256": "d8351e183450eff84fe20f6c8bc47d5b9a1a25ae46baf7251908c38327fff942"
+    },
+    {
+      "path": "verify_results.py",
+      "size": 1468,
+      "mtime_ns": 1789378543814990319,
+      "mode": 33204,
+      "sha256": "be657963d757b81a69408ea80b4e40a00d060da9b33ba1ceb039fa45ff021377"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/INDEX.md",
+      "size": 11119,
+      "mtime_ns": 1789385067566163846,
+      "mode": 33204,
+      "sha256": "021cb0d0c9ab7f6fa568190cbebad8bf8602700238e197314539ab03c01c6431"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/build_summary.py",
+      "size": 12114,
+      "mtime_ns": 1789385055950233585,
+      "mode": 33204,
+      "sha256": "049f3abfc18ec3af4ae2ce146eb8ecf416a3eb9573fb199484b711986f4aee1d"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/check_tools.py",
+      "size": 245,
+      "mtime_ns": 1789384215934883839,
+      "mode": 33204,
+      "sha256": "9fcd01fb7eefa7ce4662c51c6c6082d711adc30e8294ad9a747d1a8826882b97"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/report-sync.tar",
+      "size": 163840,
+      "mtime_ns": 1789385089109959458,
+      "mode": 33204,
+      "sha256": "b8baeffb2a6986db6fae53fbe17d04d4894a60869bcba66eb34bf1f67ebb0509"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/run-readonly-initial.sh",
+      "size": 1783,
+      "mtime_ns": 1789383953000000000,
+      "mode": 33152,
+      "sha256": "6ab4a3280dcc5b465284127d005d4be3e6a2ca4271e551c72bfc3fb5b858e0f2"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/run-t_5af7225b.sh",
+      "size": 1780,
+      "mtime_ns": 1789383944444035778,
+      "mode": 33204,
+      "sha256": "5c925e4134bc210fe64b93c8f527f46dae6e04f32085606efdb658b0f8f7e589"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/server.log",
+      "size": 106526,
+      "mtime_ns": 1789384891000000000,
+      "mode": 33204,
+      "sha256": "4d4767e5606b4623347ec01b756f85556ae3d8b7f585b8c6d254a1a1591b6024"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/summary.json",
+      "size": 15927,
+      "mtime_ns": 1789385067566163846,
+      "mode": 33204,
+      "sha256": "be89b2532364662292d0f264894b4e58914e5e2070e3d885133cc1b97f4a4e79"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/verify_videos.py",
+      "size": 1736,
+      "mtime_ns": 1789384278222582807,
+      "mode": 33204,
+      "sha256": "81011abf5ffd6e6d2a182df9b59f59b6490152c38e943038347c41ed8b109ce1"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/video-verification.json",
+      "size": 2071,
+      "mtime_ns": 1789384859000000000,
+      "mode": 33188,
+      "sha256": "517a289aab57b469b70ce5eb871901210c2f1055768e0601807ea89c67cc14c7"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/composite-seen/coffee-01/config.json",
+      "size": 269,
+      "mtime_ns": 1789383998000000000,
+      "mode": 33204,
+      "sha256": "d842a684df94149b8f6c1cfdea29753649d520d282f3375ffcc7906cddd08272"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/composite-seen/coffee-01/rollout.log",
+      "size": 3670,
+      "mtime_ns": 1789384127000000000,
+      "mode": 33204,
+      "sha256": "905100cff44150eafa750dd165c529dd5a177bb79117adb1d55bb456fe329809"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/composite-seen/coffee-01/rollout/summary.json",
+      "size": 918,
+      "mtime_ns": 1789384127000000000,
+      "mode": 33188,
+      "sha256": "3da529dd11e5165994d9be0d1a9b9993bb3a972d443fd40a0ea0577aeb004bd6"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/composite-seen/coffee-01/rollout/PrepareCoffee/episode_000_seed_13_failure.contact.jpg",
+      "size": 758738,
+      "mtime_ns": 1789384858000000000,
+      "mode": 33188,
+      "sha256": "057523ab81e549cfcd9d2471a913c696adf7c7e72f7c19c3f94e8567a4385507"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/composite-seen/coffee-01/rollout/PrepareCoffee/episode_000_seed_13_failure.mp4",
+      "size": 1752700,
+      "mtime_ns": 1789384127000000000,
+      "mode": 33188,
+      "sha256": "72aadd1dc69f49ac0292a4264af41bbd85305bc986e57108cb0b2e8041226027"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/composite-seen/coffee-01/rollout/PrepareCoffee/stats.json",
+      "size": 497,
+      "mtime_ns": 1789384127000000000,
+      "mode": 33188,
+      "sha256": "37c47998727e73572b43a6e2f24afd89a70818c7f413346a59da7fb762a78fea"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/composite-seen/kettle-01/config.json",
+      "size": 269,
+      "mtime_ns": 1789384328000000000,
+      "mode": 33204,
+      "sha256": "3891db23de0b8add274d19919058e78b1be69f5aef8fb5300a8b9d72b19ca232"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/composite-seen/kettle-01/rollout.log",
+      "size": 3670,
+      "mtime_ns": 1789384389000000000,
+      "mode": 33204,
+      "sha256": "75c198bc0cf9a6d662145645175b8a66f995f0646a7ba5973915a3d7145ccbf7"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/composite-seen/kettle-01/rollout/summary.json",
+      "size": 901,
+      "mtime_ns": 1789384389000000000,
+      "mode": 33188,
+      "sha256": "377382cbce85c82f1aaa89793e5d6d5429314bfe8ef28cceaba9b54d8d5a7081"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/composite-seen/kettle-01/rollout/KettleBoiling/episode_000_seed_9_success.contact.jpg",
+      "size": 730377,
+      "mtime_ns": 1789384858000000000,
+      "mode": 33188,
+      "sha256": "567c3d598c29fbebe85219b68a0a8f5e4b85173f368e3518e95ddc169438cd15"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/composite-seen/kettle-01/rollout/KettleBoiling/episode_000_seed_9_success.mp4",
+      "size": 965120,
+      "mtime_ns": 1789384389000000000,
+      "mode": 33188,
+      "sha256": "fc5c39d16625f4b429b207427d0ae4656846a5c5bcc8b29acc4336dce3131e8b"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/composite-seen/kettle-01/rollout/KettleBoiling/stats.json",
+      "size": 480,
+      "mtime_ns": 1789384389000000000,
+      "mode": 33188,
+      "sha256": "cbf722d19d28e42a4820d1c6dd90180b6e5ec942644ff4158a69907b9910d324"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/sources/checkpoint.sha256",
+      "size": 1958,
+      "mtime_ns": 1789385089108959482,
+      "mode": 33204,
+      "sha256": "f2f8daf792417c273017d6fc50cd88a83d5bdd1407196ac13a596931446c7e14"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/sources/dataset_registry.py",
+      "size": 94640,
+      "mtime_ns": 1789385067570163822,
+      "mode": 33204,
+      "sha256": "23e8e31bb56bae80de86c34eafadfe32dd1e1eba6608376152ba9fdda5532a4b"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/sources/heat_kebab_sandwich.py",
+      "size": 3580,
+      "mtime_ns": 1789385067570163822,
+      "mode": 33204,
+      "sha256": "59564f9b37b6d13e2dfb5cc51089c7ba43c699881624d3cbc513a09b9383600c"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/sources/kettle_boiling.py",
+      "size": 3712,
+      "mtime_ns": 1789385067570163822,
+      "mode": 33204,
+      "sha256": "6228990988af0f8266a9a6fd4e39a23606c2d49bc38f511a7f745dbc9b2cc09e"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/sources/prepare_coffee.py",
+      "size": 2760,
+      "mtime_ns": 1789385067570163822,
+      "mode": 33204,
+      "sha256": "2185183f0d46bc7d98d66978cc74901c19ed18872c8e94eaccfe8b913dd55ac3"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/sources/waffle_reheat.py",
+      "size": 2343,
+      "mtime_ns": 1789385067570163822,
+      "mode": 33204,
+      "sha256": "2d3d593468b97b32133e1b0f2edc7590747d1e2aed4b98afd4c9ac82aae81bfe"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/atomic-seen/faucet-02/config.json",
+      "size": 266,
+      "mtime_ns": 1789383953000000000,
+      "mode": 33204,
+      "sha256": "c0b23b8da251d3462cd19f3c526aac191a83658f58903d79e0c8d2984a9cbddc"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/atomic-seen/faucet-02/rollout.log",
+      "size": 3676,
+      "mtime_ns": 1789383988000000000,
+      "mode": 33204,
+      "sha256": "8bf31129d1088d1b8e284079d8c2509187da2589a6259bd2ecad22b5ca37961b"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/atomic-seen/faucet-02/rollout/summary.json",
+      "size": 840,
+      "mtime_ns": 1789383988000000000,
+      "mode": 33188,
+      "sha256": "837dd7dc17a8649a242577fdd842f8f54f657b305f5c70bdc692e77efb5fb5ef"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/atomic-seen/faucet-02/rollout/TurnOnSinkFaucet/episode_000_seed_24_success.contact.jpg",
+      "size": 970692,
+      "mtime_ns": 1789384858000000000,
+      "mode": 33188,
+      "sha256": "7dcd1df6adfd39d4e0d18eec86977692624412c23ddc2cadc484a606683b3c0a"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/atomic-seen/faucet-02/rollout/TurnOnSinkFaucet/episode_000_seed_24_success.mp4",
+      "size": 227170,
+      "mtime_ns": 1789383987000000000,
+      "mode": 33188,
+      "sha256": "f91cb04f381b7386fbc891153b0c44c3045e2ccec2e2d8448655bba5dc106876"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/atomic-seen/faucet-02/rollout/TurnOnSinkFaucet/stats.json",
+      "size": 419,
+      "mtime_ns": 1789383987000000000,
+      "mode": 33188,
+      "sha256": "f23922c15e766c152df1d1c272794b48caa807b5679af00c7ce3ddf8ba40edf4"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/atomic-seen/faucet-01/config.json",
+      "size": 266,
+      "mtime_ns": 1789383849000000000,
+      "mode": 33204,
+      "sha256": "806e9c817cb194da9f835efcc1191cc93f849ace29f6ae35b9f1084c28c3e971"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/atomic-seen/faucet-01/rollout.log",
+      "size": 4430,
+      "mtime_ns": 1789383859000000000,
+      "mode": 33204,
+      "sha256": "8071431933fa2725e349c2e4f0311a91acc2824232c7be66427b0e96bbbedb9e"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/composite-unseen/kebab-02/config.json",
+      "size": 276,
+      "mtime_ns": 1789384641000000000,
+      "mode": 33204,
+      "sha256": "1c554d83c3dca13953b820d11f707f70ba254e65bcc103b06f6bcdabe84c0da5"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/composite-unseen/kebab-02/rollout.log",
+      "size": 3688,
+      "mtime_ns": 1789384849000000000,
+      "mode": 33204,
+      "sha256": "897bb73e40601e448fcaa7a447c47ce987e1cabfcbfe7b325c837ab6d5e1175b"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/composite-unseen/kebab-02/rollout/summary.json",
+      "size": 969,
+      "mtime_ns": 1789384849000000000,
+      "mode": 33188,
+      "sha256": "16f66dad2d615d6ea6cf255e6453a873b6aad7e4e79c85419d9208bd7029269d"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/composite-unseen/kebab-02/rollout/HeatKebabSandwich/episode_000_seed_15_failure.contact.jpg",
+      "size": 890890,
+      "mtime_ns": 1789384859000000000,
+      "mode": 33188,
+      "sha256": "c580afc42df56d5171f357d95ffa9598695c12d326d4baec5e3293904b58dfd2"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/composite-unseen/kebab-02/rollout/HeatKebabSandwich/episode_000_seed_15_failure.mp4",
+      "size": 4420247,
+      "mtime_ns": 1789384849000000000,
+      "mode": 33188,
+      "sha256": "7e6e7bf63ce581b0f3a34f182d4a6b1f2db15acd0539e2d1c09c08f35f316966"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/composite-unseen/kebab-02/rollout/HeatKebabSandwich/stats.json",
+      "size": 542,
+      "mtime_ns": 1789384849000000000,
+      "mode": 33188,
+      "sha256": "dada7d0cbe2fd8e19a1c460906f93f2d48c1c6ecc6265def7e9f128f43329408"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/composite-unseen/waffle-01/config.json",
+      "size": 272,
+      "mtime_ns": 1789384390000000000,
+      "mode": 33204,
+      "sha256": "bfbedfb8b295a653c4f96403bccbbec5b2a45a9e440dd953a5b9198000318bc2"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/composite-unseen/waffle-01/rollout.log",
+      "size": 3670,
+      "mtime_ns": 1789384634000000000,
+      "mode": 33204,
+      "sha256": "b9ca67644e71541483f8e107125442488eab1a3a3d707b71ecb1ea2bd61375c1"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/composite-unseen/waffle-01/rollout/summary.json",
+      "size": 930,
+      "mtime_ns": 1789384634000000000,
+      "mode": 33188,
+      "sha256": "b0ec91f0996229ab3b8d51b390f2922443dd232355efbb2a7bd023e27fb1fc3d"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/composite-unseen/waffle-01/rollout/WaffleReheat/episode_000_seed_20_failure.contact.jpg",
+      "size": 833868,
+      "mtime_ns": 1789384859000000000,
+      "mode": 33188,
+      "sha256": "ae79f545407daaaf18b24adf70bfe88b2b6a2ef29c2ffef386ee9853de3d11ce"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/composite-unseen/waffle-01/rollout/WaffleReheat/episode_000_seed_20_failure.mp4",
+      "size": 6523779,
+      "mtime_ns": 1789384634000000000,
+      "mode": 33188,
+      "sha256": "2f13ede0d4d8068149592837ade77df2973e0de6e98e9e37d9360f9e0890ad87"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/composite-unseen/waffle-01/rollout/WaffleReheat/stats.json",
+      "size": 508,
+      "mtime_ns": 1789384634000000000,
+      "mode": 33188,
+      "sha256": "f618c56aec3c4f92ffad8ca28840c43832ec0a471309628c42cba0f87d446823"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/composite-unseen/kebab-01/config.json",
+      "size": 276,
+      "mtime_ns": 1789384128000000000,
+      "mode": 33204,
+      "sha256": "751cd18e18f89bba680c171e99e79c912cfaceed12fa0e1187308d818a631375"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/composite-unseen/kebab-01/rollout.log",
+      "size": 3688,
+      "mtime_ns": 1789384327000000000,
+      "mode": 33204,
+      "sha256": "52a3adc3b7ec4ad98adcbe9d3e3dfa673d24e301baecb9c5a2368398ee45d1ea"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/composite-unseen/kebab-01/rollout/summary.json",
+      "size": 969,
+      "mtime_ns": 1789384327000000000,
+      "mode": 33188,
+      "sha256": "ed909c02c11565978f01c7801fd0ccc0db1be1982e9b40025849a9a34a5ddacf"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/composite-unseen/kebab-01/rollout/HeatKebabSandwich/episode_000_seed_14_failure.contact.jpg",
+      "size": 718142,
+      "mtime_ns": 1789384859000000000,
+      "mode": 33188,
+      "sha256": "7fac9f0c0fbf40cafdecde16d1c8235bd7a9be6d26165850417c1dafaf4bc6a7"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/composite-unseen/kebab-01/rollout/HeatKebabSandwich/episode_000_seed_14_failure.mp4",
+      "size": 3198583,
+      "mtime_ns": 1789384327000000000,
+      "mode": 33188,
+      "sha256": "ca6d9eda4998f4de673c84dfa6f7141f2edbb2b38917acc00574e1ab9ccc5245"
+    },
+    {
+      "path": "rollouts/xiaomi-robotics-1/composite-unseen/kebab-01/rollout/HeatKebabSandwich/stats.json",
+      "size": 542,
+      "mtime_ns": 1789384327000000000,
+      "mode": 33188,
+      "sha256": "6e673c2c8d32c9ea4fdefe56eda00af5149f75a44462cd43d7047ccaf7676008"
+    },
+    {
+      "path": "rollouts-xiaomi-t_460aea68/parent-runner.sh",
+      "size": 1780,
+      "mtime_ns": 1789387648500917710,
+      "mode": 33152,
+      "sha256": "5c925e4134bc210fe64b93c8f527f46dae6e04f32085606efdb658b0f8f7e589"
+    },
+    {
+      "path": "rollouts-xiaomi-t_460aea68/rollout.py",
+      "size": 17991,
+      "mtime_ns": 1789387648499917714,
+      "mode": 33204,
+      "sha256": "cd83a86a93a5dac97b7933a77414d3b0c1763171f51625e855017ed405a972e8"
+    },
+    {
+      "path": "rollouts-xiaomi-t_460aea68/run-t_460aea68.sh",
+      "size": 1780,
+      "mtime_ns": 1789387650029910737,
+      "mode": 33204,
+      "sha256": "611810741674f11a9cf78c246c1b3e439b1ab3c51613ae57b335dd97328a4d27"
+    },
+    {
+      "path": "rollouts-xiaomi-t_460aea68/composite-seen/lettuce-01/config.json",
+      "size": 268,
+      "mtime_ns": 1789387649267914213,
+      "mode": 33204,
+      "sha256": "fd1bb15dba75d6c6aebea4c9236dbbe199c5744d71f76241a83229e32adb0290"
+    },
+    {
+      "path": "rollouts-xiaomi-t_460aea68/composite-seen/lettuce-01/rollout.log",
+      "size": 0,
+      "mtime_ns": 1789387649118914893,
+      "mode": 33204,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "rollouts-xiaomi-t_460aea68/composite-seen/lettuce-01/rollout/summary.json",
+      "size": 866,
+      "mtime_ns": 1789387649119914889,
+      "mode": 33188,
+      "sha256": "e9ad2e1dbcb232f3feb043dd42693cb33172f2363b681d4041c9078894d6274d"
+    },
+    {
+      "path": "rollouts-xiaomi-t_460aea68/composite-seen/lettuce-01/rollout/WashLettuce/episode_000_seed_22_failure.mp4",
+      "size": 1706008,
+      "mtime_ns": 1789387649265914222,
+      "mode": 33188,
+      "sha256": "b95cd46a2170893cc07ec6904fc1c128c6fb436ba246e923155cc21922f35e8b"
+    },
+    {
+      "path": "rollouts-xiaomi-t_460aea68/composite-seen/lettuce-01/rollout/WashLettuce/stats.json",
+      "size": 447,
+      "mtime_ns": 1789387649266914218,
+      "mode": 33188,
+      "sha256": "31d7235b4b6844b607645b2eaa28a655a54f53d2c748608f09d7424f8e50e695"
+    },
+    {
+      "path": "rollouts-xiaomi-t_460aea68/composite-seen/steam-01/config.json",
+      "size": 271,
+      "mtime_ns": 1789387649545912945,
+      "mode": 33204,
+      "sha256": "339ba6fdb2f30dba848a40de213489969a8b28df0fe65bb5da07605ffd06bdf8"
+    },
+    {
+      "path": "rollouts-xiaomi-t_460aea68/composite-seen/steam-01/rollout.log",
+      "size": 0,
+      "mtime_ns": 1789387649267914213,
+      "mode": 33204,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "rollouts-xiaomi-t_460aea68/composite-seen/steam-01/rollout/summary.json",
+      "size": 984,
+      "mtime_ns": 1789387649269914204,
+      "mode": 33188,
+      "sha256": "9a36800071bb3007884598a07632b314fe8bdf52c0d1e47c55e57ee5f56d00cb"
+    },
+    {
+      "path": "rollouts-xiaomi-t_460aea68/composite-seen/steam-01/rollout/SteamInMicrowave/episode_000_seed_19_failure.mp4",
+      "size": 3215060,
+      "mtime_ns": 1789387649543912954,
+      "mode": 33188,
+      "sha256": "94389a62b2dcf37bb81e58dad7f58062c41eb71a731c5dcac0253639fb825e0a"
+    },
+    {
+      "path": "rollouts-xiaomi-t_460aea68/composite-seen/steam-01/rollout/SteamInMicrowave/stats.json",
+      "size": 560,
+      "mtime_ns": 1789387649544912949,
+      "mode": 33188,
+      "sha256": "a15ed6b0ba6f4a53ca5f881b7f6584eb82c04641fba21e1cf95bd940fd9083f0"
+    },
+    {
+      "path": "rollouts-xiaomi-t_460aea68/composite-seen/lunches-01/config.json",
+      "size": 277,
+      "mtime_ns": 1789387649117914897,
+      "mode": 33204,
+      "sha256": "731fda394024b26eabaef37f99b4ab7badb94b0156cc88f932634526d4942907"
+    },
+    {
+      "path": "rollouts-xiaomi-t_460aea68/composite-seen/lunches-01/rollout.log",
+      "size": 0,
+      "mtime_ns": 1789387648501917705,
+      "mode": 33204,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "rollouts-xiaomi-t_460aea68/composite-seen/lunches-01/rollout/summary.json",
+      "size": 933,
+      "mtime_ns": 1789387649116914902,
+      "mode": 33188,
+      "sha256": "9829867273fe6b0f434f0c5d0533d43ec4f08254de55bd5524de163023e73817"
+    },
+    {
+      "path": "rollouts-xiaomi-t_460aea68/composite-seen/lunches-01/rollout/PackIdenticalLunches/episode_000_seed_11_failure.mp4",
+      "size": 7194231,
+      "mtime_ns": 1789387649115914907,
+      "mode": 33188,
+      "sha256": "462ebb37d7772eb8682ab66f8ae5d48605a1aae8ee494e88527bf2a96a455253"
+    },
+    {
+      "path": "rollouts-xiaomi-t_460aea68/composite-seen/lunches-01/rollout/PackIdenticalLunches/stats.json",
+      "size": 505,
+      "mtime_ns": 1789387648502917700,
+      "mode": 33188,
+      "sha256": "e0fdb98bca348a8abe6c98569e89284e298476e65ac315326086d67c45325eff"
+    },
+    {
+      "path": "rollouts-xiaomi-t_460aea68/composite-unseen/bread-01/config.json",
+      "size": 273,
+      "mtime_ns": 1789387650028910741,
+      "mode": 33204,
+      "sha256": "580a1594c65e048cb242bec53c7d5735274ca68bbb360f8acb7e5b875dfa3625"
+    },
+    {
+      "path": "rollouts-xiaomi-t_460aea68/composite-unseen/bread-01/rollout.log",
+      "size": 3676,
+      "mtime_ns": 1789387649734912083,
+      "mode": 33204,
+      "sha256": "1a7d06f14b0db75b57720bf150d6db37eeb9ef4bbd2c26e381a2757f2f0221ad"
+    },
+    {
+      "path": "rollouts-xiaomi-t_460aea68/composite-unseen/bread-01/rollout/summary.json",
+      "size": 1027,
+      "mtime_ns": 1789387649735912078,
+      "mode": 33188,
+      "sha256": "7b665ea055e0486560a01bcde326e76d4b7196eb979fc97897d4aaadee1b2dfd"
+    },
+    {
+      "path": "rollouts-xiaomi-t_460aea68/composite-unseen/bread-01/rollout/BreadSelection/episode_000_seed_9_failure.mp4",
+      "size": 3396010,
+      "mtime_ns": 1789387650026910750,
+      "mode": 33188,
+      "sha256": "f68213150d89c0af02c90ed10ad454484807a0af57551198845cffc1d470c45c"
+    },
+    {
+      "path": "rollouts-xiaomi-t_460aea68/composite-unseen/bread-01/rollout/BreadSelection/stats.json",
+      "size": 603,
+      "mtime_ns": 1789387650027910746,
+      "mode": 33188,
+      "sha256": "4f42d9356cf9b191eac2d4e9234ca14e9b4ed946a0b9e2dfa2068b43eab5e9d4"
+    },
+    {
+      "path": "rollouts-xiaomi-t_460aea68/composite-unseen/condiments-01/config.json",
+      "size": 284,
+      "mtime_ns": 1789387649733912087,
+      "mode": 33204,
+      "sha256": "a52513e552d14dabfdf551f948b24a1541a42058d140037b45ac516782c1595f"
+    },
+    {
+      "path": "rollouts-xiaomi-t_460aea68/composite-unseen/condiments-01/rollout.log",
+      "size": 2641,
+      "mtime_ns": 1789387649547912935,
+      "mode": 33204,
+      "sha256": "62284aefa7551f1469f745a93ed999308728110dca8ca1711fd4411fbccd4fe6"
+    },
+    {
+      "path": "rollouts-xiaomi-t_460aea68/composite-unseen/condiments-01/rollout/summary.json",
+      "size": 926,
+      "mtime_ns": 1789387649548912931,
+      "mode": 33188,
+      "sha256": "e96386f60c116fd07fa9d1ba6185771a36e8a0a1184915f655236f8f79f9581b"
+    },
+    {
+      "path": "rollouts-xiaomi-t_460aea68/composite-unseen/condiments-01/rollout/CategorizeCondiments/episode_000_seed_10_failure.mp4",
+      "size": 2140257,
+      "mtime_ns": 1789387649731912096,
+      "mode": 33188,
+      "sha256": "b2a1111a73a5027645f40faff5a76e923ced3320b63e599b154435481a735830"
+    },
+    {
+      "path": "rollouts-xiaomi-t_460aea68/composite-unseen/condiments-01/rollout/CategorizeCondiments/stats.json",
+      "size": 496,
+      "mtime_ns": 1789387649732912091,
+      "mode": 33188,
+      "sha256": "d8d68d758ce39572d7bec6aaaffa63a36a958c57cc016a3f0b3d0dc71d20a4c8"
+    },
+    {
+      "path": "xiaomi-cu121/.dockerignore",
+      "size": 56,
+      "mtime_ns": 1789380076936848276,
+      "mode": 33204,
+      "sha256": "35cd504934c99e4fc2c8e4694a65481ece6aee64485a67d2623fb45b6f3a2cb1"
+    },
+    {
+      "path": "xiaomi-cu121/Dockerfile",
+      "size": 1064,
+      "mtime_ns": 1789379979595564842,
+      "mode": 33204,
+      "sha256": "5dc6e4c4c3cebbe4b19186296748a2942ce144cac48e964fbf7efeb9f7a1484f"
+    },
+    {
+      "path": "xiaomi-cu121/Dockerfile.client",
+      "size": 287,
+      "mtime_ns": 1789380069766901128,
+      "mode": 33204,
+      "sha256": "17ab065e2a28d520a232290bed4be3e8cdc3debd62187cbb277189ebf4677c2a"
+    },
+    {
+      "path": "xiaomi-cu121/README.md",
+      "size": 5049,
+      "mtime_ns": 1789383520681955491,
+      "mode": 33204,
+      "sha256": "35cd09975b9fc9fa1b7a5cddcc981444aa0736e59e22b60d836709539a0d92a2"
+    },
+    {
+      "path": "xiaomi-cu121/REPORT.md",
+      "size": 5921,
+      "mtime_ns": 1789383581553920624,
+      "mode": 33204,
+      "sha256": "db58c55c5460f6f7069e6277a98b1f615b7481fe209e4440e7d901c5f8e099ba"
+    },
+    {
+      "path": "xiaomi-cu121/build-progress.tar",
+      "size": 20480,
+      "mtime_ns": 1789379842478570041,
+      "mode": 33204,
+      "sha256": "db4580c707198183b86a89b87893d8756d500fa2be0520c01b6f9ab65114ce13"
+    },
+    {
+      "path": "xiaomi-cu121/build_stats.py",
+      "size": 687,
+      "mtime_ns": 1789381439571696985,
+      "mode": 33204,
+      "sha256": "d5dab1c728548fbccd7d80ec33bff4a5846b86b7bf7263995805bc0f8619fbae"
+    },
+    {
+      "path": "xiaomi-cu121/checkpoint-api.json",
+      "size": 7635,
+      "mtime_ns": 1789379623900158787,
+      "mode": 33204,
+      "sha256": "4b5ef916830de1ae307957cb490cb4ddce9a2e11dbde5ce2177e90dc87fee5f6"
+    },
+    {
+      "path": "xiaomi-cu121/checkpoint.sha256",
+      "size": 1958,
+      "mtime_ns": 1789381173000000000,
+      "mode": 33204,
+      "sha256": "f2f8daf792417c273017d6fc50cd88a83d5bdd1407196ac13a596931446c7e14"
+    },
+    {
+      "path": "xiaomi-cu121/client-context.tar",
+      "size": 10240,
+      "mtime_ns": 1789380087583769772,
+      "mode": 33204,
+      "sha256": "3f0406d2b9c33698b883117b1428878dbf92971fec77ee18704a93c08093afc2"
+    },
+    {
+      "path": "xiaomi-cu121/client-image-id.txt",
+      "size": 72,
+      "mtime_ns": 1789381173000000000,
+      "mode": 33204,
+      "sha256": "17fce89a96fa4da3cb427af0b4b33e87d53cdc3b8e2657c496664f254bcbea19"
+    },
+    {
+      "path": "xiaomi-cu121/client.requirements.lock",
+      "size": 1151,
+      "mtime_ns": 1789381175000000000,
+      "mode": 33204,
+      "sha256": "bafa175f0fed17f0e29c992b0090dfac1e2a58d1d77bd7ee9cb47c8cc2e205aa"
+    },
+    {
+      "path": "xiaomi-cu121/config.reference.json",
+      "size": 5580,
+      "mtime_ns": 1789379745933274179,
+      "mode": 33204,
+      "sha256": "ff3fdf7b128376b3c52626c4874c3748d3ce087afa81af5cb1b574683ad0bedf"
+    },
+    {
+      "path": "xiaomi-cu121/context.tar",
+      "size": 10240,
+      "mtime_ns": 1789379814952771139,
+      "mode": 33204,
+      "sha256": "eabf88e246fa5fe3cd5cb608902afd425c7d2f902cb16c54e51cd973fc30b6a7"
+    },
+    {
+      "path": "xiaomi-cu121/cuda-check.tar",
+      "size": 10240,
+      "mtime_ns": 1789380628322760599,
+      "mode": 33204,
+      "sha256": "973cb0307cd768a54ae7cbc5cc81b2c5b4429f1e345e52a976a37c1a631ef082"
+    },
+    {
+      "path": "xiaomi-cu121/cuda_check.py",
+      "size": 361,
+      "mtime_ns": 1789380619319827607,
+      "mode": 33204,
+      "sha256": "ffa9d707bb39ef98c80631458957b4448705e53d460fdeb30a68499e935a6d3f"
+    },
+    {
+      "path": "xiaomi-cu121/download.py",
+      "size": 198,
+      "mtime_ns": 1789379778043040368,
+      "mode": 33204,
+      "sha256": "f99011414c116711bbde7403667e6d05e54c37633772fe47928083ca21886dd4"
+    },
+    {
+      "path": "xiaomi-cu121/final-context.tar",
+      "size": 20480,
+      "mtime_ns": 1789382736922982104,
+      "mode": 33204,
+      "sha256": "c237221b96968735baa925df01b581c0287df07a1f5f8fcbe85989bea254dbdc"
+    },
+    {
+      "path": "xiaomi-cu121/final-evidence-with-status.bin",
+      "size": 2027533,
+      "mtime_ns": 1789383376423851829,
+      "mode": 33204,
+      "sha256": "cf8fd4c42f6a72d391498e77aaf2b3d683517b4178c30fd50fe2d8d5cb27bae8"
+    },
+    {
+      "path": "xiaomi-cu121/final-evidence.tar",
+      "size": 2027520,
+      "mtime_ns": 1789383388325871610,
+      "mode": 33204,
+      "sha256": "c1aa607ff93bfe7a1492f009013b7c1352963cb8646b0abc3cd2631727bce37d"
+    },
+    {
+      "path": "xiaomi-cu121/final-logs.tar",
+      "size": 174080,
+      "mtime_ns": 1789383457968945253,
+      "mode": 33204,
+      "sha256": "a15ad5a1a9b044661be07ef64c5b000771aee402af78d7098100b5a0da37d2cf"
+    },
+    {
+      "path": "xiaomi-cu121/freeze.tar",
+      "size": 10240,
+      "mtime_ns": 1789383483902955537,
+      "mode": 33204,
+      "sha256": "13782c3738bbb30f93afd656322a360fb9e52219e150aad4df17442b75bd9987"
+    },
+    {
+      "path": "xiaomi-cu121/handoff.tar",
+      "size": 2109440,
+      "mtime_ns": 1789383627656867931,
+      "mode": 33204,
+      "sha256": "40a0a70b73442fbdac31549843e185b87eb39d67a0df9cf22d61b466fa695200"
+    },
+    {
+      "path": "xiaomi-cu121/import.tar",
+      "size": 10240,
+      "mtime_ns": 1789381687689263877,
+      "mode": 33204,
+      "sha256": "f8cf14562dbc1fcbb5fcc21330922c4a202b82a7c8866762439315fd26c45cb3"
+    },
+    {
+      "path": "xiaomi-cu121/import_check.py",
+      "size": 416,
+      "mtime_ns": 1789381676487407816,
+      "mode": 33204,
+      "sha256": "a4b1ea0dc720f217cb7fde4fd5cc97901c16283aa4030b41e54d136c6bf0adb6"
+    },
+    {
+      "path": "xiaomi-cu121/inference-image-id.txt",
+      "size": 72,
+      "mtime_ns": 1789383236000000000,
+      "mode": 33204,
+      "sha256": "eda188a7f1f2ebb537c72cc0249a62afc37bbc4c7f373f77748a99178213bb8a"
+    },
+    {
+      "path": "xiaomi-cu121/inference.requirements.lock",
+      "size": 990,
+      "mtime_ns": 1789383483000000000,
+      "mode": 33204,
+      "sha256": "422b5440fbc7accef6c9afb333150762a6ce64ed31515d66b9af4a2f1bf0b513"
+    },
+    {
+      "path": "xiaomi-cu121/modeling_mibot.reference.py",
+      "size": 82384,
+      "mtime_ns": 1789379745684275990,
+      "mode": 33204,
+      "sha256": "d2f90e88391ae06ce7beca27416544ad2cb623a2963b6c61ba9ddafa2fd42ec9"
+    },
+    {
+      "path": "xiaomi-cu121/observe.py",
+      "size": 1339,
+      "mtime_ns": 1789379924022972891,
+      "mode": 33204,
+      "sha256": "6d339f8c9d21a1350a07e6397a4d593f1807185f57e47134880f0fa0deb988ff"
+    },
+    {
+      "path": "xiaomi-cu121/observe.tar",
+      "size": 10240,
+      "mtime_ns": 1789379936010884937,
+      "mode": 33204,
+      "sha256": "474b6fb84f49f8fb71127eca37ffb442990dc196e0b98ae4f7cce4611fe1c156"
+    },
+    {
+      "path": "xiaomi-cu121/outcome.py",
+      "size": 335,
+      "mtime_ns": 1789380139028390141,
+      "mode": 33204,
+      "sha256": "e803bbe5e51d2cd3b1df6d44f5cea66441125e04177332905d29d134b5400d20"
+    },
+    {
+      "path": "xiaomi-cu121/probe.py",
+      "size": 2978,
+      "mtime_ns": 1789382709093252203,
+      "mode": 33204,
+      "sha256": "c3507513ab3f595ea8f28bc88e439b406a1b608ddbadcc1b96b31fa672a7c450"
+    },
+    {
+      "path": "xiaomi-cu121/processor.tar",
+      "size": 10240,
+      "mtime_ns": 1789380575613152793,
+      "mode": 33204,
+      "sha256": "81cb579b70bc726078e5cecf054c64a78f01304af06cd72b90483d6dcaf1c477"
+    },
+    {
+      "path": "xiaomi-cu121/processor_check.py",
+      "size": 1167,
+      "mtime_ns": 1789380556849292352,
+      "mode": 33204,
+      "sha256": "b2e3e4ffd8fc7173abbb8c40d194f4c5647ecbf3d7d089ef0dfa0bf60a926a4f"
+    },
+    {
+      "path": "xiaomi-cu121/progress.tar",
+      "size": 368640,
+      "mtime_ns": 1789383254407510495,
+      "mode": 33204,
+      "sha256": "be567eb0f1788287ca3d2234aa2bbe1a4a7010102b3063cc2a42127b938ad63d"
+    },
+    {
+      "path": "xiaomi-cu121/rollout.py",
+      "size": 17991,
+      "mtime_ns": 1789380158769244333,
+      "mode": 33204,
+      "sha256": "cd83a86a93a5dac97b7933a77414d3b0c1763171f51625e855017ed405a972e8"
+    },
+    {
+      "path": "xiaomi-cu121/run-update.tar",
+      "size": 10240,
+      "mtime_ns": 1789380324484017866,
+      "mode": 33204,
+      "sha256": "51bacdeabc41fafb1ebc9411eecdaa7bf6bb374ae6787f1c16e8ada793605773"
+    },
+    {
+      "path": "xiaomi-cu121/run.sh",
+      "size": 2686,
+      "mtime_ns": 1789382729349055540,
+      "mode": 33204,
+      "sha256": "5cc3fc9cad20a58699e688721d1c1f8b9abcbfa8c472b489650ec77ebb78d043"
+    },
+    {
+      "path": "xiaomi-cu121/scripts.tar",
+      "size": 30720,
+      "mtime_ns": 1789380245821600569,
+      "mode": 33204,
+      "sha256": "0762d52197b0ddf986af674cf7c84c0c77dd16c48426a61ddb054dc7aefbf392"
+    },
+    {
+      "path": "xiaomi-cu121/source.sha256",
+      "size": 774,
+      "mtime_ns": 1789383627615867987,
+      "mode": 33204,
+      "sha256": "0dcc154657d1639829b869f36c122568f8977eb366ca2027e1a8667f8a8bc351"
+    },
+    {
+      "path": "xiaomi-cu121/stats.tar",
+      "size": 10240,
+      "mtime_ns": 1789381447296581115,
+      "mode": 33204,
+      "sha256": "90d9679a6a4cbbc6ab38c4b0ab66d96aab15a0db1da4d394b064b1fb0c68899a"
+    },
+    {
+      "path": "xiaomi-cu121/test_outcome.py",
+      "size": 998,
+      "mtime_ns": 1789380123731503076,
+      "mode": 33204,
+      "sha256": "58be4b0c8ef9ab7f15f6f0046b3a4ea61ab0fa9ca41de9e8250f0dbf7f319b88"
+    },
+    {
+      "path": "xiaomi-cu121/textures.py",
+      "size": 395,
+      "mtime_ns": 1789380017359287109,
+      "mode": 33204,
+      "sha256": "bd0c0144155844cb43c58a24704a0a0404e259e5ca58c131fd1c782e83542f46"
+    },
+    {
+      "path": "xiaomi-cu121/update.tar",
+      "size": 40960,
+      "mtime_ns": 1789380029894194847,
+      "mode": 33204,
+      "sha256": "842c0648ff7decb8c2acc2dc7eccab4fc8146630c0f09f3e1e26b312bcbab0d0"
+    },
+    {
+      "path": "xiaomi-cu121/verify.py",
+      "size": 1876,
+      "mtime_ns": 1789381214024426473,
+      "mode": 33204,
+      "sha256": "d4cb8e002860cea5d921a995b53abb67cda3230f295e52175cd09b62d2428147"
+    },
+    {
+      "path": "xiaomi-cu121/verify.tar",
+      "size": 10240,
+      "mtime_ns": 1789381233717070202,
+      "mode": 33204,
+      "sha256": "496ca21ec55f07515e4add6b80cfa7bb33705e7b8ae87a051b1e8c843e2e47da"
+    },
+    {
+      "path": "xiaomi-cu121/xiaomi-cu121-t_9f03a613.tar.gz",
+      "size": 1887773,
+      "mtime_ns": 1789383627654867934,
+      "mode": 33204,
+      "sha256": "b794b0275d83f14cec60b08c84206379fbc7c177f5c93e85330eab90f8d0f05f"
+    },
+    {
+      "path": "xiaomi-cu121/__pycache__/outcome.cpython-311.pyc",
+      "size": 595,
+      "mtime_ns": 1789380144333350966,
+      "mode": 33204,
+      "sha256": "45e246161668e6112fbb319835c04909c49cbe2ff7098b5143d93c9151b9f1ba"
+    },
+    {
+      "path": "xiaomi-cu121/__pycache__/probe.cpython-311.pyc",
+      "size": 7274,
+      "mtime_ns": 1789380245816600606,
+      "mode": 33204,
+      "sha256": "277de4dad49342b6374bd7f2c0d99b4158de6cc859a7d695cd7281fd46c5db64"
+    },
+    {
+      "path": "xiaomi-cu121/__pycache__/rollout.cpython-311.pyc",
+      "size": 28454,
+      "mtime_ns": 1789380245816600606,
+      "mode": 33204,
+      "sha256": "58266b05feacd7f71d7938e50c104e799f3ef3385e2c4baf8626b05f122fc877"
+    },
+    {
+      "path": "xiaomi-cu121/upstream/deploy/client.py",
+      "size": 2572,
+      "mtime_ns": 1789380029890194876,
+      "mode": 33204,
+      "sha256": "5e50b3a110fa7ac08f171a8c226ceb45bccf5881c1a589beab4679c8a68239b3"
+    },
+    {
+      "path": "xiaomi-cu121/upstream/deploy/server.py",
+      "size": 3569,
+      "mtime_ns": 1789380087582769779,
+      "mode": 33204,
+      "sha256": "648eb93680c530d7f6cd3056f98e69339e021fb0e91cee06f135e91c461d37d4"
+    },
+    {
+      "path": "xiaomi-cu121/upstream/eval_robocasa365/entry.py",
+      "size": 17701,
+      "mtime_ns": 1789380029891194869,
+      "mode": 33204,
+      "sha256": "18d70fade4c990210dc5b9c34285c8030eac142d9c332066c73335e1c0aaa28e"
+    },
+    {
+      "path": "xiaomi-cu121/logs/acceptance-red.log",
+      "size": 692,
+      "mtime_ns": 1789381234480056533,
+      "mode": 33204,
+      "sha256": "03ca712c8fd3628cbc415bca452b27f1dcdc97ee943c705e9647c14fe0b60a34"
+    },
+    {
+      "path": "xiaomi-cu121/logs/assets-copy.log",
+      "size": 0,
+      "mtime_ns": 1789380262000000000,
+      "mode": 33204,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "xiaomi-cu121/logs/build-final.log",
+      "size": 3132,
+      "mtime_ns": 1789383236000000000,
+      "mode": 33204,
+      "sha256": "e8b5e3d00f312df0e67fb95b84876aefaff3862ee271cae54ec77ecf1f274627"
+    },
+    {
+      "path": "xiaomi-cu121/logs/build-resources.log",
+      "size": 2101,
+      "mtime_ns": 1789380841105175601,
+      "mode": 33204,
+      "sha256": "353929b2d55684dfb5b44290507272902037077a45af70436992267f9f91d760"
+    },
+    {
+      "path": "xiaomi-cu121/logs/build-ssh.log",
+      "size": 0,
+      "mtime_ns": 1789379825139696744,
+      "mode": 33204,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "xiaomi-cu121/logs/build.log",
+      "size": 66042,
+      "mtime_ns": 1789383225000000000,
+      "mode": 33204,
+      "sha256": "98b8ca89f1337b4d87c3591884c98ce8c86d68680c5ebf4c84d6365030cddaa4"
+    },
+    {
+      "path": "xiaomi-cu121/logs/client-build-final.log",
+      "size": 636,
+      "mtime_ns": 1789383236000000000,
+      "mode": 33204,
+      "sha256": "6f4aa40274a7b2f9a7d5a15d2f6b3802dd1058daa913ac9156ce686a591926de"
+    },
+    {
+      "path": "xiaomi-cu121/logs/client-build.log",
+      "size": 11543,
+      "mtime_ns": 1789380133000000000,
+      "mode": 33204,
+      "sha256": "2c026ed65a26772fc17cca754c855fa7d2da3a046646400045d4d0bd45307f8b"
+    },
+    {
+      "path": "xiaomi-cu121/logs/client-pip-check.log",
+      "size": 115,
+      "mtime_ns": 1789383447000000000,
+      "mode": 33204,
+      "sha256": "7e45365783fa91842073bb3540430df946ec672902232b06ddd6b2d93253015a"
+    },
+    {
+      "path": "xiaomi-cu121/logs/cuda-preflight.log",
+      "size": 3899,
+      "mtime_ns": 1789379735453350401,
+      "mode": 33204,
+      "sha256": "a8f18a44d12ad7c1cd4329d3c3ba395c65467070acbca2281b16eb31474c1e05"
+    },
+    {
+      "path": "xiaomi-cu121/logs/download.log",
+      "size": 6360,
+      "mtime_ns": 1789379963000000000,
+      "mode": 33204,
+      "sha256": "ed38f6d90973ee0770b186195153c679d22494a00bdd2ee880e79d87b592019e"
+    },
+    {
+      "path": "xiaomi-cu121/logs/final-build-probe-ssh.log",
+      "size": 5432,
+      "mtime_ns": 1789383244688471389,
+      "mode": 33204,
+      "sha256": "a7b202c0540adf0809e471d268383d11df3e603939fede97d71bbb74b5cd6961"
+    },
+    {
+      "path": "xiaomi-cu121/logs/final-isolation-check.log",
+      "size": 85,
+      "mtime_ns": 1789383388011871118,
+      "mode": 33204,
+      "sha256": "55ce8e1e16e61f3e5607a76d5c4be43b854f50fec29824c6c38d8184581fe32b"
+    },
+    {
+      "path": "xiaomi-cu121/logs/gpu-after-rollout.log",
+      "size": 1832,
+      "mtime_ns": 1789383376000000000,
+      "mode": 33204,
+      "sha256": "eb98e997accda9a9fde4f8faf8eeca6ef4bfcaf2df6509fdba7faf5b95be781e"
+    },
+    {
+      "path": "xiaomi-cu121/logs/gpu-during-rollout.log",
+      "size": 2012,
+      "mtime_ns": 1789383307000000000,
+      "mode": 33204,
+      "sha256": "d02a3094195582d867236cf6dc23240e5fcb3f4b9db9e6c8af20ac3d510c78aa"
+    },
+    {
+      "path": "xiaomi-cu121/logs/gpu-pre-rollout.log",
+      "size": 1832,
+      "mtime_ns": 1789381175000000000,
+      "mode": 33204,
+      "sha256": "9783b56b23b113fdd42ce146d9c1acd1abca007f34a96541202bd304ab50d5d6"
+    },
+    {
+      "path": "xiaomi-cu121/logs/import-check.log",
+      "size": 801,
+      "mtime_ns": 1789381692755199072,
+      "mode": 33204,
+      "sha256": "ae3af69d0e4cdc782035b027ef7043583f65abdf8b0bc1c7dcd5962944858aaa"
+    },
+    {
+      "path": "xiaomi-cu121/logs/inference-pip-check.log",
+      "size": 777,
+      "mtime_ns": 1789383426000000000,
+      "mode": 33204,
+      "sha256": "fe8eedd8bc260ae8191f18df49d4533a1d2b6a17e5c545c76f83a32a8195635d"
+    },
+    {
+      "path": "xiaomi-cu121/logs/observe-final.log",
+      "size": 1824,
+      "mtime_ns": 1789380341000000000,
+      "mode": 33204,
+      "sha256": "1ab337d1bc7be70718aab6ee7765a9fa873ab20fabebd3ade655c97576aa4fd7"
+    },
+    {
+      "path": "xiaomi-cu121/logs/observe-with-textures.log",
+      "size": 526,
+      "mtime_ns": 1789380190000000000,
+      "mode": 33204,
+      "sha256": "fc262df43b0d7bbeedb1a2b1bb29ccba466f34822e9a99541d3755aec4da7289"
+    },
+    {
+      "path": "xiaomi-cu121/logs/observe.log",
+      "size": 2381,
+      "mtime_ns": 1789379954000000000,
+      "mode": 33204,
+      "sha256": "e6151e307ac6e7f03420e8893549c2227d0843fdbbdad0717d990a14bd29b66a"
+    },
+    {
+      "path": "xiaomi-cu121/logs/outcome-green.log",
+      "size": 98,
+      "mtime_ns": 1789380144333350966,
+      "mode": 33204,
+      "sha256": "fb184ea57734512b1f088f9181209901b9cd46df3eb7eaa2500ea9e48dde20b5"
+    },
+    {
+      "path": "xiaomi-cu121/logs/outcome-red.log",
+      "size": 754,
+      "mtime_ns": 1789380128577467303,
+      "mode": 33204,
+      "sha256": "407c365c1770bbcccd64e9ea255d94947ef3192e36db79387e06cdb7f1706c96"
+    },
+    {
+      "path": "xiaomi-cu121/logs/outcome-test-final.log",
+      "size": 98,
+      "mtime_ns": 1789383446000000000,
+      "mode": 33204,
+      "sha256": "fb184ea57734512b1f088f9181209901b9cd46df3eb7eaa2500ea9e48dde20b5"
+    },
+    {
+      "path": "xiaomi-cu121/logs/probe.log",
+      "size": 1664,
+      "mtime_ns": 1789383244000000000,
+      "mode": 33204,
+      "sha256": "29b7d2a7d432f3c3473cdaacda2153060565cbf9fea6e929577ebb7ff0f1345d"
+    },
+    {
+      "path": "xiaomi-cu121/logs/processor-check.log",
+      "size": 396,
+      "mtime_ns": 1789380591372035563,
+      "mode": 33204,
+      "sha256": "6cd9943044e7858b413669a6f7fd716da347f2d47c623e181c18d8c4fe3531dd"
+    },
+    {
+      "path": "xiaomi-cu121/logs/python-version.log",
+      "size": 762,
+      "mtime_ns": 1789383425000000000,
+      "mode": 33204,
+      "sha256": "a8e5fe032971780df95bd16268f4de145aecb8fe02f0f5eb1a1e94a533db0201"
+    },
+    {
+      "path": "xiaomi-cu121/logs/rollout-ssh.log",
+      "size": 3628,
+      "mtime_ns": 1789383343170784563,
+      "mode": 33204,
+      "sha256": "8e143c77cae7c85c1c94f2429ce3758bd2ccd676ac10bddaeed2a5ee1410f1ad"
+    },
+    {
+      "path": "xiaomi-cu121/logs/rollout.log",
+      "size": 3628,
+      "mtime_ns": 1789383343000000000,
+      "mode": 33204,
+      "sha256": "8e143c77cae7c85c1c94f2429ce3758bd2ccd676ac10bddaeed2a5ee1410f1ad"
+    },
+    {
+      "path": "xiaomi-cu121/logs/server.log",
+      "size": 8786,
+      "mtime_ns": 1789383350000000000,
+      "mode": 33204,
+      "sha256": "dacfd31c1beaf6953c639e125bcdfc4f4323cf0763e23247b675a24196d72e79"
+    },
+    {
+      "path": "xiaomi-cu121/logs/textures.log",
+      "size": 38989,
+      "mtime_ns": 1789380101000000000,
+      "mode": 33204,
+      "sha256": "c2246f4d7046e6d9c59b45237a4b3679712830eab0319b8b378b335247c04265"
+    },
+    {
+      "path": "xiaomi-cu121/logs/torch-cuda-check.log",
+      "size": 642,
+      "mtime_ns": 1789380630799742165,
+      "mode": 33204,
+      "sha256": "677f9a53384eabd75a8b828bae034ba61b1fda5ba20ab2c5aa666395547074d2"
+    },
+    {
+      "path": "xiaomi-cu121/logs/verification.log",
+      "size": 1462,
+      "mtime_ns": 1789383350000000000,
+      "mode": 33204,
+      "sha256": "798bdf0c399c7f217a06a62baf8bd21f0b91ee75657ea41f65c2ef85717b46e1"
+    },
+    {
+      "path": "xiaomi-cu121/output/inference.json",
+      "size": 293,
+      "mtime_ns": 1789383244000000000,
+      "mode": 33188,
+      "sha256": "cac35175670658060a0ab8d16a6258a5eb46feaea99af6f0bd73068f6529f8e1"
+    },
+    {
+      "path": "xiaomi-cu121/output/observation.json",
+      "size": 705,
+      "mtime_ns": 1789380341000000000,
+      "mode": 33188,
+      "sha256": "589ab9879cb2309b839924aafa105cbb642120f2488a6986d73ce3e54383a802"
+    },
+    {
+      "path": "xiaomi-cu121/output/observation.npz",
+      "size": 199599,
+      "mtime_ns": 1789380341000000000,
+      "mode": 33188,
+      "sha256": "91866f8e0ac9e1543924df4800313821204e640865d3cb9a47717b532c5cc9f4"
+    },
+    {
+      "path": "xiaomi-cu121/output/preflight-actions.npy",
+      "size": 896,
+      "mtime_ns": 1789383244000000000,
+      "mode": 33188,
+      "sha256": "f3a07e50e0d18f4b9a1d13030435382fb101e370c6271b65136df60eee3a2c70"
+    },
+    {
+      "path": "xiaomi-cu121/output/rollout-first.png",
+      "size": 150421,
+      "mtime_ns": 1789383350000000000,
+      "mode": 33188,
+      "sha256": "814da73cc68f67539face548dc5d42884fd6b27b2f95c3c855fa83a6c8e4fd66"
+    },
+    {
+      "path": "xiaomi-cu121/output/rollout-last.png",
+      "size": 178286,
+      "mtime_ns": 1789383350000000000,
+      "mode": 33188,
+      "sha256": "fbf8d77c1388522431461a502c4be50965ca11bb96ba407a9fcd4060fa26b17d"
+    },
+    {
+      "path": "xiaomi-cu121/output/verification.json",
+      "size": 949,
+      "mtime_ns": 1789383350000000000,
+      "mode": 33188,
+      "sha256": "a3d5c6a34c4cf71437939da3882ad951d01a1f712ed7972ace5cbe246f5430b2"
+    },
+    {
+      "path": "xiaomi-cu121/output/rollout/summary.json",
+      "size": 871,
+      "mtime_ns": 1789383343000000000,
+      "mode": 33188,
+      "sha256": "218e2d0690b5950f049c1c6ff6c52e24bb2e69028f8ce173510871e4f2fdb4c6"
+    },
+    {
+      "path": "xiaomi-cu121/output/rollout/CloseBlenderLid/episode_000_seed_7_failure.mp4",
+      "size": 1309724,
+      "mtime_ns": 1789383342000000000,
+      "mode": 33188,
+      "sha256": "a1d929eeb1141569d490ec5242ac8e7dff9d58be5f35f75e0fc74d7745f98909"
+    },
+    {
+      "path": "xiaomi-cu121/output/rollout/CloseBlenderLid/stats.json",
+      "size": 452,
+      "mtime_ns": 1789383342000000000,
+      "mode": 33188,
+      "sha256": "567b38cb5522228b12172eb20a95ed1caf9ab32f0c063c85c17b4d53533cc0cc"
+    },
+    {
+      "path": "research/t_1d1b4ded/INDEX.md",
+      "size": 23377,
+      "mtime_ns": 1789386849763681728,
+      "mode": 33204,
+      "sha256": "69590c2817c26beed319381dbbaa9b80e872f07cd2bd0c51a4d046539b3f2cfd"
+    },
+    {
+      "path": "research/t_1d1b4ded/collect_sources.py",
+      "size": 4298,
+      "mtime_ns": 1789386642798519873,
+      "mode": 33204,
+      "sha256": "de2c905f1d8992b563158ebc25a3f61d2175077ba16b6e69a228d3fe2e15ff65"
+    },
+    {
+      "path": "research/t_1d1b4ded/ledger.json",
+      "size": 3156,
+      "mtime_ns": 1789386654903410863,
+      "mode": 33204,
+      "sha256": "3d680628b5f75bb99afe0a7ec07c97188ab33301018928c931e9d885a232606b"
+    },
+    {
+      "path": "research/t_1d1b4ded/selection.json",
+      "size": 9063,
+      "mtime_ns": 1789386654907410827,
+      "mode": 33204,
+      "sha256": "b3f751e505d47813c90a740094851529a048b06770a62344c2790ef63643322e"
+    },
+    {
+      "path": "research/t_1d1b4ded/source_manifest.json",
+      "size": 10595,
+      "mtime_ns": 1789386654907410827,
+      "mode": 33204,
+      "sha256": "da2244735d68ac917b639f56f66b380b828dfa3b3f65fa7e1baa53c4fec3a45f"
+    },
+    {
+      "path": "research/t_1d1b4ded/validate.py",
+      "size": 3040,
+      "mtime_ns": 1789386881662402613,
+      "mode": 33204,
+      "sha256": "f6776d4251c84cf8a5027f11ab5f54ddd205d8aa25aebd82e54659d8a7431b8f"
+    },
+    {
+      "path": "research/t_1d1b4ded/validation.json",
+      "size": 715,
+      "mtime_ns": 1789386887071355379,
+      "mode": 33204,
+      "sha256": "c00691ec7acd72817498bf62943f991a692b50c3ee6089a9ef74ed394efede6e"
+    },
+    {
+      "path": "research/t_1d1b4ded/sources/robocasa/utils/dataset_registry.py",
+      "size": 94640,
+      "mtime_ns": 1789386654634413283,
+      "mode": 33204,
+      "sha256": "23e8e31bb56bae80de86c34eafadfe32dd1e1eba6608376152ba9fdda5532a4b"
+    },
+    {
+      "path": "research/t_1d1b4ded/sources/robocasa/utils/dataset_registry_utils.py",
+      "size": 7796,
+      "mtime_ns": 1789386654657413076,
+      "mode": 33204,
+      "sha256": "9ea74602711ab9c499314bc3d94c4b61db6fe85bebf616cce573b9d39ba02e3b"
+    },
+    {
+      "path": "research/t_1d1b4ded/sources/robocasa/utils/object_utils.py",
+      "size": 23910,
+      "mtime_ns": 1789386654678412887,
+      "mode": 33204,
+      "sha256": "3a7ddb8ba503c5f397baa1513b7b5f370c3c3b2a6a67fa723e83c9472c58af4a"
+    },
+    {
+      "path": "research/t_1d1b4ded/sources/robocasa/environments/kitchen/composite/making_salads/wash_lettuce.py",
+      "size": 1817,
+      "mtime_ns": 1789386654825411564,
+      "mode": 33204,
+      "sha256": "52a7d871e8db62f961974c5c260ca5ba06adcefb30e65024fd807640e2899cf1"
+    },
+    {
+      "path": "research/t_1d1b4ded/sources/robocasa/environments/kitchen/composite/washing_dishes/pre_soak_pan.py",
+      "size": 3186,
+      "mtime_ns": 1789386654846411375,
+      "mode": 33204,
+      "sha256": "897edf9b4cd02b8c3898df660114850307a280943829206e1c5f226c9d3bbe70"
+    },
+    {
+      "path": "research/t_1d1b4ded/sources/robocasa/environments/kitchen/composite/packing_lunches/pack_identical_lunches.py",
+      "size": 6996,
+      "mtime_ns": 1789386654784411933,
+      "mode": 33204,
+      "sha256": "22f96ad3195e29107814ad678600827bd5e95c4cce1fe61fb50058a404948e92"
+    },
+    {
+      "path": "research/t_1d1b4ded/sources/robocasa/environments/kitchen/composite/adding_ice_to_beverages/make_ice_lemonade.py",
+      "size": 4686,
+      "mtime_ns": 1789386654866411196,
+      "mode": 33204,
+      "sha256": "696ccadd163e2a1751e28f5f0bb1d7a042f4adcd2a577b1f84464d89b0292395"
+    },
+    {
+      "path": "research/t_1d1b4ded/sources/robocasa/environments/kitchen/composite/arranging_condiments/categorize_condiments.py",
+      "size": 4188,
+      "mtime_ns": 1789386654764412113,
+      "mode": 33204,
+      "sha256": "46029f35e42d25f7bf63623e50771a2c5b63ab3de90db38698f9960b52f1b354"
+    },
+    {
+      "path": "research/t_1d1b4ded/sources/robocasa/environments/kitchen/composite/making_toast/bread_selection.py",
+      "size": 3969,
+      "mtime_ns": 1789386654742412311,
+      "mode": 33204,
+      "sha256": "b6fbc972d63c3329249f2806b2352813c7d0c17f578cb3235b4ac54ee674dcb5"
+    },
+    {
+      "path": "research/t_1d1b4ded/sources/robocasa/environments/kitchen/composite/steaming_food/steam_in_microwave.py",
+      "size": 3955,
+      "mtime_ns": 1789386654804411753,
+      "mode": 33204,
+      "sha256": "6809b6017d0d34b55668a4344c68a19a8b9b09712210ca239503621572a64c31"
+    },
+    {
+      "path": "research/t_1d1b4ded/sources/robocasa/environments/kitchen/composite/washing_fruits_and_vegetables/wash_fruit_colander.py",
+      "size": 3159,
+      "mtime_ns": 1789386654886411015,
+      "mode": 33204,
+      "sha256": "e4633c9122f77cdce8f5a3dae2f62ddee86cb79d9c44186c9139f439627013c9"
+    },
+    {
+      "path": "research/t_1d1b4ded/sources/prior/INDEX.md",
+      "size": 11119,
+      "mtime_ns": 1789386654906410836,
+      "mode": 33204,
+      "sha256": "021cb0d0c9ab7f6fa568190cbebad8bf8602700238e197314539ab03c01c6431"
+    },
+    {
+      "path": "research/t_1d1b4ded/sources/prior/rollout.py",
+      "size": 17991,
+      "mtime_ns": 1789386654906410836,
+      "mode": 33204,
+      "sha256": "cd83a86a93a5dac97b7933a77414d3b0c1763171f51625e855017ed405a972e8"
+    },
+    {
+      "path": "research/t_1d1b4ded/sources/prior/run-t_5af7225b.sh",
+      "size": 1780,
+      "mtime_ns": 1789386654906410836,
+      "mode": 33204,
+      "sha256": "5c925e4134bc210fe64b93c8f527f46dae6e04f32085606efdb658b0f8f7e589"
+    },
+    {
+      "path": "research/t_1d1b4ded/sources/prior/summary.json",
+      "size": 15927,
+      "mtime_ns": 1789386654906410836,
+      "mode": 33204,
+      "sha256": "be89b2532364662292d0f264894b4e58914e5e2070e3d885133cc1b97f4a4e79"
+    },
+    {
+      "path": "preflight/t_700146a2/BLOCKER.md",
+      "size": 6845,
+      "mtime_ns": 1789387065314812155,
+      "mode": 33204,
+      "sha256": "839c46dc2e45a484baae4e52f893726275edc1929ebc6780b5d9b66dd69bb27a"
+    },
+    {
+      "path": "__pycache__/diagnose_egl.cpython-311.pyc",
+      "size": 1202,
+      "mtime_ns": 1789378487504434724,
+      "mode": 33204,
+      "sha256": "72bd40c8b22e833c06220eb50551257c7b663e89e2533532d9278c356aa91edf"
+    },
+    {
+      "path": "__pycache__/smoke_test.cpython-311.pyc",
+      "size": 5527,
+      "mtime_ns": 1789378487504434724,
+      "mode": 33204,
+      "sha256": "9e86e24868df73b5dfba6d8f9a12dfc203a4ab58bd690c92fc47425b5fe05d57"
+    },
+    {
+      "path": "logs/asset-size.txt",
+      "size": 12,
+      "mtime_ns": 1789378467000000000,
+      "mode": 33204,
+      "sha256": "cbfcf8712e9d6206111ccb719548f58e5dec23c209c13696fbc1580dbb17dd67"
+    },
+    {
+      "path": "logs/assets-objects.log",
+      "size": 249911,
+      "mtime_ns": 1789378288000000000,
+      "mode": 33204,
+      "sha256": "515a925900ef0c6db352e455947c7f9c29c2fdb40831980d35ca974f09b9d99a"
+    },
+    {
+      "path": "logs/assets.log",
+      "size": 31312,
+      "mtime_ns": 1789377820000000000,
+      "mode": 33204,
+      "sha256": "9f5b72e84899893ecd2a16726d55a72f60d4d4f75f7e40ad96250fa9fbd6524a"
+    },
+    {
+      "path": "logs/build-2.log",
+      "size": 3470,
+      "mtime_ns": 1789377749000000000,
+      "mode": 33204,
+      "sha256": "cb1acec1061aa6255c16db06ac1c167f7de2783e3347fa7e826a83a23aa0ad8f"
+    },
+    {
+      "path": "logs/build-final.log",
+      "size": 2282,
+      "mtime_ns": 1789378423000000000,
+      "mode": 33204,
+      "sha256": "cc417983e5febc600b948c2944cda8d3624c2dd70d38f2dd16c321ea18e3dc0e"
+    },
+    {
+      "path": "logs/build-locked.log",
+      "size": 20850,
+      "mtime_ns": 1789377907000000000,
+      "mode": 33204,
+      "sha256": "d210003ac30c3d50cad8ec2c9ca8b84de194c158a1ecd59dcd507d12b8623659"
+    },
+    {
+      "path": "logs/build.log",
+      "size": 69595,
+      "mtime_ns": 1789377705000000000,
+      "mode": 33204,
+      "sha256": "742b231155fddccfca507681cdbadead37b9b19d61ad108372ada42d10c08bea"
+    },
+    {
+      "path": "logs/cpu-smoke-final.log",
+      "size": 2018,
+      "mtime_ns": 1789378456000000000,
+      "mode": 33204,
+      "sha256": "bf82a29a3864600e494138fb7aac725bb1cd699ae6d0835efd3d6f792ccfaf3b"
+    },
+    {
+      "path": "logs/gpu-smoke-final.log",
+      "size": 2015,
+      "mtime_ns": 1789378433000000000,
+      "mode": 33204,
+      "sha256": "d774f9f265dc6850b1b6e21ed8c93f0676949db70b6bc2950799f4d7e302b27e"
+    },
+    {
+      "path": "logs/gpu-smoke.log",
+      "size": 2959,
+      "mtime_ns": 1789377832000000000,
+      "mode": 33204,
+      "sha256": "83a298bc0614fd947b03a7dad8168b7867660b2d07ba383c8c0503639a68f869"
+    },
+    {
+      "path": "logs/image-inspect.json",
+      "size": 6306,
+      "mtime_ns": 1789378466000000000,
+      "mode": 33204,
+      "sha256": "9070be0ac693506e538d24389cd9b3b589b03a75c694f1cc8025bd6334492d38"
+    },
+    {
+      "path": "logs/no-assets-test.log",
+      "size": 2930,
+      "mtime_ns": 1789377756000000000,
+      "mode": 33204,
+      "sha256": "ed425b72dc00b818f6c5be3cb192e2411c38dfd3703ed5b5e5d09c6feb0a88a1"
+    },
+    {
+      "path": "logs/physics-smoke-final.log",
+      "size": 1848,
+      "mtime_ns": 1789378466000000000,
+      "mode": 33204,
+      "sha256": "0d13ba370926ccda4be1f7c15c0ee2c6f4136b4a37b255c5890ce0161b299aec"
+    },
+    {
+      "path": "logs/pip-check.txt",
+      "size": 115,
+      "mtime_ns": 1789378487193437183,
+      "mode": 33204,
+      "sha256": "7e45365783fa91842073bb3540430df946ec672902232b06ddd6b2d93253015a"
+    },
+    {
+      "path": "logs/pip-freeze.txt",
+      "size": 793,
+      "mtime_ns": 1789378341000000000,
+      "mode": 33204,
+      "sha256": "10bf97ae9926e8ebcc03a0f775b5fdf87d83c2b04d879d06cb04a3b74cd62504"
+    },
+    {
+      "path": "logs/versions.txt",
+      "size": 2528,
+      "mtime_ns": 1789377781319270358,
+      "mode": 33204,
+      "sha256": "ee4a32136dfaf2ae97b3b092d74c31797c1f4826676ff85d3e565155de448bf1"
+    },
+    {
+      "path": "logs/volume-inspect.json",
+      "size": 295,
+      "mtime_ns": 1789378466000000000,
+      "mode": 33204,
+      "sha256": "782d62badd8821563e3a57ee2ec85f995116d8bbb43ca7b335bef65139ee8767"
+    },
+    {
+      "path": "logs/xiaomi-cuda-preflight.log",
+      "size": 1851,
+      "mtime_ns": 1789378801520975762,
+      "mode": 33204,
+      "sha256": "831cea1f805a234d431c1243d0deec2b227bf8bfad440cb98c5de17fba1a468c"
+    },
+    {
+      "path": "logs/xiaomi-model-metadata.json",
+      "size": 7635,
+      "mtime_ns": 1789378828368767347,
+      "mode": 33204,
+      "sha256": "4b5ef916830de1ae307957cb490cb4ddce9a2e11dbde5ce2177e90dc87fee5f6"
+    },
+    {
+      "path": "output/smoke/frame.png",
+      "size": 20540,
+      "mtime_ns": 1789378433000000000,
+      "mode": 33188,
+      "sha256": "d594d44b01c27eb556af1f8519e125cf968631b15277f3b1ed14235a1b056d56"
+    },
+    {
+      "path": "output/smoke/result.json",
+      "size": 1009,
+      "mtime_ns": 1789378433000000000,
+      "mode": 33188,
+      "sha256": "7504c29c04ee7b6972b77bdddd550ba8729ebb24d183a5e5a46aba492f0bb88e"
+    },
+    {
+      "path": "output/physics/result.json",
+      "size": 842,
+      "mtime_ns": 1789378466000000000,
+      "mode": 33188,
+      "sha256": "802bf8515422970ccb38ca0cefdc63f1340dc61710ee4c169bfbbe78705542c4"
+    },
+    {
+      "path": "output/cpu/frame.png",
+      "size": 21799,
+      "mtime_ns": 1789378456000000000,
+      "mode": 33188,
+      "sha256": "dbb415d0cf6e653d3be9d42b1d9f02f32c86d82df601978cf566414d28d04d98"
+    },
+    {
+      "path": "output/cpu/result.json",
+      "size": 1012,
+      "mtime_ns": 1789378456000000000,
+      "mode": 33188,
+      "sha256": "5e3488152f4606d048e051439897aab30b681c49175903738d574bcd05a64b98"
+    }
+  ],
+  "excluded": [
+    "vendor",
+    "xiaomi-cu121/checkpoint",
+    "research/t_1d1b4ded/sources/robocasa/models"
+  ],
+  "top_level": [
+    ".dockerignore",
+    "10_nvidia.json",
+    "Dockerfile",
+    "README.md",
+    "VERIFICATION.md",
+    "XIAOMI_STATUS.md",
+    "__pycache__",
+    "assets-log.tar",
+    "build-log.tar",
+    "context.tar",
+    "diagnose_egl.py",
+    "logs",
+    "output",
+    "preflight",
+    "remote.sh",
+    "requirements-sim.txt",
+    "requirements.lock",
+    "research",
+    "results.tar",
+    "robocasa-docker-t_04bf4fb7.tar.gz",
+    "rollouts",
+    "rollouts-xiaomi-t_460aea68",
+    "run.sh",
+    "smoke_test.py",
+    "vendor",
+    "verify_results.py",
+    "xiaomi-cu121"
+  ],
+  "moves": [
+    {
+      "old": "assets-log.tar",
+      "new": "archives/simulation/assets-log.tar",
+      "sha256": "683de74506084a63ba76438a41fcea62fbe72b3cad37ef886825d28fe31e5ee4",
+      "members": [
+        "logs/assets-objects.log"
+      ]
+    },
+    {
+      "old": "build-log.tar",
+      "new": "archives/simulation/build-log.tar",
+      "sha256": "d168c5a1b056ef367eafad1964e98242d7ed08ee49a08383cd87b2d95e7e7750",
+      "members": [
+        "logs",
+        "logs/assets.log",
+        "logs/build.log",
+        "logs/no-assets-test.log",
+        "logs/build-2.log",
+        "logs/gpu-smoke.log"
+      ]
+    },
+    {
+      "old": "context.tar",
+      "new": "archives/simulation/context.tar",
+      "sha256": "dc87a513152c24e1205968d352801cb505a05834f8a3e54202b77197c39a0839",
+      "members": [
+        "README.md",
+        "VERIFICATION.md",
+        "XIAOMI_STATUS.md",
+        "logs/xiaomi-cuda-preflight.log",
+        "logs/xiaomi-model-metadata.json"
+      ]
+    },
+    {
+      "old": "results.tar",
+      "new": "archives/simulation/results.tar",
+      "sha256": "8034ab4d772ac9adb8d6d19a4efb1250c089267900c55c322471ffe20be8b272",
+      "members": [
+        "logs",
+        "logs/assets.log",
+        "logs/physics-smoke-final.log",
+        "logs/build.log",
+        "logs/no-assets-test.log",
+        "logs/cpu-smoke-final.log",
+        "logs/build-2.log",
+        "logs/gpu-smoke-final.log",
+        "logs/build-locked.log",
+        "logs/asset-size.txt",
+        "logs/gpu-smoke.log",
+        "logs/build-final.log",
+        "logs/volume-inspect.json",
+        "logs/pip-freeze.txt",
+        "logs/image-inspect.json",
+        "logs/assets-objects.log",
+        "output",
+        "output/cpu",
+        "output/cpu/frame.png",
+        "output/cpu/result.json",
+        "output/physics",
+        "output/physics/result.json",
+        "output/smoke",
+        "output/smoke/frame.png",
+        "output/smoke/result.json"
+      ]
+    },
+    {
+      "old": "robocasa-docker-t_04bf4fb7.tar.gz",
+      "new": "archives/simulation/robocasa-docker-t_04bf4fb7.tar.gz",
+      "sha256": "33eb260fee37dbad0ae9a8c81efd21597e620fc0b9ca47aef0c217cb3fd44093",
+      "members": [
+        "Dockerfile",
+        ".dockerignore",
+        "requirements-sim.txt",
+        "requirements.lock",
+        "smoke_test.py",
+        "run.sh",
+        "10_nvidia.json",
+        "diagnose_egl.py",
+        "verify_results.py",
+        "README.md",
+        "VERIFICATION.md",
+        "XIAOMI_STATUS.md",
+        "logs",
+        "logs/assets.log",
+        "logs/build-locked.log",
+        "logs/physics-smoke-final.log",
+        "logs/pip-check.txt",
+        "logs/volume-inspect.json",
+        "logs/xiaomi-model-metadata.json",
+        "logs/xiaomi-cuda-preflight.log",
+        "logs/image-inspect.json",
+        "logs/build-2.log",
+        "logs/build.log",
+        "logs/asset-size.txt",
+        "logs/pip-freeze.txt",
+        "logs/no-assets-test.log",
+        "logs/versions.txt",
+        "logs/gpu-smoke-final.log",
+        "logs/assets-objects.log",
+        "logs/gpu-smoke.log",
+        "logs/build-final.log",
+        "logs/cpu-smoke-final.log",
+        "output",
+        "output/smoke",
+        "output/smoke/frame.png",
+        "output/smoke/result.json",
+        "output/physics",
+        "output/physics/result.json",
+        "output/cpu",
+        "output/cpu/frame.png",
+        "output/cpu/result.json"
+      ]
+    },
+    {
+      "old": "rollouts/xiaomi-robotics-1/report-sync.tar",
+      "new": "archives/prior-rollouts/report-sync.tar",
+      "sha256": "b8baeffb2a6986db6fae53fbe17d04d4894a60869bcba66eb34bf1f67ebb0509",
+      "members": [
+        "INDEX.md",
+        "summary.json",
+        "build_summary.py",
+        "sources",
+        "sources/prepare_coffee.py",
+        "sources/heat_kebab_sandwich.py",
+        "sources/dataset_registry.py",
+        "sources/kettle_boiling.py",
+        "sources/checkpoint.sha256",
+        "sources/waffle_reheat.py"
+      ]
+    },
+    {
+      "old": "xiaomi-cu121/build-progress.tar",
+      "new": "archives/xiaomi-cu121/build-progress.tar",
+      "sha256": "db4580c707198183b86a89b87893d8756d500fa2be0520c01b6f9ab65114ce13",
+      "members": [
+        "logs/build.log"
+      ]
+    },
+    {
+      "old": "xiaomi-cu121/client-context.tar",
+      "new": "archives/xiaomi-cu121/client-context.tar",
+      "sha256": "3f0406d2b9c33698b883117b1428878dbf92971fec77ee18704a93c08093afc2",
+      "members": [
+        "Dockerfile.client",
+        ".dockerignore",
+        "upstream/deploy/server.py"
+      ]
+    },
+    {
+      "old": "xiaomi-cu121/context.tar",
+      "new": "archives/xiaomi-cu121/context.tar",
+      "sha256": "eabf88e246fa5fe3cd5cb608902afd425c7d2f902cb16c54e51cd973fc30b6a7",
+      "members": [
+        "Dockerfile",
+        "download.py",
+        "probe.py"
+      ]
+    },
+    {
+      "old": "xiaomi-cu121/cuda-check.tar",
+      "new": "archives/xiaomi-cu121/cuda-check.tar",
+      "sha256": "973cb0307cd768a54ae7cbc5cc81b2c5b4429f1e345e52a976a37c1a631ef082",
+      "members": [
+        "cuda_check.py"
+      ]
+    },
+    {
+      "old": "xiaomi-cu121/final-context.tar",
+      "new": "archives/xiaomi-cu121/final-context.tar",
+      "sha256": "c237221b96968735baa925df01b581c0287df07a1f5f8fcbe85989bea254dbdc",
+      "members": [
+        "Dockerfile",
+        "Dockerfile.client",
+        ".dockerignore",
+        "probe.py",
+        "download.py",
+        "run.sh"
+      ]
+    },
+    {
+      "old": "xiaomi-cu121/final-evidence-with-status.bin",
+      "new": "archives/xiaomi-cu121/final-evidence-with-status.bin",
+      "sha256": "cf8fd4c42f6a72d391498e77aaf2b3d683517b4178c30fd50fe2d8d5cb27bae8"
+    },
+    {
+      "old": "xiaomi-cu121/final-evidence.tar",
+      "new": "archives/xiaomi-cu121/final-evidence.tar",
+      "sha256": "c1aa607ff93bfe7a1492f009013b7c1352963cb8646b0abc3cd2631727bce37d",
+      "members": [
+        "logs",
+        "logs/rollout.log",
+        "logs/build.log",
+        "logs/server.log",
+        "logs/gpu-after-rollout.log",
+        "logs/download.log",
+        "logs/observe.log",
+        "logs/observe-final.log",
+        "logs/gpu-during-rollout.log",
+        "logs/build-final.log",
+        "logs/gpu-pre-rollout.log",
+        "logs/probe.log",
+        "logs/textures.log",
+        "logs/client-build-final.log",
+        "logs/assets-copy.log",
+        "logs/verification.log",
+        "logs/client-build.log",
+        "logs/observe-with-textures.log",
+        "output",
+        "output/verification.json",
+        "output/preflight-actions.npy",
+        "output/rollout",
+        "output/rollout/summary.json",
+        "output/rollout/CloseBlenderLid",
+        "output/rollout/CloseBlenderLid/episode_000_seed_7_failure.mp4",
+        "output/rollout/CloseBlenderLid/stats.json",
+        "output/rollout-last.png",
+        "output/observation.json",
+        "output/inference.json",
+        "output/rollout-first.png",
+        "output/observation.npz",
+        "inference.requirements.lock",
+        "client.requirements.lock",
+        "inference-image-id.txt",
+        "client-image-id.txt",
+        "checkpoint.sha256"
+      ]
+    },
+    {
+      "old": "xiaomi-cu121/final-logs.tar",
+      "new": "archives/xiaomi-cu121/final-logs.tar",
+      "sha256": "a15ad5a1a9b044661be07ef64c5b000771aee402af78d7098100b5a0da37d2cf",
+      "members": [
+        "logs",
+        "logs/rollout.log",
+        "logs/build.log",
+        "logs/outcome-test-final.log",
+        "logs/server.log",
+        "logs/gpu-after-rollout.log",
+        "logs/client-pip-check.log",
+        "logs/download.log",
+        "logs/observe.log",
+        "logs/observe-final.log",
+        "logs/gpu-during-rollout.log",
+        "logs/build-final.log",
+        "logs/gpu-pre-rollout.log",
+        "logs/probe.log",
+        "logs/python-version.log",
+        "logs/textures.log",
+        "logs/client-build-final.log",
+        "logs/assets-copy.log",
+        "logs/verification.log",
+        "logs/client-build.log",
+        "logs/inference-pip-check.log",
+        "logs/observe-with-textures.log"
+      ]
+    },
+    {
+      "old": "xiaomi-cu121/freeze.tar",
+      "new": "archives/xiaomi-cu121/freeze.tar",
+      "sha256": "13782c3738bbb30f93afd656322a360fb9e52219e150aad4df17442b75bd9987",
+      "members": [
+        "inference.requirements.lock"
+      ]
+    },
+    {
+      "old": "xiaomi-cu121/handoff.tar",
+      "new": "archives/xiaomi-cu121/handoff.tar",
+      "sha256": "40a0a70b73442fbdac31549843e185b87eb39d67a0df9cf22d61b466fa695200",
+      "members": [
+        "README.md",
+        "REPORT.md",
+        "logs",
+        "logs/outcome-test-final.log",
+        "logs/server.log",
+        "logs/outcome-green.log",
+        "logs/final-isolation-check.log",
+        "logs/textures.log",
+        "logs/processor-check.log",
+        "logs/acceptance-red.log",
+        "logs/observe-with-textures.log",
+        "logs/verification.log",
+        "logs/observe.log",
+        "logs/build-ssh.log",
+        "logs/gpu-during-rollout.log",
+        "logs/client-pip-check.log",
+        "logs/download.log",
+        "logs/build.log",
+        "logs/build-resources.log",
+        "logs/outcome-red.log",
+        "logs/final-build-probe-ssh.log",
+        "logs/import-check.log",
+        "logs/client-build.log",
+        "logs/rollout-ssh.log",
+        "logs/gpu-after-rollout.log",
+        "logs/probe.log",
+        "logs/python-version.log",
+        "logs/inference-pip-check.log",
+        "logs/cuda-preflight.log",
+        "logs/build-final.log",
+        "logs/rollout.log",
+        "logs/gpu-pre-rollout.log",
+        "logs/assets-copy.log",
+        "logs/client-build-final.log",
+        "logs/observe-final.log",
+        "logs/torch-cuda-check.log",
+        "source.sha256",
+        "xiaomi-cu121-t_9f03a613.tar.gz"
+      ]
+    },
+    {
+      "old": "xiaomi-cu121/import.tar",
+      "new": "archives/xiaomi-cu121/import.tar",
+      "sha256": "f8cf14562dbc1fcbb5fcc21330922c4a202b82a7c8866762439315fd26c45cb3",
+      "members": [
+        "import_check.py"
+      ]
+    },
+    {
+      "old": "xiaomi-cu121/observe.tar",
+      "new": "archives/xiaomi-cu121/observe.tar",
+      "sha256": "474b6fb84f49f8fb71127eca37ffb442990dc196e0b98ae4f7cce4611fe1c156",
+      "members": [
+        "observe.py"
+      ]
+    },
+    {
+      "old": "xiaomi-cu121/processor.tar",
+      "new": "archives/xiaomi-cu121/processor.tar",
+      "sha256": "81cb579b70bc726078e5cecf054c64a78f01304af06cd72b90483d6dcaf1c477",
+      "members": [
+        "processor_check.py"
+      ]
+    },
+    {
+      "old": "xiaomi-cu121/progress.tar",
+      "new": "archives/xiaomi-cu121/progress.tar",
+      "sha256": "be567eb0f1788287ca3d2234aa2bbe1a4a7010102b3063cc2a42127b938ad63d",
+      "members": [
+        "logs",
+        "logs/build.log",
+        "logs/download.log",
+        "logs/observe.log",
+        "logs/observe-final.log",
+        "logs/build-final.log",
+        "logs/gpu-pre-rollout.log",
+        "logs/probe.log",
+        "logs/textures.log",
+        "logs/client-build-final.log",
+        "logs/assets-copy.log",
+        "logs/client-build.log",
+        "logs/observe-with-textures.log",
+        "output",
+        "output/preflight-actions.npy",
+        "output/observation.json",
+        "output/inference.json",
+        "output/observation.npz",
+        "inference.requirements.lock",
+        "client.requirements.lock",
+        "inference-image-id.txt",
+        "client-image-id.txt",
+        "checkpoint.sha256"
+      ]
+    },
+    {
+      "old": "xiaomi-cu121/run-update.tar",
+      "new": "archives/xiaomi-cu121/run-update.tar",
+      "sha256": "51bacdeabc41fafb1ebc9411eecdaa7bf6bb374ae6787f1c16e8ada793605773",
+      "members": [
+        "run.sh"
+      ]
+    },
+    {
+      "old": "xiaomi-cu121/scripts.tar",
+      "new": "archives/xiaomi-cu121/scripts.tar",
+      "sha256": "0762d52197b0ddf986af674cf7c84c0c77dd16c48426a61ddb054dc7aefbf392",
+      "members": [
+        "run.sh",
+        "rollout.py",
+        "outcome.py",
+        "test_outcome.py"
+      ]
+    },
+    {
+      "old": "xiaomi-cu121/stats.tar",
+      "new": "archives/xiaomi-cu121/stats.tar",
+      "sha256": "90d9679a6a4cbbc6ab38c4b0ab66d96aab15a0db1da4d394b064b1fb0c68899a",
+      "members": [
+        "build_stats.py"
+      ]
+    },
+    {
+      "old": "xiaomi-cu121/update.tar",
+      "new": "archives/xiaomi-cu121/update.tar",
+      "sha256": "842c0648ff7decb8c2acc2dc7eccab4fc8146630c0f09f3e1e26b312bcbab0d0",
+      "members": [
+        "Dockerfile",
+        "probe.py",
+        "upstream",
+        "upstream/deploy",
+        "upstream/deploy/client.py",
+        "upstream/eval_robocasa365",
+        "upstream/eval_robocasa365/entry.py",
+        "textures.py"
+      ]
+    },
+    {
+      "old": "xiaomi-cu121/verify.tar",
+      "new": "archives/xiaomi-cu121/verify.tar",
+      "sha256": "496ca21ec55f07515e4add6b80cfa7bb33705e7b8ae87a051b1e8c843e2e47da",
+      "members": [
+        "verify.py",
+        "README.md"
+      ]
+    },
+    {
+      "old": "xiaomi-cu121/xiaomi-cu121-t_9f03a613.tar.gz",
+      "new": "archives/xiaomi-cu121/xiaomi-cu121-t_9f03a613.tar.gz",
+      "sha256": "b794b0275d83f14cec60b08c84206379fbc7c177f5c93e85330eab90f8d0f05f",
+      "members": [
+        "Dockerfile",
+        "Dockerfile.client",
+        ".dockerignore",
+        "README.md",
+        "REPORT.md",
+        "run.sh",
+        "download.py",
+        "probe.py",
+        "observe.py",
+        "textures.py",
+        "rollout.py",
+        "outcome.py",
+        "test_outcome.py",
+        "verify.py",
+        "cuda_check.py",
+        "import_check.py",
+        "processor_check.py",
+        "upstream",
+        "upstream/deploy",
+        "upstream/deploy/client.py",
+        "upstream/deploy/server.py",
+        "upstream/eval_robocasa365",
+        "upstream/eval_robocasa365/entry.py",
+        "logs",
+        "logs/outcome-test-final.log",
+        "logs/server.log",
+        "logs/outcome-green.log",
+        "logs/final-isolation-check.log",
+        "logs/textures.log",
+        "logs/processor-check.log",
+        "logs/acceptance-red.log",
+        "logs/observe-with-textures.log",
+        "logs/verification.log",
+        "logs/observe.log",
+        "logs/build-ssh.log",
+        "logs/gpu-during-rollout.log",
+        "logs/client-pip-check.log",
+        "logs/download.log",
+        "logs/build.log",
+        "logs/build-resources.log",
+        "logs/outcome-red.log",
+        "logs/final-build-probe-ssh.log",
+        "logs/import-check.log",
+        "logs/client-build.log",
+        "logs/rollout-ssh.log",
+        "logs/gpu-after-rollout.log",
+        "logs/probe.log",
+        "logs/python-version.log",
+        "logs/inference-pip-check.log",
+        "logs/cuda-preflight.log",
+        "logs/build-final.log",
+        "logs/rollout.log",
+        "logs/gpu-pre-rollout.log",
+        "logs/assets-copy.log",
+        "logs/client-build-final.log",
+        "logs/observe-final.log",
+        "logs/torch-cuda-check.log",
+        "output",
+        "output/rollout",
+        "output/rollout/summary.json",
+        "output/rollout/CloseBlenderLid",
+        "output/rollout/CloseBlenderLid/stats.json",
+        "output/rollout/CloseBlenderLid/episode_000_seed_7_failure.mp4",
+        "output/inference.json",
+        "output/rollout-first.png",
+        "output/rollout-last.png",
+        "output/preflight-actions.npy",
+        "output/observation.json",
+        "output/observation.npz",
+        "output/verification.json",
+        "checkpoint.sha256",
+        "checkpoint-api.json",
+        "inference.requirements.lock",
+        "client.requirements.lock",
+        "inference-image-id.txt",
+        "client-image-id.txt",
+        "source.sha256"
+      ]
+    }
+  ],
+  "duplicate_code": [
+    {
+      "sha256": "5c925e4134bc210fe64b93c8f527f46dae6e04f32085606efdb658b0f8f7e589",
+      "paths": [
+        "rollouts/xiaomi-robotics-1/run-t_5af7225b.sh",
+        "rollouts-xiaomi-t_460aea68/parent-runner.sh",
+        "research/t_1d1b4ded/sources/prior/run-t_5af7225b.sh"
+      ]
+    },
+    {
+      "sha256": "23e8e31bb56bae80de86c34eafadfe32dd1e1eba6608376152ba9fdda5532a4b",
+      "paths": [
+        "rollouts/xiaomi-robotics-1/sources/dataset_registry.py",
+        "research/t_1d1b4ded/sources/robocasa/utils/dataset_registry.py"
+      ]
+    },
+    {
+      "sha256": "cd83a86a93a5dac97b7933a77414d3b0c1763171f51625e855017ed405a972e8",
+      "paths": [
+        "rollouts-xiaomi-t_460aea68/rollout.py",
+        "xiaomi-cu121/rollout.py",
+        "research/t_1d1b4ded/sources/prior/rollout.py"
+      ]
+    }
+  ],
+  "existing_broken_markdown": [],
+  "git_status": "not a Git repository"
+}

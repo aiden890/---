@@ -1,0 +1,6 @@
+vendor
+logs
+output
+.git
+remote.sh
+__pycache__

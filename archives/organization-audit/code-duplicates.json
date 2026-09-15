@@ -1,0 +1,25 @@
+[
+  {
+    "sha256": "5c925e4134bc210fe64b93c8f527f46dae6e04f32085606efdb658b0f8f7e589",
+    "paths": [
+      "rollouts/xiaomi-robotics-1/run-t_5af7225b.sh",
+      "rollouts-xiaomi-t_460aea68/parent-runner.sh",
+      "research/t_1d1b4ded/sources/prior/run-t_5af7225b.sh"
+    ]
+  },
+  {
+    "sha256": "23e8e31bb56bae80de86c34eafadfe32dd1e1eba6608376152ba9fdda5532a4b",
+    "paths": [
+      "rollouts/xiaomi-robotics-1/sources/dataset_registry.py",
+      "research/t_1d1b4ded/sources/robocasa/utils/dataset_registry.py"
+    ]
+  },
+  {
+    "sha256": "cd83a86a93a5dac97b7933a77414d3b0c1763171f51625e855017ed405a972e8",
+    "paths": [
+      "rollouts-xiaomi-t_460aea68/rollout.py",
+      "xiaomi-cu121/rollout.py",
+      "research/t_1d1b4ded/sources/prior/rollout.py"
+    ]
+  }
+]

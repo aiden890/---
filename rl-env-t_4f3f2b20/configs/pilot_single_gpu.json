@@ -1,0 +1,45 @@
+{
+  "_comment": "Single-GPU (RTX 3090, 24GB) low-memory pilot config for CloseBlenderLid skill-conditioned RL. The GRPO training loop itself is a successor card; this config drives the ENVIRONMENT: baseline + flow-SDE rollouts with log-prob capture.",
+  "hardware": {"target": "single_gpu_rtx3090", "gpu_mem_gb": 24, "notes": "server(bf16 model)~10GB; run RL in-process client separately from socket server to avoid double-loading the model."},
+  "model": {
+    "checkpoint": "/checkpoint",
+    "robot_type": "robocasa365",
+    "attn_implementation": "flash_attention_2",
+    "dtype": "bfloat16"
+  },
+  "rollout": {
+    "replan_steps": 16,
+    "obs_history": 4,
+    "obs_interval": 2,
+    "crop_ratio": 0.95,
+    "video_stride": 2,
+    "video_fps": 20,
+    "horizon_grasp": 300,
+    "horizon_move": 300,
+    "horizon_place": 400,
+    "max_skill_calls": 8
+  },
+  "flow_sde": {
+    "num_steps": 5,
+    "eta": 0.6,
+    "_eta_note": "0 = deterministic (baseline). 0.6 = pilot exploration noise; sigma_k = eta*sqrt(1/num_steps).",
+    "executed_only_in_loss": true,
+    "real_action_dim": 12
+  },
+  "grpo": {
+    "group_size": 4,
+    "vlm_backbone_frozen": true,
+    "trainable": ["action_expert", "skill_adapter", "termination_head"],
+    "branch_at_each_skill_start": true,
+    "shared_prefix_branching": true,
+    "_note": "group_size 4 fits the 3090 with the VLM frozen and only the DiT/adapters trained. This card produces the log-prob + branch-state data; the loop is the successor card."
+  },
+  "reward": {
+    "mode": "simulator",
+    "terminal_success": 1.0,
+    "terminal_decay_gamma": 0.998,
+    "use_milestones": true,
+    "vlm_weight": 0.0
+  },
+  "seeds": {"pilot_fixed_seed": 9}
+}

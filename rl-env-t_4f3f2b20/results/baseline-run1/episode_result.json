@@ -1,0 +1,105 @@
+{
+  "planner": "oracle",
+  "mode": "baseline",
+  "eta": 0.0,
+  "seed": 9,
+  "success": false,
+  "total_steps": 2320,
+  "total_reward": -114.04999999999565,
+  "skill_calls": [
+    {
+      "skill": "GRASP",
+      "obj": "blender_lid",
+      "destination": null,
+      "relation_or_constraints": null,
+      "outcome": "timeout",
+      "steps": 300,
+      "chunks": 19
+    },
+    {
+      "skill": "GRASP",
+      "obj": "blender_lid",
+      "destination": null,
+      "relation_or_constraints": null,
+      "outcome": "timeout",
+      "steps": 300,
+      "chunks": 19
+    },
+    {
+      "skill": "GRASP",
+      "obj": "blender_lid",
+      "destination": null,
+      "relation_or_constraints": null,
+      "outcome": "timeout",
+      "steps": 300,
+      "chunks": 19
+    },
+    {
+      "skill": "GRASP",
+      "obj": "blender_lid",
+      "destination": null,
+      "relation_or_constraints": null,
+      "outcome": "timeout",
+      "steps": 300,
+      "chunks": 19
+    },
+    {
+      "skill": "PLACE",
+      "obj": "blender_lid",
+      "destination": "blender",
+      "relation_or_constraints": "securely_on_top",
+      "outcome": "timeout",
+      "steps": 400,
+      "chunks": 25
+    },
+    {
+      "skill": "GRASP",
+      "obj": "blender_lid",
+      "destination": null,
+      "relation_or_constraints": null,
+      "outcome": "timeout",
+      "steps": 300,
+      "chunks": 19
+    },
+    {
+      "skill": "GRASP",
+      "obj": "blender_lid",
+      "destination": null,
+      "relation_or_constraints": null,
+      "outcome": "timeout",
+      "steps": 300,
+      "chunks": 19
+    },
+    {
+      "skill": "GRASP",
+      "obj": "blender_lid",
+      "destination": null,
+      "relation_or_constraints": null,
+      "outcome": "success",
+      "steps": 120,
+      "chunks": 8
+    }
+  ],
+  "per_skill": {
+    "GRASP": {
+      "attempts": 7,
+      "successes": 1,
+      "chunks": 122,
+      "steps": 1920,
+      "failure_reasons": {
+        "timeout": 6
+      },
+      "success_rate": 0.14285714285714285
+    },
+    "PLACE": {
+      "attempts": 1,
+      "successes": 0,
+      "chunks": 25,
+      "steps": 400,
+      "failure_reasons": {
+        "timeout": 1
+      },
+      "success_rate": 0.0
+    }
+  }
+}

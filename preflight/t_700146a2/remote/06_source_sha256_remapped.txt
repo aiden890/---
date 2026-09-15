@@ -1,0 +1,14 @@
+Dockerfile: OK
+Dockerfile.client: OK
+run.sh: OK
+rollout.py: OK
+probe.py: OK
+inference.requirements.lock: OK
+client.requirements.lock: OK
+--- rollout.py identical in t_460aea68 root?
+cd83a86a93a5dac97b7933a77414d3b0c1763171f51625e855017ed405a972e8  rollout.py
+cd83a86a93a5dac97b7933a77414d3b0c1763171f51625e855017ed405a972e8  /home/v4/rollouts-xiaomi-t_460aea68/rollout.py
+--- docker volume
+local     robocasa-assets-t_04bf4fb7
+local     robocasa-assets-t_5af7225b
+local     robocasa-assets-t_9f03a613

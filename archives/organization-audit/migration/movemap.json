@@ -1,0 +1,45 @@
+{
+  "root": "/home/aiden/Desktop/lab/robot/robocasa-docker",
+  "note": "Top-level separation only. Atomic experiment modules (xiaomi-cu121, rollouts*, research, preflight, vendor, videos, experiments, archives) are NOT moved: their Docker COPY/mount roots and fixed provenance manifests (e.g. xiaomi-cu121/source.sha256) are runtime/evidence contracts. All old paths are preserved by root compat symlinks.",
+  "moves": [
+    {"from": "smoke_test.py",        "to": "scripts/smoke_test.py"},
+    {"from": "diagnose_egl.py",      "to": "scripts/diagnose_egl.py"},
+    {"from": "verify_results.py",    "to": "scripts/verify_results.py"},
+    {"from": "run.sh",               "to": "scripts/run.sh"},
+    {"from": "remote.sh",            "to": "scripts/remote.sh"},
+    {"from": "requirements-sim.txt", "to": "configs/requirements-sim.txt"},
+    {"from": "requirements.lock",    "to": "configs/requirements.lock"},
+    {"from": "10_nvidia.json",       "to": "configs/10_nvidia.json"},
+    {"from": "Dockerfile",           "to": "docker/sim/Dockerfile"},
+    {"from": "VERIFICATION.md",      "to": "docs/VERIFICATION.md"},
+    {"from": "XIAOMI_STATUS.md",     "to": "docs/XIAOMI_STATUS.md"},
+    {"from": "DIRECTORY_GUIDE.md",   "to": "docs/DIRECTORY_GUIDE.md"},
+    {"from": "output",               "to": "results/sim/output"},
+    {"from": "logs",                 "to": "results/sim/logs"}
+  ],
+  "compat_symlinks": [
+    {"link": "smoke_test.py",        "target": "scripts/smoke_test.py"},
+    {"link": "diagnose_egl.py",      "target": "scripts/diagnose_egl.py"},
+    {"link": "verify_results.py",    "target": "scripts/verify_results.py"},
+    {"link": "run.sh",               "target": "scripts/run.sh"},
+    {"link": "remote.sh",            "target": "scripts/remote.sh"},
+    {"link": "requirements-sim.txt", "target": "configs/requirements-sim.txt"},
+    {"link": "requirements.lock",    "target": "configs/requirements.lock"},
+    {"link": "10_nvidia.json",       "target": "configs/10_nvidia.json"},
+    {"link": "Dockerfile",           "target": "docker/sim/Dockerfile"},
+    {"link": "VERIFICATION.md",      "target": "docs/VERIFICATION.md"},
+    {"link": "XIAOMI_STATUS.md",     "target": "docs/XIAOMI_STATUS.md"},
+    {"link": "DIRECTORY_GUIDE.md",   "target": "docs/DIRECTORY_GUIDE.md"},
+    {"link": "output",               "target": "results/sim/output"},
+    {"link": "logs",                 "target": "results/sim/logs"}
+  ],
+  "repoint_symlinks": [
+    {"link": "experiments/simulation", "old_target": "../output", "new_target": "../results/sim/output"}
+  ],
+  "docker_copy_sources_required": [
+    "configs/requirements-sim.txt",
+    "configs/requirements.lock",
+    "configs/10_nvidia.json",
+    "scripts/smoke_test.py"
+  ]
+}

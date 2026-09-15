@@ -1,0 +1,37 @@
+{
+  "checkpoint": "/checkpoint",
+  "num_steps": 5,
+  "eta": 0.6,
+  "group": 4,
+  "eta0_matches_checkpoint": {
+    "max_abs_diff": 0.0,
+    "pass": true,
+    "shape": [
+      1,
+      16,
+      60
+    ]
+  },
+  "sde_group": {
+    "step_logprob_shape": [
+      4,
+      5
+    ],
+    "all_finite": true,
+    "chunk_logprob": [
+      -515.3856201171875,
+      -535.9429931640625,
+      -523.3789672851562,
+      -560.2694091796875
+    ],
+    "recompute_matches": true,
+    "recompute_max_abs_diff": 0.0,
+    "distinct_chunks": true,
+    "actions_shape": [
+      4,
+      16,
+      60
+    ]
+  },
+  "overall_pass": true
+}

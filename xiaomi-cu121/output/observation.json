@@ -1,0 +1,40 @@
+{
+  "task": "CloseBlenderLid",
+  "seed": 7,
+  "split": "pretrain",
+  "instruction": "Close the lid blender by securely placing the lid on top.",
+  "horizon": 900,
+  "renderer": "NVIDIA GeForce RTX 3090/PCIe/SSE2",
+  "shapes": {
+    "state.end_effector_position_relative": [
+      3
+    ],
+    "state.end_effector_rotation_relative": [
+      4
+    ],
+    "state.gripper_qpos": [
+      2
+    ],
+    "state.base_position": [
+      3
+    ],
+    "state.base_rotation": [
+      4
+    ],
+    "video.robot0_agentview_left": [
+      256,
+      256,
+      3
+    ],
+    "video.robot0_agentview_right": [
+      256,
+      256,
+      3
+    ],
+    "video.robot0_eye_in_hand": [
+      256,
+      256,
+      3
+    ]
+  }
+}

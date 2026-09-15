@@ -1,0 +1,86 @@
+[
+  {
+    "task": "PrepareCoffee",
+    "seed": "13",
+    "experiment": "previous-xiaomi-robotics-1",
+    "link": "videos/PrepareCoffee/seed-13/previous-xiaomi-robotics-1__episode_000_seed_13_failure.mp4",
+    "original": "rollouts/xiaomi-robotics-1/composite-seen/coffee-01/rollout/PrepareCoffee/episode_000_seed_13_failure.mp4"
+  },
+  {
+    "task": "KettleBoiling",
+    "seed": "9",
+    "experiment": "previous-xiaomi-robotics-1",
+    "link": "videos/KettleBoiling/seed-9/previous-xiaomi-robotics-1__episode_000_seed_9_success.mp4",
+    "original": "rollouts/xiaomi-robotics-1/composite-seen/kettle-01/rollout/KettleBoiling/episode_000_seed_9_success.mp4"
+  },
+  {
+    "task": "TurnOnSinkFaucet",
+    "seed": "24",
+    "experiment": "previous-xiaomi-robotics-1",
+    "link": "videos/TurnOnSinkFaucet/seed-24/previous-xiaomi-robotics-1__episode_000_seed_24_success.mp4",
+    "original": "rollouts/xiaomi-robotics-1/atomic-seen/faucet-02/rollout/TurnOnSinkFaucet/episode_000_seed_24_success.mp4"
+  },
+  {
+    "task": "HeatKebabSandwich",
+    "seed": "15",
+    "experiment": "previous-xiaomi-robotics-1",
+    "link": "videos/HeatKebabSandwich/seed-15/previous-xiaomi-robotics-1__episode_000_seed_15_failure.mp4",
+    "original": "rollouts/xiaomi-robotics-1/composite-unseen/kebab-02/rollout/HeatKebabSandwich/episode_000_seed_15_failure.mp4"
+  },
+  {
+    "task": "WaffleReheat",
+    "seed": "20",
+    "experiment": "previous-xiaomi-robotics-1",
+    "link": "videos/WaffleReheat/seed-20/previous-xiaomi-robotics-1__episode_000_seed_20_failure.mp4",
+    "original": "rollouts/xiaomi-robotics-1/composite-unseen/waffle-01/rollout/WaffleReheat/episode_000_seed_20_failure.mp4"
+  },
+  {
+    "task": "HeatKebabSandwich",
+    "seed": "14",
+    "experiment": "previous-xiaomi-robotics-1",
+    "link": "videos/HeatKebabSandwich/seed-14/previous-xiaomi-robotics-1__episode_000_seed_14_failure.mp4",
+    "original": "rollouts/xiaomi-robotics-1/composite-unseen/kebab-01/rollout/HeatKebabSandwich/episode_000_seed_14_failure.mp4"
+  },
+  {
+    "task": "WashLettuce",
+    "seed": "22",
+    "experiment": "latest-t_460aea68",
+    "link": "videos/WashLettuce/seed-22/latest-t_460aea68__episode_000_seed_22_failure.mp4",
+    "original": "rollouts-xiaomi-t_460aea68/composite-seen/lettuce-01/rollout/WashLettuce/episode_000_seed_22_failure.mp4"
+  },
+  {
+    "task": "SteamInMicrowave",
+    "seed": "19",
+    "experiment": "latest-t_460aea68",
+    "link": "videos/SteamInMicrowave/seed-19/latest-t_460aea68__episode_000_seed_19_failure.mp4",
+    "original": "rollouts-xiaomi-t_460aea68/composite-seen/steam-01/rollout/SteamInMicrowave/episode_000_seed_19_failure.mp4"
+  },
+  {
+    "task": "PackIdenticalLunches",
+    "seed": "11",
+    "experiment": "latest-t_460aea68",
+    "link": "videos/PackIdenticalLunches/seed-11/latest-t_460aea68__episode_000_seed_11_failure.mp4",
+    "original": "rollouts-xiaomi-t_460aea68/composite-seen/lunches-01/rollout/PackIdenticalLunches/episode_000_seed_11_failure.mp4"
+  },
+  {
+    "task": "BreadSelection",
+    "seed": "9",
+    "experiment": "latest-t_460aea68",
+    "link": "videos/BreadSelection/seed-9/latest-t_460aea68__episode_000_seed_9_failure.mp4",
+    "original": "rollouts-xiaomi-t_460aea68/composite-unseen/bread-01/rollout/BreadSelection/episode_000_seed_9_failure.mp4"
+  },
+  {
+    "task": "CategorizeCondiments",
+    "seed": "10",
+    "experiment": "latest-t_460aea68",
+    "link": "videos/CategorizeCondiments/seed-10/latest-t_460aea68__episode_000_seed_10_failure.mp4",
+    "original": "rollouts-xiaomi-t_460aea68/composite-unseen/condiments-01/rollout/CategorizeCondiments/episode_000_seed_10_failure.mp4"
+  },
+  {
+    "task": "CloseBlenderLid",
+    "seed": "7",
+    "experiment": "first-cu121",
+    "link": "videos/CloseBlenderLid/seed-7/first-cu121__episode_000_seed_7_failure.mp4",
+    "original": "xiaomi-cu121/output/rollout/CloseBlenderLid/episode_000_seed_7_failure.mp4"
+  }
+]

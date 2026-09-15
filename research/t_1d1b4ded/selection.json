@@ -1,0 +1,372 @@
+{
+  "task_id": "t_1d1b4ded",
+  "robocasa_commit": "4f8a2980def75a55dff96b990745b83540425f09",
+  "versions": {
+    "model": "XiaomiRobotics/Xiaomi-Robotics-1-RoboCasa365",
+    "checkpoint_revision": "3a6d0293bfa90759d34a7fc48c2c62413cd7bcf4",
+    "code_commit": "0dd7aef8dc87296246aae812a1f59ccb708e5546",
+    "robocasa_commit": "4f8a2980def75a55dff96b990745b83540425f09",
+    "inference_image": "xiaomi-cu121:t_9f03a613",
+    "inference_image_id": "sha256:aac5e8e597636dc80df55a3150da68f2fb5897e28bfb02836319578fba477c87",
+    "client_image": "xiaomi-client:t_9f03a613",
+    "client_image_id": "sha256:c52e01c1048c46fe0fef0ed535fad3b5067f97b3d5fc397e92a8e96f9702cd19",
+    "cuda": "12.1.1",
+    "torch": "2.5.1+cu121",
+    "driver": "535.183.01",
+    "gpu": "RTX 3090 24 GB",
+    "asset_volume": "robocasa-assets-t_5af7225b"
+  },
+  "previous_artifact_root": "/home/aiden/Desktop/lab/robot/robocasa-docker/rollouts/xiaomi-robotics-1",
+  "previous_remote_root": "/home/v4/rollouts-xiaomi-t_5af7225b",
+  "in_progress_remote_root": "/home/v4/rollouts-xiaomi-t_460aea68",
+  "excluded_tasks": [
+    "CloseBlenderLid",
+    "HeatKebabSandwich",
+    "KettleBoiling",
+    "PrepareCoffee",
+    "TurnOnSinkFaucet",
+    "WaffleReheat"
+  ],
+  "selected_tasks": [
+    {
+      "task_id": "BreadSelection",
+      "priority": "primary",
+      "category": "composite_unseen",
+      "split": "target",
+      "horizon": 1950,
+      "category_index": 2,
+      "base_seed": 7,
+      "expected_episode_seed_num_trials_1": 9,
+      "source_path": "robocasa/environments/kitchen/composite/making_toast/bread_selection.py",
+      "registry_lines": [
+        715,
+        720
+      ],
+      "methods": {
+        "__init__": {
+          "start": 16,
+          "end": 17
+        },
+        "_setup_kitchen_references": {
+          "start": 19,
+          "end": 29
+        },
+        "get_ep_meta": {
+          "start": 31,
+          "end": 40
+        },
+        "_setup_scene": {
+          "start": 42,
+          "end": 47
+        },
+        "_get_obj_cfgs": {
+          "start": 49,
+          "end": 118
+        },
+        "_check_success": {
+          "start": 120,
+          "end": 126
+        }
+      }
+    },
+    {
+      "task_id": "CategorizeCondiments",
+      "priority": "primary",
+      "category": "composite_unseen",
+      "split": "target",
+      "horizon": 1650,
+      "category_index": 3,
+      "base_seed": 7,
+      "expected_episode_seed_num_trials_1": 10,
+      "source_path": "robocasa/environments/kitchen/composite/arranging_condiments/categorize_condiments.py",
+      "registry_lines": [
+        745,
+        750
+      ],
+      "methods": {
+        "__init__": {
+          "start": 12,
+          "end": 13
+        },
+        "_setup_kitchen_references": {
+          "start": 15,
+          "end": 22
+        },
+        "get_ep_meta": {
+          "start": 24,
+          "end": 32
+        },
+        "_setup_scene": {
+          "start": 34,
+          "end": 36
+        },
+        "_get_obj_cfgs": {
+          "start": 38,
+          "end": 110
+        },
+        "_xy_dist": {
+          "start": 112,
+          "end": 119
+        },
+        "_check_success": {
+          "start": 121,
+          "end": 138
+        }
+      }
+    },
+    {
+      "task_id": "PackIdenticalLunches",
+      "priority": "primary",
+      "category": "composite_seen",
+      "split": "target",
+      "horizon": 3900,
+      "category_index": 4,
+      "base_seed": 7,
+      "expected_episode_seed_num_trials_1": 11,
+      "source_path": "robocasa/environments/kitchen/composite/packing_lunches/pack_identical_lunches.py",
+      "registry_lines": [
+        1342,
+        1350
+      ],
+      "methods": {
+        "__init__": {
+          "start": 18,
+          "end": 19
+        },
+        "_setup_kitchen_references": {
+          "start": 21,
+          "end": 27
+        },
+        "_setup_scene": {
+          "start": 29,
+          "end": 31
+        },
+        "get_ep_meta": {
+          "start": 33,
+          "end": 47
+        },
+        "_get_obj_cfgs": {
+          "start": 49,
+          "end": 176
+        },
+        "_check_success": {
+          "start": 178,
+          "end": 204
+        }
+      }
+    },
+    {
+      "task_id": "SteamInMicrowave",
+      "priority": "primary",
+      "category": "composite_seen",
+      "split": "target",
+      "horizon": 2100,
+      "category_index": 12,
+      "base_seed": 7,
+      "expected_episode_seed_num_trials_1": 19,
+      "source_path": "robocasa/environments/kitchen/composite/steaming_food/steam_in_microwave.py",
+      "registry_lines": [
+        1960,
+        1968
+      ],
+      "methods": {
+        "__init__": {
+          "start": 16,
+          "end": 17
+        },
+        "_setup_kitchen_references": {
+          "start": 19,
+          "end": 29
+        },
+        "get_ep_meta": {
+          "start": 31,
+          "end": 46
+        },
+        "_setup_scene": {
+          "start": 48,
+          "end": 51
+        },
+        "_get_obj_cfgs": {
+          "start": 53,
+          "end": 116
+        },
+        "_check_success": {
+          "start": 118,
+          "end": 127
+        }
+      }
+    },
+    {
+      "task_id": "WashLettuce",
+      "priority": "primary",
+      "category": "composite_seen",
+      "split": "target",
+      "horizon": 1650,
+      "category_index": 15,
+      "base_seed": 7,
+      "expected_episode_seed_num_trials_1": 22,
+      "source_path": "robocasa/environments/kitchen/composite/making_salads/wash_lettuce.py",
+      "registry_lines": [
+        2107,
+        2115
+      ],
+      "methods": {
+        "_setup_kitchen_references": {
+          "start": 15,
+          "end": 21
+        },
+        "get_ep_meta": {
+          "start": 23,
+          "end": 29
+        },
+        "_setup_scene": {
+          "start": 31,
+          "end": 33
+        },
+        "_get_obj_cfgs": {
+          "start": 35,
+          "end": 55
+        },
+        "update_state": {
+          "start": 57,
+          "end": 60
+        },
+        "_check_success": {
+          "start": 62,
+          "end": 63
+        }
+      }
+    },
+    {
+      "task_id": "PreSoakPan",
+      "priority": "reserve",
+      "category": "composite_seen",
+      "split": "target",
+      "horizon": 2400,
+      "category_index": 5,
+      "base_seed": 7,
+      "expected_episode_seed_num_trials_1": 12,
+      "source_path": "robocasa/environments/kitchen/composite/washing_dishes/pre_soak_pan.py",
+      "registry_lines": [
+        1477,
+        1485
+      ],
+      "methods": {
+        "__init__": {
+          "start": 14,
+          "end": 15
+        },
+        "_setup_kitchen_references": {
+          "start": 17,
+          "end": 23
+        },
+        "get_ep_meta": {
+          "start": 25,
+          "end": 33
+        },
+        "_setup_scene": {
+          "start": 35,
+          "end": 37
+        },
+        "_get_obj_cfgs": {
+          "start": 39,
+          "end": 77
+        },
+        "_check_pan_in_sink": {
+          "start": 79,
+          "end": 80
+        },
+        "_check_sponge_in_sink": {
+          "start": 82,
+          "end": 83
+        },
+        "_check_success": {
+          "start": 85,
+          "end": 96
+        }
+      }
+    },
+    {
+      "task_id": "MakeIceLemonade",
+      "priority": "reserve",
+      "category": "composite_unseen",
+      "split": "target",
+      "horizon": 3000,
+      "category_index": 8,
+      "base_seed": 7,
+      "expected_episode_seed_num_trials_1": 15,
+      "source_path": "robocasa/environments/kitchen/composite/adding_ice_to_beverages/make_ice_lemonade.py",
+      "registry_lines": [
+        1174,
+        1179
+      ],
+      "methods": {
+        "__init__": {
+          "start": 15,
+          "end": 16
+        },
+        "_setup_kitchen_references": {
+          "start": 18,
+          "end": 24
+        },
+        "get_ep_meta": {
+          "start": 26,
+          "end": 35
+        },
+        "_setup_scene": {
+          "start": 37,
+          "end": 39
+        },
+        "_get_obj_cfgs": {
+          "start": 41,
+          "end": 129
+        },
+        "_check_success": {
+          "start": 131,
+          "end": 147
+        }
+      }
+    },
+    {
+      "task_id": "WashFruitColander",
+      "priority": "reserve",
+      "category": "composite_unseen",
+      "split": "target",
+      "horizon": 3150,
+      "category_index": 14,
+      "base_seed": 7,
+      "expected_episode_seed_num_trials_1": 21,
+      "source_path": "robocasa/environments/kitchen/composite/washing_fruits_and_vegetables/wash_fruit_colander.py",
+      "registry_lines": [
+        2101,
+        2106
+      ],
+      "methods": {
+        "__init__": {
+          "start": 5,
+          "end": 6
+        },
+        "_setup_kitchen_references": {
+          "start": 8,
+          "end": 18
+        },
+        "get_ep_meta": {
+          "start": 20,
+          "end": 37
+        },
+        "_setup_scene": {
+          "start": 39,
+          "end": 44
+        },
+        "_get_obj_cfgs": {
+          "start": 46,
+          "end": 84
+        },
+        "_check_success": {
+          "start": 86,
+          "end": 93
+        }
+      }
+    }
+  ]
+}
