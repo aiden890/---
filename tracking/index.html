@@ -100,6 +100,16 @@
   <h1>RoboCasa · CloseBlenderLid 실험</h1>
 
   <div class="card">
+    <h2>🔎 Key Findings</h2>
+    <div id="b-findings"></div>
+  </div>
+
+  <div class="card">
+    <h2>⚙️ 진행 중</h2>
+    <div id="b-running"></div>
+  </div>
+
+  <div class="card">
     <h2>🙋 내 TODO</h2>
     <div id="b-user"></div>
   </div>
@@ -299,6 +309,11 @@ document.querySelectorAll('.nav button[data-tab]').forEach(b=>{
 const BADGE={run:'b-run',wait:'b-wait',rev:'b-rev',blk:'b-blk',ok:'b-ok'};
 const BLABEL={run:'진행',wait:'대기',rev:'리뷰',blk:'블로커',ok:'완료'};
 fetch('board.json').then(r=>r.json()).then(b=>{
+  const FTAG={warn:'#fb923c',ok:'var(--ok)',info:'var(--acc)'};
+  document.getElementById('b-findings').innerHTML=(b.findings||[]).map(x=>`
+    <div class="item"><span style="color:${FTAG[x.tag]||'var(--acc)'};flex:none">●</span><div class="tt">${x.title}${x.detail?`<div class="nt">${x.detail}</div>`:''}</div></div>`).join('')||'<div class="dim">없음</div>';
+  document.getElementById('b-running').innerHTML=(b.running||[]).map(x=>`
+    <div class="item"><div class="tt">${x.title}${x.note?`<div class="nt">${x.note}</div>`:''}</div><span class="badge ${BADGE[x.badge]||'b-run'}">${BLABEL[x.badge]||''}</span></div>`).join('')||'<div class="dim">없음</div>';
   document.getElementById('b-agent').innerHTML=(b.agent_todo||[]).map(x=>`
     <div class="item"><div class="tt">${x.title}${x.note?`<div class="nt">${x.note}</div>`:''}</div><span class="badge ${BADGE[x.badge]||'b-wait'}">${BLABEL[x.badge]||''}</span></div>`).join('')||'<div class="dim">없음</div>';
   document.getElementById('b-user').innerHTML=(b.user_todo||[]).map(x=>`

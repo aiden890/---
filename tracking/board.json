@@ -1,13 +1,70 @@
 {
-  "updated": "2026-09-15",
-  "user_todo": [
-    {"title": "모델 선정 (Xiaomi vs GR00T N1.5 vs π0.5 추론 비교 후 base 모델 결정)", "done": false}
-  ],
-  "agent_todo": [
-    {"title": "GR00T N1.5 RoboCasa 추론 비교 (CloseBlenderLid 전체 + skill별 hold)", "badge": "run", "note": "t_ff372eea · v4 GPU 전량 확보(24GB) 후 진행. Xiaomi와 동일 task 비교."},
-    {"title": "π0.5 (openpi) RoboCasa 추론 비교 (전체 + skill별 hold)", "badge": "run", "note": "t_ee702b9c · openpi_robocasa robocasa-finetune 브랜치. GR00T와 동시 실행 가능."},
-    {"title": "instruction vs obs 조건화 실험 (같은 obs, instruction만 변경)", "badge": "wait", "note": "hold 실험서 관찰된 표류가 부분지시 OOD 때문인지 확정."},
-    {"title": "flow_sde 재라벨 감사 결과 반영·검토", "badge": "rev", "note": "flow_sde.py = 고정 노이즈 가우시안 전이. RL 알고리즘 검증과 직결."}
-  ],
-  "note": []
+ "updated": "2026-09-15",
+ "user_todo": [
+  {
+   "title": "모델 선정 (Xiaomi vs GR00T N1.5 vs π0.5 추론 비교 후 base 모델 결정)",
+   "done": false
+  }
+ ],
+ "agent_todo": [
+  {
+   "title": "skill-SFT GPU 게이트: tiny-overfit → heldout val → entry-state rollout",
+   "badge": "wait",
+   "note": "t_e5cd5736 · GR00T eval(t_ff372eea) GPU 종료 후 순차. 침범 금지 정책 준수."
+  },
+  {
+   "title": "Goal4 skill-control eval (baseline vs per-skill, 동일 seed) + 영상",
+   "badge": "wait",
+   "note": "skill success/wrong-skill/post-boundary/termination latency/action delta. SFT 게이트 통과 후."
+  },
+  {
+   "title": "Goal5 구조 비교 (NL-only vs NL+skill-id vs shared-LoRA+learned-emb)",
+   "badge": "wait",
+   "note": "동일 budget, heldout으로 선택. per-skill LoRA 게이트 통과 후에만."
+  },
+  {
+   "title": "Goal6 검증된 multi-epoch GRPO (GRASP→MOVE→RELEASE) + RECAP feasibility",
+   "badge": "wait",
+   "note": "선정된 SFT ckpt 기반. N=50/ARM은 SFT 모델 선정 이후."
+  },
+  {
+   "title": "GR00T N1.5 / π0.5 RoboCasa 추론 비교",
+   "badge": "run",
+   "note": "t_ff372eea GR00T: target split 완료(succ~0.22), pretrain split 진행중. GPU 우선."
+  }
+ ],
+ "note": [],
+ "findings": [
+  {
+   "title": "RoboCasa365 CloseBlenderLid demos 확보·분할 완료 (106 demos)",
+   "tag": "ok",
+   "detail": "공개 LeRobot 미러 ember-lab-berkeley/robocasa365-pretrain-atomic (토큰불요). GRASP_HANDLE/MOVE_LID_TO_CLOSED/RELEASE_HANDLE 3-skill 분할, 74/16/16 traj split, action loss mask, SHA-256 manifest. RELEASE 데이터 존재.",
+   "link": ""
+  },
+  {
+   "title": "demo state에 오브젝트 pose 없음 → gripper-command 기반 분할",
+   "tag": "info",
+   "detail": "observation.state[16]=로봇 proprioception만. lid predicate는 sim-replay 필요. 대신 gripper command square wave(+1 close/-1 open)+terminal reward로 3-phase 분할. finger opening은 wide lid라 파지시 오히려 벌어져 비단조(감사됨).",
+   "link": ""
+  },
+  {
+   "title": "action 정규화 불필요: x1[:12]=demo action 그대로가 학습 타깃",
+   "tag": "ok",
+   "detail": "robot_type robocasa365 action_config: 활성 dim 0-11 mean0/std1, 12-59 std0. decode_action=a*std+mean은 활성 dim 항등 → demo raw action이 곧 model-space 타깃. CFM SFT loss는 활성 dim×skill-span에만.",
+   "link": ""
+  },
+  {
+   "title": "skill-SFT는 별도 프로젝트 아님 — rl-train-t_3ed65912 확장",
+   "tag": "info",
+   "detail": "operator 지시(t_37303cd3): data/skill_sft + results/skill_sft + 기존 src/scripts/REPORT만 확장, 중복 프로젝트 금지. turn1의 별도 dir 이관 완료.",
+   "link": ""
+  }
+ ],
+ "running": [
+  {
+   "title": "skill-SFT 파이프라인 (Goal 1~6, 카드 t_e5cd5736)",
+   "badge": "run",
+   "note": "Goal1(데이터)·Goal2(conditioning) 완료. Goal3(CFM per-skill LoRA SFT) 구현완료(server op_sft_update/val + client + driver + run-train.sh sft), 비디오 디코드 smoke PASS, 전 파일 compile+테스트 6/6. GPU 게이트(overfit→val→rollout)와 Goal4~6은 GR00T eval GPU 종료 후 순차."
+  }
+ ]
 }
