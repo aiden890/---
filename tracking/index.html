@@ -223,51 +223,9 @@
 
 <!-- ===== 데이터셋 (skill-SFT) ===== -->
 <section id="dataset" class="tab">
-  <h1>SFT 데이터셋 · CloseBlenderLid</h1>
+  <h1>SFT 학습 데이터 · 잘린 skill 조각</h1>
   <p class="dim" id="ds-sub"></p>
-  <div class="kpi" id="ds-kpi"></div>
-
-  <div class="card" style="border-left:3px solid var(--acc)">
-    <h2>👁️ 원본 데이터 직접 보기</h2>
-    <p class="dim" style="margin:0 0 12px">HF에 올라온 원본 데이터셋을 브라우저에서 바로 확인할 수 있어요. LeRobot visualizer는 3-cam 영상 + state/action 그래프를 타임라인으로 동기 재생합니다.</p>
-    <div id="ds-viz" style="display:flex;gap:10px;flex-wrap:wrap"></div>
-  </div>
-
-  <div class="card">
-    <h2>📦 출처 &amp; 규격</h2>
-    <div id="ds-meta"></div>
-  </div>
-
-  <div class="card">
-    <h2>✂️ Skill 분할 (3종)</h2>
-    <p class="dim" style="margin:0 0 12px">각 데모를 <b>정책이 볼 수 있는 신호</b>(손가락 개폐 상태머신 + 그리퍼 명령 + reward onset)로 3구간 분할. 막대는 각 skill의 평균 구간 길이(프레임 @20fps).</p>
-    <div id="ds-skills"></div>
-  </div>
-
-  <div class="card">
-    <h2>🔀 Split &amp; 마스킹</h2>
-    <div id="ds-split"></div>
-    <p class="dim" style="margin-top:12px" id="ds-mask"></p>
-  </div>
-
-  <div class="card">
-    <h2>💬 Conditioning (지시 구성)</h2>
-    <p class="dim" style="margin:0 0 10px" id="ds-goal"></p>
-    <div id="ds-prompt"></div>
-    <p class="dim" style="margin-top:10px" id="ds-promptnote"></p>
-  </div>
-
-  <div class="card">
-    <h2>🔍 샘플 에피소드 (구간 타임라인)</h2>
-    <p class="dim" style="margin:0 0 12px">가로 막대 = 한 에피소드의 프레임 진행. 색으로 skill 구간 표시. ◆ = reward onset. <b>행을 클릭하면 해당 에피소드를 LeRobot visualizer에서 영상으로 재생</b>합니다.</p>
-    <div id="ds-samples"></div>
-  </div>
-
-  <div class="card">
-    <h2>🔒 무결성 (data hashes)</h2>
-    <div id="ds-hash"></div>
-    <p class="dim" style="margin-top:10px">코드/데이터: <code>rl-train-t_3ed65912/data/skill_sft/</code> · 분할 스크립트 <code>scripts/skill_sft_segment_and_manifest.py</code></p>
-  </div>
+  <div id="ds-clips"></div>
 </section>
 
 <!-- ===== 작업 보고 ===== -->
@@ -512,61 +470,36 @@ fetch('rlenv_hold.json').then(r=>r.json()).then(RL=>{
   load(0);
 }).catch(e=>{});
 
-// ===== dataset tab =====
+// ===== dataset tab: SFT skill clips =====
 fetch('dataset.json').then(r=>r.json()).then(d=>{
-  const SKC={GRASP_HANDLE:'#818cf8',MOVE_LID_TO_CLOSED:'#4ade80',RELEASE_HANDLE:'#facc15'};
-  const SKN={GRASP_HANDLE:'GRASP',MOVE_LID_TO_CLOSED:'MOVE',RELEASE_HANDLE:'RELEASE'};
-  document.getElementById('ds-sub').innerHTML=`목표 지시: "<b>${d.instruction_text}</b>" · 이 데이터로 per-skill LoRA SFT를 학습합니다.`;
-  // viz buttons
-  const V=d.viz||{};
-  document.getElementById('ds-viz').innerHTML=`
-    <a href="${V.lerobot}" target="_blank" style="text-decoration:none;background:var(--acc);color:#fff;padding:11px 18px;border-radius:9px;font-size:14px;font-weight:600">▶ LeRobot Visualizer (영상+그래프)</a>
-    <a href="${V.data_studio}" target="_blank" style="text-decoration:none;background:#242835;color:var(--tx);border:1px solid var(--bd);padding:11px 18px;border-radius:9px;font-size:14px">📊 HF Data Studio (state/action 테이블)</a>`;
-  const kpi=[['총 데모',d.n_demos+' ep'],['총 프레임',d.total_frames.toLocaleString()],['평균 길이',d.ep_len.mean+' f ('+(d.ep_len.mean/d.fps).toFixed(1)+'s)'],['Skill',d.segmentation.skills.length+'종'],['action dim',d.action_dim],['obs dim',d.obs_state_dim]];
-  document.getElementById('ds-kpi').innerHTML=kpi.map(k=>`<div><div class="n">${k[1]}</div><div class="l">${k[0]}</div></div>`).join('');
-  document.getElementById('ds-meta').innerHTML=`<table>
-    <tr><th>항목</th><th>값</th></tr>
-    <tr><td>출처 (LeRobot 미러)</td><td><code>${d.dataset_repo}</code> · ${d.codebase_version}</td></tr>
-    <tr><td>Task</td><td>${d.task}</td></tr>
-    <tr><td>로봇 / FPS</td><td>PandaOmron · ${d.fps} fps</td></tr>
-    <tr><td>관측</td><td>3-cam 비디오(256²) + state[${d.obs_state_dim}] <span class="dim">(${d.obs_note})</span></td></tr>
-    <tr><td>액션</td><td>${d.action_dim}-D (활성 dim 0–11, 정규화 불필요 · demo action 그대로가 타깃)</td></tr>
-    <tr><td>플래그된 에피소드</td><td>${d.flagged_episodes.length?d.flagged_episodes.join(', ')+' (분할 이상치 · 학습 제외 후보)':'없음'}</td></tr></table>`;
-  // skills with avg-length bars
-  const maxL=Math.max(...d.skills.map(s=>s.len.mean));
-  document.getElementById('ds-skills').innerHTML=d.skills.map(s=>`
-    <div class="item"><div class="tt">
-      <div><b style="color:${SKC[s.name]}">${SKN[s.name]}</b> <span class="dim">(id ${s.skill_id}) · ${s.name}</span></div>
-      <div class="nt">지시: "${s.nl}"</div>
-      <div class="nt">성공조건: ${s.success}${s.constraints.length?' · 제약: '+s.constraints.join('; '):''}</div>
-      <div style="margin-top:6px"><span class="bar" style="width:${Math.round(s.len.mean/maxL*260)}px;background:${SKC[s.name]}"></span><span class="dim">평균 ${s.len.mean} f · 범위 ${s.len.min}–${s.len.max} · train/val/test ${s.avail.train}/${s.avail.val}/${s.avail.test}</span></div>
-    </div></div>`).join('');
-  // split
-  const sp=d.split, sc=d.split_ct, tot=sp.counts.train+sp.counts.val+sp.counts.test;
-  document.getElementById('ds-split').innerHTML=`
-    <div style="display:flex;height:26px;border-radius:6px;overflow:hidden;margin-bottom:10px">
-      <div style="width:${sp.counts.train/tot*100}%;background:#818cf8;text-align:center;font-size:12px;line-height:26px">train ${sp.counts.train}</div>
-      <div style="width:${sp.counts.val/tot*100}%;background:#4ade80;color:#111;text-align:center;font-size:12px;line-height:26px">val ${sp.counts.val}</div>
-      <div style="width:${sp.counts.test/tot*100}%;background:#facc15;color:#111;text-align:center;font-size:12px;line-height:26px">test ${sp.counts.test}</div></div>
-    <p class="dim">episode 단위 분할(seed ${sp.seed}) — 같은 데모가 train/val/test에 섞이지 않음(누수 방지). 실제 태그 집계: train ${sc.train} / val ${sc.val} / test ${sc.test}.</p>`;
-  document.getElementById('ds-mask').innerHTML=`<b>action loss mask:</b> ${d.action_loss_mask}`;
-  // conditioning
-  document.getElementById('ds-goal').innerHTML=`전체 목표: <b>${d.overall_task_goal}</b>`;
-  document.getElementById('ds-prompt').innerHTML=`<pre style="background:#0c0e13;border:1px solid var(--bd);border-radius:8px;padding:12px;overflow:auto;font-size:12px;color:var(--tx);white-space:pre-wrap">${d.prompt_template.replace(/</g,'&lt;')}</pre>`;
-  document.getElementById('ds-promptnote').innerHTML=`⚠ ${d.prompt_note}`;
-  // sample episodes timeline
-  document.getElementById('ds-samples').innerHTML=d.sample_episodes.map(e=>{
-    const segs=Object.entries(e.spans).filter(([k,v])=>v).map(([k,v])=>`<div title="${SKN[k]} ${v[0]}-${v[1]}" style="position:absolute;left:${v[0]/e.n*100}%;width:${(v[1]-v[0])/e.n*100}%;top:0;bottom:0;background:${SKC[k]};opacity:.85"></div>`).join('');
-    const ro=e.reward_onset!=null?`<div title="reward onset ${e.reward_onset}" style="position:absolute;left:${e.reward_onset/e.n*100}%;top:-3px;color:#fff;font-size:11px">◆</div>`:'';
-    return `<a href="${(d.viz&&d.viz.lerobot_ep||'#')+e.episode_index}" target="_blank" style="text-decoration:none;color:inherit;display:block"><div class="item" style="cursor:pointer">
-      <div class="tt">
-      <div style="display:flex;gap:8px;font-size:12px"><b>ep ${e.episode_index}</b><span class="dim">${e.split} · ${e.n} f${e.flags.length?' · ⚠'+e.flags.join(','):''}</span><span style="margin-left:auto;color:var(--acc)">▶ 재생</span></div>
-      <div style="position:relative;height:20px;margin-top:5px;border-radius:5px;overflow:hidden;background:#0c0e13">${segs}${ro}</div>
-    </div></div></a>`;}).join('')+
-    `<div style="display:flex;gap:16px;margin-top:12px;font-size:12px">`+Object.keys(SKC).map(k=>`<span><span style="display:inline-block;width:11px;height:11px;background:${SKC[k]};border-radius:2px;vertical-align:middle"></span> ${SKN[k]}</span>`).join('')+`</div>`;
-  // hashes
-  document.getElementById('ds-hash').innerHTML=`<table><tr><th>파일</th><th>SHA256 (앞 16)</th></tr>`+Object.entries(d.data_hashes).map(([f,h])=>`<tr><td><code>${f}</code></td><td><code>${h.slice(0,16)}…</code></td></tr>`).join('')+`</table>`;
-}).catch(e=>{});
+  const SKC={GRASP:'#818cf8',MOVE:'#4ade80',RELEASE:'#facc15'};
+  document.getElementById('ds-sub').innerHTML=`원본 데모를 3개 skill로 자른 뒤, <b>각 조각(구간 영상 + 그 구간의 target action)</b>만 따로 학습시킵니다. 각 예제의 <b>▶ 구간 보기</b>를 누르면 해당 에피소드가 LeRobot visualizer에서 열립니다. <span class="dim">(재생 시작 후 조각 구간 프레임으로 이동해서 보세요)</span>`;
+  document.getElementById('ds-clips').innerHTML=d.skills.map(s=>{
+    const col=SKC[s.short];
+    const rows=s.examples.map(e=>`
+      <a href="${d.viz_ep}${e.episode_index}" target="_blank" style="text-decoration:none;color:inherit;display:block">
+      <div class="item" style="cursor:pointer">
+        <div class="tt">
+          <div style="display:flex;gap:8px;align-items:center;font-size:13px">
+            <b>ep ${e.episode_index}</b>
+            <span class="dim">${e.split} · 프레임 ${e.span[0]}–${e.span[1]} · ${e.n_frames}f (${e.sec}s)</span>
+            <span style="margin-left:auto;color:var(--acc)">▶ 구간 보기</span>
+          </div>
+          <div style="position:relative;height:16px;margin-top:5px;border-radius:4px;overflow:hidden;background:#0c0e13">
+            <div title="이 조각: ${e.span[0]}–${e.span[1]}" style="position:absolute;left:0;width:100%;top:0;bottom:0;background:${col};opacity:.85"></div>
+            <span style="position:absolute;left:6px;top:0;bottom:0;display:flex;align-items:center;font-size:10px;color:#0a0a0a;font-weight:600">이 조각 = target action ${e.n_frames}스텝 × ${s.constraints?'':''}12-D</span>
+          </div>
+        </div>
+      </div></a>`).join('');
+    return `<div class="card" style="border-left:3px solid ${col}">
+      <h2 style="color:${col}">${s.short} <span class="dim" style="font-size:13px">(skill_id ${s.skill_id} · ${s.name})</span></h2>
+      <p class="dim" style="margin:0 0 4px">지시: "<b style="color:var(--tx)">${s.instruction}</b>"</p>
+      <p class="dim" style="margin:0 0 12px">성공조건: ${s.success}</p>
+      <div style="font-size:12px;color:var(--dim);margin-bottom:6px">대표 예제 (짧은/중간/긴 구간):</div>
+      ${rows}
+    </div>`;}).join('')+
+    `<p class="dim" style="margin-top:14px">각 예제 = <b>구간 영상 프레임</b>(모델 입력 obs) → <b>그 구간의 action ${''}시퀀스 12-D</b>(모델이 맞혀야 할 타깃). 구간 밖 스텝은 loss에서 제외. · 데이터: <code>rl-train-t_3ed65912/data/skill_sft/</code></p>`;
+}).catch(e=>{document.getElementById('ds-clips').innerHTML='<div class="dim">로드 실패</div>';});
 </script>
 </body>
 </html>

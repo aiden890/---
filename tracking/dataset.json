@@ -1,313 +1,124 @@
 {
- "task": "CloseBlenderLid",
- "dataset_repo": "ember-lab-berkeley/robocasa365-pretrain-atomic",
- "codebase_version": "v3.0",
- "n_demos": 106,
  "instruction_text": "Close the lid blender by securely placing the lid on top.",
- "obs_state_dim": 16,
- "action_dim": 12,
  "fps": 20,
- "obs_note": "observation.state is robot proprioception only (base+EE pose+gripper), NO object pose",
- "total_frames": 36933,
- "ep_len": {
-  "n": 106,
-  "min": 237,
-  "max": 637,
-  "mean": 348.4,
-  "median": 338.5
- },
- "split": {
-  "seed": 20260915,
-  "fractions": {
-   "train": 0.7,
-   "val": 0.15,
-   "test": 0.15
-  },
-  "counts": {
-   "train": 74,
-   "val": 16,
-   "test": 16
-  }
- },
- "split_ct": {
-  "val": 16,
-  "test": 16,
-  "train": 74
- },
- "segmentation": {
-  "method": "policy-visible signals: finger-opening state machine (hysteresis) + gripper command cross-check + next.reward terminal onset",
-  "OPEN_TH": 0.065,
-  "CLOSED_TH": 0.05,
-  "HOLD": 5,
-  "CLOSE_CMD": 0.5,
-  "OPEN_CMD": -0.5,
-  "skills": [
-   "GRASP_HANDLE",
-   "MOVE_LID_TO_CLOSED",
-   "RELEASE_HANDLE"
-  ]
- },
- "action_loss_mask": "for a per-skill training example, actions OUTSIDE the skill's [start,end) span are masked out of the flow-matching loss",
- "flagged_episodes": [
-  359
- ],
- "prompt_template": "Left camera: <video>\nRight camera: <video>\nWrist camera: <video>\n\nGenerate robot actions for the task:\n{instruction} /no_cot",
- "prompt_note": "Verbatim from deploy/client.py _build_messages; {instruction} is the only text conditioning slot. The pretrained 365 checkpoint was trained on FULL-task instructions, so partial-skill prompts are out-of-distribution (see skill model-provenance).",
- "overall_task_goal": "Close the blender by placing its lid securely on top, then release and retreat.",
+ "viz_ep": "https://huggingface.co/spaces/lerobot/visualize_dataset?dataset=ember-lab-berkeley%2Frobocasa365-pretrain-atomic&episode=",
  "skills": [
   {
    "skill_id": 0,
    "name": "GRASP_HANDLE",
-   "nl": "Pick up the blender lid securely by its handle.",
-   "object": "blender lid",
-   "destination": null,
-   "constraints": [
-    "do not knock the lid off the counter",
-    "achieve a secure grasp before lifting"
-   ],
+   "short": "GRASP",
+   "instruction": "Pick up the blender lid securely by its handle.",
    "success": "lid_grasped (gripper-lid contact AND lid lifted above rest)",
-   "len": {
-    "n": 106,
-    "min": 70,
-    "max": 203,
-    "mean": 117.2,
-    "median": 110.0
-   },
-   "avail": {
-    "train": 74,
-    "val": 16,
-    "test": 16
-   }
+   "examples": [
+    {
+     "episode_index": 371,
+     "span": [
+      0,
+      70
+     ],
+     "n_frames": 70,
+     "sec": 3.5,
+     "split": "train"
+    },
+    {
+     "episode_index": 381,
+     "span": [
+      0,
+      110
+     ],
+     "n_frames": 110,
+     "sec": 5.5,
+     "split": "train"
+    },
+    {
+     "episode_index": 406,
+     "span": [
+      0,
+      196
+     ],
+     "n_frames": 196,
+     "sec": 9.8,
+     "split": "train"
+    }
+   ]
   },
   {
    "skill_id": 1,
    "name": "MOVE_LID_TO_CLOSED",
-   "nl": "Move the grasped blender lid above the blender without colliding with the surroundings.",
-   "object": "blender lid (held)",
-   "destination": "closed position on top of the blender",
-   "constraints": [
-    "keep holding the lid",
-    "avoid collisions during transfer",
-    "reach the pre-place region above the closed pose"
-   ],
+   "short": "MOVE",
+   "instruction": "Move the grasped blender lid above the blender without colliding with the surroundings.",
    "success": "lid_grasped AND in_preplace_region",
-   "len": {
-    "n": 105,
-    "min": 109,
-    "max": 404,
-    "mean": 179.1,
-    "median": 175
-   },
-   "avail": {
-    "train": 74,
-    "val": 15,
-    "test": 16
-   }
+   "examples": [
+    {
+     "episode_index": 343,
+     "span": [
+      139,
+      248
+     ],
+     "n_frames": 109,
+     "sec": 5.5,
+     "split": "train"
+    },
+    {
+     "episode_index": 341,
+     "span": [
+      119,
+      293
+     ],
+     "n_frames": 174,
+     "sec": 8.7,
+     "split": "train"
+    },
+    {
+     "episode_index": 320,
+     "span": [
+      182,
+      586
+     ],
+     "n_frames": 404,
+     "sec": 20.2,
+     "split": "train"
+    }
+   ]
   },
   {
    "skill_id": 2,
    "name": "RELEASE_HANDLE",
-   "nl": "Place the grasped blender lid securely on top of the blender, release it, and move the gripper away.",
-   "object": "blender lid (held)",
-   "destination": "seated on the blender",
-   "constraints": [
-    "seat the lid upright (<=7 deg tilt)",
-    "release the gripper",
-    "retreat >0.15m from the lid"
-   ],
+   "short": "RELEASE",
+   "instruction": "Place the grasped blender lid securely on top of the blender, release it, and move the gripper away.",
    "success": "lid_on_blender AND gripper_lid_far_0.15 (== official CloseBlenderLid success)",
-   "len": {
-    "n": 105,
-    "min": 38,
-    "max": 120,
-    "mean": 52.9,
-    "median": 50
-   },
-   "avail": {
-    "train": 74,
-    "val": 15,
-    "test": 16
-   }
+   "examples": [
+    {
+     "episode_index": 360,
+     "span": [
+      274,
+      312
+     ],
+     "n_frames": 38,
+     "sec": 1.9,
+     "split": "train"
+    },
+    {
+     "episode_index": 338,
+     "span": [
+      281,
+      331
+     ],
+     "n_frames": 50,
+     "sec": 2.5,
+     "split": "train"
+    },
+    {
+     "episode_index": 376,
+     "span": [
+      259,
+      362
+     ],
+     "n_frames": 103,
+     "sec": 5.2,
+     "split": "train"
+    }
+   ]
   }
- ],
- "sample_episodes": [
-  {
-   "episode_index": 314,
-   "n": 347,
-   "split": "val",
-   "spans": {
-    "GRASP_HANDLE": [
-     0,
-     85
-    ],
-    "MOVE_LID_TO_CLOSED": [
-     85,
-     305
-    ],
-    "RELEASE_HANDLE": [
-     305,
-     347
-    ]
-   },
-   "reward_onset": 331,
-   "flags": []
-  },
-  {
-   "episode_index": 315,
-   "n": 268,
-   "split": "test",
-   "spans": {
-    "GRASP_HANDLE": [
-     0,
-     84
-    ],
-    "MOVE_LID_TO_CLOSED": [
-     84,
-     228
-    ],
-    "RELEASE_HANDLE": [
-     228,
-     268
-    ]
-   },
-   "reward_onset": 252,
-   "flags": []
-  },
-  {
-   "episode_index": 316,
-   "n": 363,
-   "split": "train",
-   "spans": {
-    "GRASP_HANDLE": [
-     0,
-     168
-    ],
-    "MOVE_LID_TO_CLOSED": [
-     168,
-     317
-    ],
-    "RELEASE_HANDLE": [
-     317,
-     363
-    ]
-   },
-   "reward_onset": 347,
-   "flags": []
-  },
-  {
-   "episode_index": 317,
-   "n": 339,
-   "split": "test",
-   "spans": {
-    "GRASP_HANDLE": [
-     0,
-     106
-    ],
-    "MOVE_LID_TO_CLOSED": [
-     106,
-     295
-    ],
-    "RELEASE_HANDLE": [
-     295,
-     339
-    ]
-   },
-   "reward_onset": 323,
-   "flags": []
-  },
-  {
-   "episode_index": 318,
-   "n": 281,
-   "split": "val",
-   "spans": {
-    "GRASP_HANDLE": [
-     0,
-     93
-    ],
-    "MOVE_LID_TO_CLOSED": [
-     93,
-     233
-    ],
-    "RELEASE_HANDLE": [
-     233,
-     281
-    ]
-   },
-   "reward_onset": 265,
-   "flags": []
-  },
-  {
-   "episode_index": 319,
-   "n": 381,
-   "split": "train",
-   "spans": {
-    "GRASP_HANDLE": [
-     0,
-     151
-    ],
-    "MOVE_LID_TO_CLOSED": [
-     151,
-     336
-    ],
-    "RELEASE_HANDLE": [
-     336,
-     381
-    ]
-   },
-   "reward_onset": 365,
-   "flags": []
-  },
-  {
-   "episode_index": 320,
-   "n": 637,
-   "split": "train",
-   "spans": {
-    "GRASP_HANDLE": [
-     0,
-     182
-    ],
-    "MOVE_LID_TO_CLOSED": [
-     182,
-     586
-    ],
-    "RELEASE_HANDLE": [
-     586,
-     637
-    ]
-   },
-   "reward_onset": 621,
-   "flags": []
-  },
-  {
-   "episode_index": 321,
-   "n": 360,
-   "split": "val",
-   "spans": {
-    "GRASP_HANDLE": [
-     0,
-     139
-    ],
-    "MOVE_LID_TO_CLOSED": [
-     139,
-     317
-    ],
-    "RELEASE_HANDLE": [
-     317,
-     360
-    ]
-   },
-   "reward_onset": 344,
-   "flags": []
-  }
- ],
- "data_hashes": {
-  "data/chunk-000/file-000.parquet": "c76d5148d77b928afc41e024ea06faf4bf8c7c724e0302e26973496bfebb5b48",
-  "meta/info.json": "6651e9885590925c44e1f05d8ab22a60f59cc2fc609c677a204dbf2d8d20ea21",
-  "meta/tasks.parquet": "49be42103606d159561601b4f31cf080fe714937ae5207638ebd4ca56f945bfb"
- },
- "viz": {
-  "data_studio": "https://huggingface.co/datasets/ember-lab-berkeley/robocasa365-pretrain-atomic",
-  "lerobot": "https://huggingface.co/spaces/lerobot/visualize_dataset?dataset=ember-lab-berkeley%2Frobocasa365-pretrain-atomic",
-  "lerobot_ep": "https://huggingface.co/spaces/lerobot/visualize_dataset?dataset=ember-lab-berkeley%2Frobocasa365-pretrain-atomic&episode="
- }
+ ]
 }
