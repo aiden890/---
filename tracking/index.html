@@ -49,6 +49,10 @@
   .dim{color:var(--dim);font-size:13px}
   .foot{color:var(--dim);font-size:12px;margin-top:26px;text-align:center}
   a{color:var(--rev)}
+  .filt{background:#0c0e13;border:1px solid var(--bd);color:var(--dim);font:inherit;font-size:13px;padding:8px 14px;border-radius:8px;cursor:pointer}
+  .filt.active{background:#242835;color:var(--tx);border-color:var(--acc)}
+  .bar{display:inline-block;height:7px;border-radius:4px;background:var(--acc);vertical-align:middle;margin-right:7px}
+  .sr{font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body>
@@ -91,38 +95,26 @@
   </div>
 </section>
 
-<!-- ===== RoboCasa Task ===== -->
+<!-- ===== RoboCasa Task (벤치마크 전체) ===== -->
 <section id="tasks" class="tab">
-  <h1>RoboCasa Task 정보</h1>
-  <div class="card">
-    <h2>CloseBlenderLid (집중 task)</h2>
-    <table>
-      <tr><td class="dim">목표</td><td>블렌더 뚜껑을 집어 블렌더 위에 안전하게 닫기</td></tr>
-      <tr><td class="dim">성공 조건</td><td><code>lid_on_blender=true</code> AND gripper–lid 거리 &gt;0.15m AND 기울기 &lt;7°</td></tr>
-      <tr><td class="dim">분류</td><td>Composite (다단계 · 순서 제약)</td></tr>
-      <tr><td class="dim">공식 성공률</td><td>36% (18/50) — Xiaomi-Robotics-1-RoboCasa365</td></tr>
-      <tr><td class="dim">horizon</td><td>900 steps</td></tr>
-      <tr><td class="dim">에셋</td><td>Blender028_Lid (layout 32 / style 14)</td></tr>
-    </table>
+  <h1>RoboCasa 벤치마크 Task</h1>
+  <p class="dim">RoboCasa365 <code>target50</code> 평가 세트 · 성공률은 Xiaomi-Robotics-1-RoboCasa365 공식 결과 (task당 50 episode, base seed 7).</p>
+  <div class="kpi">
+    <div><div class="n" id="k-total">50</div><div class="l">task</div></div>
+    <div><div class="n" id="k-overall">57.3%</div><div class="l">전체 성공률</div></div>
+    <div><div class="n" id="k-atomic">18</div><div class="l">atomic</div></div>
+    <div><div class="n" id="k-comp">32</div><div class="l">composite</div></div>
   </div>
   <div class="card">
-    <h2>skill 분해</h2>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+      <input id="tsearch" placeholder="task 검색…" style="flex:1;min-width:160px;background:#0c0e13;border:1px solid var(--bd);border-radius:8px;color:var(--tx);padding:8px 12px;font:inherit;font-size:14px">
+      <button class="filt active" data-f="all">전체</button>
+      <button class="filt" data-f="atomic">atomic</button>
+      <button class="filt" data-f="composite">composite</button>
+    </div>
     <table>
-      <tr><th>skill</th><th>지시문</th><th>성공 조건</th></tr>
-      <tr><td>GRASP</td><td>"Pick up the blender lid securely."</td><td>안정적 grasp + 들어올림</td></tr>
-      <tr><td>MOVE_HOLDING</td><td>"Move the grasped lid above the blender…"</td><td>충돌 없이 pre-place 도달</td></tr>
-      <tr><td>PLACE</td><td>"Place … securely …, release …"</td><td>lid 안착 + release + retreat</td></tr>
-    </table>
-  </div>
-  <div class="card">
-    <h2>공식 모델 성능 (참고)</h2>
-    <p class="dim">Xiaomi-Robotics-1-RoboCasa365 · target50 · 2500 episode 중 1432 성공 = <b>57.28%</b></p>
-    <table>
-      <tr><th>task</th><th>성공률</th></tr>
-      <tr><td>WashLettuce / TurnOnSinkFaucet</td><td>84%</td></tr>
-      <tr><td>KettleBoiling</td><td>74%</td></tr>
-      <tr><td>CloseBlenderLid</td><td>36%</td></tr>
-      <tr><td>HeatKebabSandwich</td><td>0% (planning 실패 후보)</td></tr>
+      <thead><tr><th>#</th><th>task</th><th>분류</th><th>공식 성공률</th><th>horizon</th></tr></thead>
+      <tbody id="task-body"></tbody>
     </table>
   </div>
 </section>
@@ -201,6 +193,35 @@ fetch('demos.json').then(r=>r.json()).then(ds=>{
       <div class="vsub">${d.instr}${d.reason?'<br>사유: '+d.reason:''}</div>
     </div>`).join('');
 }).catch(e=>{document.getElementById('demo-grid').innerHTML='<p class="dim">demos.json 로드 실패</p>'});
+
+// load RoboCasa benchmark tasks
+let TASKS=[], filt='all';
+function srColor(sr){ if(sr>=70)return'var(--ok)'; if(sr>=40)return'var(--run)'; if(sr>=15)return'#fb923c'; return'var(--red)'; }
+function renderTasks(){
+  const q=(document.getElementById('tsearch').value||'').toLowerCase();
+  const rows=TASKS.filter(t=>(filt==='all'||t.cat===filt)&&t.name.toLowerCase().includes(q));
+  document.getElementById('task-body').innerHTML=rows.map((t,i)=>`
+    <tr>
+      <td class="dim">${i+1}</td>
+      <td>${t.name}</td>
+      <td><span class="dim">${t.cat}</span></td>
+      <td class="sr"><span class="bar" style="width:${Math.max(t.sr*0.6,2)}px;background:${srColor(t.sr)}"></span>${t.sr.toFixed(0)}%</td>
+      <td class="dim">${t.h}</td>
+    </tr>`).join('');
+}
+fetch('robocasa_tasks.json').then(r=>r.json()).then(d=>{
+  TASKS=d.tasks;
+  document.getElementById('k-total').textContent=d.num_tasks;
+  document.getElementById('k-overall').textContent=d.overall+'%';
+  document.getElementById('k-atomic').textContent=TASKS.filter(t=>t.cat==='atomic').length;
+  document.getElementById('k-comp').textContent=TASKS.filter(t=>t.cat==='composite').length;
+  renderTasks();
+}).catch(e=>{document.getElementById('task-body').innerHTML='<tr><td colspan=5 class="dim">robocasa_tasks.json 로드 실패</td></tr>'});
+document.getElementById('tsearch').addEventListener('input',renderTasks);
+document.querySelectorAll('.filt').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.filt').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active'); filt=b.dataset.f; renderTasks();
+});
 </script>
 </body>
 </html>
