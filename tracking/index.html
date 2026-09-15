@@ -53,6 +53,9 @@
   .filt.active{background:#242835;color:var(--tx);border-color:var(--acc)}
   .bar{display:inline-block;height:7px;border-radius:4px;background:var(--acc);vertical-align:middle;margin-right:7px}
   .sr{font-variant-numeric:tabular-nums}
+  th.sort{cursor:pointer;user-select:none}
+  th.sort:hover{color:var(--tx)}
+  th.sort .ar{opacity:.5;font-size:10px;margin-left:3px}
 </style>
 </head>
 <body>
@@ -113,13 +116,16 @@
       <button class="filt" data-f="eval">target50</button>
     </div>
     <table>
-      <thead><tr><th>#</th><th>task</th><th>분류</th><th>공식 성공률</th><th>horizon</th><th>데모</th></tr></thead>
+      <thead><tr>
+        <th>#</th>
+        <th class="sort" data-k="name">task</th>
+        <th class="sort" data-k="cat">분류</th>
+        <th class="sort" data-k="sr">공식 성공률</th>
+        <th class="sort" data-k="h">horizon</th>
+        <th>데모</th>
+      </tr></thead>
       <tbody id="task-body"></tbody>
     </table>
-  </div>
-  <div id="task-demo" style="display:none" class="card">
-    <h2 id="td-title">데모</h2>
-    <div class="grid" id="td-grid"></div>
   </div>
 </section>
 
@@ -181,33 +187,47 @@ document.querySelectorAll('.nav button[data-tab]').forEach(b=>{
   };
 });
 // load demos (grouped by task) then benchmark tasks
-let TASKS=[], DEMOS={}, filt='all';
+let TASKS=[], DEMOS={}, filt='all', sortK=null, sortDir=1;
 function srColor(sr){ if(sr>=70)return'var(--ok)'; if(sr>=40)return'var(--run)'; if(sr>=15)return'#fb923c'; return'var(--red)'; }
 function renderTasks(){
   const q=(document.getElementById('tsearch').value||'').toLowerCase();
-  const rows=TASKS.filter(t=>{
+  let rows=TASKS.filter(t=>{
     if(filt==='eval') return t.eval && t.name.toLowerCase().includes(q);
     return (filt==='all'||t.cat===filt)&&t.name.toLowerCase().includes(q);
   });
+  if(sortK){
+    rows=rows.slice().sort((a,b)=>{
+      let x=a[sortK], y=b[sortK];
+      if(x==null&&y==null)return 0; if(x==null)return 1; if(y==null)return -1; // nulls last
+      if(typeof x==='string')return x.localeCompare(y)*sortDir;
+      return (x-y)*sortDir;
+    });
+  }
   document.getElementById('task-body').innerHTML=rows.map((t,i)=>{
     const sr = t.sr==null ? '<span class="dim">—</span>'
       : `<span class="bar" style="width:${Math.max(t.sr*0.6,2)}px;background:${srColor(t.sr)}"></span>${t.sr.toFixed(0)}%`;
-    const nd=(DEMOS[t.name]||[]).length;
-    const demo = nd ? `<a href="#" onclick="showDemo('${t.name}');return false">▶ ${nd}</a>` : '<span class="dim">—</span>';
-    return `<tr><td class="dim">${i+1}</td><td>${t.name}</td><td><span class="dim">${t.cat}</span></td>
+    const ds=DEMOS[t.name]||[];
+    const demo = ds.length ? `<a href="#" onclick="toggleDemo('${t.name}',this);return false">▶ ${ds.length}</a>` : '<span class="dim">—</span>';
+    const main=`<tr data-task="${t.name}"><td class="dim">${i+1}</td><td>${t.name}</td><td><span class="dim">${t.cat}</span></td>
       <td class="sr">${sr}</td><td class="dim">${t.h||'—'}</td><td>${demo}</td></tr>`;
+    const drop = ds.length ? `<tr class="drop" id="drop-${t.name}" style="display:none"><td colspan="6" style="padding:0 10px 14px">
+      <div class="grid">${ds.map(d=>`<div class="card" style="margin:0">
+        <video src="${d.file}" controls preload="metadata"></video>
+        <div class="vcap"><b>${d.skill}</b> ${d.success?'<span class="ok">성공</span>':'<span class="no">실패</span>'}</div>
+        <div class="vsub">${d.instr}${d.reason?'<br>사유: '+d.reason:''}</div></div>`).join('')}</div></td></tr>` : '';
+    return main+drop;
   }).join('');
+  // header arrows
+  document.querySelectorAll('th.sort').forEach(h=>{
+    const a=h.querySelector('.ar'); if(a)a.remove();
+    if(h.dataset.k===sortK) h.insertAdjacentHTML('beforeend',`<span class="ar">${sortDir>0?'▲':'▼'}</span>`);
+  });
 }
-function showDemo(name){
-  const ds=DEMOS[name]||[]; const box=document.getElementById('task-demo');
-  document.getElementById('td-title').textContent=name+' 데모';
-  document.getElementById('td-grid').innerHTML=ds.map(d=>`
-    <div class="card" style="margin:0">
-      <video src="${d.file}" controls preload="metadata"></video>
-      <div class="vcap"><b>${d.skill}</b> ${d.success?'<span class="ok">성공</span>':'<span class="no">실패</span>'}</div>
-      <div class="vsub">${d.instr}${d.reason?'<br>사유: '+d.reason:''}</div>
-    </div>`).join('');
-  box.style.display='block'; box.scrollIntoView({behavior:'smooth',block:'nearest'});
+function toggleDemo(name,el){
+  const r=document.getElementById('drop-'+name); if(!r)return;
+  const open=r.style.display==='none';
+  r.style.display=open?'table-row':'none';
+  el.textContent=(open?'▼ ':'▶ ')+(DEMOS[name]||[]).length;
 }
 Promise.all([
   fetch('demos.json').then(r=>r.json()).catch(()=>[]),
@@ -225,6 +245,11 @@ document.getElementById('tsearch').addEventListener('input',renderTasks);
 document.querySelectorAll('.filt').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('.filt').forEach(x=>x.classList.remove('active'));
   b.classList.add('active'); filt=b.dataset.f; renderTasks();
+});
+document.querySelectorAll('th.sort').forEach(h=>h.onclick=()=>{
+  const k=h.dataset.k;
+  if(sortK===k){ sortDir=-sortDir; } else { sortK=k; sortDir = (k==='sr'||k==='h') ? -1 : 1; }
+  renderTasks();
 });
 </script>
 </body>
