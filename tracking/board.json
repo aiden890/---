@@ -29,8 +29,8 @@
     },
     {
       "title": "GR00T N1.5 / π0.5 RoboCasa 추론 비교",
-      "badge": "run",
-      "note": "t_ff372eea GR00T: target split 완료(succ~0.22), pretrain split 진행중. GPU 우선."
+      "badge": "ok",
+      "note": "완료. GR00T: pretrain 20%(target 22%). π0.5(openpi t_ee702b9c): pretrain 14%. Xiaomi 36% > GR00T 20% > π0.5 14%. 세 모델 모두 skill×hold 미지원."
     },
     {
       "title": "instr-attendance probe를 GR00T/π0.5로 확장",
@@ -40,6 +40,12 @@
   ],
   "note": [],
   "findings": [
+    {
+      "title": "3-모델 동일조건 비교 완료: Xiaomi 36% > GR00T 20% > π0.5 14% (CloseBlenderLid)",
+      "tag": "ok",
+      "detail": "동일 task·robot(Panda+Omron)·predicate·replan16·split=pretrain·50ep 추론 비교. Xiaomi-Robotics-1 18/50=36%, GR00T N1.5 10/50=20%, π0.5(openpi) 7/50=14%. 세 공개 RoboCasa365 파인튜닝 체크포인트 중 Xiaomi가 가장 강함. π0.5 14%는 공식 리더보드 π0.5 RoboCasa365 평균 16.9%(논문 Table3)와 정합 — CloseBlenderLid는 평균보다 약간 낮은 hard task. π0.5는 JAX라 serve+client 2-part. skill×hold는 세 모델 모두 미지원(하네스 full-task instruction only). 성공 포장 없이 수치 그대로.",
+      "link": "rlenv"
+    },
     {
       "title": "Xiaomi RoboCasa365, instruction에 실제로 어텐드 (obs-only 아님) — state-의존적",
       "tag": "ok",
