@@ -1,0 +1,15 @@
+{
+  "gate": "overfit",
+  "skill": "GRASP_HANDLE",
+  "arm": "nl_plus_skill_id",
+  "base_mc_loss": 1.1999918619791667,
+  "final_mc_loss": 0.02399444580078125,
+  "drop_x": 50.011234764175946,
+  "pass": true,
+  "demos": [
+    316,
+    319,
+    320
+  ],
+  "steps": 700
+}

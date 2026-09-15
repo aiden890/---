@@ -56,10 +56,15 @@ def center_crop_np(img, ratio):
     from PIL import Image
     if ratio >= 1.0:
         return img if isinstance(img, Image.Image) else Image.fromarray(img)
+    # Match rollout.py center_crop EXACTLY: crop then resize BACK to the original
+    # (H,W) so frames stay patch-divisible (256x256). Cropping without the resize
+    # yields 243px frames that the Qwen3-VL video patchifier rejects.
     h, w = img.shape[:2]
     cw, ch = max(1, int(w * ratio)), max(1, int(h * ratio))
     l, t = (w - cw) // 2, (h - ch) // 2
-    return Image.fromarray(np.ascontiguousarray(img[t:t + ch, l:l + cw]))
+    cropped = Image.fromarray(np.ascontiguousarray(img[t:t + ch, l:l + cw]))
+    resampling = getattr(Image, "Resampling", Image).BILINEAR
+    return cropped.resize((w, h), resampling)
 
 
 class SFTData:

@@ -46,6 +46,21 @@ from lora import (  # noqa: E402
 )
 import vlm_scorer  # noqa: E402  (env card: single source of truth for the VQA prompt+math)
 
+# Goal-3 SFT sends DATASET skill names; map them to the per-skill LoRA keys used by
+# inject_per_skill_lora (grasp/move_holding/place) -- same roles the GRPO loop's
+# SKILL_KEY produces. GRASP_HANDLE->grasp, MOVE_LID_TO_CLOSED->move_holding (lid held
+# in transit), RELEASE_HANDLE->place (release/seat). Idempotent: passing a LoRA key or
+# None returns it unchanged so the GRPO path and baseline (skill=None) are unaffected.
+_SFT_SKILL_TO_LORA = {
+    "GRASP_HANDLE": "grasp",
+    "MOVE_LID_TO_CLOSED": "move_holding",
+    "RELEASE_HANDLE": "place",
+}
+def _lora_key(skill):
+    if skill is None:
+        return None
+    return _SFT_SKILL_TO_LORA.get(skill, skill)
+
 
 def assert_no_active_dropout(model):
     """AUDIT FIX #5: fail loudly if any Dropout with p>0 is in TRAIN mode anywhere in the
@@ -286,8 +301,30 @@ class GRPOTrainerServer:
         # arms B/C also open non-LoRA params (action expert / vlm slice): save those too
         extra = {n: p.detach().cpu() for n, p in self.model.named_parameters()
                  if p.requires_grad and ".lora_" not in n}
-        torch.save({"lora": sd, "extra_trainable": extra, "config": vars(self.a)}, path)
-        return {"saved": str(path), "n_lora": len(sd), "n_extra": len(extra)}
+        # Goal-3 reproducibility: persist optimizer + RNG + config + data/model provenance so a
+        # resumed/loaded checkpoint is bit-reproducible and auditable (which data, which base rev).
+        rng = {
+            "torch": torch.get_rng_state(),
+            "cuda": (torch.cuda.get_rng_state_all() if torch.cuda.is_available() else None),
+        }
+        try:
+            import numpy as _np
+            rng["numpy"] = _np.random.get_state()
+        except Exception:
+            pass
+        provenance = {
+            "data_hash": req.get("data_hash"),          # SHA-256 manifest hashes (from client)
+            "data_manifest": req.get("data_manifest"),  # dataset repo/split identity
+            "model_path": str(getattr(self.a, "model", "")),
+            "model_rev": req.get("model_rev"),          # pinned XiaomiRobotics rev (from client)
+            "train_meta": req.get("train_meta"),        # skill/arm/epochs/steps
+        }
+        torch.save({"lora": sd, "extra_trainable": extra, "config": vars(self.a),
+                    "optimizer": self.opt.state_dict(), "rng": rng,
+                    "provenance": provenance}, path)
+        return {"saved": str(path), "n_lora": len(sd), "n_extra": len(extra),
+                "has_optimizer": True, "has_rng": True,
+                "data_hash": provenance["data_hash"], "model_rev": provenance["model_rev"]}
 
     def op_load(self, req):
         blob = torch.load(req["path"], map_location=self.model.device)
@@ -365,7 +402,8 @@ class GRPOTrainerServer:
         Only the active per-skill LoRA (or shared LoRA + learned embedding) is trained;
         the backbone stays frozen per train_mode. Supports several optimizer steps.
         """
-        skill = req.get("skill")
+        skill = _lora_key(req.get("skill"))
+        assert skill in (None,) + tuple(SKILLS), f"unknown sft skill {req.get('skill')!r} -> {skill!r}"
         set_active_skill(self.wrappers, skill)
         assert_no_active_dropout(self.model)
         steps = int(req.get("sft_steps", 1))
@@ -403,7 +441,8 @@ class GRPOTrainerServer:
     def op_sft_val(self, req):
         """CFM validation loss (no grad, no optimizer step). Averages over `mc` random
         (x0,t) draws to reduce Monte-Carlo variance of the flow-matching loss."""
-        skill = req.get("skill")
+        skill = _lora_key(req.get("skill"))
+        assert skill in (None,) + tuple(SKILLS), f"unknown sft skill {req.get('skill')!r} -> {skill!r}"
         set_active_skill(self.wrappers, skill)
         mc = int(req.get("mc", 8))
         seed = req.get("seed")

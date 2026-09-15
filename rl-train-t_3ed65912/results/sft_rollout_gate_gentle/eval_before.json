@@ -1,0 +1,80 @@
+{
+  "n": 12,
+  "official_success_rate": 0.08333333333333333,
+  "grasp_success_rate": 0.16666666666666666,
+  "episodes": [
+    {
+      "seed": 5000,
+      "official_success": false,
+      "grasp_success": false,
+      "total_reward": 0.0
+    },
+    {
+      "seed": 5001,
+      "official_success": false,
+      "grasp_success": false,
+      "total_reward": 0.0
+    },
+    {
+      "seed": 5002,
+      "official_success": false,
+      "grasp_success": false,
+      "total_reward": -1.0
+    },
+    {
+      "seed": 5003,
+      "official_success": false,
+      "grasp_success": false,
+      "total_reward": 0.0
+    },
+    {
+      "seed": 5004,
+      "official_success": true,
+      "grasp_success": false,
+      "total_reward": 0.0602
+    },
+    {
+      "seed": 5005,
+      "official_success": false,
+      "grasp_success": true,
+      "total_reward": -1.2
+    },
+    {
+      "seed": 5006,
+      "official_success": false,
+      "grasp_success": false,
+      "total_reward": 0.0
+    },
+    {
+      "seed": 5007,
+      "official_success": false,
+      "grasp_success": false,
+      "total_reward": -2.15
+    },
+    {
+      "seed": 5008,
+      "official_success": false,
+      "grasp_success": true,
+      "total_reward": -1.5
+    },
+    {
+      "seed": 5009,
+      "official_success": false,
+      "grasp_success": false,
+      "total_reward": 0.0
+    },
+    {
+      "seed": 5010,
+      "official_success": false,
+      "grasp_success": false,
+      "total_reward": 0.0
+    },
+    {
+      "seed": 5011,
+      "official_success": false,
+      "grasp_success": false,
+      "total_reward": -3.85
+    }
+  ],
+  "seconds": 325.1
+}

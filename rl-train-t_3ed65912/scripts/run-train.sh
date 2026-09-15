@@ -90,13 +90,17 @@ case "${1:-help}" in
     #   bash run-train.sh sft <out-subdir> --op overfit --skill GRASP_HANDLE --arm nl_plus_skill_id ...
     docker ps --format '{{.Names}}' | grep -q "^${trainer}$" || { echo "start trainer first: bash $0 trainer-start" >&2; exit 5; }
     run="${2:-sft}"; out="$train/results/skill_sft/$run"; mkdir -p "$out"
+    # Trainer runs --network none (GRPO isolation), so this client cannot pip-install or
+    # hf-download at run time. Deps (pyarrow/av/hf_hub) are pre-staged in $train/pylibs and
+    # the ONLY needed dataset files (CBL parquet + 3 shared video chunks) in $train/hf_cache;
+    # HF_HUB_OFFLINE=1 makes hf_hub_download resolve from that local_dir. Re-stage with
+    # scripts/skill_sft_stage_data.sh if pylibs/hf_cache are missing.
     docker run --rm --name "xiaomi-sft-$run" --gpus all --shm-size=2g \
       -v "$parent/checkpoint:/checkpoint:ro" -v "$rlenv:/rl_env:ro" -v "$train:/train" -v "$out:/out" \
-      -e HF_HOME=/tmp/hf --network "container:$trainer" \
+      -e HF_HUB_OFFLINE=1 -e HF_HOME=/train/hf_home --network "container:$trainer" \
       --entrypoint bash "$server_image" -lc \
-      "python3 -m pip install --quiet --target /tmp/pylibs pyarrow av 2>/dev/null; \
-       PYTHONPATH=/tmp/pylibs python3 /train/scripts/skill_sft_train.py \
-       --model /checkpoint --port $port --cache /tmp/hf/cache --out /out ${*:3}" 2>&1 | tee "$out/sft.log"
+      "PYTHONPATH=/train/pylibs:/train/src python3 /train/scripts/skill_sft_train.py \
+       --model /checkpoint --port $port --cache /train/hf_cache --out /out ${*:3}" 2>&1 | tee "$out/sft.log"
     ;;
   *)
     echo "Usage: bash run-train.sh {probe|trainer-start [server args]|trainer-stop|audit-p0|audit-branch|train <run> [args]|sft <run> [sft args]}" >&2

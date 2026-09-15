@@ -95,23 +95,34 @@ def main():
             step, span = next(iter_examples(data, ei, a.skill, a.stride))
             exs.append((ei,) + make_example(data, client, ei, a.skill, step, span, instruction))
         print(f"[overfit] {len(exs)} examples from demos {eis}", flush=True)
-        first_loss = None
-        hist = []
+
+        # CFM loss has irreducible per-step noise (fresh x0,t each step), so the raw
+        # training-loss trace is a poor gate signal. Measure DETERMINISTICALLY instead:
+        # mean over the K examples of a fixed-seed MC-averaged CFM loss (sft_val, mc=16),
+        # BEFORE and AFTER training the same K examples. drop = base/final on that clean
+        # metric -- an honest overfit test (identical examples, low-variance measurement).
+        def mc_loss(tag):
+            vs = []
+            for ei, inputs, x1, mask in exs:
+                rv = client.sft_val(inputs, x1, mask, a.skill, seed=a.seed, mc=16)
+                vs.append(rv["val_loss"])
+            m = float(np.mean(vs))
+            print(f"  [{tag}] mc_loss mean {m:.5f} per_ex {[round(v,4) for v in vs]}", flush=True)
+            return m
+
+        base_mc = mc_loss("pre")
         for it in range(a.steps):
             ei, inputs, x1, mask = exs[it % len(exs)]
             r = client.sft_update(inputs, x1, mask, a.skill, seed=a.seed + it, sft_steps=1)
-            if first_loss is None:
-                first_loss = r["loss_first"]
-            if it % 10 == 0 or it == a.steps - 1:
-                print(f"  it {it:3d} loss {r['loss']:.5f} gnorm {r['grad_norm']:.3f} "
+            if it % 20 == 0 or it == a.steps - 1:
+                print(f"  it {it:3d} train_loss {r['loss']:.5f} gnorm {r['grad_norm']:.3f} "
                       f"n_active {r['n_active']}", flush=True)
-            hist.append(r["loss"])
-        last = float(np.mean(hist[-5:]))
-        drop = first_loss / max(last, 1e-9)
+        final_mc = mc_loss("post")
+        drop = base_mc / max(final_mc, 1e-9)
         ok = drop > 10.0  # honest bar; brief said >100x ideal, >10x proves the path learns
-        res = {"gate": "overfit", "skill": a.skill, "arm": a.arm, "first_loss": first_loss,
-               "last_loss_mean5": last, "drop_x": drop, "pass": bool(ok), "demos": eis,
-               "steps": a.steps}
+        res = {"gate": "overfit", "skill": a.skill, "arm": a.arm,
+               "base_mc_loss": base_mc, "final_mc_loss": final_mc, "drop_x": drop,
+               "pass": bool(ok), "demos": eis, "steps": a.steps}
         json.dump(res, open(os.path.join(a.out, f"overfit_{a.skill}_{a.arm}.json"), "w"), indent=2)
         print("[overfit] RESULT", json.dumps(res), flush=True)
         client.close()
@@ -134,6 +145,14 @@ def main():
         return
 
     if a.op == "train":
+        # op_save runs on the TRAINER SERVER, which mounts /train (not /out; /out is
+        # client-only). A --ckpt under /out would land in the trainer container's ephemeral
+        # fs and be lost on --rm. Rewrite /out/<f> -> /train/results/skill_sft/ckpt/<f> so the
+        # checkpoint persists on the host. Absolute /train or other paths pass through.
+        if a.ckpt and a.ckpt.startswith("/out/"):
+            fixed = "/train/results/skill_sft/ckpt/" + os.path.basename(a.ckpt)
+            print(f"[train] remapping ckpt {a.ckpt} -> {fixed} (trainer-visible mount)", flush=True)
+            a.ckpt = fixed
         eis = demos_for(data, a.skill, "train")
         examples = []
         for ei in eis:
@@ -154,7 +173,17 @@ def main():
                           f"({time.time()-t0:.0f}s)", flush=True)
                 step_i += 1
         if a.ckpt:
-            sr = client.rpc({"op": "save", "path": a.ckpt})
+            mani = data.manifest
+            save_req = {
+                "op": "save", "path": a.ckpt,
+                "data_hash": mani.get("data_hashes"),
+                "data_manifest": {k: mani.get(k) for k in ("task", "dataset_repo",
+                                   "dataset_codebase_version", "n_demos", "split")},
+                "model_rev": "3a6d0293bfa90759d34a7fc48c2c62413cd7bcf4",  # pinned XiaomiRobotics rev
+                "train_meta": {"skill": a.skill, "arm": a.arm, "epochs": a.epochs,
+                               "n_examples": len(examples), "stride": a.stride, "seed": a.seed},
+            }
+            sr = client.rpc(save_req)
             print("[train] saved", json.dumps(sr), flush=True)
         client.close()
         return
