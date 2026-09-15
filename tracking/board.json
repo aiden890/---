@@ -1,14 +1,37 @@
 {
   "updated": "2026-09-15",
   "user_todo": [
-    {"title": "모델 선정 (base 모델 결정) — 3모델 비교·probe 근거 확보됨, 판단만 남음", "done": false}
+    {
+      "title": "모델 선정: Xiaomi-Robotics-1-RoboCasa365 확정 (3모델 비교 36% 최상 + skill/probe 하네스 유일 지원)",
+      "done": true
+    }
   ],
   "agent_todo": [
-    {"title": "skill-SFT 파이프라인 (t_e5cd5736): per-skill CFM SFT 학습", "badge": "run", "note": "Goal1 데이터·Goal2 conditioning 완료. Goal3 CFM SFT 학습 진행 중 (GPU)."},
-    {"title": "Goal4 skill-control eval (baseline vs per-skill)", "badge": "wait", "note": "skill success / wrong-skill / post-boundary 지속 지표. Goal3 통과 후."},
-    {"title": "Goal5 구조 비교 (NL-only vs NL+skill-id vs shared-LoRA+embed)", "badge": "wait", "note": "동일 budget, heldout 선택. per-skill LoRA 게이트 통과 후."},
-    {"title": "Goal6 multi-epoch GRPO (GRASP→MOVE→RELEASE)", "badge": "wait", "note": "선정된 SFT ckpt 기반. RECAP은 별도 비교군 feasibility."},
-    {"title": "instr-attendance probe를 GR00T/π0.5로 확장", "badge": "todo", "note": "동일 probe(고정 obs·지시만 변경·순열검정). fixed-obs infer 래퍼 필요."}
+    {
+      "title": "skill-SFT 파이프라인 (t_e5cd5736): per-skill CFM SFT 학습",
+      "badge": "run",
+      "note": "Goal1 데이터·Goal2 conditioning 완료. Goal3 CFM SFT 학습 진행 중 (GPU)."
+    },
+    {
+      "title": "Goal4 skill-control eval (baseline vs per-skill)",
+      "badge": "wait",
+      "note": "skill success / wrong-skill / post-boundary 지속 지표. Goal3 통과 후."
+    },
+    {
+      "title": "Goal5 구조 비교 (NL-only vs NL+skill-id vs shared-LoRA+embed)",
+      "badge": "wait",
+      "note": "동일 budget, heldout 선택. per-skill LoRA 게이트 통과 후."
+    },
+    {
+      "title": "Goal6 multi-epoch GRPO (GRASP→MOVE→RELEASE)",
+      "badge": "wait",
+      "note": "선정된 SFT ckpt 기반. RECAP은 별도 비교군 feasibility."
+    },
+    {
+      "title": "instr-attendance probe를 GR00T/π0.5로 확장",
+      "badge": "todo",
+      "note": "동일 probe(고정 obs·지시만 변경·순열검정). fixed-obs infer 래퍼 필요."
+    }
   ],
   "note": [
     "3-모델 비교 완료 (CloseBlenderLid, 동일조건 50ep): Xiaomi 36% > GR00T 20% > π0.5 14%. π0.5는 공식 리더보드 16.9%와 정합 → 하네스 정상 교차검증.",
