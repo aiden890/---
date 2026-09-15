@@ -56,6 +56,12 @@
   th.sort{cursor:pointer;user-select:none}
   th.sort:hover{color:var(--tx)}
   th.sort .ar{opacity:.5;font-size:10px;margin-left:3px}
+  .item{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd)}
+  .item:last-child{border-bottom:none}
+  .item .tt{flex:1}
+  .item .nt{font-size:12px;color:var(--dim);margin-top:2px}
+  .chk{width:16px;height:16px;border:1.5px solid var(--dim);border-radius:5px;margin-top:2px;flex:none}
+  .chk.on{background:var(--ok);border-color:var(--ok)}
 </style>
 </head>
 <body>
@@ -73,27 +79,31 @@
 
 <!-- ===== 현재 작업 ===== -->
 <section id="now" class="tab active">
-  <h1>지금 진행 중</h1>
-  <div class="card now">
-    <h2>🔄 CloseBlenderLid GRPO pilot 학습 <span class="badge b-run">진행</span></h2>
-    <p class="dim" id="now-note">terminal-only ablation iter 12/30 진행 중 · run17 289/360 · 약 52분 남음</p>
+  <h1>RoboCasa · CloseBlenderLid 실험</h1>
+
+  <div class="card">
+    <h2>실험 요약</h2>
     <div class="kpi">
-      <div><div class="n">ARM B</div><div class="l">현재 학습 arm</div></div>
-      <div><div class="n">12/30</div><div class="l">iteration</div></div>
-      <div><div class="n">10.5 GB</div><div class="l">GPU 사용</div></div>
-      <div><div class="n">~52분</div><div class="l">예상 잔여</div></div>
+      <div><div class="n">CloseBlenderLid</div><div class="l">집중 task (공식 36%)</div></div>
+      <div><div class="n">flow-SDE</div><div class="l">GRPO RL 파이프라인</div></div>
+      <div><div class="n">19/19</div><div class="l">리워드 검증</div></div>
+      <div><div class="n">v4 · 3090</div><div class="l">실행 환경</div></div>
     </div>
   </div>
 
+  <div class="card now">
+    <h2>🔄 진행 중</h2>
+    <div id="b-running"></div>
+  </div>
+
   <div class="card">
-    <h2>작업 큐</h2>
-    <table>
-      <tr><th>작업</th><th>상태</th></tr>
-      <tr><td>CloseBlenderLid GRPO pilot 학습</td><td><span class="badge b-run">진행</span></td></tr>
-      <tr><td>로컬 구조 개편 · 중복 통합</td><td><span class="badge b-rev">리뷰</span></td></tr>
-      <tr><td>GRPO: sim+VLM 보조 reward ablation</td><td><span class="badge b-wait">대기</span></td></tr>
-      <tr><td>비교군 실험</td><td><span class="badge b-blk">블로커</span></td></tr>
-    </table>
+    <h2>🤖 에이전트 TODO</h2>
+    <div id="b-agent"></div>
+  </div>
+
+  <div class="card">
+    <h2>🙋 내 TODO</h2>
+    <div id="b-user"></div>
   </div>
 </section>
 
@@ -186,6 +196,18 @@ document.querySelectorAll('.nav button[data-tab]').forEach(b=>{
     document.getElementById(b.dataset.tab).classList.add('active');
   };
 });
+// board (running / agent todo / user todo)
+const BADGE={run:'b-run',wait:'b-wait',rev:'b-rev',blk:'b-blk',ok:'b-ok'};
+const BLABEL={run:'진행',wait:'대기',rev:'리뷰',blk:'블로커',ok:'완료'};
+fetch('board.json').then(r=>r.json()).then(b=>{
+  document.getElementById('b-running').innerHTML=(b.running||[]).map(x=>`
+    <div class="item"><div class="tt"><b>${x.title}</b> <span class="badge ${BADGE[x.badge]||'b-run'}">${BLABEL[x.badge]||''}</span>
+    ${x.note?`<div class="nt">${x.note}</div>`:''}</div></div>`).join('')||'<div class="dim">없음</div>';
+  document.getElementById('b-agent').innerHTML=(b.agent_todo||[]).map(x=>`
+    <div class="item"><div class="tt">${x.title}</div><span class="badge ${BADGE[x.badge]||'b-wait'}">${BLABEL[x.badge]||''}</span></div>`).join('')||'<div class="dim">없음</div>';
+  document.getElementById('b-user').innerHTML=(b.user_todo||[]).map(x=>`
+    <div class="item"><span class="chk ${x.done?'on':''}"></span><div class="tt" style="${x.done?'text-decoration:line-through;color:var(--dim)':''}">${x.title}</div></div>`).join('')||'<div class="dim">없음</div>';
+}).catch(e=>{});
 // load demos (grouped by task) then benchmark tasks
 let TASKS=[], DEMOS={}, filt='all', sortK=null, sortDir=1;
 function srColor(sr){ if(sr>=70)return'var(--ok)'; if(sr>=40)return'var(--run)'; if(sr>=15)return'#fb923c'; return'var(--red)'; }
