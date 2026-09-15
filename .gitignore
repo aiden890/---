@@ -26,5 +26,3 @@ logs/
 # OS
 .DS_Store
 
-# 트래킹 페이지는 별도 git 저장소로 관리
-tracking/
