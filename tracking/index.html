@@ -113,11 +113,6 @@
     <h2>📝 Note</h2>
     <div id="b-note"></div>
   </div>
-
-  <div class="card">
-    <h2>🔎 주요 발견 (Key Findings)</h2>
-    <div id="b-findings"></div>
-  </div>
 </section>
 
 <!-- ===== RoboCasa Task (벤치마크 전체) ===== -->
@@ -304,12 +299,6 @@ document.querySelectorAll('.nav button[data-tab]').forEach(b=>{
 const BADGE={run:'b-run',wait:'b-wait',rev:'b-rev',blk:'b-blk',ok:'b-ok'};
 const BLABEL={run:'진행',wait:'대기',rev:'리뷰',blk:'블로커',ok:'완료'};
 fetch('board.json').then(r=>r.json()).then(b=>{
-  const FTAG={warn:{c:'var(--run)',t:'주의'},ok:{c:'var(--ok)',t:'정상'},info:{c:'var(--acc)',t:'정보'}};
-  document.getElementById('b-findings').innerHTML=(b.findings||[]).map(x=>{
-    const f=FTAG[x.tag]||FTAG.info;
-    const go=x.link?` <a href="#" onclick="document.querySelector('[data-tab=${x.link}]').click();return false" style="font-size:12px">→ 보기</a>`:'';
-    return `<div class="item"><span style="color:${f.c};font-weight:700;flex:none">●</span><div class="tt"><b>${x.title}</b>${go}<div class="nt">${x.detail||''}</div></div></div>`;
-  }).join('')||'<div class="dim">없음</div>';
   document.getElementById('b-agent').innerHTML=(b.agent_todo||[]).map(x=>`
     <div class="item"><div class="tt">${x.title}${x.note?`<div class="nt">${x.note}</div>`:''}</div><span class="badge ${BADGE[x.badge]||'b-wait'}">${BLABEL[x.badge]||''}</span></div>`).join('')||'<div class="dim">없음</div>';
   document.getElementById('b-user').innerHTML=(b.user_todo||[]).map(x=>`
