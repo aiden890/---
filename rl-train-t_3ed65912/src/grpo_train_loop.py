@@ -301,6 +301,142 @@ def _run_one_skill(sim, client, obs, args, skill, reward_mgr, *, eta, traj_id, s
     return obs, outcome, reward_sum, steps, p, hold_stats
 
 
+# --------------------------------------------------------------------------- #
+# Entry-state setup (operator MOVE-first decision).
+# GRASP is too rarely successful in eta>0 training rollouts (~0.17), so the
+# boundary-hold reward never triggers (n_success_hold ~ 0) and GRPO has no signal.
+# MOVE_HOLDING is the EASIER skill once the lid is already grasped+lifted, so we
+# train/eval it from a grasp-SUCCESS entry-state (operator option 1): reset(seed),
+# run GRASP deterministically (eta=0), and only if it reaches SUCCESS use that
+# post-grasp obs/sim state as the MOVE start. All group members share the SAME
+# deterministic grasp entry (identical seed, eta=0), so the group-relative MOVE
+# advantage stays a pure within-entry-state comparison. Backward-compatible:
+# --entry-from-grasp defaults OFF (skills start from reset as before).
+# --------------------------------------------------------------------------- #
+# prerequisite skill chain to reach a skill's entry-state from a fresh reset
+ENTRY_PREREQS = {Skill.MOVE_HOLDING: (Skill.GRASP,)}
+
+
+def _reach_entry_state(sim, client, args, seed, target_skill, init_obs):
+    """Advance a freshly-reset env to `target_skill`'s entry-state by running its
+    prerequisite skills DETERMINISTICALLY (eta=0). Returns (obs, ok, p) where ok is
+    True iff every prerequisite reached SUCCESS. The action-noise seed is derived
+    from the env seed (paired/reproducible), matching eval_episode's convention.
+    Caller must have already reset the env (passing that reset obs as init_obs) and
+    set sim.rest_lid_pos."""
+    prereqs = ENTRY_PREREQS.get(target_skill, ())
+    obs = init_obs
+    p = sim.predicates()
+    ok = True
+    for i, pre in enumerate(prereqs):
+        entry_action_seed = int(seed) * 131 + (i + 1)   # same scheme as eval_episode
+        obs, outcome, _r, _steps, p, _h = _run_one_skill(
+            sim, client, obs, args, pre,
+            RewardManager(_ENTRY_REWARD_CFG), eta=0.0, traj_id=None, seed=entry_action_seed)
+        if outcome is not SkillOutcome.SUCCESS:
+            ok = False
+            break
+    return obs, ok, p
+
+
+def _current_obs(sim):
+    """Get a valid observation after a snapshot restore WITHOUT meaningful motion.
+    RoboCasa exposes no pure obs getter, so mirror skill_eval's settle convention:
+    one hold-action step (gripper CLOSED so the grasped lid is retained, zero arm
+    motion) both settles physics after set_state and returns the obs dict the queues
+    need. This is the same 'restore + 1 hold step' skill_eval uses for its per-skill
+    entry-state datasets, so the MOVE start matches that verified convention."""
+    obs, _, _, _, _ = sim.genv.step(convert_action(skill_eval.hold_action(True)))
+    return obs
+
+
+# throwaway reward cfg for the deterministic entry-setup grasp (its reward is unused)
+_ENTRY_REWARD_CFG = RewardConfig(mode="simulator", horizon=200, use_milestones=True)
+
+
+def build_entry_seed_pool(factory, client, args, candidate_seeds, target_skill, need, tag=""):
+    """Scan candidate env seeds, keeping only those whose deterministic (eta=0)
+    prerequisite chain reaches the target skill's entry-state (e.g. grasp SUCCESS),
+    until `need` are found or candidates run out. Returns the list of good seeds.
+    This makes MOVE train/eval start from a real grasp-success state instead of the
+    OOD lid-on-counter reset."""
+    good = []
+    for seed in candidate_seeds:
+        if len(good) >= need:
+            break
+        genv, sim = factory(seed)
+        try:
+            obs, _ = rollout.reset_env(genv, seed)
+            sim.rest_lid_pos = sim.lid_pos()
+            _obs, ok, _p = _reach_entry_state(sim, client, args, seed, target_skill, obs)
+        finally:
+            genv.close()
+        print(f"[entry-scan{tag}] seed={seed} reached_entry={ok} ({len(good)}/{need})", flush=True)
+        if ok:
+            good.append(seed)
+    return good
+
+
+def eval_skill_from_entry(sim, client, args, reward_cfg, seed, skill,
+                          entry_from_grasp, out_dir=None, tag=""):
+    """Single-skill deterministic (eta=0) eval from the skill's entry-state.
+
+    When entry_from_grasp and skill is MOVE_HOLDING: reset(seed) -> run GRASP eta=0
+    to reach the grasp entry-state -> run MOVE eta=0 and judge MOVE's own success
+    predicate (grasped AND in_preplace_region held MOVE_HOLD_STEPS = the SkillMonitor
+    FSM outcome). Returns {seed, entry_ok, skill_success, ...}. If the grasp entry
+    is not reached, skill_success is False and entry_ok is False (seed excluded from
+    rate by the caller). This isolates MOVE from the full oracle plan so the number
+    is a clean MOVE-from-grasp success rate, comparable base vs trained."""
+    obs, _ = rollout.reset_env(sim.genv, seed)
+    sim.rest_lid_pos = sim.lid_pos()
+    reward_mgr = RewardManager(reward_cfg)
+    save_dir = None
+    if out_dir is not None:
+        save_dir = Path(out_dir); save_dir.mkdir(parents=True, exist_ok=True)
+    entry_ok = True
+    if entry_from_grasp:
+        obs, entry_ok, _p = _reach_entry_state(sim, client, args, seed, skill, obs)
+        if not entry_ok:
+            return {"seed": seed, "entry_ok": False, "skill_success": False,
+                    "outcome": "ENTRY_FAILED", "total_reward": 0.0}
+    frames = [] if save_dir is not None else None
+    vid = (save_dir / f"{tag}seed{seed}_{SKILL_KEY[skill]}.mp4") if frames is not None else None
+    eval_action_seed = int(seed) * 131 + 90   # distinct from entry-setup seeds
+    obs, outcome, r, steps, p, _hold = _run_one_skill(
+        sim, client, obs, args, skill, reward_mgr, eta=0.0, traj_id=None,
+        seed=eval_action_seed, frames=frames, save_video=str(vid) if vid else None)
+    return {"seed": seed, "entry_ok": entry_ok,
+            "skill_success": bool(outcome is SkillOutcome.SUCCESS),
+            "outcome": outcome.name if outcome else "NONE",
+            "steps": steps, "total_reward": round(r, 4)}
+
+
+def eval_skill_pool(factory, client, args, reward_cfg, seeds, skill, entry_from_grasp,
+                    out_dir, tag):
+    """Single-skill eval over a seed pool (MOVE-from-grasp-entry). Rate is over
+    seeds whose entry was reached (entry_ok), so it measures the skill in isolation."""
+    results = []
+    for i, seed in enumerate(seeds):
+        genv, sim = factory(seed)
+        try:
+            save = out_dir if i < args.save_videos else None
+            r = eval_skill_from_entry(sim, client, args, reward_cfg, seed, skill,
+                                      entry_from_grasp, out_dir=save, tag=tag)
+        finally:
+            genv.close()
+        results.append(r)
+        print(f"[{tag}] {i+1}/{len(seeds)} seed={seed} entry_ok={r['entry_ok']} "
+              f"skill_success={r['skill_success']} outcome={r['outcome']}", flush=True)
+    entered = [r for r in results if r["entry_ok"]]
+    n_entered = len(entered)
+    succ = sum(r["skill_success"] for r in entered)
+    return {"n": len(results), "n_entered": n_entered,
+            "skill_success_rate": (succ / n_entered if n_entered else 0.0),
+            "skill_success_rate_over_all": (succ / len(results) if results else 0.0),
+            "episodes": results}
+
+
 def eval_episode(sim, client, args, reward_cfg, seed, out_dir=None, tag="", return_final_obs=False):
     """Deterministic full-plan rollout; returns official + grasp-stage success.
 
@@ -374,35 +510,80 @@ def train_iteration(client, args, reward_cfg, seed, it):
     traj_ids = []
     vlm_scores = []
     hold_stats_all = []
-    for m in range(args.group):
+    entry_from_grasp = getattr(args, "entry_from_grasp", False) and skill in ENTRY_PREREQS
+
+    if entry_from_grasp:
+        # Reach the grasp entry-state ONCE (deterministic eta=0), snapshot it, then
+        # restore per group member so every member starts byte-identical from the SAME
+        # real grasp-success state (skill guidance: group members start byte-identical,
+        # diverge under eta>0). Avoids re-running the ~120-step grasp `group` times.
         genv, sim = _make_env(args.split, seed)
         try:
-            obs, _ = rollout.reset_env(genv, seed)   # identical start for all members
+            reset_obs, _ = rollout.reset_env(genv, seed)
             sim.rest_lid_pos = sim.lid_pos()
-            reward_mgr = RewardManager(reward_cfg)
-            traj_id = f"iter{it}_m{m}"
-            final_obs, outcome, r, steps, p, hstats = _run_one_skill(
-                sim, client, obs, args, skill, reward_mgr, eta=args.eta,
-                traj_id=traj_id, seed=args.seed_base + it * 100 + m,
-                approach_coef=train_approach_coef,
-                timeout_penalty=train_timeout_penalty,
-                hold_cfg=hold_cfg, hold_steps=hold_steps)
-            hold_stats_all.append(hstats)
-            # terminal shaping for the skill unit: bonus if the skill's predicate is met
-            if outcome is SkillOutcome.SUCCESS:
-                r += 1.0
-            # --- REAL VLM-auxiliary channel (sim+VLM ablation only; weight>0) ---
-            # A genuine Qwen3-VL VQA judgement of the FINAL frame: P(yes) that the grasp/
-            # closing progressed. Added to the GRPO return, never replacing the simulator
-            # reward. weight==0 => pure sim-only (identical to the executed baseline).
-            if vlm_weight > 0.0:
-                vscore = client.vlm_score(_scoring_image(final_obs), vlm_question)
-                vlm_scores.append(vscore)
-                r += vlm_weight * vscore
-            returns.append(r)
-            traj_ids.append(traj_id)
+            _obs, entry_ok, _p = _reach_entry_state(sim, client, args, seed, skill, reset_obs)
+            if not entry_ok:
+                genv.close()
+                # No grasp entry this seed -> no MOVE signal. Return a sentinel the
+                # caller logs and skips (no optimizer update on an empty group).
+                return {"iter": it, "seed": seed, "skipped": "entry_failed",
+                        "n_success_hold": 0, "mean_hold_stay_frac": None,
+                        "loss": 0.0, "grad_norm": 0.0, "mean_ratio": 1.0,
+                        "mean_return": 0.0, "max_return": 0.0, "reward_std": 0.0,
+                        "returns": []}
+            entry_snap = sim.snapshot("move_entry", 0)
+            for m in range(args.group):
+                sim.restore(entry_snap)
+                obs = _current_obs(sim)
+                reward_mgr = RewardManager(reward_cfg)
+                traj_id = f"iter{it}_m{m}"
+                final_obs, outcome, r, steps, p, hstats = _run_one_skill(
+                    sim, client, obs, args, skill, reward_mgr, eta=args.eta,
+                    traj_id=traj_id, seed=args.seed_base + it * 100 + m,
+                    approach_coef=train_approach_coef,
+                    timeout_penalty=train_timeout_penalty,
+                    hold_cfg=hold_cfg, hold_steps=hold_steps)
+                hold_stats_all.append(hstats)
+                if outcome is SkillOutcome.SUCCESS:
+                    r += 1.0
+                if vlm_weight > 0.0:
+                    vscore = client.vlm_score(_scoring_image(final_obs), vlm_question)
+                    vlm_scores.append(vscore)
+                    r += vlm_weight * vscore
+                returns.append(r)
+                traj_ids.append(traj_id)
         finally:
             genv.close()
+    else:
+        for m in range(args.group):
+            genv, sim = _make_env(args.split, seed)
+            try:
+                obs, _ = rollout.reset_env(genv, seed)   # identical start for all members
+                sim.rest_lid_pos = sim.lid_pos()
+                reward_mgr = RewardManager(reward_cfg)
+                traj_id = f"iter{it}_m{m}"
+                final_obs, outcome, r, steps, p, hstats = _run_one_skill(
+                    sim, client, obs, args, skill, reward_mgr, eta=args.eta,
+                    traj_id=traj_id, seed=args.seed_base + it * 100 + m,
+                    approach_coef=train_approach_coef,
+                    timeout_penalty=train_timeout_penalty,
+                    hold_cfg=hold_cfg, hold_steps=hold_steps)
+                hold_stats_all.append(hstats)
+                # terminal shaping for the skill unit: bonus if the skill's predicate is met
+                if outcome is SkillOutcome.SUCCESS:
+                    r += 1.0
+                # --- REAL VLM-auxiliary channel (sim+VLM ablation only; weight>0) ---
+                # A genuine Qwen3-VL VQA judgement of the FINAL frame: P(yes) that the grasp/
+                # closing progressed. Added to the GRPO return, never replacing the simulator
+                # reward. weight==0 => pure sim-only (identical to the executed baseline).
+                if vlm_weight > 0.0:
+                    vscore = client.vlm_score(_scoring_image(final_obs), vlm_question)
+                    vlm_scores.append(vscore)
+                    r += vlm_weight * vscore
+                returns.append(r)
+                traj_ids.append(traj_id)
+            finally:
+                genv.close()
     arr = np.asarray(returns, dtype=np.float64)
     adv = (arr - arr.mean()) / (arr.std() + 1e-8)
     advantages = {tid: float(a) for tid, a in zip(traj_ids, adv)}
@@ -568,6 +749,13 @@ def build_parser():
     ap.add_argument("--hold-drift-penalty", type=float, default=0.10)
     ap.add_argument("--hold-stay-radius", type=float, default=0.02)
     ap.add_argument("--hold-drop-penalty", type=float, default=0.5)
+    # Operator MOVE-first: start the trained skill from its prerequisite skill's
+    # SUCCESS entry-state (e.g. MOVE from a deterministic grasp-success) instead of
+    # the fresh lid-on-counter reset. Default OFF (backward-compatible GRASP-from-reset).
+    ap.add_argument("--entry-from-grasp", action="store_true",
+                    help="For --train-skill move_holding: reach a deterministic (eta=0) "
+                         "GRASP-success entry-state before MOVE train/eval (snapshot once, "
+                         "restore per group member). No-op for grasp/place.")
     return ap
 
 
@@ -580,7 +768,7 @@ def main():
               "max_skill_calls", "seed_base", "save_videos", "split",
               "vlm_weight", "vlm_question", "update_epochs",
               "hold_steps", "hold_stay_bonus", "hold_drift_penalty",
-              "hold_stay_radius", "hold_drop_penalty"):
+              "hold_stay_radius", "hold_drop_penalty", "entry_from_grasp"):
         setattr(args, k, getattr(my, k))
     out = Path(my.out); out.mkdir(parents=True, exist_ok=True)
 
@@ -607,6 +795,24 @@ def main():
     eval_seeds = [my.eval_seed_base + i for i in range(my.eval_n)]
     heldout_seeds = [my.heldout_seed_base + i for i in range(my.heldout_n)]
 
+    # MOVE-first mode: the trained skill is a single skill evaluated from its
+    # grasp-success entry-state, so before/after/heldout use eval_skill_pool (isolated
+    # single-skill success rate) instead of the full-plan eval_pool.
+    entry_mode = bool(my.entry_from_grasp) and my.train_skill in ("move_holding",)
+    train_skill_enum = {"grasp": Skill.GRASP, "move_holding": Skill.MOVE_HOLDING,
+                        "place": Skill.PLACE}[my.train_skill]
+
+    def _rate_str(d):
+        if entry_mode:
+            return f"skill_success={d.get('skill_success_rate')} (n_entered={d.get('n_entered')}/{d.get('n')})"
+        return f"official={d.get('official_success_rate')} grasp={d.get('grasp_success_rate')}"
+
+    def run_eval(factory, seeds, subdir, tag):
+        if entry_mode:
+            return eval_skill_pool(factory, client, args, reward_cfg, seeds,
+                                   train_skill_enum, True, out / subdir, tag)
+        return eval_pool(factory, client, args, reward_cfg, seeds, out / subdir, tag)
+
     # ---- VLM-scorer verification GATE (standing gate: run BEFORE any ablation train) ----
     if my.vlm_gate_n > 0:
         gate_seeds = [my.eval_seed_base + i for i in range(my.vlm_gate_n)]
@@ -619,11 +825,11 @@ def main():
     # ---- EVAL(before) ----
     if not my.skip_eval:
         t0 = time.time()
-        before = eval_pool(eval_factory, client, args, reward_cfg, eval_seeds, out / "eval_before", "before_")
+        before = run_eval(eval_factory, eval_seeds, "eval_before", "before_")
         before["seconds"] = round(time.time() - t0, 1)
         log["phases"]["eval_before"] = before
         (out / "eval_before.json").write_text(json.dumps(before, indent=2))
-        print("EVAL(before):", before["official_success_rate"], before["grasp_success_rate"], flush=True)
+        print("EVAL(before):", _rate_str(before), flush=True)
 
     # ---- TRAIN ----
     curve = []
@@ -634,10 +840,15 @@ def main():
             m["iter"] = it
             m["seed"] = seed
             curve.append({"iter": it, "loss": m["loss"], "mean_return": m["mean_return"],
-                          "grad_norm": m["grad_norm"], "mean_ratio": m["mean_ratio"]})
+                          "grad_norm": m["grad_norm"], "mean_ratio": m["mean_ratio"],
+                          "skipped": m.get("skipped")})
             fh.write(json.dumps(m) + "\n"); fh.flush()
-            print(f"[train] it={it} loss={m['loss']:.4f} mean_return={m['mean_return']:.3f} "
-                  f"grad_norm={m['grad_norm']:.3f} ratio={m['mean_ratio']:.3f} mem={m.get('peak_mem_gb')}", flush=True)
+            if m.get("skipped"):
+                print(f"[train] it={it} SKIPPED ({m['skipped']}) — no entry-state this seed", flush=True)
+            else:
+                print(f"[train] it={it} loss={m['loss']:.4f} mean_return={m['mean_return']:.3f} "
+                      f"grad_norm={m['grad_norm']:.3f} ratio={m['mean_ratio']:.3f} "
+                      f"n_succ_hold={m.get('n_success_hold')} mem={m.get('peak_mem_gb')}", flush=True)
     log["phases"]["train_curve"] = curve
 
     # Checkpoint path must be on the TRAINER SERVER's filesystem, which has /train mounted
@@ -653,15 +864,15 @@ def main():
             load_res = client.load(my.load_ckpt)
             print(f"Loaded checkpoint {my.load_ckpt}: {load_res}", flush=True)
         t0 = time.time()
-        after = eval_pool(eval_factory, client, args, reward_cfg, eval_seeds, out / "eval_after", "after_")
+        after = run_eval(eval_factory, eval_seeds, "eval_after", "after_")
         after["seconds"] = round(time.time() - t0, 1)
         log["phases"]["eval_after"] = after
         (out / "eval_after.json").write_text(json.dumps(after, indent=2))
-        print("EVAL(after):", after["official_success_rate"], after["grasp_success_rate"], flush=True)
+        print("EVAL(after):", _rate_str(after), flush=True)
 
         # ---- HELDOUT (disjoint geometry/seed) ----
         t0 = time.time()
-        heldout = eval_pool(heldout_factory, client, args, reward_cfg, heldout_seeds, out / "eval_heldout", "heldout_")
+        heldout = run_eval(heldout_factory, heldout_seeds, "eval_heldout", "heldout_")
         heldout["seconds"] = round(time.time() - t0, 1)
         log["phases"]["eval_heldout"] = heldout
         (out / "eval_heldout.json").write_text(json.dumps(heldout, indent=2))
