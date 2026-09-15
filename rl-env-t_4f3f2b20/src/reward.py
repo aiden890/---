@@ -198,3 +198,56 @@ class RewardManager:
 def z1_baseline_reward(success: bool, steps: int, gamma: float = 0.998) -> float:
     """The pure Z-1-compatible terminal reward: 1/0 with success-aware decay."""
     return (gamma ** steps) if success else 0.0
+
+
+# ============================================================================
+# Boundary-compliance ("post-success hold") reward  --  operator decision B (run30)
+# ----------------------------------------------------------------------------
+# The confirmed failure mode is NOT "the policy cannot do the skill" but "after the
+# skill's success predicate is met it does NOT STOP -- it drifts into the next action"
+# (hold experiment: KEEPS_MOVING; skill-boundary not respected). SFT (behaviour cloning)
+# does not fix this; the operator's directive is to teach boundary respect directly with
+# a closed-loop RL reward: once a skill has succeeded, REWARD staying put and PENALISE
+# further end-effector motion.
+#
+# This is the reward DEFINITION (reusable, unit-tested). It is applied only AFTER the
+# SkillMonitor first reports SUCCESS, over a post-success hold window, using the same
+# eef position the predicates already expose ("eef_pos") -- single source of truth, no
+# new geometry. It is a TRAINING-ONLY shaping term (eval uses the pure sim reward), just
+# like approach shaping / timeout penalty.
+# ============================================================================
+
+@dataclass
+class HoldConfig:
+    """Per-step boundary-compliance shaping applied during the post-success hold window."""
+    stay_bonus: float = 0.05          # + per step while the eef stays within stay_radius_m
+    drift_penalty: float = 0.10       # - scaled by how far past stay_radius_m the eef moved
+    stay_radius_m: float = 0.02       # <= this per-step eef displacement counts as "stopped"
+    drop_success_penalty: float = 0.5  # - if the success predicate LAPSES during the hold
+                                       # (drifting broke the achieved state -> boundary violation)
+
+
+def hold_step_reward(eef_prev, eef_curr, still_success: bool, cfg: HoldConfig) -> float:
+    """One post-success-hold step's boundary reward.
+
+    eef_prev, eef_curr : 3-vectors (any sequence of 3 floats) = eef position last/this step.
+    still_success      : is the skill's success predicate STILL true this step?
+    Returns:
+      + stay_bonus                         when displacement <= stay_radius_m (held position)
+      - drift_penalty * (disp/radius - 1)  when displacement >  stay_radius_m (drifted away)
+      - drop_success_penalty (additional)  when the success state has lapsed (still_success False)
+    So standing still after success is rewarded and drifting/breaking the state is penalised,
+    which is exactly the boundary-respect signal SFT could not instill.
+    """
+    import math
+    dx = float(eef_curr[0]) - float(eef_prev[0])
+    dy = float(eef_curr[1]) - float(eef_prev[1])
+    dz = float(eef_curr[2]) - float(eef_prev[2])
+    disp = math.sqrt(dx * dx + dy * dy + dz * dz)
+    if disp <= cfg.stay_radius_m:
+        r = cfg.stay_bonus
+    else:
+        r = -cfg.drift_penalty * (disp / max(cfg.stay_radius_m, 1e-6) - 1.0)
+    if not still_success:
+        r -= cfg.drop_success_penalty
+    return float(r)

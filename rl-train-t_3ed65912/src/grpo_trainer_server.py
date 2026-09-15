@@ -107,10 +107,23 @@ class GRPOTrainerServer:
         print(f"train_mode={a.train_mode} | per-skill LoRA rank={a.rank} into DiT {targets} | "
               f"trainable={n_train/1e6:.2f}M groups={groups} "
               f"({len(self.wrappers)} wrapped x {len(SKILLS)} skills)", flush=True)
+        # Arm B (adapter_plus_expert): the action-expert projections are pretrained weights,
+        # not zero-init LoRA, so they need a MUCH lower lr than the LoRA to avoid overwriting
+        # base competence. Split into two param groups (LoRA at --lr, expert/vlm at --expert-lr).
+        expert_lr = getattr(a, "expert_lr", None)
+        if a.train_mode != "adapter_only" and expert_lr is not None:
+            lora_ps = [p for n, p in self.model.named_parameters() if p.requires_grad and ".lora_" in n]
+            extra_ps = [p for n, p in self.model.named_parameters() if p.requires_grad and ".lora_" not in n]
+            param_groups = [{"params": lora_ps, "lr": a.lr},
+                            {"params": extra_ps, "lr": expert_lr}]
+            print(f"param groups: lora lr={a.lr} ({sum(p.numel() for p in lora_ps)/1e6:.2f}M), "
+                  f"expert/vlm lr={expert_lr} ({sum(p.numel() for p in extra_ps)/1e6:.2f}M)", flush=True)
+        else:
+            param_groups = self.trainable_params
         if a.optimizer == "sgd":
-            self.opt = torch.optim.SGD(self.trainable_params, lr=a.lr, momentum=0.0)
+            self.opt = torch.optim.SGD(param_groups, lr=a.lr, momentum=0.0)
         elif a.optimizer == "adamw":
-            self.opt = torch.optim.AdamW(self.trainable_params, lr=a.lr)
+            self.opt = torch.optim.AdamW(param_groups, lr=a.lr)
         else:
             raise ValueError(a.optimizer)
         self.store: dict = {}
@@ -413,8 +426,19 @@ class GRPOTrainerServer:
         state, action_mask, vlm = self._split(inputs)
         x1 = self._to_dev(req["x1"])                         # [B,L,A_full]
         loss_mask = self._to_dev(req["loss_mask"]).to(self.model.dtype)  # [B,L,A_full]
+        # REDESIGN (operator decision A, run30): KL-to-base anchor to stop the per-skill
+        # adapter from overwriting the pretrained full-task competence. On the SAME (xt,t)
+        # demo-derived draw, the BASE velocity (adapter OFF) v_base is the pretrained
+        # policy's flow field; anchoring v_theta -> v_base in action/velocity space is the
+        # exact tractable KL surrogate for this fixed-noise Gaussian flow transition
+        # (mu = xt + v*dt, sigma const): KL(N(v_theta) || N(v_base)) = ||v_theta - v_base||^2/(2 sig^2).
+        # So loss = masked_mse(v_theta, u_demo) + anchor_coef * masked_mse(v_theta, v_base).
+        # anchor_coef=0 reproduces the prior pure-BC objective bit-for-bit.
+        anchor_coef = float(req.get("anchor_coef", getattr(self.a, "anchor_coef", 0.0)))
 
         losses = []
+        bc_losses = []
+        anc_losses = []
         gn = 0.0
         for _ in range(steps):
             self.opt.zero_grad(set_to_none=True)
@@ -423,18 +447,34 @@ class GRPOTrainerServer:
             t = torch.rand((shape[0], 1, 1), device=dev, dtype=action_mask.dtype, generator=gen)
             xt = (1.0 - t) * x0 + t * x1
             u = x1 - x0
+            denom = loss_mask.sum().clamp_min(1.0)
+            # base velocity at the same (xt,t) with the adapter disabled (no grad) -- shares
+            # the already-encoded VLM/state conditioning from the same vfield closure.
+            v_base = None
+            if anchor_coef > 0.0:
+                set_active_skill(self.wrappers, None)
+                with torch.no_grad():
+                    v_base = vfield(xt, t).detach()
+                set_active_skill(self.wrappers, skill)
             if self.a.grad_checkpoint:
                 v = torch.utils.checkpoint.checkpoint(vfield, xt, t, use_reentrant=False)
             else:
                 v = vfield(xt, t)
-            se = (v - u) ** 2 * loss_mask
-            denom = loss_mask.sum().clamp_min(1.0)
-            loss = se.sum() / denom
+            bc = ((v - u) ** 2 * loss_mask).sum() / denom
+            if anchor_coef > 0.0:
+                anc = ((v - v_base) ** 2 * loss_mask).sum() / denom
+                loss = bc + anchor_coef * anc
+                anc_losses.append(float(anc.detach().cpu()))
+            else:
+                loss = bc
             loss.backward()
             gn = float(torch.nn.utils.clip_grad_norm_(self.trainable_params, max_norm=self.a.grad_clip))
             self.opt.step()
             losses.append(float(loss.detach().cpu()))
+            bc_losses.append(float(bc.detach().cpu()))
         return {"loss": losses[-1], "loss_first": losses[0], "losses": losses,
+                "bc_loss": bc_losses[-1], "anchor_loss": (anc_losses[-1] if anc_losses else 0.0),
+                "anchor_coef": anchor_coef,
                 "grad_norm": gn, "n_active": int(loss_mask.sum().item()),
                 "peak_mem_gb": round(torch.cuda.max_memory_allocated() / 1e9, 2)}
 
@@ -513,6 +553,13 @@ def main():
                     choices=("adapter_only", "adapter_plus_expert", "adapter_plus_expert_vlm"))
     ap.add_argument("--rank", type=int, default=8)
     ap.add_argument("--alpha", type=int, default=32)
+    ap.add_argument("--expert-lr", type=float, default=None,
+                    help="arm B/C: separate (much lower) lr for the pretrained action-expert/VLM "
+                         "slice; LoRA keeps --lr. None = single lr for all trainables.")
+    ap.add_argument("--anchor-coef", type=float, default=0.0,
+                    help="Goal-3 SFT KL-to-base anchor weight: adds anchor_coef*||v_theta-v_base||^2 "
+                         "(base = adapter-off pretrained velocity) to the CFM loss to preserve base "
+                         "competence. 0 = pure BC (prior behaviour).")
     ap.add_argument("--lora-targets", default="qkv_proj")
     ap.add_argument("--num-steps", type=int, default=5)
     ap.add_argument("--eta", type=float, default=0.6)

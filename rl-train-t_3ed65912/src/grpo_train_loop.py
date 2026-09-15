@@ -43,7 +43,7 @@ sys.path.insert(0, "/skill_eval_tools")   # skill_eval.py (predicates/sim)
 sys.path.insert(0, "/rl_env/src")         # env card: reward, skill_manager, randomization
 import rollout  # noqa: E402
 import skill_eval  # noqa: E402
-from reward import RewardConfig, RewardManager, official_success  # noqa: E402
+from reward import RewardConfig, RewardManager, official_success, HoldConfig, hold_step_reward  # noqa: E402
 from skill_manager import (  # noqa: E402
     MonitorConfig, OraclePlanner, Skill, SkillMonitor, SkillOutcome,
     SKILL_INSTRUCTION,
@@ -181,15 +181,25 @@ def _make_env(split, seed):
 
 
 def _run_one_skill(sim, client, obs, args, skill, reward_mgr, *, eta, traj_id, seed,
-                   frames=None, save_video=None, approach_coef=0.0, timeout_penalty=0.0):
+                   frames=None, save_video=None, approach_coef=0.0, timeout_penalty=0.0,
+                   hold_cfg=None, hold_steps=0):
     """Run ONE skill's VLA loop; return (obs, outcome, reward, steps, predicates).
 
-    Training-only dense shaping (not used in eval; both default to 0.0):
+    Training-only dense shaping (not used in eval; all default to off):
       approach_coef: reward += approach_coef * (prev_dist - curr_dist) per step toward lid.
         Creates return variance even when all members fail to grasp, so GRPO has signal.
       timeout_penalty: flat penalty added when outcome==TIMEOUT (skill horizon exceeded).
         Ensures failed trajectories are numerically distinguished from successful ones.
-    Neither changes the official eval reward which uses these at their defaults (0.0).
+      hold_cfg/hold_steps (operator decision B, run30): the BOUNDARY-COMPLIANCE term.
+        When the skill first reaches SUCCESS, instead of breaking immediately we keep
+        stepping for `hold_steps` more steps with the SAME instruction and add
+        hold_step_reward per step (+ for staying put, - for drifting / breaking the
+        success state). This directly teaches "stop after you succeed" -- the failure
+        SFT could not fix. hold_steps=0 disables it (prior behaviour, break on success).
+    Only affects the training return; eval passes hold_steps=0 so official reward is unchanged.
+    Also returns post-success drift stats via the `_hold_stats` attribute on the returned
+    predicate dict is avoided; instead we stash them on the function's return tuple caller
+    reads from reward_mgr? -> simplest: attach to a mutable, see stats dict below.
     """
     instruction = SKILL_INSTRUCTION[skill]
     skill_key = SKILL_KEY[skill]
@@ -212,6 +222,20 @@ def _run_one_skill(sim, client, obs, args, skill, reward_mgr, *, eta, traj_id, s
     chunk_idx = 0   # AUDIT FIX #2: monotonic per-skill chunk counter -> unique RNG per replan
     p = sim.predicates()
     prev_eef_lid_dist = float(p.get("eef_lid_dist", 0.0)) if approach_coef > 0.0 else None
+    # --- post-success hold bookkeeping (operator decision B) ---
+    success_step = None                 # step at which the skill first succeeded
+    held_steps = 0                      # steps stepped in the post-success hold window
+    hold_stay = 0                       # of those, how many were "stopped" (<= stay_radius)
+    hold_reward = 0.0                   # total hold shaping added
+    prev_eef = list(p.get("eef_pos", (0.0, 0.0, 0.0)))
+    def _success_now(pred):
+        # the skill's own success predicate (same source as SkillMonitor): GRASP=lid_grasped,
+        # MOVE=grasped & in preplace region, PLACE/terminal = official_check_success.
+        if skill is Skill.GRASP:
+            return bool(pred.get("lid_grasped"))
+        if skill is Skill.MOVE_HOLDING:
+            return bool(pred.get("lid_grasped")) and bool(pred.get("in_preplace_region"))
+        return bool(pred.get("official_check_success")) or official_success(pred)
     while steps < horizon:
         if not action_plan:
             states = rollout.sample_history(state_queue, args.obs_history, args.obs_interval)
@@ -232,6 +256,19 @@ def _run_one_skill(sim, client, obs, args, skill, reward_mgr, *, eta, traj_id, s
         p = sim.predicates()
         rb = reward_mgr.step_reward(steps, p, done=bool(done), truncated=bool(trunc))
         reward_sum += rb.primary
+        # --- post-success boundary hold shaping (training-only) ---
+        if success_step is not None and hold_cfg is not None and hold_steps > 0:
+            curr_eef = list(p.get("eef_pos", prev_eef))
+            hr = hold_step_reward(prev_eef, curr_eef, _success_now(p), hold_cfg)
+            reward_sum += hr
+            hold_reward += hr
+            held_steps += 1
+            import math as _m
+            disp = _m.dist(prev_eef, curr_eef) if hasattr(_m, "dist") else \
+                sum((a - b) ** 2 for a, b in zip(prev_eef, curr_eef)) ** 0.5
+            if disp <= hold_cfg.stay_radius_m:
+                hold_stay += 1
+        prev_eef = list(p.get("eef_pos", prev_eef))
         # Approach shaping: reward getting closer to the lid (training-only)
         if approach_coef > 0.0 and prev_eef_lid_dist is not None:
             curr_dist = float(p.get("eef_lid_dist", prev_eef_lid_dist))
@@ -240,6 +277,16 @@ def _run_one_skill(sim, client, obs, args, skill, reward_mgr, *, eta, traj_id, s
         outcome = monitor.update(p, steps, horizon)
         if frames is not None and (steps % args.video_stride == 0 or outcome or done or trunc):
             frames.append(rollout.make_video_frame(obs))
+        # Boundary-hold: on the FIRST SUCCESS, latch the step and keep going for a hold
+        # window instead of breaking (so the post-success stay/drift shaping can score the
+        # policy's boundary behaviour). Without a hold window, break on any terminal outcome.
+        if outcome is SkillOutcome.SUCCESS and hold_cfg is not None and hold_steps > 0:
+            if success_step is None:
+                success_step = steps
+            if steps - success_step >= hold_steps:
+                break
+            # keep the success outcome latched; do not break yet
+            continue
         if outcome or done or trunc:
             break
     if outcome is None:
@@ -248,7 +295,10 @@ def _run_one_skill(sim, client, obs, args, skill, reward_mgr, *, eta, traj_id, s
     if save_video is not None and frames is not None:
         import imageio.v2 as imageio
         imageio.mimsave(save_video, frames, fps=args.video_fps)
-    return obs, outcome, reward_sum, steps, p
+    hold_stats = {"success_step": success_step, "held_steps": held_steps,
+                  "hold_stay": hold_stay, "hold_reward": round(hold_reward, 4),
+                  "hold_stay_frac": (round(hold_stay / held_steps, 3) if held_steps else None)}
+    return obs, outcome, reward_sum, steps, p, hold_stats
 
 
 def eval_episode(sim, client, args, reward_cfg, seed, out_dir=None, tag="", return_final_obs=False):
@@ -276,7 +326,7 @@ def eval_episode(sim, client, args, reward_cfg, seed, out_dir=None, tag="", retu
         # env seed + skill-call index, so before/after eval on the same env seed shares the
         # same x0 latent and the comparison is paired (was seed=None -> unseeded x0).
         eval_action_seed = int(seed) * 131 + guard
-        obs, outcome, r, steps, p = _run_one_skill(
+        obs, outcome, r, steps, p, _hold = _run_one_skill(
             sim, client, obs, args, call.skill, reward_mgr, eta=0.0, traj_id=None,
             seed=eval_action_seed, frames=frames, save_video=str(vid) if vid else None)
         last_obs = obs
@@ -310,11 +360,20 @@ def train_iteration(client, args, reward_cfg, seed, it):
     # approach shaping only makes sense for GRASP (lid proximity); other skills use milestone variety
     train_approach_coef = 0.1 if skill is Skill.GRASP else 0.0
     train_timeout_penalty = 0.5  # flat cost for timing out a skill
+    # Boundary-compliance hold (operator decision B): reward stopping after success. Config
+    # from args (0 hold_steps disables it -> identical to the pre-B behaviour).
+    hold_steps = int(getattr(args, "hold_steps", 0))
+    hold_cfg = HoldConfig(stay_bonus=getattr(args, "hold_stay_bonus", 0.05),
+                          drift_penalty=getattr(args, "hold_drift_penalty", 0.10),
+                          stay_radius_m=getattr(args, "hold_stay_radius", 0.02),
+                          drop_success_penalty=getattr(args, "hold_drop_penalty", 0.5)) \
+        if hold_steps > 0 else None
     vlm_weight = float(getattr(args, "vlm_weight", 0.0))
     vlm_question = getattr(args, "vlm_question", "grasp")
     returns = []
     traj_ids = []
     vlm_scores = []
+    hold_stats_all = []
     for m in range(args.group):
         genv, sim = _make_env(args.split, seed)
         try:
@@ -322,11 +381,13 @@ def train_iteration(client, args, reward_cfg, seed, it):
             sim.rest_lid_pos = sim.lid_pos()
             reward_mgr = RewardManager(reward_cfg)
             traj_id = f"iter{it}_m{m}"
-            final_obs, outcome, r, steps, p = _run_one_skill(
+            final_obs, outcome, r, steps, p, hstats = _run_one_skill(
                 sim, client, obs, args, skill, reward_mgr, eta=args.eta,
                 traj_id=traj_id, seed=args.seed_base + it * 100 + m,
                 approach_coef=train_approach_coef,
-                timeout_penalty=train_timeout_penalty)
+                timeout_penalty=train_timeout_penalty,
+                hold_cfg=hold_cfg, hold_steps=hold_steps)
+            hold_stats_all.append(hstats)
             # terminal shaping for the skill unit: bonus if the skill's predicate is met
             if outcome is SkillOutcome.SUCCESS:
                 r += 1.0
@@ -355,6 +416,12 @@ def train_iteration(client, args, reward_cfg, seed, it):
     if vlm_scores:
         metrics["vlm_mean"] = round(float(np.mean(vlm_scores)), 4)
         metrics["vlm_scores"] = [round(x, 4) for x in vlm_scores]
+    # Boundary-hold diagnostics: how often did group members reach success, and of the
+    # post-success hold steps, what fraction were "stopped" (eef displacement <= radius).
+    succ_holds = [h for h in hold_stats_all if h.get("success_step") is not None]
+    metrics["n_success_hold"] = len(succ_holds)
+    stay_fracs = [h["hold_stay_frac"] for h in succ_holds if h.get("hold_stay_frac") is not None]
+    metrics["mean_hold_stay_frac"] = round(float(np.mean(stay_fracs)), 4) if stay_fracs else None
     return metrics
 
 
@@ -492,6 +559,15 @@ def build_parser():
     ap.add_argument("--load-ckpt", default=None,
                     help="Load a saved LoRA checkpoint before AFTER-eval phase. "
                          "For standalone post-hoc eval of a saved ARM checkpoint.")
+    # Boundary-compliance post-success hold (operator decision B, run30)
+    ap.add_argument("--hold-steps", type=int, default=0,
+                    help="post-success hold window length (steps). 0 = disabled (break on "
+                         "success, prior behaviour). >0 keeps stepping the same instruction and "
+                         "applies the stay/drift boundary reward.")
+    ap.add_argument("--hold-stay-bonus", type=float, default=0.05)
+    ap.add_argument("--hold-drift-penalty", type=float, default=0.10)
+    ap.add_argument("--hold-stay-radius", type=float, default=0.02)
+    ap.add_argument("--hold-drop-penalty", type=float, default=0.5)
     return ap
 
 
@@ -502,7 +578,9 @@ def main():
     for k in ("group", "eta", "clip", "kl_coef", "ratio_max", "adv_clip", "train_skill",
               "horizon_grasp", "horizon_move", "horizon_place",
               "max_skill_calls", "seed_base", "save_videos", "split",
-              "vlm_weight", "vlm_question", "update_epochs"):
+              "vlm_weight", "vlm_question", "update_epochs",
+              "hold_steps", "hold_stay_bonus", "hold_drift_penalty",
+              "hold_stay_radius", "hold_drop_penalty"):
         setattr(args, k, getattr(my, k))
     out = Path(my.out); out.mkdir(parents=True, exist_ok=True)
 

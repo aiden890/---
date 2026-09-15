@@ -27,6 +27,7 @@ if _LOCAL.exists():
 
 from reward import (  # noqa: E402
     RewardConfig, RewardManager, official_success, SKILL_MILESTONES, DEFAULT_MILESTONE_BONUS,
+    HoldConfig, hold_step_reward,
 )
 
 _FAILS = []
@@ -249,6 +250,29 @@ def test_timeout_penalty_only_on_failed_end():
     # success end: terminal>0 and NO timeout penalty
     check(end_ok.penalty == 0.0 and end_ok.terminal > 0,
           "NO timeout penalty on a SUCCESSFUL episode end (only terminal reward)")
+
+
+def test_boundary_hold_reward():
+    """operator decision B: post-success hold reward rewards stopping, penalises drift,
+    and adds an extra penalty when the achieved success state lapses."""
+    c = HoldConfig(stay_bonus=0.05, drift_penalty=0.10, stay_radius_m=0.02, drop_success_penalty=0.5)
+    # held in place (< radius) while still successful -> exactly +stay_bonus
+    r_stay = hold_step_reward([0, 0, 0], [0, 0, 0.01], True, c)
+    check(abs(r_stay - 0.05) < 1e-9, "hold: staying within radius pays +stay_bonus")
+    # exactly at radius boundary still counts as stopped (<=)
+    r_edge = hold_step_reward([0, 0, 0], [0.02, 0, 0], True, c)
+    check(abs(r_edge - 0.05) < 1e-9, "hold: displacement == radius still counts as stopped")
+    # drifted well past radius -> strictly negative, scales with distance
+    r_drift = hold_step_reward([0, 0, 0], [0, 0, 0.06], True, c)
+    check(r_drift < 0, "hold: drifting past radius is penalised")
+    r_drift_far = hold_step_reward([0, 0, 0], [0, 0, 0.12], True, c)
+    check(r_drift_far < r_drift, "hold: farther drift is penalised more")
+    # success lapsed while stopped -> stay_bonus minus drop penalty (net negative)
+    r_lapse = hold_step_reward([0, 0, 0], [0, 0, 0.0], False, c)
+    check(abs(r_lapse - (0.05 - 0.5)) < 1e-9, "hold: lapsed success subtracts drop penalty")
+    # a perfectly still, still-successful hold accumulates positive reward over a window
+    total = sum(hold_step_reward([0, 0, 0], [0, 0, 0.0], True, c) for _ in range(10))
+    check(total > 0, "hold: a sustained stop accumulates positive reward over the window")
 
 
 def _run_all():
