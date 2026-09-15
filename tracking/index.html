@@ -227,6 +227,12 @@
   <p class="dim" id="ds-sub"></p>
   <div class="kpi" id="ds-kpi"></div>
 
+  <div class="card" style="border-left:3px solid var(--acc)">
+    <h2>👁️ 원본 데이터 직접 보기</h2>
+    <p class="dim" style="margin:0 0 12px">HF에 올라온 원본 데이터셋을 브라우저에서 바로 확인할 수 있어요. LeRobot visualizer는 3-cam 영상 + state/action 그래프를 타임라인으로 동기 재생합니다.</p>
+    <div id="ds-viz" style="display:flex;gap:10px;flex-wrap:wrap"></div>
+  </div>
+
   <div class="card">
     <h2>📦 출처 &amp; 규격</h2>
     <div id="ds-meta"></div>
@@ -253,7 +259,7 @@
 
   <div class="card">
     <h2>🔍 샘플 에피소드 (구간 타임라인)</h2>
-    <p class="dim" style="margin:0 0 12px">가로 막대 = 한 에피소드의 프레임 진행. 색으로 skill 구간 표시. ◆ = reward onset.</p>
+    <p class="dim" style="margin:0 0 12px">가로 막대 = 한 에피소드의 프레임 진행. 색으로 skill 구간 표시. ◆ = reward onset. <b>행을 클릭하면 해당 에피소드를 LeRobot visualizer에서 영상으로 재생</b>합니다.</p>
     <div id="ds-samples"></div>
   </div>
 
@@ -511,6 +517,11 @@ fetch('dataset.json').then(r=>r.json()).then(d=>{
   const SKC={GRASP_HANDLE:'#818cf8',MOVE_LID_TO_CLOSED:'#4ade80',RELEASE_HANDLE:'#facc15'};
   const SKN={GRASP_HANDLE:'GRASP',MOVE_LID_TO_CLOSED:'MOVE',RELEASE_HANDLE:'RELEASE'};
   document.getElementById('ds-sub').innerHTML=`목표 지시: "<b>${d.instruction_text}</b>" · 이 데이터로 per-skill LoRA SFT를 학습합니다.`;
+  // viz buttons
+  const V=d.viz||{};
+  document.getElementById('ds-viz').innerHTML=`
+    <a href="${V.lerobot}" target="_blank" style="text-decoration:none;background:var(--acc);color:#fff;padding:11px 18px;border-radius:9px;font-size:14px;font-weight:600">▶ LeRobot Visualizer (영상+그래프)</a>
+    <a href="${V.data_studio}" target="_blank" style="text-decoration:none;background:#242835;color:var(--tx);border:1px solid var(--bd);padding:11px 18px;border-radius:9px;font-size:14px">📊 HF Data Studio (state/action 테이블)</a>`;
   const kpi=[['총 데모',d.n_demos+' ep'],['총 프레임',d.total_frames.toLocaleString()],['평균 길이',d.ep_len.mean+' f ('+(d.ep_len.mean/d.fps).toFixed(1)+'s)'],['Skill',d.segmentation.skills.length+'종'],['action dim',d.action_dim],['obs dim',d.obs_state_dim]];
   document.getElementById('ds-kpi').innerHTML=kpi.map(k=>`<div><div class="n">${k[1]}</div><div class="l">${k[0]}</div></div>`).join('');
   document.getElementById('ds-meta').innerHTML=`<table>
@@ -547,10 +558,11 @@ fetch('dataset.json').then(r=>r.json()).then(d=>{
   document.getElementById('ds-samples').innerHTML=d.sample_episodes.map(e=>{
     const segs=Object.entries(e.spans).filter(([k,v])=>v).map(([k,v])=>`<div title="${SKN[k]} ${v[0]}-${v[1]}" style="position:absolute;left:${v[0]/e.n*100}%;width:${(v[1]-v[0])/e.n*100}%;top:0;bottom:0;background:${SKC[k]};opacity:.85"></div>`).join('');
     const ro=e.reward_onset!=null?`<div title="reward onset ${e.reward_onset}" style="position:absolute;left:${e.reward_onset/e.n*100}%;top:-3px;color:#fff;font-size:11px">◆</div>`:'';
-    return `<div class="item"><div class="tt">
-      <div style="display:flex;gap:8px;font-size:12px"><b>ep ${e.episode_index}</b><span class="dim">${e.split} · ${e.n} f${e.flags.length?' · ⚠'+e.flags.join(','):''}</span></div>
+    return `<a href="${(d.viz&&d.viz.lerobot_ep||'#')+e.episode_index}" target="_blank" style="text-decoration:none;color:inherit;display:block"><div class="item" style="cursor:pointer">
+      <div class="tt">
+      <div style="display:flex;gap:8px;font-size:12px"><b>ep ${e.episode_index}</b><span class="dim">${e.split} · ${e.n} f${e.flags.length?' · ⚠'+e.flags.join(','):''}</span><span style="margin-left:auto;color:var(--acc)">▶ 재생</span></div>
       <div style="position:relative;height:20px;margin-top:5px;border-radius:5px;overflow:hidden;background:#0c0e13">${segs}${ro}</div>
-    </div></div>`;}).join('')+
+    </div></div></a>`;}).join('')+
     `<div style="display:flex;gap:16px;margin-top:12px;font-size:12px">`+Object.keys(SKC).map(k=>`<span><span style="display:inline-block;width:11px;height:11px;background:${SKC[k]};border-radius:2px;vertical-align:middle"></span> ${SKN[k]}</span>`).join('')+`</div>`;
   // hashes
   document.getElementById('ds-hash').innerHTML=`<table><tr><th>파일</th><th>SHA256 (앞 16)</th></tr>`+Object.entries(d.data_hashes).map(([f,h])=>`<tr><td><code>${f}</code></td><td><code>${h.slice(0,16)}…</code></td></tr>`).join('')+`</table>`;

@@ -304,5 +304,10 @@
   "data/chunk-000/file-000.parquet": "c76d5148d77b928afc41e024ea06faf4bf8c7c724e0302e26973496bfebb5b48",
   "meta/info.json": "6651e9885590925c44e1f05d8ab22a60f59cc2fc609c677a204dbf2d8d20ea21",
   "meta/tasks.parquet": "49be42103606d159561601b4f31cf080fe714937ae5207638ebd4ca56f945bfb"
+ },
+ "viz": {
+  "data_studio": "https://huggingface.co/datasets/ember-lab-berkeley/robocasa365-pretrain-atomic",
+  "lerobot": "https://huggingface.co/spaces/lerobot/visualize_dataset?dataset=ember-lab-berkeley%2Frobocasa365-pretrain-atomic",
+  "lerobot_ep": "https://huggingface.co/spaces/lerobot/visualize_dataset?dataset=ember-lab-berkeley%2Frobocasa365-pretrain-atomic&episode="
  }
 }
