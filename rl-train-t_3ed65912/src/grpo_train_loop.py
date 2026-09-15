@@ -508,8 +508,8 @@ def eval_pool(sim_factory, client, args, reward_cfg, seeds, out_dir, tag):
             genv.close()
         results.append(r)
         print(f"[{tag}] {i+1}/{len(seeds)} seed={seed} official={r['official_success']} grasp={r['grasp_success']}", flush=True)
-    off = sum(r["official_success"] for r in results) / len(results)
-    grasp = sum(r["grasp_success"] for r in results) / len(results)
+    off = (sum(r["official_success"] for r in results) / len(results)) if results else 0.0
+    grasp = (sum(r["grasp_success"] for r in results) / len(results)) if results else 0.0
     return {"n": len(results), "official_success_rate": off, "grasp_success_rate": grasp,
             "episodes": results}
 
