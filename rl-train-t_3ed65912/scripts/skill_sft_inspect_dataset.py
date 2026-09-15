@@ -26,7 +26,7 @@ os.makedirs(OUT, exist_ok=True)
 
 def dl(fn):
     return hf_hub_download(repo_id=REPO, filename=fn, repo_type="dataset",
-                           local_dir=os.path.join(OUT, "hf_cache"))
+                           local_dir=os.environ.get("SFT_HF_CACHE", os.path.join(OUT, "hf_cache")))
 
 
 def main():

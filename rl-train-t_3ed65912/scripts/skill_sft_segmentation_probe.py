@@ -19,7 +19,8 @@ from huggingface_hub import hf_hub_download
 
 REPO = "ember-lab-berkeley/robocasa365-pretrain-atomic"
 OUT = os.environ.get("OUT", "/out")
-CACHE = os.path.join(OUT, "hf_cache")
+DATA_OUT = os.environ.get("DATA_OUT", OUT)  # durable data artifacts (manifest/segments/episode index)
+CACHE = os.environ.get("SFT_HF_CACHE", os.path.join(OUT, "hf_cache"))
 
 
 def dl(fn):
@@ -27,7 +28,7 @@ def dl(fn):
 
 
 def main():
-    cbl = json.load(open(os.path.join(OUT, "closeblenderlid_episodes.json")))
+    cbl = json.load(open(os.path.join(DATA_OUT, "closeblenderlid_episodes.json")))
     tbl = pq.read_table(dl("data/chunk-000/file-000.parquet"))
     ei = tbl.column("episode_index").to_numpy()
 

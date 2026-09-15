@@ -15,7 +15,7 @@ import os
 from typing import Optional
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
-_SCHEMA_PATH = os.path.join(_HERE, "..", "configs", "conditioning_schema.json")
+_SCHEMA_PATH = os.path.join(_HERE, "..", "data", "skill_sft", "conditioning_schema.json")
 
 ARMS = ("nl_only", "nl_plus_skill_id", "shared_lora_learned_embedding")
 

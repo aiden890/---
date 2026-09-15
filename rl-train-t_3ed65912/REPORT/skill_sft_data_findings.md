@@ -2,7 +2,7 @@
 
 Task t_e5cd5736, phase 1. All numbers reproduced on v4 in an ephemeral CPU
 container (`docker run --rm --cpus 4 xiaomi-cu121:t_9f03a613`, no GPU touched,
-GR00T eval left running). Scripts under `scripts/`, outputs under `results/`.
+GR00T eval left running). Scripts `scripts/skill_sft_*.py`; durable data under `data/skill_sft/`, evidence under `results/skill_sft/`.
 
 ## Source data (PASS — data exists, RELEASE present)
 
@@ -72,7 +72,7 @@ direct expression of the demonstrator's grasp/release intent.
 - **Action loss mask**: for a per-skill training example, action steps *outside* the
   skill's `[start, end)` span are masked out of the flow-matching loss (spec recorded
   in the manifest; applied by the dataloader in the SFT phase).
-- **Manifest** `results/data_manifest.json` records: repo + codebase version, demo
+- **Manifest** `data/skill_sft/data_manifest.json` records: repo + codebase version, demo
   count, instruction text, obs/action dims, the segmentation method + thresholds, the
   split (seed/fractions/counts), per-skill availability counts, flagged episodes, the
   loss-mask rule, and **SHA-256 of every source file** (data parquet + info + tasks).
@@ -82,8 +82,7 @@ Per-skill availability (train/val/test): GRASP 74/16/16 · MOVE 74/15/16 · RELE
 
 ## Artifacts
 
-- `results/data_manifest.json` — the canonical manifest (hashes, split, method).
-- `results/skill_segments.json` — per-episode spans, boundaries, reward onset, flags.
-- `results/closeblenderlid_episodes.json` — 106 episode index (row ranges, lengths).
-- `results/dataset_meta_summary.json`, `traj_probe.json`, `segmentation_probe.json`,
-  `finger_timeline.json` — inspection evidence behind the decisions above.
+- `data/skill_sft/data_manifest.json` — the canonical manifest (hashes, split, method).
+- `data/skill_sft/skill_segments.json` — per-episode spans, boundaries, reward onset, flags.
+- `data/skill_sft/closeblenderlid_episodes.json` — 106 episode index (row ranges, lengths).
+- `results/skill_sft/{dataset_meta_summary,traj_probe,segmentation_probe,finger_timeline}.json` — inspection evidence behind the decisions above.

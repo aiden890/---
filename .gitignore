@@ -38,3 +38,5 @@ logs/
 # OS
 .DS_Store
 
+rl-train-*/results/skill_sft/hf_cache/
+rl-train-*/data/skill_sft/hf_cache/

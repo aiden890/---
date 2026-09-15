@@ -36,7 +36,8 @@ from huggingface_hub import hf_hub_download
 
 REPO = "ember-lab-berkeley/robocasa365-pretrain-atomic"
 OUT = os.environ.get("OUT", "/out")
-CACHE = os.path.join(OUT, "hf_cache")
+DATA_OUT = os.environ.get("DATA_OUT", OUT)  # durable data artifacts (manifest/segments/episode index)
+CACHE = os.environ.get("SFT_HF_CACHE", os.path.join(OUT, "hf_cache"))
 
 # hysteresis thresholds on finger opening (metres); from finger_timeline.py:
 # open approach ~0.078-0.080, closed-on-lid ~0.026-0.045, rest ~0.041, loose ~0.065
@@ -144,7 +145,7 @@ def segment_episode(state, action, reward):
 
 
 def main():
-    cbl = json.load(open(os.path.join(OUT, "closeblenderlid_episodes.json")))
+    cbl = json.load(open(os.path.join(DATA_OUT, "closeblenderlid_episodes.json")))
     data_path = dl("data/chunk-000/file-000.parquet")
     info_path = dl("meta/info.json")
     tasks_path = dl("meta/tasks.parquet")
@@ -211,8 +212,8 @@ def main():
         },
     }
 
-    json.dump(per_ep, open(os.path.join(OUT, "skill_segments.json"), "w"), indent=2)
-    json.dump(manifest, open(os.path.join(OUT, "data_manifest.json"), "w"), indent=2)
+    json.dump(per_ep, open(os.path.join(DATA_OUT, "skill_segments.json"), "w"), indent=2)
+    json.dump(manifest, open(os.path.join(DATA_OUT, "data_manifest.json"), "w"), indent=2)
 
     print("=== segmentation summary ===")
     print("demos:", n, "| split train/val/test:", n_tr, n_va, n - n_tr - n_va)

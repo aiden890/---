@@ -3,7 +3,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
-import conditioning as C  # noqa: E402
+import skill_sft_conditioning as C  # noqa: E402
 
 
 def test_schema_loads_three_skills():

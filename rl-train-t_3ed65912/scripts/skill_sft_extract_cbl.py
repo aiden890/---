@@ -15,7 +15,8 @@ from huggingface_hub import hf_hub_download
 
 REPO = "ember-lab-berkeley/robocasa365-pretrain-atomic"
 OUT = os.environ.get("OUT", "/out")
-CACHE = os.path.join(OUT, "hf_cache")
+DATA_OUT = os.environ.get("DATA_OUT", OUT)  # durable data artifacts (manifest/segments/episode index)
+CACHE = os.environ.get("SFT_HF_CACHE", os.path.join(OUT, "hf_cache"))
 os.makedirs(OUT, exist_ok=True)
 
 
@@ -48,7 +49,7 @@ def main():
         print("length min/mean/max:", min(lens), round(sum(lens)/len(lens),1), max(lens))
         print("data files used:", sorted(set((e["data_chunk"], e["data_file"]) for e in cbl)))
         print("distinct task phrasings:", set(tuple(e["tasks"]) for e in cbl))
-    json.dump(cbl, open(os.path.join(OUT, "closeblenderlid_episodes.json"), "w"), indent=2)
+    json.dump(cbl, open(os.path.join(DATA_OUT, "closeblenderlid_episodes.json"), "w"), indent=2)
 
     # Load the needed data parquet files (only those containing CBL rows), extract a few eps.
     needed = sorted(set((e["data_chunk"], e["data_file"]) for e in cbl))
