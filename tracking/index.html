@@ -392,7 +392,7 @@ PLACE_OBJECT:
 <!-- ===== RL 환경 ===== -->
 <section id="rlenv" class="tab">
   <h1>RL 환경 · 리워드 동기화 뷰어</h1>
-  <p class="dim">영상을 재생하거나 슬라이더를 움직이면, 그 순간 로봇팔 상태(predicate)와 <b>그 스킬의 학습 리워드</b>가 함께 표시됩니다. 각 스킬은 자기 리워드만 <b>0에서 시작</b>해 계산합니다.</p>
+  <p class="dim">영상을 재생하거나 슬라이더를 움직이면, 그 순간 로봇팔 상태(predicate)와 <b>그 스킬의 학습 리워드</b>가 함께 표시됩니다. 각 스킬은 자기 리워드만 <b>0에서 시작</b>해 계산하며, 스킬이 종료된 뒤 프레임(성공 후 표류 관찰 구간)은 리워드를 더 이상 누적하지 않습니다.</p>
 
   <div class="card">
     <h2>각 스킬이 학습 때 받는 리워드</h2>
@@ -455,10 +455,10 @@ PLACE_OBJECT:
   <div class="card">
     <h2>이 뷰어로 무엇을 검증하나</h2>
     <ul class="dim" style="margin:0;padding-left:18px;line-height:1.7">
-      <li>영상 속 팔이 뚜껑을 <b>실제로 집는 순간</b> predicate <code>lid_grasped</code>가 true로 바뀌고 milestone 리워드가 붙는지</li>
-      <li>"성공"이라고 판정한 순간 영상에서도 뚜껑이 블렌더에 닫혀 있는지 (거짓 성공 없음)</li>
-      <li>release 때 뚜껑이 7° 넘게 기울면 성공 리워드가 <b>지급되지 않는지</b> (place 클립에서 확인)</li>
-      <li>매 스텝 아주 작은 timeout 압력(−0.05)만 있고, 밀집 penalty가 리워드를 포화시키지 않는지</li>
+      <li>영상 속 팔이 뚜껑을 <b>실제로 집는 순간</b> predicate <code>lid_grasped</code>가 true로 바뀌고, 20스텝 연속으로 유지되면 <b>스킬 성공 +1.0</b>이 그 시점에 <b>한 번</b> 붙는지 (grasp SUCCESS 클립: step 120)</li>
+      <li>"성공"이라고 판정한 순간 영상에서도 뚜껑이 블렌더에 닫혀 있는지 (거짓 성공 없음) — place SUCCESS 클립은 안착+이격+수평이 동시 충족되는 step 160에 <b>terminal +1.0</b>이 붙음</li>
+      <li>성공 조건을 <b>못 채우면 성공 리워드가 0</b>인지 (grasp/place TIMEOUT·OFF_TARGET 클립: terminal 목표가 끝까지 불이 안 들어옴)</li>
+      <li>성공 후 표류하면 <b>hold shaping</b>이 정지엔 +0.05, 이탈엔 −를 매기는지 (place SUCCESS 클립의 성공 후 hold 구간) · drop −0.25 · 금지충돌 −0.05 · timeout −0.5(스킬 단위) 감점이 정확한지</li>
     </ul>
   </div>
 </section>
