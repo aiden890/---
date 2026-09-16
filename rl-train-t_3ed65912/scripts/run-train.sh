@@ -116,7 +116,7 @@ case "${1:-help}" in
     # the resident policy stays bit-for-bit the pretrained checkpoint. Needs the trainer up.
     #   bash run-train.sh diag <out-subdir> --split pretrain --seeds 0,1,..,9 --horizons 120,208
     docker ps --format '{{.Names}}' | grep -q "^${trainer}$" || { echo "start trainer first: bash $0 trainer-start" >&2; exit 5; }
-    run="${2:-grasp_horizon_diag}"; out="$train/results/diag/$run"; mkdir -p "$out"
+    run="${2:-grasp_horizon_diag}"; out="$train/results/horizon_diag/$run"; mkdir -p "$out"
     docker run --rm --name "xiaomi-client-diag-$run" --gpus all --shm-size=2g \
       -e MUJOCO_GL=egl -e PYOPENGL_PLATFORM=egl -e NVIDIA_DRIVER_CAPABILITIES=compute,utility,graphics \
       -v "$assets_volume:/opt/robocasa/robocasa/models/assets" -v "$parent:/work:ro" \

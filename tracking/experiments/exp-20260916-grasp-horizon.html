@@ -1,0 +1,49 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>훈련 롤아웃 GRASP horizon 진단</title><link rel="stylesheet" href="style.css"></head>
+<body><header><div class="bar"><a href="../index.html#attend">← 실험 목록</a><b>RoboCasa · Xiaomi VLA</b></div></header>
+<main id="app"><p class="dim">실험 정보를 불러오는 중…</p></main>
+<script>
+const fmt=v=>v==null?'—':v;
+function cellChip(c){return `<span class="chip">성공 ${c.success_count}/${c.n} (${(c.success_rate*100).toFixed(0)}%)</span>`;}
+function vgrid(rows){
+ return `<div class="videos">`+rows.filter(r=>r.mp4).map(r=>`
+   <article class="video-card"><video controls preload="metadata" src="../${r.mp4}"></video>
+   <h3>seed ${r.seed} ${r.outcome==='SUCCESS'?'<span class="ok">PASS</span>':'<span class="no">FAIL</span>'}</h3>
+   <p>성공 step: ${fmt(r.success_step)} · 전체 ${r.steps} steps · ${r.terminated_by}</p>
+   ${r.failure_reason?`<p class="dim">${r.failure_reason}</p>`:''}</article>`).join('')+`</div>`;
+}
+function tbl(rows){
+ return `<table><thead><tr><th>seed</th><th>결과</th><th>성공 step</th><th>steps</th><th>종료</th></tr></thead><tbody>`+
+  rows.map(r=>`<tr><td>${r.seed}</td><td class="${r.outcome==='SUCCESS'?'ok':'no'}">${r.outcome}</td><td>${fmt(r.success_step)}</td><td>${r.steps}</td><td>${r.terminated_by}</td></tr>`).join('')+
+  `</tbody></table>`;
+}
+Promise.all([fetch('../experiments.json').then(r=>r.json()),fetch('../grasp_horizon.json').then(r=>r.json())]).then(([db,g])=>{
+ const e=db.experiments.find(x=>x.id==='EXP-20260916-02');
+ document.title=e.title;
+ const c=g.cells, rw=g.rows;
+ const summaryTable=`<table><thead><tr><th>샘플러</th><th>horizon 120 (훈련 기본)</th><th>horizon 208 (standalone)</th></tr></thead><tbody>
+  <tr><td>eta=0 (결정론)</td><td class="no">${(c.eta0_h120.success_rate*100).toFixed(0)}% (${c.eta0_h120.success_count}/10)</td><td class="ok">${(c.eta0_h208.success_rate*100).toFixed(0)}% (${c.eta0_h208.success_count}/10)</td></tr>
+  <tr><td>eta=0.1 (훈련 실제 롤아웃)</td><td class="no">${(c['eta0.1_h120'].success_rate*100).toFixed(0)}% (${c['eta0.1_h120'].success_count}/10)</td><td class="ok">${(c['eta0.1_h208'].success_rate*100).toFixed(0)}% (${c['eta0.1_h208'].success_count}/10)</td></tr>
+  <tr><td>standalone 레퍼런스</td><td>—</td><td class="ok">${(g.standalone.success_rate*100).toFixed(0)}% (${g.standalone.success_count}/10)</td></tr>
+ </tbody></table>`;
+ const holdRows=Object.entries(g.standalone.hold20_complete_step).map(([s,st])=>`<tr><td>seed ${s}</td><td>${st}</td><td class="${st<=120?'no':'ok'}">${st<=120?'120에서 절단 → 실패':'120 초과 → 208에서만 성공'}</td></tr>`).join('');
+ document.getElementById('app').innerHTML=`
+  <div class="dim">${e.id} · ${e.date}</div><h1>${e.title}</h1>
+  <div class="meta"><span class="chip">${e.model}</span><span class="chip">${e.task}</span><span class="chip">checkpoint ${e.checkpoint.slice(0,8)}</span><span class="chip">완료</span></div>
+  <div class="question"><b>실험 질문</b><br>${e.question}</div>
+  <div class="card"><h2>실험 조건</h2><ul>${e.setup.map(x=>`<li>${x}</li>`).join('')}</ul>
+   <p class="dim">폴리시: ${g.policy}</p><p class="dim">하네스: ${g.harness}</p></div>
+  <div class="verdict"><div><b>결과</b>${e.verdict}</div><div><b>판단</b>${e.decision}</div></div>
+  <div class="card"><h2>요약 — horizon × 샘플러 성공률</h2>${summaryTable}
+   <p class="dim">horizon 120에서는 샘플러 무관하게 0%. horizon 208로 늘리면 40~50%로 회복되어 standalone 40%와 일치한다. → 폴리시가 아니라 <b>horizon 절단</b>이 원인.</p></div>
+  <div class="card"><h2>왜 120이 성공을 자르는가 (standalone step 근거)</h2>
+   <p class="dim">GRASP 성공 = lid_grasped 20-consecutive-hold. standalone 성공 seed의 20-hold 완성 step:</p>
+   <table><thead><tr><th>seed</th><th>20-hold 완성 step</th><th>horizon 120 하에서</th></tr></thead><tbody>${holdRows}</tbody></table>
+   <p class="dim">가장 이른 완성이 step 136(진단 롤아웃에서는 seed3 step 128)이므로 horizon 120은 어떤 성공도 담지 못한다.</p></div>
+  <div class="card"><h2>영상 — eta=0.1 (훈련 실제 롤아웃), horizon 208</h2>${cellChip(c['eta0.1_h208'])}${vgrid(rw['eta0.1_h208'])}${tbl(rw['eta0.1_h208'])}</div>
+  <div class="card"><h2>영상 — eta=0 (결정론, standalone 샘플러), horizon 208</h2>${cellChip(c.eta0_h208)}${vgrid(rw.eta0_h208)}${tbl(rw.eta0_h208)}</div>
+  <div class="card"><h2>horizon 120 상세 (영상 생략, 전부 시간부족 절단)</h2>
+   <h3 class="subhead">eta=0.1</h3>${tbl(rw['eta0.1_h120'])}
+   <h3 class="subhead">eta=0</h3>${tbl(rw.eta0_h120)}</div>
+  <div class="artifact">원본 산출물: <code>rl-train-t_3ed65912/results/horizon_diag/grasp_horizon_diag/</code> · 진단 스크립트 <code>scripts/grasp_horizon_diag.py</code> (run-train.sh diag)</div>`;
+}).catch(err=>{document.getElementById('app').innerHTML='<p class="no">실험 정보를 불러오지 못했습니다.</p>';console.error(err);});
+</script></body></html>
