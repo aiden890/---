@@ -349,52 +349,11 @@ PLACE_OBJECT:
   </div>
   <div class="card"><h2>배포 Skill Registry</h2><table><thead><tr><th>Skill / Adapter</th><th>Arguments</th><th>Rendered instruction</th><th>done_when</th></tr></thead><tbody id="inf-skills"></tbody></table></div>
 
-  <!-- ===== Adapter-free 아키텍처 스모크 테스트 (t_1d5b404f) ===== -->
+  <!-- ===== 인퍼런스 영상 (아키텍처 실행) ===== -->
   <div class="card" id="smoke-card">
-    <h2>Adapter-free 아키텍처 스모크 테스트 <span class="dim" style="font-size:13px">· t_1d5b404f</span></h2>
-    <p class="dim" id="smoke-intro"></p>
-    <div id="smoke-banner"></div>
-    <div class="kpi" id="smoke-kpi"></div>
-
-    <h3 style="margin:18px 0 8px">아키텍처 통과 체크 (근거 포함)</h3>
-    <table><thead><tr><th>검사</th><th>결과</th><th>근거</th></tr></thead><tbody id="smoke-checks"></tbody></table>
-
-    <h3 style="margin:22px 0 8px">하네스 무결성 정밀검증 — 8항목 (t_91bfee2b · 트레이스 기반 감사)</h3>
-    <p class="dim" id="smoke-hv-intro"></p>
-    <div id="smoke-hv-banner"></div>
-    <table><thead><tr><th>#</th><th>하네스 항목</th><th>결과</th><th>근거 (실제 트레이스 수치)</th></tr></thead><tbody id="smoke-hv"></tbody></table>
-    <p class="dim" id="smoke-hv-model"></p>
-
-    <h3 style="margin:22px 0 8px">검증 영상 — skill 경계·instruction 전환·verifier 판정 오버레이</h3>
-    <p class="dim">각 프레임 상단에 실행 중인 skill·planner call·지시문, 하단에 verifier 상태(CONTINUE 실행중 → 경계에서 ADVANCE/REPLAN 판정)를 오버레이. 성공 skill이 done_when에서 끊기는 것과 실패가 timeout까지 가는 것이 눈으로 구분됨. 3 seed 세로 결합본:</p>
+    <h2>인퍼런스 영상 <span class="dim" style="font-size:13px">· base 정책으로 전체 파이프라인 실행</span></h2>
+    <p class="dim">각 프레임 상단에 실행 중인 skill·planner call·지시문, 하단에 verifier 상태(CONTINUE 실행중 → 경계에서 ADVANCE/REPLAN 판정)를 오버레이. 성공 skill이 done_when에서 끊기고 실패가 timeout까지 가는 것이 눈으로 구분됩니다. (3 seed 세로 결합본)</p>
     <div id="smoke-hv-video"></div>
-
-    <h3 style="margin:18px 0 8px">에피소드 결과 (랜덤 초기상태 3개 seed)</h3>
-    <p class="dim">각 행을 누르면 그 seed의 영상 + planner/skill 타임라인이 아래로 펼쳐집니다. task 성공은 참고용이며, base-policy의 skill 실패는 아키텍처 실패가 아닙니다.</p>
-    <table><thead><tr><th>seed</th><th>종료</th><th>planner calls</th><th>steps</th><th>skill 시퀀스</th><th>task 성공</th></tr></thead><tbody id="smoke-eps"></tbody></table>
-
-    <h3 style="margin:18px 0 8px">관측된 base-policy 실패 (정책 결과, 아키텍처 아님)</h3>
-    <table><thead><tr><th>seed</th><th>skill</th><th>상태</th><th>사유</th></tr></thead><tbody id="smoke-fail"></tbody></table>
-  </div>
-
-  <!-- ===== obs 기반 skill 종료 verifier 재설계 (t_d4268a2e) ===== -->
-  <div class="card" id="obsv-card">
-    <h2>obs 기반 skill 종료 verifier <span class="dim" style="font-size:13px">· t_d4268a2e</span></h2>
-    <p class="dim" id="obsv-why" style="margin:6px 0 2px"></p>
-    <p class="dim" id="obsv-intro"></p>
-    <div id="obsv-banner"></div>
-    <div class="kpi" id="obsv-kpi"></div>
-
-    <h3 style="margin:18px 0 8px">obs-only 보장 (코드로 강제)</h3>
-    <table><thead><tr><th>보장</th><th>결과</th><th>근거</th></tr></thead><tbody id="obsv-guards"></tbody></table>
-
-    <h3 style="margin:20px 0 8px">실기 현실성 — VLM 호출 비용·주기</h3>
-    <p class="dim" id="obsv-latency"></p>
-
-    <h3 style="margin:20px 0 8px">실제 VLM 판별 프로브 — done vs not-done 분리</h3>
-    <p class="dim" id="obsv-probe-intro"></p>
-    <div id="obsv-probe-banner"></div>
-    <table><thead><tr><th>rollout</th><th>skill</th><th>phase</th><th>env_step</th><th>gt_done</th><th>P(yes)</th></tr></thead><tbody id="obsv-probe"></tbody></table>
   </div>
 </section>
 
