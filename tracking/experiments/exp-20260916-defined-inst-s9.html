@@ -1,0 +1,44 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Defined instruction zero-shot rollout</title><link rel="stylesheet" href="style.css"></head>
+<body><header><div class="bar"><a href="../index.html#attend">← 실험 목록</a><b>RoboCasa · Xiaomi VLA</b></div></header>
+<main id="app"><p class="dim">실험 정보를 불러오는 중…</p></main>
+<script>
+function randomBlock(rnd){
+ const fmt=v=>v==null?'—':v;
+ const sec=(title,d,mp4dir)=>{
+  const vids=d.runs.map(r=>`
+   <article class="video-card"><video controls preload="metadata" src="../${r.mp4}"></video>
+   <h3>seed ${r.seed} ${r.outcome==='SUCCESS'?'<span class="ok">PASS</span>':'<span class="no">FAIL</span>'}</h3>
+   <p>성공 step: ${fmt(r.success_step)} · 전체 ${r.steps} steps · ${r.terminated_by}</p>
+   <p>entry valid: ${r.entry_valid?'✔':'✗'} · frames ${r.video_frames}</p>
+   ${r.failure_reason?`<p class="dim">${r.failure_reason}</p>`:''}</article>`).join('');
+  const trows=d.runs.map(r=>`<tr><td>${r.seed}</td><td class="${r.outcome==='SUCCESS'?'ok':'no'}">${r.outcome}</td><td>${fmt(r.success_step)}</td><td>${r.steps}</td><td>${r.terminated_by}</td><td>${r.entry_valid?'✔':'✗'}</td></tr>`).join('');
+  const extra = d.entry_valid_count!=null?` · 유효 entry ${d.entry_valid_count}/10`:'';
+  return `<div class="card"><h2>${title} — 랜덤 10회</h2>
+   <div class="meta"><span class="chip">성공 ${d.success_count}/${d.n} (${(d.success_rate*100).toFixed(0)}%)${extra}</span></div>
+   <p class="instruction">“${d.instruction}”</p><p>시작 상태: ${d.start_state}</p>
+   <div class="videos">${vids}</div>
+   <table><thead><tr><th>seed</th><th>결과</th><th>성공 step</th><th>steps</th><th>종료</th><th>entry valid</th></tr></thead><tbody>${trows}</tbody></table></div>`;
+ };
+ return `<div class="card"><h2>랜덤 시작 상태 zero-shot (10×2)</h2><p>${rnd.note}</p><div class="artifact">산출물: <code>${rnd.artifact_path}</code></div></div>`
+  + sec('GRASP_OBJECT',rnd.grasp)
+  + sec('PLACE_OBJECT',rnd.place);
+}
+fetch('../experiments.json').then(r=>r.json()).then(db=>{
+ const e=db.experiments.find(x=>x.id==='EXP-20260916-01');
+ const fmt=v=>v==null?'—':v;
+ document.title=e.title;
+ document.getElementById('app').innerHTML=`
+  <div class="dim">${e.id} · ${e.date}</div><h1>${e.title}</h1>
+  <div class="meta"><span class="chip">${e.model}</span><span class="chip">${e.task}</span><span class="chip">seed ${e.seed}</span><span class="chip">checkpoint ${e.checkpoint.slice(0,8)}</span><span class="chip">Pilot</span></div>
+  <div class="question"><b>실험 질문</b><br>${e.question}</div>
+  <div class="card"><h2>실험 조건</h2><ul>${e.setup.map(x=>`<li>${x}</li>`).join('')}</ul></div>
+  <div class="verdict"><div><b>결과</b>${e.verdict}</div><div><b>현재 판단</b>${e.decision}</div></div>
+  <div class="card"><h2>스킬별 영상과 결과</h2><div class="videos">${e.videos.map(v=>`
+   <article class="video-card"><video controls preload="metadata" src="../${v.mp4}"></video>
+   <h3>${v.skill} ${v.outcome==='SUCCESS'?'<span class="ok">PASS</span>':'<span class="no">FAIL</span>'}</h3>
+   <p class="instruction">“${v.instruction}”</p><p>시작 상태: ${v.start_state}</p><p>성공 step: ${fmt(v.success_step)} · 전체 ${v.steps} steps</p><p>${v.note}</p></article>`).join('')}</div></div>
+  <div class="card"><h2>정량 결과</h2><table><thead><tr><th>Skill</th><th>결과</th><th>성공 step</th><th>추가 관찰</th><th>predicate 유지</th><th>EEF 이동</th></tr></thead><tbody>${e.videos.map(v=>`<tr><td>${v.skill}</td><td class="${v.outcome==='SUCCESS'?'ok':'no'}">${v.outcome}</td><td>${fmt(v.success_step)}</td><td>${v.post_steps} steps</td><td>${v.post_predicate_fraction==null?'—':(v.post_predicate_fraction*100).toFixed(1)+'%'}</td><td>${v.post_eef_displacement_m==null?'—':(v.post_eef_displacement_m*100).toFixed(2)+' cm'}</td></tr>`).join('')}</tbody></table></div>
+  ${e.random?randomBlock(e.random):''}
+  <div class="artifact">원본 산출물: <code>${e.artifact_path}</code></div>`;
+}).catch(()=>document.getElementById('app').innerHTML='<p class="no">실험 정보를 불러오지 못했습니다.</p>');
+</script></body></html>
