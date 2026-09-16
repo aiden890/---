@@ -359,6 +359,16 @@ PLACE_OBJECT:
     <h3 style="margin:18px 0 8px">아키텍처 통과 체크 (근거 포함)</h3>
     <table><thead><tr><th>검사</th><th>결과</th><th>근거</th></tr></thead><tbody id="smoke-checks"></tbody></table>
 
+    <h3 style="margin:22px 0 8px">하네스 무결성 정밀검증 — 8항목 (t_91bfee2b · 트레이스 기반 감사)</h3>
+    <p class="dim" id="smoke-hv-intro"></p>
+    <div id="smoke-hv-banner"></div>
+    <table><thead><tr><th>#</th><th>하네스 항목</th><th>결과</th><th>근거 (실제 트레이스 수치)</th></tr></thead><tbody id="smoke-hv"></tbody></table>
+    <p class="dim" id="smoke-hv-model"></p>
+
+    <h3 style="margin:22px 0 8px">검증 영상 — skill 경계·instruction 전환·verifier 판정 오버레이</h3>
+    <p class="dim">각 프레임 상단에 실행 중인 skill·planner call·지시문, 하단에 verifier 상태(CONTINUE 실행중 → 경계에서 ADVANCE/REPLAN 판정)를 오버레이. 성공 skill이 done_when에서 끊기는 것과 실패가 timeout까지 가는 것이 눈으로 구분됨. 3 seed 세로 결합본:</p>
+    <div id="smoke-hv-video"></div>
+
     <h3 style="margin:18px 0 8px">에피소드 결과 (랜덤 초기상태 3개 seed)</h3>
     <p class="dim">각 행을 누르면 그 seed의 영상 + planner/skill 타임라인이 아래로 펼쳐집니다. task 성공은 참고용이며, base-policy의 skill 실패는 아키텍처 실패가 아닙니다.</p>
     <table><thead><tr><th>seed</th><th>종료</th><th>planner calls</th><th>steps</th><th>skill 시퀀스</th><th>task 성공</th></tr></thead><tbody id="smoke-eps"></tbody></table>

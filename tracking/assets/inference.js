@@ -38,6 +38,30 @@ fetch("smoke.json").then(r=>r.json()).then(d=>{
   document.getElementById("smoke-checks").innerHTML=d.checks.map(c=>
     `<tr><td><b>${esc(c.name)}</b></td><td>${yn(c.pass)}</td><td class="dim">${esc(c.evidence)}</td></tr>`).join("");
 
+  // ---- 하네스 무결성 정밀검증 (t_91bfee2b) ----
+  const hv=d.harness_verification;
+  if(hv){
+    const oc=d.offline_checks_extended||d.offline_checks;
+    document.getElementById("smoke-hv-intro").innerHTML=
+      `모델 실패(base 정책이 skill을 못 함)는 <b>정상</b>이며 하네스 버그가 아님. 모델 주변 파이프라인(Planner→SkillCall→instruction→base VLA→env→Verifier→handoff) 배선에 버그가 없는지를 <b>실제 rollout 트레이스 감사</b>로 검증. `+
+      `단위/통합 테스트 <b>${oc.passed}/${oc.total}</b> 통과 · check_architecture.py 확장.`;
+    document.getElementById("smoke-hv-banner").innerHTML=
+      `<div style="margin:12px 0;padding:12px 14px;border-radius:10px;border:1px solid ${hv.harness_bugs_found===0?"#2a5":"#a33"};background:${hv.harness_bugs_found===0?"rgba(61,220,132,.08)":"rgba(255,92,92,.08)"}">`+
+      `<b style="font-size:16px">하네스 판정: ${hv.harness_bugs_found===0?"✅ 무결 (버그 0건)":"❌ 버그 "+hv.harness_bugs_found+"건"}</b> — `+
+      `8개 무결성 항목 <b>${hv.n_pass}/${hv.n_items}</b> PASS · 발견된 하네스 버그 <b>${hv.harness_bugs_found}</b> · 모델 실패 <b>${hv.model_failures.length}</b>건(별도, OK)`+
+      `<br><span class="dim">${esc(hv.note)}</span></div>`;
+    document.getElementById("smoke-hv").innerHTML=hv.items.map(b=>
+      `<tr><td><b>${b.item}</b></td><td>${esc(b.name)}</td><td>${yn(b.pass)}</td><td class="dim">${esc(b.evidence)}</td></tr>`).join("");
+    const mf=hv.model_failures, mc={};
+    mf.forEach(f=>{mc[f.skill]=(mc[f.skill]||0)+1;});
+    document.getElementById("smoke-hv-model").innerHTML=
+      `<b>모델 실패 분류(하네스 아님):</b> `+(mf.length?Object.entries(mc).map(([k,v])=>`${esc(k)} ×${v} clean TIMEOUT`).join(" · "):"없음")+
+      ` — 모두 done_when을 max_steps 내 미충족한 base 정책 한계이며 verifier가 정확히 REPLAN 처리(hold 리셋 확인).`;
+    if(hv.verify_video_all)
+      document.getElementById("smoke-hv-video").innerHTML=
+        `<video src="${esc(hv.verify_video_all)}" controls muted loop style="width:520px;max-width:100%;border-radius:8px;background:#000"></video>`;
+  }
+
   const tl=ep=>ep.timeline.map(t=>{
     if(t.kind==="PLAN") return `<div class="smk-tl plan"><b>PLAN #${t.planner_calls}</b> → ${t.skill?esc(t.skill):"TERMINATE"} `+
       `${t.args?`<code>${esc(JSON.stringify(t.args))}</code>`:""}<br><span class="dim">obs ${esc(t.obs_ref)} · ${esc(t.rationale)}</span>`+
@@ -52,8 +76,9 @@ fetch("smoke.json").then(r=>r.json()).then(d=>{
   body.innerHTML=d.episodes.map(ep=>{
     const seq=ep.skills.map(s=>`<span style="color:${stat(s.status)}">${esc(s.skill.replace("_OBJECT",""))}</span>`).join(" → ");
     const row=`<tr class="smk-row" data-seed="${ep.seed}" style="cursor:pointer"><td>▶ seed ${ep.seed}</td><td>${esc(ep.terminal)}</td><td>${ep.planner_calls}</td><td>${ep.steps_used}</td><td>${seq}</td><td>${ep.task_success?"✅":"—"}</td></tr>`;
+    const vids=`<video src="${esc(ep.verify_video||ep.video)}" controls muted style="width:420px;max-width:100%;border-radius:8px;background:#000"></video>`;
     const drop=`<tr class="smk-drop" data-seed="${ep.seed}" style="display:none"><td colspan="6"><div style="display:flex;gap:16px;flex-wrap:wrap">`+
-      `<video src="${esc(ep.video)}" controls muted style="width:420px;max-width:100%;border-radius:8px;background:#000"></video>`+
+      vids+
       `<div style="flex:1;min-width:280px;max-height:420px;overflow:auto">${tl(ep)}</div>`+
       `</div></td></tr>`;
     return row+drop;

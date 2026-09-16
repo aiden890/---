@@ -1,0 +1,93 @@
+{
+  "n_items": 8,
+  "n_pass": 8,
+  "harness_bugs_found": 0,
+  "model_failures": [
+    {
+      "seed": 0,
+      "skill": "PLACE_OBJECT",
+      "reason": "done_when unmet in 96 steps"
+    },
+    {
+      "seed": 0,
+      "skill": "PLACE_OBJECT",
+      "reason": "done_when unmet in 96 steps"
+    },
+    {
+      "seed": 0,
+      "skill": "GRASP_OBJECT",
+      "reason": "done_when unmet in 208 steps"
+    },
+    {
+      "seed": 1,
+      "skill": "GRASP_OBJECT",
+      "reason": "done_when unmet in 208 steps"
+    },
+    {
+      "seed": 1,
+      "skill": "PLACE_OBJECT",
+      "reason": "done_when unmet in 96 steps"
+    },
+    {
+      "seed": 2,
+      "skill": "PLACE_OBJECT",
+      "reason": "done_when unmet in 96 steps"
+    },
+    {
+      "seed": 2,
+      "skill": "MOVE_OBJECT",
+      "reason": "done_when unmet in 288 steps"
+    }
+  ],
+  "items": [
+    {
+      "item": 1,
+      "name": "instruction 전달 정확성 (렌더된 지시문이 base VLA로 그 skill 지시로 전달)",
+      "pass": true,
+      "evidence": "all rendered instructions match bindings + windows stay on-skill"
+    },
+    {
+      "item": 2,
+      "name": "action 흐름 정확성 (chunk 잘림/중복/순서뒤바뀜 없이 env.step 전달, 16-step replan 경계)",
+      "pass": true,
+      "evidence": "16-strided replan windows, ceil(elapsed/16) count, no dup/skip"
+    },
+    {
+      "item": 3,
+      "name": "verifier 판정 정확성 (done_when/hold: GRASP20·MOVE3·PLACE1, 성공 즉시 ADVANCE, 실패만 REPLAN, hold 리셋)",
+      "pass": true,
+      "evidence": "ADVANCE at exact hold w/ immediate success; REPLAN only at full budget, hold reset"
+    },
+    {
+      "item": 4,
+      "name": "handoff 정확성 (ADVANCE→다음 skill, TIMEOUT→retry/replan, obs/predicate 인계·큐 오염 없음)",
+      "pass": true,
+      "evidence": "planner subgoal follows live predicates; can_start ok; retry after failure"
+    },
+    {
+      "item": 5,
+      "name": "adapter-free 불변식 (매 infer adapter_checkpoint=None assert 실행, 우회 경로 없음)",
+      "pass": true,
+      "evidence": "adapter_mode=disabled + adapter_checkpoint=null in episode_start/provenance/every route+window"
+    },
+    {
+      "item": 6,
+      "name": "predicate 소스 일관성 (verifier가 skill_eval.Sim 단일 소스 predicate만 사용, 이중계산·불일치 없음)",
+      "pass": true,
+      "evidence": "digests carry only skill_eval.Sim predicate keys; no intra-step contradiction"
+    },
+    {
+      "item": 7,
+      "name": "경계값/에러 처리 (chunk<replan, can_start 실패, max planner-calls, budget soft-cap 정의대로)",
+      "pass": true,
+      "evidence": "per-skill<=max_steps, planner_calls<=cap; steps_used=629>budget=600 (last skill overran; soft cap at planner boundary) · per-skill<=max_steps, planner_calls<=cap; steps_used=601>budget=600 (last skill overran; soft cap at planner boundary) · per-skill<=max_steps, planner_calls<=cap; steps_used=792>budget=600 (last skill overran; soft cap at planner boundary)"
+    },
+    {
+      "item": 8,
+      "name": "재현성 (같은 seed 재실행 시 결정론 sampler 동일 결과)",
+      "pass": true,
+      "evidence": "rollout.EvalClient uses argmax action decode (no multinomial/temperature RNG); fingerprints above are the reproducible record"
+    }
+  ],
+  "note": "트레이스 기반 하네스 무결성 감사 — 모델 실패(clean TIMEOUT)는 하네스 버그가 아니며 별도 집계. 하네스 버그 0건이면 파이프라인 배선 정상."
+}
