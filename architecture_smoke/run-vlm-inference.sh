@@ -73,4 +73,20 @@ nvidia-smi --query-gpu=memory.used,memory.total --format=csv,noheader > "$out/gp
 
 # ---- 3. stop the server ----------------------------------------------------
 docker rm -f "$server" >/dev/null 2>&1 || true
+
+# ---- 4. overlay: VLM-verifier annotated videos (cv2 in the client image) ---
+# no GPU / server needed; pure cv2 + trace.jsonl. One per seed that produced a video.
+for sd in "$out"/seed*; do
+  [ -d "$sd" ] || continue
+  sn=$(basename "$sd" | sed 's/seed//')
+  [ -f "$sd/episode.mp4" ] || continue
+  docker run --rm --name "vlm-overlay-t_fc5e73d5-$sn" \
+    -e PYTHONPATH=/pkg \
+    -v "$pkg/architecture_smoke:/pkg:ro" -v "$out:/output" \
+    xiaomi-client:t_9f03a613 \
+    python /pkg/make_vlm_verification_video.py --root /output --seed "$sn" \
+      --out "/output/seed${sn}/episode_vlm_verify.mp4" \
+      >> "$out/overlay.log" 2>&1 || echo "overlay seed$sn failed" >> "$out/overlay.log"
+done
+
 echo "done. results in $out"
