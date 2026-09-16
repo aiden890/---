@@ -1,4 +1,53 @@
 {
   "note": "인퍼런스 영상 버전 목록. VLM(Qwen3-VL) 기반 verifier로 판정한 인퍼런스 영상만 등록한다. sim-predicate verify 버전은 사용하지 않음(operator 결정 2026-09-16). 새 버전은 여기에 항목 추가 시 드롭다운에 자동 노출. video 경로는 tracking/ 기준 상대경로.",
-  "versions": []
+  "versions": [
+    {
+      "id": "base-vlm-verify-seed0",
+      "label": "학습 전 base · VLM verify · seed0 (GRASP 0.69✓ · MOVE 0.91✓ · PLACE 0.96✓)",
+      "stage": "pre-training",
+      "date": "2026-09-17",
+      "desc": "학습 전 base 정책 CloseBlenderLid 인퍼런스 (seed 0). 스킬 종료 판정=정책 자신의 frozen Qwen3-VL VQA P(yes) (obs-only: 3-cam+14D proprio, 특권 predicate 미사용), proprio 이벤트 게이트+hysteresis latch(tau=0.6, 2연속). VLM 판정: GRASP 0.69✓ · MOVE 0.91✓ · PLACE 0.96✓. 공식 task predicate success=False (base 미학습이라 실제 뚜껑 안착은 미완). 주의: PLACE는 단일프레임 VQA로 낮은 신뢰(과거 검증 AUC~0.75, false pos/neg 가능).",
+      "video": "media/inference/base_vlm_verify_seed0.mp4"
+    },
+    {
+      "id": "base-vlm-verify-seed1",
+      "label": "학습 전 base · VLM verify · seed1 (GRASP 0.61✓ · MOVE 0.65✓ · PLACE 0.88✓)",
+      "stage": "pre-training",
+      "date": "2026-09-17",
+      "desc": "학습 전 base 정책 CloseBlenderLid 인퍼런스 (seed 1). 스킬 종료 판정=정책 자신의 frozen Qwen3-VL VQA P(yes) (obs-only: 3-cam+14D proprio, 특권 predicate 미사용), proprio 이벤트 게이트+hysteresis latch(tau=0.6, 2연속). VLM 판정: GRASP 0.61✓ · MOVE 0.65✓ · PLACE 0.88✓. 공식 task predicate success=False (base 미학습이라 실제 뚜껑 안착은 미완). 주의: PLACE는 단일프레임 VQA로 낮은 신뢰(과거 검증 AUC~0.75, false pos/neg 가능).",
+      "video": "media/inference/base_vlm_verify_seed1.mp4"
+    },
+    {
+      "id": "base-vlm-verify-seed2",
+      "label": "학습 전 base · VLM verify · seed2 (GRASP 0.95✓ · MOVE 0.79✓ · PLACE 0.74✓)",
+      "stage": "pre-training",
+      "date": "2026-09-17",
+      "desc": "학습 전 base 정책 CloseBlenderLid 인퍼런스 (seed 2). 스킬 종료 판정=정책 자신의 frozen Qwen3-VL VQA P(yes) (obs-only: 3-cam+14D proprio, 특권 predicate 미사용), proprio 이벤트 게이트+hysteresis latch(tau=0.6, 2연속). VLM 판정: GRASP 0.95✓ · MOVE 0.79✓ · PLACE 0.74✓. 공식 task predicate success=False (base 미학습이라 실제 뚜껑 안착은 미완). 주의: PLACE는 단일프레임 VQA로 낮은 신뢰(과거 검증 AUC~0.75, false pos/neg 가능).",
+      "video": "media/inference/base_vlm_verify_seed2.mp4"
+    },
+    {
+      "id": "base-vlm-verify-seed3",
+      "label": "학습 전 base · VLM verify · seed3 (GRASP 0.67✓ · MOVE 0.67✓ · PLACE 0.66✓)",
+      "stage": "pre-training",
+      "date": "2026-09-17",
+      "desc": "학습 전 base 정책 CloseBlenderLid 인퍼런스 (seed 3). 스킬 종료 판정=정책 자신의 frozen Qwen3-VL VQA P(yes) (obs-only: 3-cam+14D proprio, 특권 predicate 미사용), proprio 이벤트 게이트+hysteresis latch(tau=0.6, 2연속). VLM 판정: GRASP 0.67✓ · MOVE 0.67✓ · PLACE 0.66✓. 공식 task predicate success=False (base 미학습이라 실제 뚜껑 안착은 미완). 주의: PLACE는 단일프레임 VQA로 낮은 신뢰(과거 검증 AUC~0.75, false pos/neg 가능).",
+      "video": "media/inference/base_vlm_verify_seed3.mp4"
+    },
+    {
+      "id": "base-vlm-verify-seed4",
+      "label": "학습 전 base · VLM verify · seed4 (GRASP 0.75✓ · MOVE 0.61✓ · PLACE 0.60✓)",
+      "stage": "pre-training",
+      "date": "2026-09-17",
+      "desc": "학습 전 base 정책 CloseBlenderLid 인퍼런스 (seed 4). 스킬 종료 판정=정책 자신의 frozen Qwen3-VL VQA P(yes) (obs-only: 3-cam+14D proprio, 특권 predicate 미사용), proprio 이벤트 게이트+hysteresis latch(tau=0.6, 2연속). VLM 판정: GRASP 0.75✓ · MOVE 0.61✓ · PLACE 0.60✓. 공식 task predicate success=False (base 미학습이라 실제 뚜껑 안착은 미완). 주의: PLACE는 단일프레임 VQA로 낮은 신뢰(과거 검증 AUC~0.75, false pos/neg 가능).",
+      "video": "media/inference/base_vlm_verify_seed4.mp4"
+    },
+    {
+      "id": "base-vlm-verify-seed5",
+      "label": "학습 전 base · VLM verify · seed5 (GRASP 0.65✓ · MOVE 0.73✓ · PLACE TIMEOUT · PLACE TIMEOUT)",
+      "stage": "pre-training",
+      "date": "2026-09-17",
+      "desc": "학습 전 base 정책 CloseBlenderLid 인퍼런스 (seed 5). 스킬 종료 판정=정책 자신의 frozen Qwen3-VL VQA P(yes) (obs-only: 3-cam+14D proprio, 특권 predicate 미사용), proprio 이벤트 게이트+hysteresis latch(tau=0.6, 2연속). VLM 판정: GRASP 0.65✓ · MOVE 0.73✓ · PLACE TIMEOUT · PLACE TIMEOUT. 공식 task predicate success=False (base 미학습이라 실제 뚜껑 안착은 미완). PLACE는 단일프레임 VQA가 latch 실패→timeout(step budget 소진). 단일프레임 PLACE 판별 약함(신뢰 낮음).",
+      "video": "media/inference/base_vlm_verify_seed5.mp4"
+    }
+  ]
 }

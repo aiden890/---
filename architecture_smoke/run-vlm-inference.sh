@@ -39,7 +39,7 @@ docker run -d --name "$server" --gpus all --shm-size=2g \
   -v "$rlenv:/rl_env:ro" \
   -v "$parent/checkpoint:/checkpoint:ro" \
   xiaomi-cu121:t_9f03a613 \
-  python /pkg/infer_verify_server.py --model /checkpoint --host 0.0.0.0 --port "$port"
+  python3 /pkg/infer_verify_server.py --model /checkpoint --host 0.0.0.0 --port "$port"
 
 # wait for the model to load (server prints "Model loaded." then "running on")
 echo "waiting for server to load model..."
