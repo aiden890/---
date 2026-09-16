@@ -4,21 +4,21 @@
     "north_star": "Skill-conditioned VLA 훈련 — 집기/옮기기/놓기 같은 skill을 각각의 지시로 제어하는 정책을 만든다 (base: Xiaomi-RoboCasa365)."
   },
   "user_todo": [
-   {
-    "title": "RL training",
-    "why": "skill-conditioned VLA 강화학습. 현재 '행동 후 정지' 목표는 현 접근(GRASP→MOVE 경계 리워드 GRPO)으로 개선 입증이 어려움 확인 — 적절한 난이도 대상/방법 재설계 필요.",
-    "done": false
-   },
-   {
-    "title": "duet root non-LLM top-k 결과 제공",
-    "why": "duet root의 non-LLM top-k 결과 산출·제공.",
-    "done": false
-   },
-   {
-    "title": "모델 선정: Xiaomi-Robotics-1-RoboCasa365 확정",
-    "why": "SFT/RL의 base를 하나로 고정해야 비교가 성립. 3모델 비교(36% 최상) + skill/probe 하네스 유일 지원이 근거.",
-    "done": true
-   }
+    {
+      "title": "RL training",
+      "why": "skill-conditioned VLA 강화학습. 현재 '행동 후 정지' 목표는 현 접근(GRASP→MOVE 경계 리워드 GRPO)으로 개선 입증이 어려움 확인 — 적절한 난이도 대상/방법 재설계 필요.",
+      "done": false
+    },
+    {
+      "title": "duet root non-LLM top-k 결과 제공",
+      "why": "duet root의 non-LLM top-k 결과 산출·제공.",
+      "done": false
+    },
+    {
+      "title": "모델 선정: Xiaomi-Robotics-1-RoboCasa365 확정",
+      "why": "SFT/RL의 base를 하나로 고정해야 비교가 성립. 3모델 비교(36% 최상) + skill/probe 하네스 유일 지원이 근거.",
+      "done": true
+    }
   ],
   "agent_todo": [
     {
@@ -53,11 +53,22 @@
     }
   ],
   "note": [
+    "✅ Adapter-free 전체 아키텍처 스모크(t_1d5b404f) PASS: Planner(oracle stub)→SkillCall→Manager→base Xiaomi VLA(adapter_mode=disabled, ckpt=null)→RoboCasa→Verifier→Planner 루프가 랜덤 3 seed에서 정상 배선 검증(아키텍처 체크 6/6, 오프라인 15/15). task 성공 0/3은 base-policy PLACE 실패(정책 결과, 아키텍처 아님). 근거: Inference 탭 + defined-instruction-rollouts/architecture_base_smoke/.",
     "RL 재개 원칙: policy에 stop을 우선 학습하지 않고 짧은 action chunk 뒤 simulator verifier가 종료·handoff를 관리한다. VLM은 보조 판정에만 사용한다. 현재는 설계만 정리했으며 카드 t_e5cd5736은 보류 상태다.",
     "⚠ skill-SFT Gate3(entry-state rollout) 미통과: per-skill CFM LoRA SFT는 Gate1 tiny-overfit(1.20→0.024,50x)·Gate2 heldout val(1.370→0.218,6.3x) 통과했으나, 실제 sim 롤아웃에서 강한 config는 GRASP 2/12→0/12(붕괴)·약한 config는 1/12→2/12(≈base). BC open-loop→closed-loop 전이 실패 → 정책상 개선 확인 전 Goal4~6(N=50/ARM) 진행 금지. 근거: rl-train-t_3ed65912/REPORT/skill_sft_rollout_findings.md",
     "3-모델 비교 완료 (CloseBlenderLid, 동일조건 50ep): Xiaomi 36% > GR00T 20% > π0.5 14%. π0.5는 공식 리더보드 16.9%와 정합 → 하네스 정상 교차검증.",
     "Xiaomi는 instruction에 실제로 어텐드(obs-only 아님), 단 state-의존적: task 시작 땐 지시 지배, 진행 중엔 obs가 phase 규정. hold '표류'는 지시 무시가 아니라 OOD 부분지시 하 obs-우세.",
     "skill 분해 추론 + instruction probe 하네스는 Xiaomi만 가능(GR00T/π0.5는 full-task instruction만) → skill-conditioned RL base로 Xiaomi 유력.",
     "결과 영상/데이터: RL 환경 탭 (rlenv / rlenv_groot / rlenv_pi05)."
+  ],
+  "rl_training_steps": [
+    {
+      "title": "전체 모델 아키텍처·역할·task 수행 흐름 설계",
+      "badge": "run"
+    },
+    {
+      "title": "대상 task와 skill 종류·계약 정의",
+      "badge": "run"
+    }
   ]
 }

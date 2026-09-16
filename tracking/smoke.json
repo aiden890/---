@@ -1,0 +1,857 @@
+{
+  "task": "CloseBlenderLid",
+  "goal": "Close the blender lid securely.",
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "split": "pretrain",
+  "adapter_mode": "disabled",
+  "adapter_checkpoint": null,
+  "planner": {
+    "kind": "oracle_stub",
+    "note": "scripted oracle stub, NOT a learned VLM planner"
+  },
+  "policy_provenance": {
+    "model_path": "/checkpoint",
+    "adapter_mode": "disabled",
+    "adapter_checkpoint": null,
+    "replan_steps": 16
+  },
+  "params": {
+    "replan_steps": 16,
+    "obs_history": 4,
+    "obs_interval": 2,
+    "crop_ratio": 0.95,
+    "video_stride": 2,
+    "video_fps": 20,
+    "episode_budget": 600
+  },
+  "skill_catalog": [
+    {
+      "name": "GRASP_OBJECT",
+      "description": "Grasp an object at a named grasp region and lift it clear.",
+      "args": [
+        "object",
+        "grasp_region"
+      ],
+      "instruction": "Grasp the blender lid securely at its handle and lift it clear.",
+      "done_when": "held AND lifted>=0.05m AND stable_for(20) AND no_disallowed_contact",
+      "max_steps": 208
+    },
+    {
+      "name": "MOVE_OBJECT",
+      "description": "Move a held object to a named destination region.",
+      "args": [
+        "object",
+        "destination"
+      ],
+      "instruction": "Move the held blender lid to the pre-place region above the blender while maintaining a stable grasp and avoiding disallowed contact.",
+      "done_when": "held AND at_target(xy<=0.06m,z 0.015-0.25m) AND stable_for(3) AND no_disallowed_contact",
+      "max_steps": 288
+    },
+    {
+      "name": "PLACE_OBJECT",
+      "description": "Place a held object on a support, release, and retreat.",
+      "args": [
+        "object",
+        "destination"
+      ],
+      "instruction": "Place the blender lid on the blender, release it after it is stably supported, then move the gripper clear.",
+      "done_when": "supported_by AND released AND upright_error<=7deg AND gripper_clear>=0.15m",
+      "max_steps": 96
+    }
+  ],
+  "n_episodes": 3,
+  "task_success_count": 0,
+  "offline_checks": {
+    "passed": 15,
+    "total": 15,
+    "note": "check_architecture.py: schema/render/adapter-disabled/verifier-handoff/mocked-e2e"
+  },
+  "arch_pass": true,
+  "checks": [
+    {
+      "name": "Planner output schema-valid",
+      "pass": true,
+      "evidence": "15 typed SkillCall(name,args) emitted across 3 episodes; every call carried its required args (validated by SkillRegistry before dispatch)."
+    },
+    {
+      "name": "Requested skill reaches the base VLA (base-only routing)",
+      "pass": true,
+      "evidence": "15 ROUTE records, all adapter_mode=disabled, adapter_checkpoint=null; policy provenance {\"model_path\": \"/checkpoint\", \"adapter_mode\": \"disabled\", \"adapter_checkpoint\": null, \"replan_steps\": 16}."
+    },
+    {
+      "name": "Environment actions execute",
+      "pass": true,
+      "evidence": "131 VLA inference windows -> env steps; 1014 recorded video frames across the 3 episodes."
+    },
+    {
+      "name": "Termination returns control (verifier handoff)",
+      "pass": true,
+      "evidence": "verifier produced ADVANCE (done_when latched) and REPLAN (budget exhausted) decisions; 15 verify records, 15 SkillResults."
+    },
+    {
+      "name": "Planner advances / retries without manual intervention",
+      "pass": true,
+      "evidence": "on PLACE/GRASP TIMEOUT the oracle planner re-issued the next subgoal automatically (see retry rationale in timeline); no human step."
+    },
+    {
+      "name": "Adapter loading demonstrably disabled",
+      "pass": true,
+      "evidence": "config + every trace record: adapter_mode=disabled, adapter_checkpoint=null; BasePolicyClient asserts no adapter checkpoint at construction and per infer()."
+    }
+  ],
+  "record_type_counts": {
+    "episode_start": 3,
+    "plan": 15,
+    "route": 15,
+    "window": 131,
+    "frame": 1014,
+    "verify": 15,
+    "skill_result": 15,
+    "episode_end": 3
+  },
+  "episodes": [
+    {
+      "seed": 0,
+      "terminal": "budget_exhausted",
+      "task_success": false,
+      "planner_calls": 5,
+      "steps_used": 629,
+      "skills": [
+        {
+          "skill": "GRASP_OBJECT",
+          "status": "SUCCESS",
+          "steps": 161,
+          "success_step": 161,
+          "terminated_by": "success"
+        },
+        {
+          "skill": "MOVE_OBJECT",
+          "status": "SUCCESS",
+          "steps": 68,
+          "success_step": 68,
+          "terminated_by": "success"
+        },
+        {
+          "skill": "PLACE_OBJECT",
+          "status": "TIMEOUT",
+          "steps": 96,
+          "success_step": null,
+          "terminated_by": "timeout"
+        },
+        {
+          "skill": "PLACE_OBJECT",
+          "status": "TIMEOUT",
+          "steps": 96,
+          "success_step": null,
+          "terminated_by": "timeout"
+        },
+        {
+          "skill": "GRASP_OBJECT",
+          "status": "TIMEOUT",
+          "steps": 208,
+          "success_step": null,
+          "terminated_by": "timeout"
+        }
+      ],
+      "n_advance": 2,
+      "n_timeout": 3,
+      "n_failed": 0,
+      "base_failures": [
+        {
+          "skill": "PLACE_OBJECT",
+          "status": "TIMEOUT",
+          "reason": "step budget 96 exhausted without done_when (supported_by AND released AND upright_error<=7deg AND gripper_clear>=0.15m)"
+        },
+        {
+          "skill": "PLACE_OBJECT",
+          "status": "TIMEOUT",
+          "reason": "step budget 96 exhausted without done_when (supported_by AND released AND upright_error<=7deg AND gripper_clear>=0.15m)"
+        },
+        {
+          "skill": "GRASP_OBJECT",
+          "status": "TIMEOUT",
+          "reason": "step budget 208 exhausted without done_when (held AND lifted>=0.05m AND stable_for(20) AND no_disallowed_contact)"
+        }
+      ],
+      "video": "media/architecture_smoke/seed0.mp4",
+      "timeline": [
+        {
+          "kind": "PLAN",
+          "planner_calls": 0,
+          "skill": "GRASP_OBJECT",
+          "args": {
+            "object": "blender_lid",
+            "grasp_region": "lid_handle"
+          },
+          "instruction": "Grasp the blender lid securely at its handle and lift it clear.",
+          "rationale": "selected GRASP_OBJECT from current predicate state",
+          "planner_kind": "oracle_stub",
+          "obs_ref": "seed0:step0"
+        },
+        {
+          "kind": "ROUTE",
+          "skill": "GRASP_OBJECT",
+          "adapter_mode": "disabled",
+          "adapter_checkpoint": null,
+          "max_steps": 208,
+          "can_start": true
+        },
+        {
+          "kind": "VERIFY",
+          "skill": "GRASP_OBJECT",
+          "decision": "ADVANCE",
+          "reason": "done_when satisfied for 20 consecutive step(s): held AND lifted>=0.05m AND stable_for(20) AND no_disallowed_contact",
+          "elapsed": 161
+        },
+        {
+          "kind": "RESULT",
+          "skill": "GRASP_OBJECT",
+          "status": "SUCCESS",
+          "steps": 161,
+          "terminated_by": "success",
+          "next": "advance"
+        },
+        {
+          "kind": "PLAN",
+          "planner_calls": 1,
+          "skill": "MOVE_OBJECT",
+          "args": {
+            "object": "blender_lid",
+            "destination": "closed_preplace_region"
+          },
+          "instruction": "Move the held blender lid to the pre-place region above the blender while maintaining a stable grasp and avoiding disallowed contact.",
+          "rationale": "selected MOVE_OBJECT from current predicate state",
+          "planner_kind": "oracle_stub",
+          "obs_ref": "seed0:step161"
+        },
+        {
+          "kind": "ROUTE",
+          "skill": "MOVE_OBJECT",
+          "adapter_mode": "disabled",
+          "adapter_checkpoint": null,
+          "max_steps": 288,
+          "can_start": true
+        },
+        {
+          "kind": "VERIFY",
+          "skill": "MOVE_OBJECT",
+          "decision": "ADVANCE",
+          "reason": "done_when satisfied for 3 consecutive step(s): held AND at_target(xy<=0.06m,z 0.015-0.25m) AND stable_for(3) AND no_disallowed_contact",
+          "elapsed": 68
+        },
+        {
+          "kind": "RESULT",
+          "skill": "MOVE_OBJECT",
+          "status": "SUCCESS",
+          "steps": 68,
+          "terminated_by": "success",
+          "next": "advance"
+        },
+        {
+          "kind": "PLAN",
+          "planner_calls": 2,
+          "skill": "PLACE_OBJECT",
+          "args": {
+            "object": "blender_lid",
+            "destination": "blender"
+          },
+          "instruction": "Place the blender lid on the blender, release it after it is stably supported, then move the gripper clear.",
+          "rationale": "selected PLACE_OBJECT from current predicate state",
+          "planner_kind": "oracle_stub",
+          "obs_ref": "seed0:step229"
+        },
+        {
+          "kind": "ROUTE",
+          "skill": "PLACE_OBJECT",
+          "adapter_mode": "disabled",
+          "adapter_checkpoint": null,
+          "max_steps": 96,
+          "can_start": true
+        },
+        {
+          "kind": "VERIFY",
+          "skill": "PLACE_OBJECT",
+          "decision": "REPLAN",
+          "reason": "step budget 96 exhausted without done_when (supported_by AND released AND upright_error<=7deg AND gripper_clear>=0.15m)",
+          "elapsed": 96
+        },
+        {
+          "kind": "RESULT",
+          "skill": "PLACE_OBJECT",
+          "status": "TIMEOUT",
+          "steps": 96,
+          "terminated_by": "timeout",
+          "next": "replan"
+        },
+        {
+          "kind": "PLAN",
+          "planner_calls": 3,
+          "skill": "PLACE_OBJECT",
+          "args": {
+            "object": "blender_lid",
+            "destination": "blender"
+          },
+          "instruction": "Place the blender lid on the blender, release it after it is stably supported, then move the gripper clear.",
+          "rationale": "selected PLACE_OBJECT from current predicate state (retry after previous PLACE_OBJECT=TIMEOUT)",
+          "planner_kind": "oracle_stub",
+          "obs_ref": "seed0:step325"
+        },
+        {
+          "kind": "ROUTE",
+          "skill": "PLACE_OBJECT",
+          "adapter_mode": "disabled",
+          "adapter_checkpoint": null,
+          "max_steps": 96,
+          "can_start": true
+        },
+        {
+          "kind": "VERIFY",
+          "skill": "PLACE_OBJECT",
+          "decision": "REPLAN",
+          "reason": "step budget 96 exhausted without done_when (supported_by AND released AND upright_error<=7deg AND gripper_clear>=0.15m)",
+          "elapsed": 96
+        },
+        {
+          "kind": "RESULT",
+          "skill": "PLACE_OBJECT",
+          "status": "TIMEOUT",
+          "steps": 96,
+          "terminated_by": "timeout",
+          "next": "replan"
+        },
+        {
+          "kind": "PLAN",
+          "planner_calls": 4,
+          "skill": "GRASP_OBJECT",
+          "args": {
+            "object": "blender_lid",
+            "grasp_region": "lid_handle"
+          },
+          "instruction": "Grasp the blender lid securely at its handle and lift it clear.",
+          "rationale": "selected GRASP_OBJECT from current predicate state (retry after previous PLACE_OBJECT=TIMEOUT)",
+          "planner_kind": "oracle_stub",
+          "obs_ref": "seed0:step421"
+        },
+        {
+          "kind": "ROUTE",
+          "skill": "GRASP_OBJECT",
+          "adapter_mode": "disabled",
+          "adapter_checkpoint": null,
+          "max_steps": 208,
+          "can_start": true
+        },
+        {
+          "kind": "VERIFY",
+          "skill": "GRASP_OBJECT",
+          "decision": "REPLAN",
+          "reason": "step budget 208 exhausted without done_when (held AND lifted>=0.05m AND stable_for(20) AND no_disallowed_contact)",
+          "elapsed": 208
+        },
+        {
+          "kind": "RESULT",
+          "skill": "GRASP_OBJECT",
+          "status": "TIMEOUT",
+          "steps": 208,
+          "terminated_by": "timeout",
+          "next": "replan"
+        }
+      ]
+    },
+    {
+      "seed": 1,
+      "terminal": "budget_exhausted",
+      "task_success": false,
+      "planner_calls": 5,
+      "steps_used": 601,
+      "skills": [
+        {
+          "skill": "GRASP_OBJECT",
+          "status": "TIMEOUT",
+          "steps": 208,
+          "success_step": null,
+          "terminated_by": "timeout"
+        },
+        {
+          "skill": "GRASP_OBJECT",
+          "status": "SUCCESS",
+          "steps": 104,
+          "success_step": 104,
+          "terminated_by": "success"
+        },
+        {
+          "skill": "MOVE_OBJECT",
+          "status": "SUCCESS",
+          "steps": 45,
+          "success_step": 45,
+          "terminated_by": "success"
+        },
+        {
+          "skill": "PLACE_OBJECT",
+          "status": "TIMEOUT",
+          "steps": 96,
+          "success_step": null,
+          "terminated_by": "timeout"
+        },
+        {
+          "skill": "GRASP_OBJECT",
+          "status": "SUCCESS",
+          "steps": 148,
+          "success_step": 148,
+          "terminated_by": "success"
+        }
+      ],
+      "n_advance": 3,
+      "n_timeout": 2,
+      "n_failed": 0,
+      "base_failures": [
+        {
+          "skill": "GRASP_OBJECT",
+          "status": "TIMEOUT",
+          "reason": "step budget 208 exhausted without done_when (held AND lifted>=0.05m AND stable_for(20) AND no_disallowed_contact)"
+        },
+        {
+          "skill": "PLACE_OBJECT",
+          "status": "TIMEOUT",
+          "reason": "step budget 96 exhausted without done_when (supported_by AND released AND upright_error<=7deg AND gripper_clear>=0.15m)"
+        }
+      ],
+      "video": "media/architecture_smoke/seed1.mp4",
+      "timeline": [
+        {
+          "kind": "PLAN",
+          "planner_calls": 0,
+          "skill": "GRASP_OBJECT",
+          "args": {
+            "object": "blender_lid",
+            "grasp_region": "lid_handle"
+          },
+          "instruction": "Grasp the blender lid securely at its handle and lift it clear.",
+          "rationale": "selected GRASP_OBJECT from current predicate state",
+          "planner_kind": "oracle_stub",
+          "obs_ref": "seed1:step0"
+        },
+        {
+          "kind": "ROUTE",
+          "skill": "GRASP_OBJECT",
+          "adapter_mode": "disabled",
+          "adapter_checkpoint": null,
+          "max_steps": 208,
+          "can_start": true
+        },
+        {
+          "kind": "VERIFY",
+          "skill": "GRASP_OBJECT",
+          "decision": "REPLAN",
+          "reason": "step budget 208 exhausted without done_when (held AND lifted>=0.05m AND stable_for(20) AND no_disallowed_contact)",
+          "elapsed": 208
+        },
+        {
+          "kind": "RESULT",
+          "skill": "GRASP_OBJECT",
+          "status": "TIMEOUT",
+          "steps": 208,
+          "terminated_by": "timeout",
+          "next": "replan"
+        },
+        {
+          "kind": "PLAN",
+          "planner_calls": 1,
+          "skill": "GRASP_OBJECT",
+          "args": {
+            "object": "blender_lid",
+            "grasp_region": "lid_handle"
+          },
+          "instruction": "Grasp the blender lid securely at its handle and lift it clear.",
+          "rationale": "selected GRASP_OBJECT from current predicate state (retry after previous GRASP_OBJECT=TIMEOUT)",
+          "planner_kind": "oracle_stub",
+          "obs_ref": "seed1:step208"
+        },
+        {
+          "kind": "ROUTE",
+          "skill": "GRASP_OBJECT",
+          "adapter_mode": "disabled",
+          "adapter_checkpoint": null,
+          "max_steps": 208,
+          "can_start": true
+        },
+        {
+          "kind": "VERIFY",
+          "skill": "GRASP_OBJECT",
+          "decision": "ADVANCE",
+          "reason": "done_when satisfied for 20 consecutive step(s): held AND lifted>=0.05m AND stable_for(20) AND no_disallowed_contact",
+          "elapsed": 104
+        },
+        {
+          "kind": "RESULT",
+          "skill": "GRASP_OBJECT",
+          "status": "SUCCESS",
+          "steps": 104,
+          "terminated_by": "success",
+          "next": "advance"
+        },
+        {
+          "kind": "PLAN",
+          "planner_calls": 2,
+          "skill": "MOVE_OBJECT",
+          "args": {
+            "object": "blender_lid",
+            "destination": "closed_preplace_region"
+          },
+          "instruction": "Move the held blender lid to the pre-place region above the blender while maintaining a stable grasp and avoiding disallowed contact.",
+          "rationale": "selected MOVE_OBJECT from current predicate state",
+          "planner_kind": "oracle_stub",
+          "obs_ref": "seed1:step312"
+        },
+        {
+          "kind": "ROUTE",
+          "skill": "MOVE_OBJECT",
+          "adapter_mode": "disabled",
+          "adapter_checkpoint": null,
+          "max_steps": 288,
+          "can_start": true
+        },
+        {
+          "kind": "VERIFY",
+          "skill": "MOVE_OBJECT",
+          "decision": "ADVANCE",
+          "reason": "done_when satisfied for 3 consecutive step(s): held AND at_target(xy<=0.06m,z 0.015-0.25m) AND stable_for(3) AND no_disallowed_contact",
+          "elapsed": 45
+        },
+        {
+          "kind": "RESULT",
+          "skill": "MOVE_OBJECT",
+          "status": "SUCCESS",
+          "steps": 45,
+          "terminated_by": "success",
+          "next": "advance"
+        },
+        {
+          "kind": "PLAN",
+          "planner_calls": 3,
+          "skill": "PLACE_OBJECT",
+          "args": {
+            "object": "blender_lid",
+            "destination": "blender"
+          },
+          "instruction": "Place the blender lid on the blender, release it after it is stably supported, then move the gripper clear.",
+          "rationale": "selected PLACE_OBJECT from current predicate state",
+          "planner_kind": "oracle_stub",
+          "obs_ref": "seed1:step357"
+        },
+        {
+          "kind": "ROUTE",
+          "skill": "PLACE_OBJECT",
+          "adapter_mode": "disabled",
+          "adapter_checkpoint": null,
+          "max_steps": 96,
+          "can_start": true
+        },
+        {
+          "kind": "VERIFY",
+          "skill": "PLACE_OBJECT",
+          "decision": "REPLAN",
+          "reason": "step budget 96 exhausted without done_when (supported_by AND released AND upright_error<=7deg AND gripper_clear>=0.15m)",
+          "elapsed": 96
+        },
+        {
+          "kind": "RESULT",
+          "skill": "PLACE_OBJECT",
+          "status": "TIMEOUT",
+          "steps": 96,
+          "terminated_by": "timeout",
+          "next": "replan"
+        },
+        {
+          "kind": "PLAN",
+          "planner_calls": 4,
+          "skill": "GRASP_OBJECT",
+          "args": {
+            "object": "blender_lid",
+            "grasp_region": "lid_handle"
+          },
+          "instruction": "Grasp the blender lid securely at its handle and lift it clear.",
+          "rationale": "selected GRASP_OBJECT from current predicate state (retry after previous PLACE_OBJECT=TIMEOUT)",
+          "planner_kind": "oracle_stub",
+          "obs_ref": "seed1:step453"
+        },
+        {
+          "kind": "ROUTE",
+          "skill": "GRASP_OBJECT",
+          "adapter_mode": "disabled",
+          "adapter_checkpoint": null,
+          "max_steps": 208,
+          "can_start": true
+        },
+        {
+          "kind": "VERIFY",
+          "skill": "GRASP_OBJECT",
+          "decision": "ADVANCE",
+          "reason": "done_when satisfied for 20 consecutive step(s): held AND lifted>=0.05m AND stable_for(20) AND no_disallowed_contact",
+          "elapsed": 148
+        },
+        {
+          "kind": "RESULT",
+          "skill": "GRASP_OBJECT",
+          "status": "SUCCESS",
+          "steps": 148,
+          "terminated_by": "success",
+          "next": "advance"
+        }
+      ]
+    },
+    {
+      "seed": 2,
+      "terminal": "budget_exhausted",
+      "task_success": false,
+      "planner_calls": 5,
+      "steps_used": 792,
+      "skills": [
+        {
+          "skill": "GRASP_OBJECT",
+          "status": "SUCCESS",
+          "steps": 200,
+          "success_step": 200,
+          "terminated_by": "success"
+        },
+        {
+          "skill": "MOVE_OBJECT",
+          "status": "SUCCESS",
+          "steps": 54,
+          "success_step": 54,
+          "terminated_by": "success"
+        },
+        {
+          "skill": "PLACE_OBJECT",
+          "status": "TIMEOUT",
+          "steps": 96,
+          "success_step": null,
+          "terminated_by": "timeout"
+        },
+        {
+          "skill": "GRASP_OBJECT",
+          "status": "SUCCESS",
+          "steps": 154,
+          "success_step": 154,
+          "terminated_by": "success"
+        },
+        {
+          "skill": "MOVE_OBJECT",
+          "status": "TIMEOUT",
+          "steps": 288,
+          "success_step": null,
+          "terminated_by": "timeout"
+        }
+      ],
+      "n_advance": 3,
+      "n_timeout": 2,
+      "n_failed": 0,
+      "base_failures": [
+        {
+          "skill": "PLACE_OBJECT",
+          "status": "TIMEOUT",
+          "reason": "step budget 96 exhausted without done_when (supported_by AND released AND upright_error<=7deg AND gripper_clear>=0.15m)"
+        },
+        {
+          "skill": "MOVE_OBJECT",
+          "status": "TIMEOUT",
+          "reason": "step budget 288 exhausted without done_when (held AND at_target(xy<=0.06m,z 0.015-0.25m) AND stable_for(3) AND no_disallowed_contact)"
+        }
+      ],
+      "video": "media/architecture_smoke/seed2.mp4",
+      "timeline": [
+        {
+          "kind": "PLAN",
+          "planner_calls": 0,
+          "skill": "GRASP_OBJECT",
+          "args": {
+            "object": "blender_lid",
+            "grasp_region": "lid_handle"
+          },
+          "instruction": "Grasp the blender lid securely at its handle and lift it clear.",
+          "rationale": "selected GRASP_OBJECT from current predicate state",
+          "planner_kind": "oracle_stub",
+          "obs_ref": "seed2:step0"
+        },
+        {
+          "kind": "ROUTE",
+          "skill": "GRASP_OBJECT",
+          "adapter_mode": "disabled",
+          "adapter_checkpoint": null,
+          "max_steps": 208,
+          "can_start": true
+        },
+        {
+          "kind": "VERIFY",
+          "skill": "GRASP_OBJECT",
+          "decision": "ADVANCE",
+          "reason": "done_when satisfied for 20 consecutive step(s): held AND lifted>=0.05m AND stable_for(20) AND no_disallowed_contact",
+          "elapsed": 200
+        },
+        {
+          "kind": "RESULT",
+          "skill": "GRASP_OBJECT",
+          "status": "SUCCESS",
+          "steps": 200,
+          "terminated_by": "success",
+          "next": "advance"
+        },
+        {
+          "kind": "PLAN",
+          "planner_calls": 1,
+          "skill": "MOVE_OBJECT",
+          "args": {
+            "object": "blender_lid",
+            "destination": "closed_preplace_region"
+          },
+          "instruction": "Move the held blender lid to the pre-place region above the blender while maintaining a stable grasp and avoiding disallowed contact.",
+          "rationale": "selected MOVE_OBJECT from current predicate state",
+          "planner_kind": "oracle_stub",
+          "obs_ref": "seed2:step200"
+        },
+        {
+          "kind": "ROUTE",
+          "skill": "MOVE_OBJECT",
+          "adapter_mode": "disabled",
+          "adapter_checkpoint": null,
+          "max_steps": 288,
+          "can_start": true
+        },
+        {
+          "kind": "VERIFY",
+          "skill": "MOVE_OBJECT",
+          "decision": "ADVANCE",
+          "reason": "done_when satisfied for 3 consecutive step(s): held AND at_target(xy<=0.06m,z 0.015-0.25m) AND stable_for(3) AND no_disallowed_contact",
+          "elapsed": 54
+        },
+        {
+          "kind": "RESULT",
+          "skill": "MOVE_OBJECT",
+          "status": "SUCCESS",
+          "steps": 54,
+          "terminated_by": "success",
+          "next": "advance"
+        },
+        {
+          "kind": "PLAN",
+          "planner_calls": 2,
+          "skill": "PLACE_OBJECT",
+          "args": {
+            "object": "blender_lid",
+            "destination": "blender"
+          },
+          "instruction": "Place the blender lid on the blender, release it after it is stably supported, then move the gripper clear.",
+          "rationale": "selected PLACE_OBJECT from current predicate state",
+          "planner_kind": "oracle_stub",
+          "obs_ref": "seed2:step254"
+        },
+        {
+          "kind": "ROUTE",
+          "skill": "PLACE_OBJECT",
+          "adapter_mode": "disabled",
+          "adapter_checkpoint": null,
+          "max_steps": 96,
+          "can_start": true
+        },
+        {
+          "kind": "VERIFY",
+          "skill": "PLACE_OBJECT",
+          "decision": "REPLAN",
+          "reason": "step budget 96 exhausted without done_when (supported_by AND released AND upright_error<=7deg AND gripper_clear>=0.15m)",
+          "elapsed": 96
+        },
+        {
+          "kind": "RESULT",
+          "skill": "PLACE_OBJECT",
+          "status": "TIMEOUT",
+          "steps": 96,
+          "terminated_by": "timeout",
+          "next": "replan"
+        },
+        {
+          "kind": "PLAN",
+          "planner_calls": 3,
+          "skill": "GRASP_OBJECT",
+          "args": {
+            "object": "blender_lid",
+            "grasp_region": "lid_handle"
+          },
+          "instruction": "Grasp the blender lid securely at its handle and lift it clear.",
+          "rationale": "selected GRASP_OBJECT from current predicate state (retry after previous PLACE_OBJECT=TIMEOUT)",
+          "planner_kind": "oracle_stub",
+          "obs_ref": "seed2:step350"
+        },
+        {
+          "kind": "ROUTE",
+          "skill": "GRASP_OBJECT",
+          "adapter_mode": "disabled",
+          "adapter_checkpoint": null,
+          "max_steps": 208,
+          "can_start": true
+        },
+        {
+          "kind": "VERIFY",
+          "skill": "GRASP_OBJECT",
+          "decision": "ADVANCE",
+          "reason": "done_when satisfied for 20 consecutive step(s): held AND lifted>=0.05m AND stable_for(20) AND no_disallowed_contact",
+          "elapsed": 154
+        },
+        {
+          "kind": "RESULT",
+          "skill": "GRASP_OBJECT",
+          "status": "SUCCESS",
+          "steps": 154,
+          "terminated_by": "success",
+          "next": "advance"
+        },
+        {
+          "kind": "PLAN",
+          "planner_calls": 4,
+          "skill": "MOVE_OBJECT",
+          "args": {
+            "object": "blender_lid",
+            "destination": "closed_preplace_region"
+          },
+          "instruction": "Move the held blender lid to the pre-place region above the blender while maintaining a stable grasp and avoiding disallowed contact.",
+          "rationale": "selected MOVE_OBJECT from current predicate state",
+          "planner_kind": "oracle_stub",
+          "obs_ref": "seed2:step504"
+        },
+        {
+          "kind": "ROUTE",
+          "skill": "MOVE_OBJECT",
+          "adapter_mode": "disabled",
+          "adapter_checkpoint": null,
+          "max_steps": 288,
+          "can_start": true
+        },
+        {
+          "kind": "VERIFY",
+          "skill": "MOVE_OBJECT",
+          "decision": "REPLAN",
+          "reason": "step budget 288 exhausted without done_when (held AND at_target(xy<=0.06m,z 0.015-0.25m) AND stable_for(3) AND no_disallowed_contact)",
+          "elapsed": 288
+        },
+        {
+          "kind": "RESULT",
+          "skill": "MOVE_OBJECT",
+          "status": "TIMEOUT",
+          "steps": 288,
+          "terminated_by": "timeout",
+          "next": "replan"
+        }
+      ]
+    }
+  ],
+  "trace_type_legend": {
+    "plan": "planner boundary: obs ref + selected skill + args + rendered instruction + rationale",
+    "route": "manager validates can_start, renders instruction, base-only adapter mode, budget",
+    "window": "one base-VLA inference -> executed action window",
+    "frame": "recorded video frame index",
+    "verify": "verifier decision ADVANCE/REPLAN + reason",
+    "skill_result": "SkillResult status + next planner action"
+  }
+}

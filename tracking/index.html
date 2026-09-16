@@ -4,81 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RoboCasa · Xiaomi VLA</title>
-<style>
-  :root{--bg:#0f1115;--card:#181b22;--bd:#262b36;--tx:#e6e9ef;--dim:#9aa4b2;--ok:#4ade80;--run:#facc15;--wait:#94a3b8;--rev:#60a5fa;--red:#f87171;--acc:#818cf8}
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
-  /* top bar */
-  header{position:sticky;top:0;z-index:10;background:#12141a;border-bottom:1px solid var(--bd);backdrop-filter:blur(6px)}
-  .nav{max-width:960px;margin:0 auto;display:flex;align-items:center;gap:4px;padding:0 16px;height:52px;flex-wrap:wrap}
-  .brand{font-weight:700;font-size:15px;margin-right:14px;white-space:nowrap}
-  .brand span{color:var(--acc)}
-  .nav button{background:none;border:none;color:var(--dim);font:inherit;font-size:14px;padding:8px 13px;border-radius:8px;cursor:pointer}
-  .nav button:hover{color:var(--tx);background:#1c1f27}
-  .nav button.active{color:var(--tx);background:#242835}
-  .live{margin-left:auto;font-size:12px;color:var(--dim);display:flex;align-items:center;gap:6px}
-  .dot{width:8px;height:8px;border-radius:50%;background:var(--run);box-shadow:0 0 8px var(--run);animation:pulse 1.6s infinite}
-  @keyframes pulse{50%{opacity:.4}}
-  /* layout */
-  .wrap{max-width:960px;margin:0 auto;padding:24px 16px 70px}
-  .tab{display:none}.tab.active{display:block}
-  h1{font-size:21px;margin:0 0 16px}
-  .card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:18px 20px;margin:14px 0}
-  h2{font-size:16px;margin:0 0 12px;padding-bottom:8px;border-bottom:1px solid var(--bd)}
-  table{width:100%;border-collapse:collapse;font-size:14px}
-  th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--bd);vertical-align:top}
-  th{color:var(--dim);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
-  tr:last-child td{border-bottom:none}
-  code{background:#0c0e13;border:1px solid var(--bd);border-radius:5px;padding:1px 6px;font-size:12px;color:#c9d3e0}
-  .badge{display:inline-block;font-size:12px;font-weight:600;padding:2px 9px;border-radius:20px;white-space:nowrap}
-  .b-ok{background:rgba(74,222,128,.13);color:var(--ok)}
-  .b-run{background:rgba(250,204,21,.14);color:var(--run)}
-  .b-wait{background:rgba(148,163,184,.15);color:var(--wait)}
-  .b-rev{background:rgba(96,165,250,.15);color:var(--rev)}
-  .b-blk{background:rgba(248,113,113,.14);color:var(--red)}
-  .kpi{display:flex;gap:12px;flex-wrap:wrap;margin:6px 0}
-  .kpi div{flex:1;min-width:120px;background:#0c0e13;border:1px solid var(--bd);border-radius:9px;padding:12px}
-  .kpi .n{font-size:20px;font-weight:700}.kpi .l{font-size:12px;color:var(--dim)}
-  ul{margin:6px 0;padding-left:20px}li{margin:3px 0}
-  .now{border-left:3px solid var(--run)}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
-  video{width:100%;border-radius:8px;background:#000;display:block}
-  .vcap{font-size:13px;margin:8px 0 2px}
-  .vsub{font-size:12px;color:var(--dim)}
-  .ok{color:var(--ok)}.no{color:var(--red)}
-  .dim{color:var(--dim);font-size:13px}
-  .foot{color:var(--dim);font-size:12px;margin-top:26px;text-align:center}
-  a{color:var(--rev)}
-  .filt{background:#0c0e13;border:1px solid var(--bd);color:var(--dim);font:inherit;font-size:13px;padding:8px 14px;border-radius:8px;cursor:pointer}
-  .filt.active{background:#242835;color:var(--tx);border-color:var(--acc)}
-  .bar{display:inline-block;height:7px;border-radius:4px;background:var(--acc);vertical-align:middle;margin-right:7px}
-  .sr{font-variant-numeric:tabular-nums}
-  th.sort{cursor:pointer;user-select:none}
-  th.sort:hover{color:var(--tx)}
-  th.sort .ar{opacity:.5;font-size:10px;margin-left:3px}
-  .item{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd)}
-  .item:last-child{border-bottom:none}
-  .item .tt{flex:1}
-  .item .nt{font-size:12px;color:var(--dim);margin-top:2px}
-  .chk{width:16px;height:16px;border:1.5px solid var(--dim);border-radius:5px;margin-top:2px;flex:none}
-  .chk.on{background:var(--ok);border-color:var(--ok)}
-  .rl-tabs{display:flex;gap:8px;margin-bottom:6px;flex-wrap:wrap}
-  .rl-tabs button{background:#0c0e13;border:1px solid var(--bd);color:var(--dim);font:inherit;font-size:13px;padding:6px 14px;border-radius:8px;cursor:pointer}
-  .rl-tabs button.active{background:#242835;color:var(--tx);border-color:var(--acc)}
-  .rl-view{display:grid;grid-template-columns:1.3fr 1fr;gap:20px}
-  @media(max-width:720px){.rl-view{grid-template-columns:1fr}}
-  .rl-rewardbox{background:#0c0e13;border:1px solid var(--bd);border-radius:10px;padding:12px 14px;margin-bottom:12px}
-  .rl-cum{font-size:30px;font-weight:700;font-variant-numeric:tabular-nums}
-  .rl-pred{width:100%;border-collapse:collapse}
-  .rl-pred td{padding:5px 6px;border-bottom:1px solid var(--bd);font-size:13px}
-  .rl-pred td:last-child{text-align:right;font-variant-numeric:tabular-nums}
-  .pt{color:var(--ok);font-weight:600}.pf{color:var(--dim)}
-  .fire{color:var(--run);font-weight:600}
-  .tgt{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px}
-  .tgt .tk{width:15px;height:15px;border:1.5px solid var(--dim);border-radius:5px;flex:none}
-  .tgt .tk.on{background:var(--ok);border-color:var(--ok)}
-  .tgt .tb{margin-left:auto;color:var(--dim);font-variant-numeric:tabular-nums}
-</style>
+<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/inference.css">
 </head>
 <body>
 <header>
@@ -87,6 +14,8 @@
     <button data-tab="now" class="active">현재 작업</button>
     <button data-tab="tasks">RoboCasa Task</button>
     <button data-tab="rlenv">RL 환경</button>
+    <button data-tab="rltrain">RL 학습</button>
+    <button data-tab="inference">Inference</button>
     <button data-tab="attend">실험 결과</button>
     <button data-tab="dataset">데이터셋</button>
     <button data-tab="report">작업 보고</button>
@@ -119,6 +48,323 @@
   <div class="card">
     <h2>📝 Note</h2>
     <div id="b-note"></div>
+  </div>
+</section>
+
+<!-- ===== RL 학습 ===== -->
+<section id="rltrain" class="tab">
+  <h1>RL 학습 설계</h1>
+
+  <div class="card rl-design-card">
+    <div class="section-head">
+      <h2>1. 전체 모델 아키텍처</h2>
+      <span class="badge b-ok">정리 완료</span>
+    </div>
+
+    <div class="arch-stack" aria-label="VLM planner와 VLA 실행 계층">
+      <div class="arch-node arch-planner">
+        <span class="arch-kicker">Planning layer</span>
+        <strong>VLM Planner</strong>
+        <span>전체 task를 보고 다음 skill을 선택</span>
+      </div>
+      <div class="arch-arrow"><span>SkillCall(name, args, prompt)</span>↓</div>
+      <div class="arch-node arch-manager">
+        <span class="arch-kicker">Control layer</span>
+        <strong>Execution Manager · Router</strong>
+        <span>adapter 선택 · step budget 관리 · verifier 호출</span>
+      </div>
+      <div class="arch-arrow"><span>고정 instruction + observation</span>↓</div>
+      <div class="arch-pair">
+        <div class="arch-node">
+          <span class="arch-kicker">Shared policy</span>
+          <strong>RoboCasa365 VLA</strong>
+          <span>영상·상태·instruction으로 action chunk 생성</span>
+        </div>
+        <div class="arch-plus">+</div>
+        <div class="arch-node arch-adapter">
+          <span class="arch-kicker">Selected expert</span>
+          <strong>Skill Adapter</strong>
+          <span>GRASP_OBJECT / MOVE_OBJECT / PLACE_OBJECT 중 하나</span>
+        </div>
+      </div>
+      <div class="arch-arrow"><span>Action chunk</span>↓</div>
+      <div class="arch-node arch-world">
+        <span class="arch-kicker">Execution layer</span>
+        <strong>Simulator · Robot</strong>
+        <span>행동 실행 후 새로운 observation과 predicate 생성</span>
+      </div>
+      <div class="arch-feedback">↺ Manager/Verifier가 postcondition과 handoff-ready를 검사해 <b>advance · retry · replan</b></div>
+    </div>
+
+    <h3 class="subhead">각 부분 정의</h3>
+    <div class="definition-grid">
+      <div><b>VLM Planner</b><span>전체 목표와 현재 상태를 바탕으로 다음 skill과 arguments를 결정한다.</span></div>
+      <div><b>Execution Manager</b><span>SkillCall을 실행 단위로 바꾸고 adapter, instruction, budget을 설정한다.</span></div>
+      <div><b>VLA Backbone</b><span>공통 시각·언어·로봇 제어 능력을 제공하는 Xiaomi RoboCasa365 정책이다.</span></div>
+      <div><b>Skill Adapter</b><span>선택된 skill의 행동을 강화하는 경량 파라미터다. 초기안은 skill별 LoRA다.</span></div>
+      <div><b>Verifier</b><span>simulator predicate를 우선 사용해 성공과 다음 skill 실행 가능 상태를 판정한다.</span></div>
+    </div>
+
+    <h3 class="subhead">Task 수행 흐름</h3>
+    <div class="task-flow">
+      <div><i>1</i><span>전체 task와 observation을 Planner에 입력</span></div>
+      <div><i>2</i><span>Planner가 다음 SkillCall 선택</span></div>
+      <div><i>3</i><span>Manager가 adapter와 고정 instruction 설정</span></div>
+      <div><i>4</i><span>VLA가 action chunk 생성·실행</span></div>
+      <div><i>5</i><span>Verifier가 postcondition과 handoff-ready 검사</span></div>
+      <div><i>6</i><span>성공이면 다음 skill, 실패면 retry 또는 replan</span></div>
+    </div>
+  </div>
+
+  <div class="card rl-design-card">
+    <div class="section-head">
+      <h2>2. 대상 Task와 Skill 정의</h2>
+      <span class="badge b-ok">정리 완료</span>
+    </div>
+
+    <div class="target-task">
+      <span class="arch-kicker">Target task</span>
+      <strong>CloseBlenderLid</strong>
+      <span>뚜껑 손잡이를 잡고, 충돌 없이 닫힌 위치까지 이동한 뒤, 닫힌 상태를 유지하며 놓는다.</span>
+    </div>
+
+    <h3 class="subhead">레퍼런스 기반 설계 원칙</h3>
+    <div class="reference-strip">
+      <a class="reference-chip" href="https://www.sciencedirect.com/science/article/pii/S0004370299000521" target="_blank" rel="noreferrer"><b>Options</b><span>initiation · policy · termination</span></a>
+      <a class="reference-chip" href="https://say-can.github.io/" target="_blank" rel="noreferrer"><b>SayCan</b><span>planner description · affordance</span></a>
+      <a class="reference-chip" href="https://arxiv.org/abs/2403.01823" target="_blank" rel="noreferrer"><b>RT-H</b><span>atomic language motion</span></a>
+      <a class="reference-chip" href="https://arxiv.org/pdf/2607.06256" target="_blank" rel="noreferrer"><b>Semantic Handoff</b><span>typed call · φ ∧ ρ handoff</span></a>
+    </div>
+
+    <h3 class="subhead">공통 실행 인터페이스</h3>
+    <pre class="contract-code"><code>Skill:
+  name: 스킬 식별자
+  description: Planner가 스킬을 고를 때 읽는 설명
+  args: 대상 물체와 목표 위치
+  instruction: VLA에 직접 주는 명령
+  can_start: 시작 가능한 상태
+  done_when: 성공 및 handoff 조건
+  max_steps: 제한 시간
+
+SkillResult:
+  status: SUCCESS | FAILED | TIMEOUT
+  predicates: 종료 시 simulator 상태</code></pre>
+    <p class="schema-note"><b>실행 규칙</b> — <code>can_start</code>일 때만 실행하고, <code>done_when</code>이 참이면 종료한다. 시간 안에 충족하지 못하면 실패 결과를 Planner에 돌려준다. 다음 스킬은 계약에 고정하지 않고 VLM Planner가 현재 상태를 보고 선택한다.</p>
+
+    <div class="skill-contract-grid">
+      <article class="skill-contract">
+        <div class="contract-head">
+          <div><span class="skill-num-inline">01</span><h3>GRASP_OBJECT</h3></div>
+          <span class="adapter-key">adapter: grasp</span>
+        </div>
+        <pre class="contract-code"><code>name: GRASP_OBJECT
+description_template: "Grasp {object} at {grasp_region}."
+args_schema:
+  object: ObjectRef
+  grasp_region: RegionRef
+  min_lift: Distance
+  stable_steps: int
+  max_steps: int
+instruction_template: "Grasp {object} securely at {grasp_region} and lift it clear."
+can_start: reachable(object) AND NOT held(object)
+done_when:
+  held(object)
+  AND lifted(object, min_lift)
+  AND stable_for(stable_steps)
+  AND no_disallowed_contact(object)</code></pre>
+      </article>
+
+      <article class="skill-contract">
+        <div class="contract-head">
+          <div><span class="skill-num-inline">02</span><h3>MOVE_OBJECT</h3></div>
+          <span class="adapter-key">adapter: move_holding</span>
+        </div>
+        <pre class="contract-code"><code>name: MOVE_OBJECT
+description_template: "Move {object} to {destination} while maintaining grasp."
+args_schema:
+  object: ObjectRef
+  destination: TargetRegion
+  position_tolerance: Tolerance
+  stable_steps: int
+  max_steps: int
+instruction_template: "Move the held {object} to {destination} while maintaining a stable grasp and avoiding disallowed contact."
+can_start: held(object)
+done_when:
+  held(object)
+  AND at_target(object, destination, position_tolerance)
+  AND stable_for(stable_steps)
+  AND no_disallowed_contact(object)</code></pre>
+      </article>
+
+      <article class="skill-contract">
+        <div class="contract-head">
+          <div><span class="skill-num-inline">03</span><h3>PLACE_OBJECT</h3></div>
+          <span class="adapter-key">adapter: place</span>
+        </div>
+        <pre class="contract-code"><code>name: PLACE_OBJECT
+description_template: "Place {object} at {destination}, release, and retreat."
+args_schema:
+  object: ObjectRef
+  destination: SupportRef
+  pose_tolerance: Tolerance
+  clear_distance: Distance
+  max_steps: int
+instruction_template: "Place {object} at {destination}, release it after it is stably supported, then move the gripper clear."
+can_start: held(object) AND near_target(object, destination)
+done_when:
+  supported_by(object, destination)
+  AND released(object)
+  AND pose_valid(object, pose_tolerance)
+  AND gripper_clear(object, clear_distance)</code></pre>
+      </article>
+    </div>
+
+    <h3 class="subhead">CloseBlenderLid task binding</h3>
+    <pre class="contract-code"><code>GRASP_OBJECT:
+  args: {object: blender_lid, grasp_region: lid_handle,
+         min_lift: 0.05m, stable_steps: 20, max_steps: 208}
+  instruction: "Grasp the blender lid securely at its handle and lift it clear."
+
+MOVE_OBJECT:
+  args: {object: blender_lid, destination: closed_preplace_region,
+         position_tolerance: {xy: 0.06m, z: [0.015m, 0.25m]},
+         stable_steps: 3, max_steps: 288}
+  instruction: "Move the held blender lid to the pre-place region above the blender while maintaining a stable grasp and avoiding disallowed contact."
+
+PLACE_OBJECT:
+  args: {object: blender_lid, destination: blender,
+         pose_tolerance: {upright_error: 7deg},
+         clear_distance: 0.15m, max_steps: 96}
+  instruction: "Place the blender lid on the blender, release it after it is stably supported, then move the gripper clear."</code></pre>
+    <div class="implementation-note"><b>일반화 규칙</b> — skill 이름, description, instruction, 시작·종료 조건에는 특정 물체나 task를 넣지 않는다. <code>held · lifted · at_target · supported_by · released · pose_valid · gripper_clear</code>를 공통 predicate로 사용하고, 물체·목표·거리·각도·유지 step은 args로 전달한다. CloseBlenderLid 환경에서는 이 predicate를 기존 RoboCasa simulator 신호에 매핑한다.</div>
+
+    <div class="implementation-note"><b>왜 이 7개만 남겼나</b> — <code>name · description · args</code>는 Planner 선택에, <code>instruction</code>은 VLA 실행에, <code>can_start · done_when</code>은 안전한 시작과 종료에, <code>max_steps</code>는 무한 실행 방지에 필요하다. affordance, reward, recovery, verifier 주기, adapter 상세 설정은 학습·런타임 설정으로 분리한다.</div>
+  </div>
+
+  <div class="card rl-design-card">
+    <div class="section-head">
+      <h2>3. 스킬 학습 및 검증</h2>
+      <span class="badge b-rev">학습 계획</span>
+    </div>
+
+    <div class="target-task">
+      <span class="arch-kicker">Training decision</span>
+      <strong>Zero-shot instruction probe → 필요한 skill만 SFT → RL</strong>
+      <span>먼저 정의된 instruction으로 기존 정책을 평가한다. 충분히 제어되는 skill은 SFT를 생략하고, 구분되지 않는 skill만 기존 성공 trajectory로 grounding한다.</span>
+    </div>
+
+    <div class="train-stage-grid">
+      <article class="train-stage">
+        <h3>3.1 Zero-shot instruction rollout</h3>
+        <p>학습 전에 정의된 instruction만 넣어 기존 정책의 skill 제어 능력을 측정한다.</p>
+        <ul>
+          <li>GRASP는 reset, MOVE는 grasp 완료, PLACE는 pre-place 완료 상태에서 시작</li>
+          <li>서로 다른 environment seed에서 초기 배치·형상·entry state를 무작위화</li>
+          <li>skill success · wrong-skill action · done_when 도달을 기록</li>
+          <li>성공 뒤 추가 window에서 불필요한 행동 지속 여부 확인</li>
+          <li>영상·predicate trace·action 차이를 저장</li>
+        </ul>
+      </article>
+
+      <article class="train-stage">
+        <h3>3.2 SFT 필요성 판정</h3>
+        <p>Zero-shot 결과가 통과한 skill은 SFT를 생략하고, 실패한 skill만 grounding한다.</p>
+        <ul>
+          <li>PASS: instruction별 행동 분리 + skill 성공 + manager가 done_when 감지</li>
+          <li>FAIL: 동일 행동 반복, wrong-skill 진행 또는 낮은 성공률</li>
+          <li>실패 시 기존 성공 trajectory를 skill 구간으로 분할</li>
+          <li>새 demonstration 없이 task goal + skill instruction을 부착</li>
+          <li>Xiaomi backbone 고정, 해당 skill LoRA만 짧게 SFT</li>
+        </ul>
+      </article>
+
+      <article class="train-stage">
+        <h3>3.3 RL 미세조정</h3>
+        <p>Zero-shot 또는 SFT gate를 통과한 정책의 성공률과 강건성만 개선한다.</p>
+        <ul>
+          <li>주 알고리즘: skill별 Flow-GRPO (πRL Flow-SDE)</li>
+          <li>reward: simulator predicate 중심</li>
+          <li>GRASP: 안정 파지 · MOVE: 유지/충돌 회피 · PLACE: 안착/해제/후퇴</li>
+          <li>drop · collision · timeout에 penalty</li>
+          <li>같은 entry state 안에서 group-relative advantage 계산, group 간 seed는 무작위화</li>
+          <li>LoRA adapter만 update하고 frozen base와 KL로 성능 붕괴 방지</li>
+        </ul>
+      </article>
+
+      <article class="train-stage">
+        <h3>3.4 검증 및 모델 선택</h3>
+        <p>단일 skill 성능과 실제 연결 상태 성능을 함께 본다.</p>
+        <ul>
+          <li>skill success와 wrong-skill execution</li>
+          <li>manager의 stop latency와 retry/replan 비율</li>
+          <li>drop · collision · timeout 비율</li>
+          <li>clean state 대비 chained state 성능 저하</li>
+          <li>세 skill 연결 후 CloseBlenderLid 성공률</li>
+        </ul>
+      </article>
+    </div>
+
+    <div class="train-gate">
+      <h3>RL 시작 조건</h3>
+      <p>같은 observation과 noise seed에서 instruction별 올바른 행동이 분리되고 각 skill이 <code>done_when</code>을 달성해야 한다. 통과한 skill은 SFT 없이 RL로, 실패한 skill은 grounding SFT 후 재평가한다. 실제 실행 중단은 외부 Manager가 <code>done_when</code>을 감지해 담당한다.</p>
+    </div>
+
+    <h3 class="subhead">사용할 RL 알고리즘</h3>
+    <div class="target-task">
+      <span class="arch-kicker">Primary algorithm</span>
+      <strong>Skill-wise Flow-GRPO · πRL Flow-SDE</strong>
+      <span>Flow policy의 ODE sampler를 marginal-preserving SDE로 변환해 rollout log-prob을 계산하고, 같은 초기 상태에서 생성한 action trajectory 그룹의 상대 보상으로 각 skill adapter를 업데이트한다.</span>
+    </div>
+    <table>
+      <tr><th>항목</th><th>선택</th><th>이유</th></tr>
+      <tr><td>정책 최적화</td><td><b>GRPO</b></td><td>별도 critic 없이 같은 entry state의 rollout 그룹으로 advantage를 계산할 수 있다.</td></tr>
+      <tr><td>Flow log-prob</td><td><b>πRL Flow-SDE</b></td><td>결정론적 flow ODE를 RL 탐색과 likelihood 계산이 가능한 SDE로 바꾼다.</td></tr>
+      <tr><td>학습 단위</td><td><b>Skill별</b></td><td>GRASP_OBJECT · MOVE_OBJECT · PLACE_OBJECT의 reward와 초기 상태가 서로 다르다.</td></tr>
+      <tr><td>업데이트 범위</td><td><b>선택된 LoRA adapter</b></td><td>RoboCasa365 base 능력을 보존하고 skill 간 간섭을 줄인다.</td></tr>
+      <tr><td>Reward</td><td><b>Simulator predicate</b></td><td>done_when 성공, milestone, collision/drop/timeout을 정확하게 계산한다.</td></tr>
+      <tr><td>안정화</td><td><b>Clipped ratio + KL-to-base</b></td><td>적은 rollout에서 adapter가 base policy를 덮어쓰는 것을 막는다.</td></tr>
+    </table>
+    <div class="implementation-note"><b>Sampler gate</b> — 현재 sampler가 정확한 πRL Flow-SDE 조건을 만족하는지 먼저 검증한다. 단순 noise 주입 sampler라면 πRL로 부르지 않고 baseline으로 분리하며, ODE/SDE action 분포와 log-prob·ratio 검증을 통과한 뒤 학습한다.</div>
+    <div class="reference-strip">
+      <a class="reference-chip" href="https://arxiv.org/abs/2505.05470" target="_blank" rel="noreferrer"><b>Flow-GRPO</b><span>ODE-to-SDE · group-relative RL</span></a>
+      <a class="reference-chip" href="https://arxiv.org/abs/2510.25889" target="_blank" rel="noreferrer"><b>πRL</b><span>Flow-SDE for flow-based VLA</span></a>
+      <a class="reference-chip" href="https://arxiv.org/abs/2606.31846" target="_blank" rel="noreferrer"><b>Z-1</b><span>task-wise GRPO on RoboCasa</span></a>
+      <a class="reference-chip" href="https://arxiv.org/abs/2402.03300" target="_blank" rel="noreferrer"><b>GRPO</b><span>critic-free group advantage</span></a>
+    </div>
+
+    <div class="implementation-note"><b>참고한 방향</b> — RT-H는 세밀한 language motion과 action의 연결을 학습하고, CORAL은 instruction별 LoRA expert로 간섭을 줄인다. 따라서 여기서는 대규모 행동 SFT 대신 기존 trajectory를 이용한 최소 grounding SFT만 수행한다.</div>
+  </div>
+</section>
+
+<!-- ===== Inference framework ===== -->
+<section id="inference" class="tab">
+  <h1>Inference 과정</h1>
+  <p class="dim">학습이 완료됐다고 가정한 전체 실행 프레임워크입니다. 단계 버튼을 눌러 Planner부터 task 종료까지의 입력·출력·판정을 확인할 수 있습니다.</p>
+  <div id="inf-assumption" class="inf-assumption"></div>
+  <div class="card"><h2>전체 프레임워크</h2><div id="inf-layers" class="inf-layers"></div></div>
+  <div class="card">
+    <h2>CloseBlenderLid 실행 Trace</h2>
+    <div class="inf-controls"><button id="inf-prev">이전</button><div class="inf-progress"><i id="inf-progress"></i></div><button id="inf-next">다음</button></div>
+    <div class="inf-trace"><div id="inf-steps" class="inf-steps"></div><div id="inf-detail" class="inf-detail"></div></div>
+  </div>
+  <div class="card"><h2>배포 Skill Registry</h2><table><thead><tr><th>Skill / Adapter</th><th>Arguments</th><th>Rendered instruction</th><th>done_when</th></tr></thead><tbody id="inf-skills"></tbody></table></div>
+
+  <!-- ===== Adapter-free 아키텍처 스모크 테스트 (t_1d5b404f) ===== -->
+  <div class="card" id="smoke-card">
+    <h2>Adapter-free 아키텍처 스모크 테스트 <span class="dim" style="font-size:13px">· t_1d5b404f</span></h2>
+    <p class="dim" id="smoke-intro"></p>
+    <div id="smoke-banner"></div>
+    <div class="kpi" id="smoke-kpi"></div>
+
+    <h3 style="margin:18px 0 8px">아키텍처 통과 체크 (근거 포함)</h3>
+    <table><thead><tr><th>검사</th><th>결과</th><th>근거</th></tr></thead><tbody id="smoke-checks"></tbody></table>
+
+    <h3 style="margin:18px 0 8px">에피소드 결과 (랜덤 초기상태 3개 seed)</h3>
+    <p class="dim">각 행을 누르면 그 seed의 영상 + planner/skill 타임라인이 아래로 펼쳐집니다. task 성공은 참고용이며, base-policy의 skill 실패는 아키텍처 실패가 아닙니다.</p>
+    <table><thead><tr><th>seed</th><th>종료</th><th>planner calls</th><th>steps</th><th>skill 시퀀스</th><th>task 성공</th></tr></thead><tbody id="smoke-eps"></tbody></table>
+
+    <h3 style="margin:18px 0 8px">관측된 base-policy 실패 (정책 결과, 아키텍처 아님)</h3>
+    <table><thead><tr><th>seed</th><th>skill</th><th>상태</th><th>사유</th></tr></thead><tbody id="smoke-fail"></tbody></table>
   </div>
 </section>
 
@@ -227,30 +473,23 @@
   </div>
 </section>
 
-<!-- ===== 실험 결과 (instruction-attendance) ===== -->
+<!-- ===== 실험 결과 ===== -->
 <section id="attend" class="tab">
-  <h1>실험 결과 · Instruction Attendance</h1>
-  <p class="dim" id="at-sub"></p>
-
-  <div class="card" style="border-left:3px solid var(--acc)">
-    <h2>❓ 질문 &amp; 결론</h2>
-    <div id="at-verdict"></div>
-  </div>
-
+  <h1>실험 결과</h1>
+  <p class="dim">목록에서 실험을 찾고, 항목을 선택하면 독립된 상세 페이지에서 영상과 결과를 확인할 수 있습니다.</p>
+  <div class="kpi" id="exp-kpi"></div>
   <div class="card">
-    <h2>🔬 방법</h2>
-    <p class="dim" id="at-method"></p>
-    <p class="dim" style="margin-top:8px"><b>읽는 법:</b> <b style="color:var(--ok)">효과크기(ES)</b>가 클수록 그 지시로 액션이 크게 달라짐 = instruction에 반응. ES가 0에 가까우면 지시를 바꿔도 액션이 그대로 = 무시. <b>cos</b>는 정답 지시와의 방향 유사도(1=동일, 0=직교, 낮을수록 다른 행동).</p>
-  </div>
-
-  <div id="at-states"></div>
-
-  <div class="card">
-    <h2>🎬 발산 사례 영상</h2>
-    <p class="dim" style="margin:0 0 10px">같은 obs(task 시작)에서 지시만 바꿨을 때 궤적이 갈라지는 사례. → 영상은 <a href="#" onclick="document.querySelector('[data-tab=rlenv]').click();return false">RL 환경 탭</a> 참고 또는 로컬 <code>videos/CloseBlenderLid/instr_attend/</code></p>
+    <div class="exp-controls">
+      <input id="exp-search" placeholder="실험명, ID, 태그 검색…">
+      <select id="exp-task"><option value="">모든 Task</option></select>
+      <select id="exp-model"><option value="">모든 모델</option></select>
+      <select id="exp-status"><option value="">모든 상태</option><option value="complete">완료</option><option value="pilot">Pilot</option><option value="running">진행 중</option></select>
+    </div>
+    <div class="exp-list-head"><span>날짜 · ID</span><span>실험</span><span>Task / 모델</span><span>상태</span></div>
+    <div id="exp-list"></div>
+    <p class="dim" id="exp-empty" style="display:none;margin:14px 0 0">조건에 맞는 실험이 없습니다.</p>
   </div>
 </section>
-
 <!-- ===== 데이터셋 (skill-SFT) ===== -->
 <section id="dataset" class="tab">
   <h1>SFT 학습 데이터 · 잘린 skill 조각</h1>
@@ -323,244 +562,7 @@
 
 <div class="foot">source: <code>tracking/</code> (git) · 초안 · 메뉴는 필요에 따라 추가 예정</div>
 
-<script>
-// tab switch
-document.querySelectorAll('.nav button[data-tab]').forEach(b=>{
-  b.onclick=()=>{
-    document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));
-    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-    b.classList.add('active');
-    document.getElementById(b.dataset.tab).classList.add('active');
-  };
-});
-// board (running / agent todo / user todo)
-const BADGE={run:'b-run',wait:'b-wait',rev:'b-rev',blk:'b-blk',ok:'b-ok'};
-const BLABEL={run:'진행',wait:'대기',rev:'리뷰',blk:'블로커',ok:'완료'};
-fetch('board.json').then(r=>r.json()).then(b=>{
-  const P=b.purpose||{};
-  document.getElementById('b-purpose').innerHTML=P.north_star?`<div class="tt">${P.north_star}</div>`:'<div class="dim">없음</div>';
-  document.getElementById('b-agent').innerHTML=(b.agent_todo||[]).map(x=>`
-    <div class="item"><div class="tt">${x.title}${x.note?`<div class="nt">${x.note}</div>`:''}</div><span class="badge ${BADGE[x.badge]||'b-wait'}">${BLABEL[x.badge]||''}</span></div>`).join('')||'<div class="dim">없음</div>';
-  document.getElementById('b-user').innerHTML=(b.user_todo||[]).map(x=>`
-    <div class="item"><span class="chk ${x.done?'on':''}"></span><div class="tt" style="${x.done?'color:var(--dim)':''}"><span style="${x.done?'text-decoration:line-through':''}">${x.title}</span>${x.why?`<div class="nt" style="font-size:12px"><b style="color:var(--acc)">왜:</b> ${x.why}</div>`:''}</div></div>`).join('')||'<div class="dim">없음</div>';
-  document.getElementById('b-note').innerHTML=(b.note||[]).map(n=>`<div class="item"><span style="color:var(--acc);flex:none">•</span><div class="tt nt" style="font-size:13px">${n}</div></div>`).join('')||'<div class="dim">없음</div>';
-}).catch(e=>{});
-// load demos (grouped by task) then benchmark tasks
-let TASKS=[], DEMOS={}, filt='all', sortK=null, sortDir=1;
-function srColor(sr){ if(sr>=70)return'var(--ok)'; if(sr>=40)return'var(--run)'; if(sr>=15)return'#fb923c'; return'var(--red)'; }
-function renderTasks(){
-  const q=(document.getElementById('tsearch').value||'').toLowerCase();
-  let rows=TASKS.filter(t=>{
-    if(filt==='eval') return t.eval && t.name.toLowerCase().includes(q);
-    return (filt==='all'||t.cat===filt)&&t.name.toLowerCase().includes(q);
-  });
-  if(sortK){
-    rows=rows.slice().sort((a,b)=>{
-      let x=a[sortK], y=b[sortK];
-      if(x==null&&y==null)return 0; if(x==null)return 1; if(y==null)return -1; // nulls last
-      if(typeof x==='string')return x.localeCompare(y)*sortDir;
-      return (x-y)*sortDir;
-    });
-  }
-  document.getElementById('task-body').innerHTML=rows.map((t,i)=>{
-    const sr = t.sr==null ? '<span class="dim">—</span>'
-      : `<span class="bar" style="width:${Math.max(t.sr*0.6,2)}px;background:${srColor(t.sr)}"></span>${t.sr.toFixed(0)}%`;
-    const ds=DEMOS[t.name]||[];
-    const demo = ds.length ? `<a href="#" onclick="toggleDemo('${t.name}',this);return false">▶ ${ds.length}</a>` : '<span class="dim">—</span>';
-    const main=`<tr data-task="${t.name}"><td class="dim">${i+1}</td><td>${t.name}</td><td><span class="dim">${t.cat}</span></td>
-      <td class="sr">${sr}</td><td class="dim">${t.h||'—'}</td><td>${demo}</td></tr>`;
-    const drop = ds.length ? `<tr class="drop" id="drop-${t.name}" style="display:none"><td colspan="6" style="padding:0 10px 14px">
-      <div class="grid">${ds.map(d=>`<div class="card" style="margin:0">
-        <video src="${d.file}" controls preload="metadata"></video>
-        <div class="vcap"><b>${d.skill}</b> ${d.success?'<span class="ok">성공</span>':'<span class="no">실패</span>'}</div>
-        <div class="vsub">${d.instr}${d.reason?'<br>사유: '+d.reason:''}</div></div>`).join('')}</div></td></tr>` : '';
-    return main+drop;
-  }).join('');
-  // header arrows
-  document.querySelectorAll('th.sort').forEach(h=>{
-    const a=h.querySelector('.ar'); if(a)a.remove();
-    if(h.dataset.k===sortK) h.insertAdjacentHTML('beforeend',`<span class="ar">${sortDir>0?'▲':'▼'}</span>`);
-  });
-}
-function toggleDemo(name,el){
-  const r=document.getElementById('drop-'+name); if(!r)return;
-  const open=r.style.display==='none';
-  r.style.display=open?'table-row':'none';
-  el.textContent=(open?'▼ ':'▶ ')+(DEMOS[name]||[]).length;
-}
-Promise.all([
-  fetch('demos.json').then(r=>r.json()).catch(()=>[]),
-  fetch('robocasa_tasks.json').then(r=>r.json())
-]).then(([demos,d])=>{
-  demos.forEach(x=>{(DEMOS[x.task]=DEMOS[x.task]||[]).push(x);});
-  TASKS=d.tasks;
-  document.getElementById('k-total').textContent=d.total;
-  document.getElementById('k-eval').textContent=d.eval_count;
-  document.getElementById('k-atomic').textContent=d.atomic;
-  document.getElementById('k-comp').textContent=d.composite;
-  renderTasks();
-}).catch(e=>{document.getElementById('task-body').innerHTML='<tr><td colspan=6 class="dim">데이터 로드 실패</td></tr>'});
-document.getElementById('tsearch').addEventListener('input',renderTasks);
-document.querySelectorAll('.filt').forEach(b=>b.onclick=()=>{
-  document.querySelectorAll('.filt').forEach(x=>x.classList.remove('active'));
-  b.classList.add('active'); filt=b.dataset.f; renderTasks();
-});
-document.querySelectorAll('th.sort').forEach(h=>h.onclick=()=>{
-  const k=h.dataset.k;
-  if(sortK===k){ sortDir=-sortDir; } else { sortK=k; sortDir = (k==='sr'||k==='h') ? -1 : 1; }
-  renderTasks();
-});
-// ===== RL 환경 리워드 동기화 뷰어 =====
-fetch('rlenv.json').then(r=>r.json()).then(RL=>{
-  const LAB=RL.predicate_labels, clips=RL.clips;
-  const tabs=document.getElementById('rl-clip-tabs');
-  const vid=document.getElementById('rl-video'), seek=document.getElementById('rl-seek');
-  let cur=0;
-  function fmt(v){ if(v===true)return'<span class="pt">true</span>'; if(v===false)return'<span class="pf">false</span>'; return v; }
-  function nearest(clip, fidx){
-    // find last timeline entry whose frame <= fidx
-    let lo=0,hi=clip.timeline.length-1,ans=0;
-    while(lo<=hi){const m=(lo+hi)>>1; if(clip.timeline[m].f<=fidx){ans=m;lo=m+1;}else hi=m-1;}
-    return clip.timeline[ans];
-  }
-  function paint(row, clip, idx){
-    document.getElementById('rl-cum').textContent=row.t.toFixed(2);
-    document.getElementById('rl-cum').style.color = row.t>0?'var(--ok)':(row.t<0?'var(--red)':'var(--tx)');
-    let dl=[];
-    if(row.d.term)dl.push(`<span class="fire">작업 성공 +${row.d.term}</span>`);
-    if(row.d.mile)dl.push(`<span class="fire">목표 달성 +${row.d.mile} (${row.fire.join(', ')})</span>`);
-    if(row.d.shape)dl.push(`접근 shaping ${row.d.shape>0?'+':''}${row.d.shape}`);
-    if(row.d.pen)dl.push(`감점 ${row.d.pen}`);
-    if(row.end)dl.push(`<span class="fire">${row.end.note} → 스킬 종료 (최종 ${row.end.total})</span>`);
-    document.getElementById('rl-delta').innerHTML=dl.join(' · ')||'<span class="dim">이 스텝 리워드 변화 없음</span>';
-    // live target checklist: a target is "done" once its bonus appeared at or before current step
-    const firedByNow={};
-    for(let j=0;j<=idx;j++){ clip.timeline[j].fire.forEach(f=>firedByNow[f]=true); if(clip.timeline[j].d.term) firedByNow['__term']=true; }
-    document.getElementById('rl-targets').innerHTML=clip.targets.map(t=>{
-      const on = t.name==='작업 성공(terminal)' ? firedByNow['__term'] : firedByNow[t.name];
-      return `<div class="tgt"><span class="tk ${on?'on':''}"></span><span>${t.name}</span><span class="tb">+${t.bonus}</span></div>`;
-    }).join('');
-    document.getElementById('rl-pred').innerHTML=Object.entries(row.p).map(([k,v])=>
-      `<tr><td>${LAB[k]||k}</td><td>${fmt(v)}</td></tr>`).join('');
-    document.getElementById('rl-stepinfo').textContent=`step ${row.s} / ${clip.n} · frame ${row.f}`;
-  }
-  function load(i){
-    cur=i; const clip=clips[i];
-    [...tabs.children].forEach((b,j)=>b.classList.toggle('active',j===i));
-    vid.src=clip.mp4; vid.load();
-    const maxf=clip.timeline[clip.timeline.length-1].f;
-    seek.max=maxf; seek.value=0;
-    document.getElementById('rl-meta').innerHTML=`<b>${clip.case||''}</b> · 목표: ${clip.goal} · 판정 <b>${clip.outcome}</b> · 학습 리워드 합계 <b>${clip.total}</b>`;
-    paint(clip.timeline[0], clip, 0);
-  }
-  function idxFromFrame(clip, fidx){
-    let lo=0,hi=clip.timeline.length-1,ans=0;
-    while(lo<=hi){const m=(lo+hi)>>1; if(clip.timeline[m].f<=fidx){ans=m;lo=m+1;}else hi=m-1;}
-    return ans;
-  }
-  function syncFromFrame(fidx){ const clip=clips[cur]; const idx=idxFromFrame(clip,fidx); paint(clip.timeline[idx],clip,idx); }
-  tabs.innerHTML=''; clips.forEach((c,i)=>{const b=document.createElement('button');b.innerHTML=`${c.label} <span style="opacity:.6;font-size:11px">${c.outcome}</span>`;b.title=c.case||'';b.onclick=()=>load(i);tabs.appendChild(b);});
-  vid.addEventListener('timeupdate',()=>{ const clip=clips[cur]; const fidx=Math.round(vid.currentTime*clip.fps); seek.value=Math.min(fidx,seek.max); syncFromFrame(fidx); });
-  seek.addEventListener('input',()=>{ const clip=clips[cur]; const fidx=+seek.value; vid.currentTime=fidx/clip.fps; syncFromFrame(fidx); });
-  load(0);
-}).catch(e=>{});
-
-// ===== 스킬 경계(hold) 뷰어 =====
-fetch('rlenv_hold.json').then(r=>r.json()).then(RL=>{
-  const LAB=RL.predicate_labels, clips=RL.clips;
-  const tabs=document.getElementById('hold-tabs');
-  const vid=document.getElementById('hold-video'), seek=document.getElementById('hold-seek');
-  let cur=0;
-  function fmt(v){ if(v===true)return'<span class="pt">true</span>'; if(v===false)return'<span class="pf">false</span>'; return v; }
-  function idxFromFrame(clip,fidx){let lo=0,hi=clip.timeline.length-1,ans=0;while(lo<=hi){const m=(lo+hi)>>1;if(clip.timeline[m].f<=fidx){ans=m;lo=m+1;}else hi=m-1;}return ans;}
-  function paint(row,clip){
-    const post = row.phase==='post' || row.s>(clip.success_step||1e9);
-    const ph=document.getElementById('hold-phase');
-    ph.textContent = clip.success_step==null ? '성공 없음' : (post?'성공 후 (hold)':'스킬 수행 중');
-    ph.style.color = post?'var(--run)':'var(--tx)';
-    document.getElementById('hold-verdict').innerHTML = post && clip.verdict==='KEEPS_MOVING'
-      ? `<span class="fire">계속 움직임 → ${clip.drift||'다음 동작으로 표류'}</span>`
-      : (post?'<span class="pt">정지 유지</span>':'<span class="dim">성공 지점 이후를 보세요</span>');
-    document.getElementById('hold-pred').innerHTML=Object.entries(row.p).map(([k,v])=>`<tr><td>${LAB[k]||k}</td><td>${fmt(v)}</td></tr>`).join('');
-    const tag = row.s===clip.success_step ? ' · ★성공 판정' : (post?' · hold':'');
-    document.getElementById('hold-stepinfo').textContent=`step ${row.s} / ${clip.n}${tag}  (성공 step ${clip.success_step??'-'})`;
-    document.getElementById('hold-video').style.boxShadow = post ? '0 0 0 3px var(--run)' : 'none';
-  }
-  function load(i){
-    cur=i; const clip=clips[i];
-    [...tabs.children].forEach((b,j)=>b.classList.toggle('active',j===i));
-    vid.src=clip.mp4; vid.load();
-    seek.max=clip.timeline[clip.timeline.length-1].f; seek.value=0;
-    const vv = clip.success_step==null ? '이 클립은 성공하지 못함' : (clip.verdict==='KEEPS_MOVING'?`<b style="color:var(--run)">판정: 성공 후 계속 움직임</b> — ${clip.drift}`:'<b class="pt">판정: 정지 유지</b>');
-    document.getElementById('hold-meta').innerHTML=`<b>${clip.label}</b> · ${clip.case} · 지시 ${clip.instr} · ${vv}`;
-    paint(clip.timeline[0],clip);
-  }
-  function sync(fidx){const clip=clips[cur];paint(clip.timeline[idxFromFrame(clip,fidx)],clip);}
-  tabs.innerHTML=''; clips.forEach((c,i)=>{const b=document.createElement('button');b.innerHTML=`${c.label}${c.label==='place'?' '+(c.success_step!=null?'✓':'✗'):''}`;b.title=c.case||'';b.onclick=()=>load(i);tabs.appendChild(b);});
-  vid.addEventListener('timeupdate',()=>{const clip=clips[cur];const fidx=Math.round(vid.currentTime*clip.fps);seek.value=Math.min(fidx,seek.max);sync(fidx);});
-  seek.addEventListener('input',()=>{const clip=clips[cur];const fidx=+seek.value;vid.currentTime=fidx/clip.fps;sync(fidx);});
-  load(0);
-}).catch(e=>{});
-
-// ===== attend tab: instruction-attendance =====
-fetch('attend.json').then(r=>r.json()).then(a=>{
-  const CATC={correct:'#9aa4b2',skill:'#818cf8',opposite:'#f87171',irrelevant:'#facc15',degenerate:'#60a5fa'};
-  document.getElementById('at-sub').innerHTML=`모델 <b>${a.model}</b> · ${a.task} · seed ${a.seed}`;
-  document.getElementById('at-method').innerHTML=a.method;
-  document.getElementById('at-verdict').innerHTML=`
-    <div class="item"><div class="tt"><b style="color:var(--acc)">질문</b><div style="margin-top:2px">모델이 지시(instruction)를 실제로 보고 행동하나, 아니면 지시를 무시하고 obs(화면)만 보고 행동하나?</div></div></div>
-    <div class="item"><div class="tt"><b style="color:var(--acc)">결론</b><div style="margin-top:2px"><b>${a.verdict}</b></div>
-      <div class="nt" style="font-size:13px;margin-top:4px">• <b>task 시작</b>: 지시가 지배 — 지시를 바꾸면 액션이 크게 달라짐(ES 6~11). 즉 지시를 잘 따름.<br>• <b>진행 중</b>: obs가 우세 — 현재 단계와 맞는 지시는 정답과 거의 동일(cos≈1), 모순되는 지시만 액션을 흔듦.<br>→ hold 실험의 '성공 후 표류'는 <b>지시 무시가 아니라</b>, 진행 중 obs가 부분지시(OOD)를 눌러서 생긴 것.</div></div></div>`;
-  document.getElementById('at-states').innerHTML=a.states.map(s=>{
-    const maxes=Math.max(...s.rows.map(r=>r.es),1);
-    const rows=s.rows.filter(r=>r.cat!=='correct').map(r=>`
-      <div class="item"><div class="tt">
-        <div style="display:flex;gap:8px;align-items:center;font-size:13px">
-          <span style="flex:none;width:130px">${r.label}</span>
-          <div style="flex:1;position:relative;height:16px;background:#0c0e13;border-radius:4px;overflow:hidden">
-            <div style="position:absolute;left:0;top:0;bottom:0;width:${Math.round(r.es/maxes*100)}%;background:${CATC[r.cat]||'#818cf8'};opacity:.85"></div>
-          </div>
-          <span style="flex:none;width:56px;text-align:right;font-variant-numeric:tabular-nums">ES ${r.es}</span>
-          <span style="flex:none;width:64px;text-align:right;color:var(--dim);font-variant-numeric:tabular-nums">cos ${r.cos}</span>
-        </div>
-      </div></div>`).join('');
-    const dom = s.key==='reset' ? '<span style="color:var(--ok)">지시 지배</span>' : '<span style="color:var(--run)">obs 우세</span>';
-    return `<div class="card">
-      <h2>${s.state} <span class="dim" style="font-size:13px">· ${dom} · noise floor ${s.noise_floor}</span></h2>
-      ${rows}
-    </div>`;}).join('');
-}).catch(e=>{document.getElementById('at-states').innerHTML='<div class="dim">로드 실패</div>';});
-
-// ===== dataset tab: SFT skill clips =====
-fetch('dataset.json').then(r=>r.json()).then(d=>{
-  const SKC={GRASP:'#818cf8',MOVE:'#4ade80',RELEASE:'#facc15'};
-  document.getElementById('ds-sub').innerHTML=`원본 데모를 3개 skill로 자른 뒤, <b>각 조각(구간 영상 + 그 구간의 target action)</b>만 따로 학습시킵니다. 각 예제의 <b>▶ 구간 보기</b>를 누르면 해당 에피소드가 LeRobot visualizer에서 열립니다. <span class="dim">(재생 시작 후 조각 구간 프레임으로 이동해서 보세요)</span>`;
-  document.getElementById('ds-clips').innerHTML=d.skills.map(s=>{
-    const col=SKC[s.short];
-    const rows=s.examples.map(e=>`
-      <a href="${d.viz_ep}${e.episode_index}" target="_blank" style="text-decoration:none;color:inherit;display:block">
-      <div class="item" style="cursor:pointer">
-        <div class="tt">
-          <div style="display:flex;gap:8px;align-items:center;font-size:13px">
-            <b>ep ${e.episode_index}</b>
-            <span class="dim">${e.split} · 프레임 ${e.span[0]}–${e.span[1]} · ${e.n_frames}f (${e.sec}s)</span>
-            <span style="margin-left:auto;color:var(--acc)">▶ 구간 보기</span>
-          </div>
-          <div style="position:relative;height:16px;margin-top:5px;border-radius:4px;overflow:hidden;background:#0c0e13">
-            <div title="이 조각: ${e.span[0]}–${e.span[1]}" style="position:absolute;left:0;width:100%;top:0;bottom:0;background:${col};opacity:.85"></div>
-            <span style="position:absolute;left:6px;top:0;bottom:0;display:flex;align-items:center;font-size:10px;color:#0a0a0a;font-weight:600">이 조각 = target action ${e.n_frames}스텝 × ${s.constraints?'':''}12-D</span>
-          </div>
-        </div>
-      </div></a>`).join('');
-    return `<div class="card" style="border-left:3px solid ${col}">
-      <h2 style="color:${col}">${s.short} <span class="dim" style="font-size:13px">(skill_id ${s.skill_id} · ${s.name})</span></h2>
-      <p class="dim" style="margin:0 0 4px">지시: "<b style="color:var(--tx)">${s.instruction}</b>"</p>
-      <p class="dim" style="margin:0 0 12px">성공조건: ${s.success}</p>
-      <div style="font-size:12px;color:var(--dim);margin-bottom:6px">대표 예제 (짧은/중간/긴 구간):</div>
-      ${rows}
-    </div>`;}).join('')+
-    `<p class="dim" style="margin-top:14px">각 예제 = <b>구간 영상 프레임</b>(모델 입력 obs) → <b>그 구간의 action ${''}시퀀스 12-D</b>(모델이 맞혀야 할 타깃). 구간 밖 스텝은 loss에서 제외. · 데이터: <code>rl-train-t_3ed65912/data/skill_sft/</code></p>`;
-}).catch(e=>{document.getElementById('ds-clips').innerHTML='<div class="dim">로드 실패</div>';});
-</script>
+<script src="assets/site.js" defer></script>
+<script src="assets/inference.js" defer></script>
 </body>
 </html>
