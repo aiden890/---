@@ -10,7 +10,7 @@ fetch("inference_versions.json").then(r=>r.json()).then(d=>{
   const player=document.getElementById("infvid-player");
   const desc=document.getElementById("infvid-desc");
   const badge=document.getElementById("infvid-badge");
-  if(!versions.length){ player.innerHTML='<span class="dim">등록된 인퍼런스 영상이 없습니다.</span>'; return; }
+  if(!versions.length){ player.innerHTML='<span class="dim">VLM(Qwen3-VL) 기반 verifier 인퍼런스 영상 생성 중입니다. 완료되면 여기에 버전별로 표시됩니다.</span>'; return; }
 
   sel.innerHTML=versions.map((v,i)=>`<option value="${i}">${esc(v.label)}</option>`).join("");
 
