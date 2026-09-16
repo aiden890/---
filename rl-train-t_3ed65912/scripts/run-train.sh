@@ -17,10 +17,13 @@
 #   train  = /home/v4/rl-train-t_3ed65912          (this card: trainer + loop)
 #   skill  = /home/v4/rollouts-xiaomi-t_4a072806/tools (skill_eval.py, imported)
 set -euo pipefail
-parent=/home/v4/robocasa-docker-t_9f03a613
-rlenv=/home/v4/rl-env-t_4f3f2b20
-train=/home/v4/rl-train-t_3ed65912
-skilltools=/home/v4/rollouts-xiaomi-t_4a072806/tools
+# Server-root prefix so the SAME script runs on v4 (/home/v4, default) and amp_csi
+# (/home/guest via RC_ROOT). Single source of truth: no per-server fork of this file.
+ROOT="${RC_ROOT:-/home/v4}"
+parent=$ROOT/robocasa-docker-t_9f03a613
+rlenv=$ROOT/rl-env-t_4f3f2b20
+train=$ROOT/rl-train-t_3ed65912
+skilltools=$ROOT/rollouts-xiaomi-t_4a072806/tools
 shared_server=xiaomi-server-t_460aea68
 trainer=xiaomi-grpo-trainer-t_3ed65912
 server_image=xiaomi-cu121:t_9f03a613
