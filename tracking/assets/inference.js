@@ -16,7 +16,7 @@ fetch("inference_versions.json").then(r=>r.json()).then(d=>{
 
   function show(i){
     const v=versions[i];
-    player.innerHTML=`<video src="${esc(v.video)}" controls muted loop preload="metadata" playsinline style="width:520px;max-width:100%;border-radius:8px;background:#000"></video>`;
+    player.innerHTML=`<video src="${esc(v.video)}" controls muted loop preload="auto" playsinline style="width:520px;max-width:100%;border-radius:8px;background:#000"></video>`;
     desc.innerHTML=esc(v.desc||"");
     badge.textContent=[v.stage,v.date].filter(Boolean).join(" · ");
   }
