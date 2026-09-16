@@ -1,0 +1,41 @@
+{
+  "live_progress": [
+    {
+      "last_it": 1,
+      "n_succ": "3/8",
+      "post_ratio": 0.932,
+      "post_kl": 0.25962,
+      "post_clip": 0.959,
+      "before_prog": "20/20",
+      "arm": "s1_sgd2e3"
+    },
+    {
+      "last_it": null,
+      "n_succ": null,
+      "post_ratio": null,
+      "post_kl": null,
+      "post_clip": null,
+      "before_prog": null,
+      "arm": "s1_adamw3e6"
+    },
+    {
+      "last_it": null,
+      "n_succ": null,
+      "post_ratio": null,
+      "post_kl": null,
+      "post_clip": null,
+      "before_prog": "8/20",
+      "arm": "s1_adamw1e5"
+    },
+    {
+      "last_it": null,
+      "n_succ": null,
+      "post_ratio": null,
+      "post_kl": null,
+      "post_clip": null,
+      "before_prog": null,
+      "arm": "s1_adamw3e5"
+    }
+  ],
+  "finalized": false
+}

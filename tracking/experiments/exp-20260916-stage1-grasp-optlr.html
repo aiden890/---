@@ -13,20 +13,28 @@ Promise.all([
   const e=db.experiments.find(x=>x.id==='EXP-20260916-STAGE1')||{};
   document.title=s.run_group;
   const c=s.common_config;
-  // arm progress table (live-updates from agg if available)
+  // arm progress table (finalized agg if available, else live-progress from puller)
   const aggRows=(agg&&agg.rows)?Object.fromEntries(agg.rows.map(r=>[r.arm,r])):{};
+  const liveRows=(agg&&agg.live_progress)?Object.fromEntries(agg.live_progress.map(r=>[r.arm,r])):{};
   const armRows=s.arms.map(a=>{
     const r=aggRows[a.id];
     const done=!!r;
     const gb=r?pct(r.grasp_before):'—', ga=r?pct(r.grasp_after):'—';
     const dg=r&&r.delta_grasp!=null?(r.delta_grasp>0?'<span class="ok">+'+(r.delta_grasp*100).toFixed(1)+'%p</span>':'<span class="no">'+(r.delta_grasp*100).toFixed(1)+'%p</span>'):'—';
     const ho=r?pct(r.grasp_heldout):'—';
-    const post=r?`${fmt(r.post_ratio)} / ${fmt(r.post_kl)} / ${fmt(r.post_clip)}`:'—';
-    const gated=r?`${fmt(r.n_gated)}/${fmt(r.n_iters)}`:'—';
+    // live progress (before finalization): show current iter or eval_before progress
+    const lv=liveRows[a.id];
+    let live='—', st=a.status||'pending';
+    if(lv){
+      if(lv.last_it!=null){live=`it ${lv.last_it+1}/30 · n_succ ${lv.n_succ}`; st='running';}
+      else if(lv.before_prog){live=`eval_before ${lv.before_prog}`; st='running';}
+    }
+    const post=r?`${fmt(r.post_ratio)} / ${fmt(r.post_kl)} / ${fmt(r.post_clip)}`:(lv&&lv.post_ratio!=null?`${fmt(lv.post_ratio)} / ${fmt(lv.post_kl)} / ${fmt(lv.post_clip)}`:'—');
+    const gated=r?`${fmt(r.n_gated)}/${fmt(r.n_iters)}`:live;
     return `<tr>
       <td>${a.id}</td><td>${a.server}</td><td>${a.optimizer}</td><td>${a.lr}</td>
       <td>${gb} → ${ga} <b>(${dg})</b></td><td>${ho}</td><td>${post}</td><td>${gated}</td>
-      <td>${done?statusChip('done'):statusChip(a.status||'pending')}</td></tr>`;
+      <td>${done?statusChip('done'):statusChip(st)}</td></tr>`;
   }).join('');
   const selected=agg&&agg.selected?agg.selected:null;
   document.getElementById('app').innerHTML=`
@@ -61,4 +69,5 @@ Promise.all([
 
     <div class="artifact">산출물: <code>rl-train-t_3ed65912/results/stage1/</code> · finisher <code>REPORT/STAGE1_FINAL.md</code> · agg <code>results/stage1/STAGE1_AGG.json</code> · 스크립트 <code>scripts/stage1_sweep.sh</code>, <code>scripts/stage1_finisher.sh</code></div>`;
 }).catch(err=>{document.getElementById('app').innerHTML='<p class="no">실험 정보를 불러오지 못했습니다.</p>';console.error(err);});
+setTimeout(()=>location.reload(), 60000); // 진행중 자동 새로고침(finisher 결과 나오면 자동 반영)
 </script></body></html>
