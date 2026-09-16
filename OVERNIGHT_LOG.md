@@ -23,3 +23,20 @@
 - exp1(30 iter, optimizer 대조) 완료. **1차목표 달성**: GATED 68%→33%(SGD)/36%(AdamW), mixed 63%. 커리큘럼이 GRPO 신호 복구는 확실히 함.
 - **2차목표(고정 eval 개선) 미달, 노이즈 바닥**: SGD 2e-3 adapter_dL2=0.001(사실상 정지)→grasp 0.60→0.55 REGRESSED. AdamW 1e-5 dL2=0.0038(유일하게 어댑터 이동)→grasp+0.05, official 0.05→0.15. 병목=신호부재 아니라 **업뎃 강도**로 지목(단일변수 optimizer 대조).
 - 조치: exp2 착수 — optimizer를 mover(AdamW) 고정, **LR만** 변수. v4 adaptive_adamw3e5(3e-5) + amp_csi adaptive_adamw5e5(5e-5), paired seed 12345. 둘 다 실행중(EVAL-before 단계). finisher(파라미터화) detached 집계 대기. 코드 커밋 e8ca603, 양서버 배포. exp1 리포트 REPORT/에 보관.
+
+## 07:03 KST — exp2 AdamW LR-ladder 페어드 진행중, 막힘 없음 (조치 없음)
+- v4 `adaptive_adamw3e5`(AdamW 3e-5) it=14/30, amp_csi `adaptive_adamw5e5`(AdamW 5e-5) it=13/30. 양쪽 client+trainer 살아있음(v4 pid 1915495, finisher pid 1919211), amp 컨테이너 정상. GPU v4 10.9G/24%. OOM/RPC drop/에러 0.
+- 페어드 재현성 유지: iter별 동일 seed(it0=1002, it3=1070, it8-11·14=1092, it13=1222 양쪽 동일), LR만 변수.
+- **핵심 조기관측(LR→업뎃강도 단조)**: 동일 seed·동일 mixed 배치에서 adapter_dL2가 LR에 비례.
+  - it3(s1070,1/8): 3e-5=0.0279 vs 5e-5=0.0464 | it8(s1092,5/8): 0.0213 vs 0.0386 | it9: 0.0175 vs 0.0309 | it10: 0.0151 vs 0.0262 | it11: 0.0131 vs 0.0225.
+  - 5e-5 ≈ 1.7x 3e-5, 둘 다 exp1 AdamW 1e-5(dL2 0.0038) 대비 3e-5≈4-7x·5e-5≈6-12x. exp1 결론(병목=업뎃강도)대로 이 LR들은 어댑터를 훨씬 크게 이동시킴 → after/heldout delta가 실제 정책개선 전환 여부 판정.
+- post-step 안정: 3e-5 kl 0.19-0.30, 5e-5 kl 0.27-0.35(약간 높으나 발산X), clip 0.82-0.93, ratio 0.87-1.14. dL2가 iter 진행하며 감소(0.028→0.012 등)=수렴 방향.
+- 조치: 없음(정상 ~45% 진행, 개입=페어드 비교 파괴+낭비). 남은 ~16 iter→EVAL(after)+heldout→finisher가 ADAPTIVE_FINAL_exp2_lr_ladder.md 자동집계. 다음 cron서 exp2 DONE + before/after delta로 LR별 개선 정직 판정.
+
+## 08:05 KST — exp2 AdamW LR-ladder 마무리 단계, 막힘 없음 (조치 없음)
+- v4 `adaptive_adamw3e5`(3e-5) it=28/30, amp_csi `adaptive_adamw5e5`(5e-5) it=25/30. 양쪽 client+trainer 살아있음(v4 trainer pid1915214/client pid1915495/finisher pid1919211, amp 컨테이너 Up 2h). GPU v4 10.9G/0%, amp 12.0G/1%. OOM/RPC drop/에러 0.
+- GATED 비율: 3e-5 = 11/29 = 38%, 5e-5 = 10/26 = 38% — exp1(33~36%) 재현, baseline 68% 대비 절반. 커리큘럼 신호복구 일관됨.
+- **페어드 dL2(업뎃강도, LR 단조 재확인)**: 후반 iter도 5e-5 > 3e-5 유지. it24 s1092: 5e-5=0.0148 / 3e-5는 유사 seed서 ~0.008. 5e-5 ≈ 1.7~2x 3e-5. 둘 다 exp1 1e-5(0.0038)보다 크게 이동. dL2가 iter 진행하며 감소=수렴방향, 발산 없음.
+- post-step 안정: 3e-5 kl 0.26~0.30 clip 0.89~0.92 ratio 0.91~1.02, 5e-5 kl 0.24 clip 0.87 ratio 1.04. grad_norm 높으나(1500~2200) dL2로 실제 업뎃 절제.
+- before-eval(고정 5000~5019): 양쪽 grasp 11/20=0.55 동일(같은 base ckpt), official은 노이즈로 3e-5=1/20·5e-5=3/20. after/heldout은 아직 미실행(학습 진행중) → delta 판정 불가.
+- 조치: 없음(정상, 3e-5=93%·5e-5=83% 진행). 개입=페어드 비교 파괴. 남은 ~2·5 iter→EVAL(after)+heldout→finisher가 ADAPTIVE_FINAL_exp2 자동집계. 다음 cron서 exp2 DONE + before/after delta로 LR별 개선 정직 판정(현재까진 개선 미확인, 완료 대기).
