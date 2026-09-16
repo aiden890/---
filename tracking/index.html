@@ -376,6 +376,26 @@ PLACE_OBJECT:
     <h3 style="margin:18px 0 8px">관측된 base-policy 실패 (정책 결과, 아키텍처 아님)</h3>
     <table><thead><tr><th>seed</th><th>skill</th><th>상태</th><th>사유</th></tr></thead><tbody id="smoke-fail"></tbody></table>
   </div>
+
+  <!-- ===== obs 기반 skill 종료 verifier 재설계 (t_d4268a2e) ===== -->
+  <div class="card" id="obsv-card">
+    <h2>obs 기반 skill 종료 verifier <span class="dim" style="font-size:13px">· t_d4268a2e</span></h2>
+    <p class="dim" id="obsv-why" style="margin:6px 0 2px"></p>
+    <p class="dim" id="obsv-intro"></p>
+    <div id="obsv-banner"></div>
+    <div class="kpi" id="obsv-kpi"></div>
+
+    <h3 style="margin:18px 0 8px">obs-only 보장 (코드로 강제)</h3>
+    <table><thead><tr><th>보장</th><th>결과</th><th>근거</th></tr></thead><tbody id="obsv-guards"></tbody></table>
+
+    <h3 style="margin:20px 0 8px">실기 현실성 — VLM 호출 비용·주기</h3>
+    <p class="dim" id="obsv-latency"></p>
+
+    <h3 style="margin:20px 0 8px">실제 VLM 판별 프로브 — done vs not-done 분리</h3>
+    <p class="dim" id="obsv-probe-intro"></p>
+    <div id="obsv-probe-banner"></div>
+    <table><thead><tr><th>rollout</th><th>skill</th><th>phase</th><th>env_step</th><th>gt_done</th><th>P(yes)</th></tr></thead><tbody id="obsv-probe"></tbody></table>
+  </div>
 </section>
 
 <!-- ===== RoboCasa Task (벤치마크 전체) ===== -->
