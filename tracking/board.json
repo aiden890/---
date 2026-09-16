@@ -1,57 +1,63 @@
 {
- "updated": "2026-09-15",
- "purpose": {
-  "north_star": "Skill-conditioned VLA 훈련 — 집기/옮기기/놓기 같은 skill을 각각의 지시로 제어하는 정책을 만든다 (base: Xiaomi-RoboCasa365)."
- },
- "user_todo": [
-  {
-   "title": "SFT 학습 데이터셋 검토",
-   "why": "skill 단위로 자른 데이터(구간 영상 + target action)가 올바른지 학습 전에 확인. 잘못 잘린 데이터로 SFT하면 그 위 RL까지 무너지므로. → 데이터셋 탭",
-   "done": false
+  "updated": "2026-09-16",
+  "purpose": {
+    "north_star": "Skill-conditioned VLA 훈련 — 집기/옮기기/놓기 같은 skill을 각각의 지시로 제어하는 정책을 만든다 (base: Xiaomi-RoboCasa365)."
   },
-  {
-   "title": "모델 선정: Xiaomi-Robotics-1-RoboCasa365 확정",
-   "why": "SFT/RL의 base를 하나로 고정해야 비교가 성립. 3모델 비교(36% 최상) + skill/probe 하네스 유일 지원이 근거.",
-   "done": true
-  },
-  {
-   "title": "결정: skill-SFT Gate3 회귀 대응",
-   "why": "SFT loss는 줄지만 실제 성공률이 안 오르는 벽. 방향을 못 정하면 파이프라인이 멈춤 → 현재 (A)레시피 재설계로 진행 중.",
-   "done": false
-  }
- ],
- "agent_todo": [
-  {
-   "title": "skill-SFT 파이프라인 (t_e5cd5736): per-skill CFM SFT 학습",
-   "badge": "wait",
-   "note": "Goal1 데이터·Goal2 conditioning·Goal3 구현 완료. GPU 게이트: Gate1·2 PASS, Gate3(entry-state rollout) 미통과(회귀). SFT 레시피 재설계(A) 진행."
-  },
-  {
-   "title": "Goal4 skill-control eval (baseline vs per-skill)",
-   "badge": "wait",
-   "note": "skill success / wrong-skill / post-boundary 지표. Gate3 통과(개선 확인) 후에만. 현재 보류."
-  },
-  {
-   "title": "Goal5 구조 비교 (NL-only vs NL+skill-id vs shared-LoRA+embed)",
-   "badge": "wait",
-   "note": "동일 budget, heldout 선택. per-skill LoRA 게이트 통과 후."
-  },
-  {
-   "title": "Goal6 multi-epoch GRPO (GRASP→MOVE→RELEASE)",
-   "badge": "wait",
-   "note": "선정된 SFT ckpt 기반. RECAP은 별도 비교군 feasibility."
-  },
-  {
-   "title": "instr-attendance probe를 GR00T/π0.5로 확장",
-   "badge": "todo",
-   "note": "동일 probe(고정 obs·지시만 변경·순열검정). fixed-obs infer 래퍼 필요."
-  }
- ],
- "note": [
-  "⚠ skill-SFT Gate3(entry-state rollout) 미통과: per-skill CFM LoRA SFT는 Gate1 tiny-overfit(1.20→0.024,50x)·Gate2 heldout val(1.370→0.218,6.3x) 통과했으나, 실제 sim 롤아웃에서 강한 config는 GRASP 2/12→0/12(붕괴)·약한 config는 1/12→2/12(≈base). BC open-loop→closed-loop 전이 실패 → 정책상 개선 확인 전 Goal4~6(N=50/ARM) 진행 금지. 근거: rl-train-t_3ed65912/REPORT/skill_sft_rollout_findings.md",
-  "3-모델 비교 완료 (CloseBlenderLid, 동일조건 50ep): Xiaomi 36% > GR00T 20% > π0.5 14%. π0.5는 공식 리더보드 16.9%와 정합 → 하네스 정상 교차검증.",
-  "Xiaomi는 instruction에 실제로 어텐드(obs-only 아님), 단 state-의존적: task 시작 땐 지시 지배, 진행 중엔 obs가 phase 규정. hold '표류'는 지시 무시가 아니라 OOD 부분지시 하 obs-우세.",
-  "skill 분해 추론 + instruction probe 하네스는 Xiaomi만 가능(GR00T/π0.5는 full-task instruction만) → skill-conditioned RL base로 Xiaomi 유력.",
-  "결과 영상/데이터: RL 환경 탭 (rlenv / rlenv_groot / rlenv_pi05)."
- ]
+  "user_todo": [
+   {
+    "title": "RL training",
+    "why": "skill-conditioned VLA 강화학습. 현재 '행동 후 정지' 목표는 현 접근(GRASP→MOVE 경계 리워드 GRPO)으로 개선 입증이 어려움 확인 — 적절한 난이도 대상/방법 재설계 필요.",
+    "done": false
+   },
+   {
+    "title": "duet root non-LLM top-k 결과 제공",
+    "why": "duet root의 non-LLM top-k 결과 산출·제공.",
+    "done": false
+   },
+   {
+    "title": "모델 선정: Xiaomi-Robotics-1-RoboCasa365 확정",
+    "why": "SFT/RL의 base를 하나로 고정해야 비교가 성립. 3모델 비교(36% 최상) + skill/probe 하네스 유일 지원이 근거.",
+    "done": true
+   }
+  ],
+  "agent_todo": [
+    {
+      "title": "CloseBlenderLid 스킬 계약 확정",
+      "badge": "rev",
+      "note": "grasp(lid_handle) → move_to_closed(blender_lid) → release(lid_handle). 각 단계에는 현재 스킬만 지시하고 성공 조건·다음 스킬 진입 조건·step budget을 둔다."
+    },
+    {
+      "title": "1. 고정 instruction 기준선 측정",
+      "badge": "wait",
+      "note": "손잡이 두께·뚜껑 각도·로봇 자세를 바꿔 clean/chained 초기 상태의 스킬별 성공률과 instruction 반응성을 측정."
+    },
+    {
+      "title": "2. 스킬별 LoRA SFT 초기화",
+      "badge": "wait",
+      "note": "instruction을 충분히 따르지 않을 때만 GRASP/MOVE/RELEASE 성공 구간으로 SFT. tiny-overfit → heldout → 실제 rollout 게이트 순서."
+    },
+    {
+      "title": "3. 스킬별 RL",
+      "badge": "wait",
+      "note": "simulator predicate를 주 reward로 사용. clean 상태에서 시작해 이전 스킬이 만든 chained 상태로 확장하고, base 대비 개선된 경우에만 다음 단계 진행."
+    },
+    {
+      "title": "4. 연결 평가 및 planner 연결",
+      "badge": "wait",
+      "note": "GRASP→MOVE→RELEASE 전체 성공률과 handoff-ready rate를 확인. 외부 manager/verifier가 성공 시 다음 스킬로 전환하고 실패 시 재시도/replan."
+    },
+    {
+      "title": "instr-attendance probe를 GR00T/π0.5로 확장",
+      "badge": "todo",
+      "note": "동일 probe(고정 obs·지시만 변경·순열검정). fixed-obs infer 래퍼 필요."
+    }
+  ],
+  "note": [
+    "RL 재개 원칙: policy에 stop을 우선 학습하지 않고 짧은 action chunk 뒤 simulator verifier가 종료·handoff를 관리한다. VLM은 보조 판정에만 사용한다. 현재는 설계만 정리했으며 카드 t_e5cd5736은 보류 상태다.",
+    "⚠ skill-SFT Gate3(entry-state rollout) 미통과: per-skill CFM LoRA SFT는 Gate1 tiny-overfit(1.20→0.024,50x)·Gate2 heldout val(1.370→0.218,6.3x) 통과했으나, 실제 sim 롤아웃에서 강한 config는 GRASP 2/12→0/12(붕괴)·약한 config는 1/12→2/12(≈base). BC open-loop→closed-loop 전이 실패 → 정책상 개선 확인 전 Goal4~6(N=50/ARM) 진행 금지. 근거: rl-train-t_3ed65912/REPORT/skill_sft_rollout_findings.md",
+    "3-모델 비교 완료 (CloseBlenderLid, 동일조건 50ep): Xiaomi 36% > GR00T 20% > π0.5 14%. π0.5는 공식 리더보드 16.9%와 정합 → 하네스 정상 교차검증.",
+    "Xiaomi는 instruction에 실제로 어텐드(obs-only 아님), 단 state-의존적: task 시작 땐 지시 지배, 진행 중엔 obs가 phase 규정. hold '표류'는 지시 무시가 아니라 OOD 부분지시 하 obs-우세.",
+    "skill 분해 추론 + instruction probe 하네스는 Xiaomi만 가능(GR00T/π0.5는 full-task instruction만) → skill-conditioned RL base로 Xiaomi 유력.",
+    "결과 영상/데이터: RL 환경 탭 (rlenv / rlenv_groot / rlenv_pi05)."
+  ]
 }
