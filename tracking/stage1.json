@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "run_group": "STAGE1-GRASP-OPT-LR",
-  "task_card": "t_74a6ed7a",
+  "task_card": "t_c896eb17",
   "code_rev": "ae02598",
   "north_star": "GRASP GRPO를 실제로 개선하는 optimizer/LR 설정을 2-GPU 병렬 스크리닝으로 찾는다. flat(0.25->0.25)의 진짜 원인은 LR이 아니라 advantage 처리+측정 방식이었다는 참고문서 진단을 코드로 고친 뒤 검증.",
   "prereq_fixes": [
@@ -26,7 +26,7 @@
   },
   "servers": {
     "v4": {"gpu": "RTX 3090 (24GB). xiaomi-server(~10.7G)+trainer(~10.1G)=20.8G면 eval 추론 activation 부족->trainer RPC drop(struct.error). operator 사전승인대로 xiaomi-server stop 후 단독 실행.", "arms": ["s1_sgd2e3", "s1_adamw3e6"]},
-    "amp_csi": {"gpu": "RTX 3090 (전용, 24GB free)", "arms": ["s1_adamw1e5", "s1_adamw3e5"], "note": "checkpoint/code/docker image 이전 완료, assets 볼륨(22.7G) per-dir 스트리밍 재이전 중."}
+    "amp_csi": {"gpu": "RTX 3090 (전용, 24GB free)", "arms": ["s1_adamw1e5", "s1_adamw3e5"], "note": "checkpoint/code/docker image 이전 완료. assets 볼륨은 이전 세션의 이중-쓰기 경합으로 손상(파일수는 맞았으나 scenes/·textures/ 서브트리 통째 누락)됐어서, operator per-dir 재전송(단일 writer, 재시도+검증)으로 클린 재이전 중. rollout.py + upstream/deploy(client.py) 누락도 v4->amp_csi rsync로 보충. 런처는 파일수뿐 아니라 top-level 10개 디렉토리(scenes/textures 포함) 구조 완성까지 게이트 후 arm 시작."}
   },
   "arms": [
     {"id": "s1_sgd2e3", "server": "v4", "optimizer": "SGD", "lr": "2e-3", "role": "control(참고문서 audited run)", "status": "pending"},
