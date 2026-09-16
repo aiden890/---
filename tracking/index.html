@@ -398,12 +398,12 @@ PLACE_OBJECT:
     <h2>각 스킬이 학습 때 받는 리워드</h2>
     <p class="dim" style="margin:0 0 12px"><b>변경 (2026-09-16):</b> 중간 목표를 조각조각 주던 <b>마일스톤 보너스를 폐지</b>했습니다. 이제 각 스킬은 <b>성공 조건을 모두 충족하면 마지막에 한 번</b> 리워드(+1.0)를 받습니다. (조건 미충족 시 0)</p>
     <table>
-      <tr><th>스킬</th><th>스킬 성공 판정 (AND 조건)</th><th>리워드</th><th>학습 전용 shaping</th></tr>
-      <tr><td><b>grasp</b></td><td>20스텝 연속 파지 (각도 조건 없음)</td><td>충족 시 <b>+1.0 (1회)</b></td><td>접근 shaping +0.1·(거리감소)/스텝</td></tr>
-      <tr><td><b>move_holding</b></td><td>3스텝 연속 preplace 영역</td><td>충족 시 <b>+1.0 (1회)</b></td><td>—</td></tr>
-      <tr><td><b>place</b></td><td>official 성공 = 안착 <b>AND</b> 이격(&gt;0.15m) <b>AND</b> 수평(≤7°)</td><td>모두 충족 시 <b>terminal +1.0×0.998<sup>step</sup> (1회)</b></td><td>—</td></tr>
+      <tr><th>스킬</th><th>스킬 성공 판정</th><th>성공 리워드</th><th>학습 전용 shaping (평가 미적용)</th></tr>
+      <tr><td><b>grasp</b></td><td><code>lid_grasped</code> 20스텝 연속 (각도 조건 없음)</td><td>충족 시 <b>+1.0 ×0.998<sup>step</sup> (1회)</b></td><td>성공 후 hold: 정지 +0.05/스텝 · 이탈 −0.10×(초과비율) · 성공상태 깨짐 −0.5</td></tr>
+      <tr><td><b>move_holding</b></td><td><code>lid_grasped AND in_preplace_region</code> 3스텝 연속</td><td>충족 시 <b>+1.0 ×0.998<sup>step</sup> (1회)</b></td><td>성공 후 hold: 위와 동일</td></tr>
+      <tr><td><b>place</b></td><td>official 성공 = 안착 <b>AND</b> 이격(&gt;0.15m) <b>AND</b> 수평(≤7°)</td><td>모두 충족 시 <b>+1.0 ×0.998<sup>step</sup> (1회)</b></td><td>성공 후 hold: 위와 동일</td></tr>
     </table>
-    <p class="dim" style="margin-top:10px">핵심: 리워드는 <b>모든 성공 조건이 동시에 충족되는 최종 시점에 한 번</b>만 지급됩니다(<code>use_milestones=False</code>, settle_terminal 유지). place는 그리퍼가 물러난 뒤 최종 안정 상태에서 판정하므로, 놓다가 흔들려도 마지막에 안착+수평이면 성공. 공통 감점: 파지 중 뚜껑 떨어뜨림 −0.25 · 운반 중 금지 충돌 −0.05 · 스킬 타임아웃 −0.5(감점·shaping은 <b>학습에서만</b>, 평가는 순수 시뮬레이터 리워드). VLM 보조 점수는 기본 가중치 0. <span style="color:var(--dim)">근거: <code>rl-env-t_4f3f2b20/src/reward.py</code> · 검증 14/14 통과</span></p>
+    <p class="dim" style="margin-top:10px">핵심: 리워드는 <b>모든 성공 조건이 동시에 충족되는 최종 시점에 한 번</b>만 지급됩니다(<code>use_milestones=False</code>, settle_terminal 유지 — 중간 마일스톤 폐지). place는 그리퍼가 물러난 뒤 최종 안정 상태에서 판정하므로, 놓다가 흔들려도 마지막에 안착+수평이면 성공. <b>hold shaping</b>은 스킬이 성공한 뒤 "그 자리에 멈춰있기"를 학습시키는 항(정지 보상·이탈 감점) — SFT로 못 고친 "성공 후 표류"를 직접 교정하는 학습 전용 신호. 공통 감점: 파지 중 뚜껑 떨어뜨림 <b>−0.25</b> · 운반 중 금지 충돌 <b>−0.05</b> · 실패로 에피소드 종료(timeout) <b>−0.10</b>. 감점·shaping은 <b>학습에서만</b>, 평가는 순수 시뮬레이터 리워드(terminal+drop/collision). VLM 보조 점수는 기본 가중치 0(진단용). <span style="color:var(--dim)">근거: <code>rl-env-t_4f3f2b20/src/reward.py</code> (RewardConfig·HoldConfig) · 검증 14/14 통과</span></p>
   </div>
 
   <div class="card">
