@@ -494,6 +494,16 @@ class GRPOTrainerServer:
                                    f"in model (first: {missing[:3]})")
         return {"loaded": req["path"], "n_tensors": len(sd), "n_extra": n_extra}
 
+    def op_reset(self, req):
+        """Drop every buffered rollout chunk WITHOUT an optimizer step. The difficulty-band
+        prefilter rolls out group members at the training eta>0 (populating self.store), but
+        those scan rollouts must NOT enter the first real op_update batch. The client calls
+        this after the prefilter (and after any diagnostic rollouts) to clear the store."""
+        n_trajs = len(self.store)
+        n_chunks = sum(len(v) for v in self.store.values())
+        self.store.clear()
+        return {"cleared_trajs": n_trajs, "cleared_chunks": n_chunks}
+
     def op_metrics(self, req):
         return {"n_trajs": len(self.store), "n_chunks": sum(len(v) for v in self.store.values()),
                 "free_gb": round(torch.cuda.mem_get_info()[0] / 1e9, 2)}
@@ -634,6 +644,7 @@ class GRPOTrainerServer:
     def handle(self, req):
         fn = {"sample": self.op_sample, "update": self.op_update, "save": self.op_save,
               "load": self.op_load, "metrics": self.op_metrics, "config": self.op_config,
+              "reset": self.op_reset,
               "vlm_score": self.op_vlm_score,
               "sft_update": self.op_sft_update, "sft_val": self.op_sft_val}.get(req.get("op"))
         return fn(req) if fn else {"error": f"unknown op {req.get('op')}"}

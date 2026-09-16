@@ -150,6 +150,12 @@ class TrainerClient:
     def save(self, path):
         return self._rpc({"op": "save", "path": path})
 
+    def reset_store(self):
+        """Clear the trainer's buffered rollout chunks without an optimizer step.
+        Called after the difficulty-band prefilter so its eta>0 scan rollouts do not
+        leak into the first real training update."""
+        return self._rpc({"op": "reset"})
+
     def config(self, code_rev=None):
         """Fetch the full trainer configuration (optimizer/LR/grad-clip/LoRA/trainable count/
         sampler/eta) for the run summary. Measurement fix: every run summary is self-describing."""
@@ -381,6 +387,72 @@ def build_entry_seed_pool(factory, client, args, candidate_seeds, target_skill, 
         if ok:
             good.append(seed)
     return good
+
+
+def scan_seed_difficulty(factory, client, args, reward_cfg, seed, skill):
+    """Roll out `group` STOCHASTIC (eta>0, the SAME eta training uses) members of the
+    trained skill from seed's fresh reset with the CURRENT (base) policy, and return how
+    many succeeded. This is the difficulty signal used by the band prefilter: a seed whose
+    base success count is 0/group is TOO HARD (all-failure, GRPO std=0) and 8/8 is TOO EASY
+    (all-success, near-zero reward variance) -- both get GATED and their learning signal
+    thrown away. The band [LOW,HIGH] keeps only the mixed-difficulty seeds in between.
+
+    Mirrors train_iteration's non-entry group rollout EXACTLY (new env per member, same
+    reset seed, same eta, same per-member action seed derivation) so the scanned success
+    count matches what the first training iteration on that seed would see. Does NOT call
+    op_update; the caller clears the trainer store afterwards via client.reset_store().
+    """
+    n_succ = 0
+    for m in range(args.group):
+        genv, sim = factory(seed)
+        try:
+            obs, _ = rollout.reset_env(genv, seed)
+            sim.rest_lid_pos = sim.lid_pos()
+            reward_mgr = RewardManager(reward_cfg)
+            # distinct traj_id namespace so scan rollouts never collide with train iters
+            traj_id = f"bandscan_s{seed}_m{m}"
+            # action-noise seed: derived from (seed, member) but offset into a disjoint
+            # range from the training seeds (args.seed_base + it*100 + m) to avoid overlap.
+            scan_action_seed = int(seed) * 977 + m + 500000
+            _obs, outcome, _r, _steps, _p, _h = _run_one_skill(
+                sim, client, obs, args, skill, reward_mgr, eta=args.eta,
+                traj_id=traj_id, seed=scan_action_seed)
+            if outcome is SkillOutcome.SUCCESS:
+                n_succ += 1
+        finally:
+            genv.close()
+    return n_succ
+
+
+def build_difficulty_band_pool(factory, client, args, reward_cfg, candidate_seeds,
+                               skill, band, need, tag=""):
+    """Prefilter candidate env seeds by BASE-policy success-count difficulty band.
+
+    For each candidate seed, scan_seed_difficulty() rolls out `group` stochastic members
+    with the current policy and counts successes; a seed is kept for the train pool only
+    if LOW <= n_succ <= HIGH (a mid-difficulty seed that yields a real GRPO advantage
+    signal instead of an all-success / all-failure GATED group). Scans until `need` seeds
+    are collected or candidates run out.
+
+    Returns (train_seeds, per_seed_nsucc) where per_seed_nsucc maps EVERY scanned seed to
+    its success count (for the cache + diagnostics, incl. the rejected 0/8 and 8/8 seeds).
+    Backward-compatible: only invoked when --train-difficulty-band is set (GRASP-from-reset
+    mode, entry_from_grasp=False); the entry-mode prefilter path is unchanged.
+    """
+    lo, hi = band
+    good = []
+    per_seed = {}
+    for seed in candidate_seeds:
+        if len(good) >= need:
+            break
+        n_succ = scan_seed_difficulty(factory, client, args, reward_cfg, seed, skill)
+        per_seed[seed] = n_succ
+        kept = (lo <= n_succ <= hi)
+        if kept:
+            good.append(seed)
+        print(f"[band-scan{tag}] seed={seed} n_succ={n_succ}/{args.group} "
+              f"band=[{lo},{hi}] kept={kept} ({len(good)}/{need})", flush=True)
+    return good, per_seed
 
 
 def eval_skill_from_entry(sim, client, args, reward_cfg, seed, skill,
@@ -795,6 +867,30 @@ def build_parser():
                          "band to prefilter grasp-entry-reaching seeds for the eval/train "
                          "pools (cached to entry_seeds.json). 0 = no prefilter (raw seeds, "
                          "non-entering ones are SKIPPED).")
+    # Difficulty-band seed prefilter (operator redesign t_2907de4f): GRASP-from-reset mode.
+    # Keep only MID-difficulty train seeds (base success count inside [LOW,HIGH]) so the
+    # group is neither all-failure (0/group, GATED std=0) nor all-success (group/group,
+    # near-zero reward variance) -- both throw away the GRPO signal. Independent of the
+    # entry-mode (MOVE) --entry-scan-cap prefilter, which filters on ENTRY-REACHED, not
+    # success-rate band.
+    ap.add_argument("--train-difficulty-band", type=int, nargs=2, default=None,
+                    metavar=("LOW", "HIGH"),
+                    help="Prefilter train-pool seeds to those whose BASE-policy success "
+                         "count over `group` stochastic (eta) rollouts is in [LOW,HIGH]. "
+                         "E.g. 1 7 with group 8 keeps mixed seeds, drops 0/8 and 8/8. "
+                         "None = no band prefilter (legacy seed_base+it sequential seeds).")
+    ap.add_argument("--train-scan-cap", type=int, default=0,
+                    help="With --train-difficulty-band: max candidate seeds (seed_base+i) to "
+                         "scan for the band. Recommend >= iters*a few so `need` band seeds "
+                         "are found. 0 = auto (iters*8).")
+    ap.add_argument("--train-pool-need", type=int, default=0,
+                    help="How many band-passing train seeds to collect. 0 = auto "
+                         "(max(iters, ceil(iters*1.5)) so the pool exceeds iters and every "
+                         "train step draws WITHOUT replacement for diversity).")
+    ap.add_argument("--seed", type=int, default=12345,
+                    help="RNG seed for the per-iter WITHOUT-REPLACEMENT random draw from the "
+                         "band-filtered train pool (reproducible; both arms share it so the "
+                         "paired comparison uses the same pool + same iter-seed order).")
     return ap
 
 
@@ -895,6 +991,53 @@ def main():
             print(f"[entry-prefilter] found {len(eval_seeds)}/{need_eval} eval + "
                   f"{len(train_seeds)}/{need_train} train grasp-entry seeds (cap {my.entry_scan_cap})", flush=True)
         log["entry_prefilter"] = {"eval_seeds": eval_seeds, "train_seeds": train_seeds}
+    elif (not entry_mode) and my.train_difficulty_band is not None:
+        # ---- Difficulty-band seed prefilter (GRASP-from-reset) ----
+        # Scan the train-seed band with the BASE policy and keep only MID-difficulty seeds
+        # (base success count inside [LOW,HIGH]); pool > iters so the train loop draws
+        # without replacement for diversity. Cached to train_pool.json (reproducibility +
+        # rerun skip). eval/heldout seeds are NOT band-filtered (fixed held-out set).
+        band = tuple(my.train_difficulty_band)
+        need_train = my.train_pool_need or max(my.iters, -(-my.iters * 3 // 2))  # ceil(iters*1.5)
+        scan_cap = my.train_scan_cap or (my.iters * 8)
+        cache = out / "train_pool.json"
+        if cache.exists():
+            pool = json.loads(cache.read_text())
+            train_seeds = pool["train_seeds"]
+            per_seed_nsucc = pool.get("per_seed_nsucc", {})
+            print(f"[band-prefilter] reuse cache: {len(train_seeds)} train seeds "
+                  f"band={pool.get('band')}", flush=True)
+        else:
+            train_cands = [my.seed_base + i for i in range(scan_cap)]
+            train_seeds, per_seed_nsucc = build_difficulty_band_pool(
+                train_factory, client, args, reward_cfg, train_cands,
+                train_skill_enum, band, need_train, tag="_train")
+            # the eta>0 scan rollouts populated the trainer store; clear it so they do NOT
+            # enter the first real op_update batch.
+            try:
+                cleared = client.reset_store()
+                print(f"[band-prefilter] cleared trainer store after scan: {cleared}", flush=True)
+            except Exception as _e:
+                print(f"[band-prefilter] store reset failed (non-fatal): {_e}", flush=True)
+            # distribution of scanned success counts (incl. rejected 0/group & group/group)
+            hist = {}
+            for k in per_seed_nsucc.values():
+                hist[k] = hist.get(k, 0) + 1
+            cache.write_text(json.dumps({
+                "band": list(band), "scan_cap": scan_cap, "need_train": need_train,
+                "eta": args.eta, "group": args.group,
+                "n_scanned": len(per_seed_nsucc), "nsucc_hist": {str(k): v for k, v in sorted(hist.items())},
+                "train_seeds": train_seeds,
+                "per_seed_nsucc": {str(k): v for k, v in per_seed_nsucc.items()},
+            }, indent=2))
+            print(f"[band-prefilter] found {len(train_seeds)}/{need_train} band seeds "
+                  f"(band={band}, scanned {len(per_seed_nsucc)}/{scan_cap}, hist={dict(sorted(hist.items()))})",
+                  flush=True)
+        if not train_seeds:
+            raise RuntimeError(f"band prefilter found 0 seeds in band {band} "
+                               f"(scan_cap={scan_cap}); widen the band or raise scan-cap.")
+        log["band_prefilter"] = {"band": list(band), "train_seeds": train_seeds,
+                                 "scan_cap": scan_cap, "need_train": need_train}
     else:
         train_seeds = None  # non-entry mode: train uses seed_base+it inline
 
@@ -917,13 +1060,35 @@ def main():
         print("EVAL(before):", _rate_str(before), flush=True)
 
     # ---- TRAIN ----
+    # Build the per-iter seed schedule. In band mode, draw from the band-filtered pool
+    # WITHOUT replacement (reshuffling when exhausted) using the reproducible --seed RNG,
+    # so a pool larger than iters gives every step a different mid-difficulty seed and no
+    # single seed is overfit. entry_mode keeps its cycle; legacy keeps seed_base+it.
+    band_mode = (not entry_mode) and my.train_difficulty_band is not None and bool(train_seeds)
+    iter_seeds = None
+    if band_mode:
+        import random as _random
+        rng = _random.Random(my.seed)
+        pool = list(train_seeds)
+        order = []
+        while len(order) < my.iters:
+            shuffled = pool[:]
+            rng.shuffle(shuffled)
+            order.extend(shuffled)
+        iter_seeds = order[:my.iters]
+        log["train_seed_schedule"] = iter_seeds
+        print(f"[train] band mode: pool={len(pool)} seeds, drawing {my.iters} "
+              f"without-replacement (rng seed {my.seed}); first 8={iter_seeds[:8]}", flush=True)
     curve = []
     with open(out / "train_log.jsonl", "a") as fh:
         for it in range(my.iters):
             # In entry_mode with a prefiltered pool, iterate over grasp-entry seeds
             # (cycled if fewer were found than iters) so every train step gets a real
-            # entry-state instead of being SKIPPED. Otherwise seed_base+it as before.
-            if train_seeds:
+            # entry-state instead of being SKIPPED. In band mode, draw the precomputed
+            # without-replacement schedule. Otherwise seed_base+it as before.
+            if band_mode:
+                seed = iter_seeds[it]
+            elif train_seeds:
                 seed = train_seeds[it % len(train_seeds)]
             else:
                 seed = my.seed_base + it
