@@ -108,6 +108,24 @@ case "${1:-help}" in
       "PYTHONPATH=/train/src python /train/scripts/pirl_g5_sweep.py \
        --out /out --trainer-port $port ${*:3}" 2>&1 | tee "$out/g5_sweep.log"
     ;;
+  diag)
+    # Diagnosis (task t_7b40aba0): run the TRAINING rollout harness (grpo_train_loop.
+    # _run_one_skill + trainer op_sample, eta=0, zero-init LoRA == base policy) for GRASP
+    # only, on the SAME seeds as the standalone 40% reference, sweeping the grasp horizon
+    # (120 training-default vs 208 standalone). Pure eval: no op=update is ever sent, so
+    # the resident policy stays bit-for-bit the pretrained checkpoint. Needs the trainer up.
+    #   bash run-train.sh diag <out-subdir> --split pretrain --seeds 0,1,..,9 --horizons 120,208
+    docker ps --format '{{.Names}}' | grep -q "^${trainer}$" || { echo "start trainer first: bash $0 trainer-start" >&2; exit 5; }
+    run="${2:-grasp_horizon_diag}"; out="$train/results/diag/$run"; mkdir -p "$out"
+    docker run --rm --name "xiaomi-client-diag-$run" --gpus all --shm-size=2g \
+      -e MUJOCO_GL=egl -e PYOPENGL_PLATFORM=egl -e NVIDIA_DRIVER_CAPABILITIES=compute,utility,graphics \
+      -v "$assets_volume:/opt/robocasa/robocasa/models/assets" -v "$parent:/work:ro" \
+      -v "$skilltools:/skill_eval_tools:ro" -v "$rlenv:/rl_env:ro" -v "$train:/train" -v "$out:/out" \
+      -v "$parent/checkpoint:/checkpoint:ro" --network "container:$trainer" \
+      --entrypoint bash "$client_image" -lc \
+      "PYTHONPATH=/train/src python /train/scripts/grasp_horizon_diag.py \
+       --out /out --trainer-port $port ${*:3}" 2>&1 | tee "$out/diag.log"
+    ;;
   sft)
     # Goal-3 SFT client (CFM per-skill LoRA). Uses the SERVER image (torch+hf+torchvision
     # +pyarrow for demo parquet/video decode; no sim needed) networked to the trainer.
@@ -129,6 +147,6 @@ case "${1:-help}" in
        --model /checkpoint --port $port --cache /train/hf_cache --out /out ${*:3}" 2>&1 | tee "$out/sft.log"
     ;;
   *)
-    echo "Usage: bash run-train.sh {probe|trainer-start [server args]|trainer-stop|audit-p0|pirl-gates [args]|audit-branch|train <run> [args]|g5-sweep <run> [args]|sft <run> [sft args]}" >&2
+    echo "Usage: bash run-train.sh {probe|trainer-start [server args]|trainer-stop|audit-p0|pirl-gates [args]|audit-branch|train <run> [args]|g5-sweep <run> [args]|diag <run> [args]|sft <run> [sft args]}" >&2
     exit 2;;
 esac
