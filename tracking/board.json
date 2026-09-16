@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-16",
+  "updated": "2026-09-16 18:52 KST",
   "purpose": {
     "north_star": "Skill-conditioned VLA 훈련 — 집기/옮기기/놓기 같은 skill을 각각의 지시로 제어하는 정책을 만든다 (base: Xiaomi-RoboCasa365)."
   },
@@ -38,8 +38,8 @@
     },
     {
       "title": "3. 스킬별 RL",
-      "badge": "wait",
-      "note": "simulator predicate를 주 reward로 사용. clean 상태에서 시작해 이전 스킬이 만든 chained 상태로 확장하고, base 대비 개선된 경우에만 다음 단계 진행."
+      "badge": "run",
+      "note": "pi-RL sampler로 G5(noise 성공률 스윕)·G7(update후 eta=0 ODE 전이) 진행. GRASP G5 완료(단조 붕괴, TOO-HARD). G7 GRASP 런 v4 detached 진행 중(finisher가 REPORT/G7_g7_grasp_FINAL.md+DONE 작성)."
     },
     {
       "title": "4. 연결 평가 및 planner 연결",
@@ -53,6 +53,8 @@
     }
   ],
   "note": [
+    "✅ faithful pi-RL Flow-SDE sampler(--sampler pirl) 전 게이트 PASS + 실훈련 검증: G7 GRASP 런에서 epoch0 on-policy ratio=1.0 정확, 이후 epoch ratio 0.90·KL 0.22·clip 0.75로 PPO/GRPO 관여. fixed_noise와 명칭 분리 유지.",
+    "⚠ G5 pi-RL noise 스윕(GRASP-from-reset): eta 0.0→0.167, 0.1→0.167, 0.3→0.083, 0.5→0.042, 0.7·1.0→0.0. 단조 붕괴 — GRASP는 base가 낮아 exploration이 base를 넘지 못함(TOO-HARD 영역). 최적 eta=0.1도 base와 동률.",
     "✅ Adapter-free 전체 아키텍처 스모크(t_1d5b404f) PASS: Planner(oracle stub)→SkillCall→Manager→base Xiaomi VLA(adapter_mode=disabled, ckpt=null)→RoboCasa→Verifier→Planner 루프가 랜덤 3 seed에서 정상 배선 검증(아키텍처 체크 6/6, 오프라인 15/15). task 성공 0/3은 base-policy PLACE 실패(정책 결과, 아키텍처 아님). 근거: Inference 탭 + defined-instruction-rollouts/architecture_base_smoke/.",
     "RL 재개 원칙: policy에 stop을 우선 학습하지 않고 짧은 action chunk 뒤 simulator verifier가 종료·handoff를 관리한다. VLM은 보조 판정에만 사용한다. 현재는 설계만 정리했으며 카드 t_e5cd5736은 보류 상태다.",
     "⚠ skill-SFT Gate3(entry-state rollout) 미통과: per-skill CFM LoRA SFT는 Gate1 tiny-overfit(1.20→0.024,50x)·Gate2 heldout val(1.370→0.218,6.3x) 통과했으나, 실제 sim 롤아웃에서 강한 config는 GRASP 2/12→0/12(붕괴)·약한 config는 1/12→2/12(≈base). BC open-loop→closed-loop 전이 실패 → 정책상 개선 확인 전 Goal4~6(N=50/ARM) 진행 금지. 근거: rl-train-t_3ed65912/REPORT/skill_sft_rollout_findings.md",
