@@ -40,7 +40,10 @@ for spec in "${arms[@]}"; do
   out="$base/$run"; mkdir -p "$out"
   log "--- arm $run: optimizer=$opt lr=$lr ---"
 
-  # clean any prior trainer, start with THIS arm's optimizer/lr (pi-RL sampler, eta 0.1)
+  # clean any prior trainer + a stale client of THIS arm's name (a crashed/zombie client
+  # keeps its --name and makes `docker run --name` collide on restart), then start the
+  # trainer with THIS arm's optimizer/lr (pi-RL sampler, eta 0.1).
+  docker rm -f "xiaomi-client-grpo-$run" >>"$slog" 2>&1 || true
   bash scripts/run-train.sh trainer-stop >>"$slog" 2>&1 || true
   bash scripts/run-train.sh trainer-start \
     --sampler pirl --eta 0.1 --optimizer "$opt" --lr "$lr" \
