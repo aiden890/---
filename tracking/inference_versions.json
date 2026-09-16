@@ -1,0 +1,13 @@
+{
+  "note": "인퍼런스 영상 버전 목록. 새 모델/아키텍처 버전이 나오면 여기에 항목을 추가하면 드롭다운에 자동으로 뜬다. video 경로는 tracking/ 기준 상대경로.",
+  "versions": [
+    {
+      "id": "base-pretrain",
+      "label": "학습 전 base (Xiaomi RoboCasa365, adapter 없음)",
+      "stage": "pre-training",
+      "date": "2026-09-16",
+      "desc": "학습되지 않은 base 정책으로 전체 skill-conditioned 파이프라인(Planner→GRASP→MOVE→PLACE)을 실행한 인퍼런스. 프레임 상단에 실행 중 skill·지시문, 하단에 verifier 판정(성공 시 ADVANCE, 실패 시 timeout)을 오버레이. 3 seed 결합본.",
+      "video": "media/architecture_smoke/architecture_verify_all.mp4"
+    }
+  ]
+}
