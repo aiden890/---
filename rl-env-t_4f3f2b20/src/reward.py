@@ -72,7 +72,9 @@ class RewardConfig:
     terminal_success: float = 1.0
     terminal_decay_gamma: float = 0.998     # Z-1 success-aware decay
     horizon: int = 400                      # steps; used for the decay reference
-    use_milestones: bool = True
+    use_milestones: bool = False            # operator decision (2026-09-16): pay reward ONCE at the
+                                            # end when ALL success conditions are met (terminal only),
+                                            # instead of paying intermediate milestones piece by piece.
     settle_terminal: bool = True            # judge task success on the FINAL SETTLED state
                                             # (after the gripper has released and moved away),
                                             # not only during manipulation. A placement that

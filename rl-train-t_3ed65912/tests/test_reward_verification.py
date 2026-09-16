@@ -172,8 +172,10 @@ def test_each_milestone_fires_only_on_its_predicate():
 
 
 def test_milestone_once_only_under_oscillation():
-    """Grasp toggles true/false/true; stable_grasp must be paid exactly once (no farming)."""
-    rm = RewardManager(RewardConfig())
+    """Grasp toggles true/false/true; stable_grasp must be paid exactly once (no farming).
+    Milestones are OFF by default (operator 2026-09-16: reward once at the end); this test
+    explicitly re-enables them to verify the once-only gating logic still holds when used."""
+    rm = RewardManager(RewardConfig(use_milestones=True))
     seq = [False, True, False, True, True, False, True]
     fires = 0
     for s, g in enumerate(seq, 1):
