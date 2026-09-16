@@ -199,33 +199,5 @@ fetch('experiments.json').then(r=>r.json()).then(db=>{
   [search,task,model,status].forEach(x=>x.addEventListener(x===search?'input':'change',render));render();
 }).catch(()=>document.getElementById('exp-list').innerHTML='<p class="no">실험 목록을 불러오지 못했습니다.</p>');
 
-// ===== dataset tab: SFT skill clips =====
-fetch('dataset.json').then(r=>r.json()).then(d=>{
-  const SKC={GRASP:'#818cf8',MOVE:'#4ade80',RELEASE:'#facc15'};
-  document.getElementById('ds-sub').innerHTML=`원본 데모를 3개 skill로 자른 뒤, <b>각 조각(구간 영상 + 그 구간의 target action)</b>만 따로 학습시킵니다. 각 예제의 <b>▶ 구간 보기</b>를 누르면 해당 에피소드가 LeRobot visualizer에서 열립니다. <span class="dim">(재생 시작 후 조각 구간 프레임으로 이동해서 보세요)</span>`;
-  document.getElementById('ds-clips').innerHTML=d.skills.map(s=>{
-    const col=SKC[s.short];
-    const rows=s.examples.map(e=>`
-      <a href="${d.viz_ep}${e.episode_index}" target="_blank" style="text-decoration:none;color:inherit;display:block">
-      <div class="item" style="cursor:pointer">
-        <div class="tt">
-          <div style="display:flex;gap:8px;align-items:center;font-size:13px">
-            <b>ep ${e.episode_index}</b>
-            <span class="dim">${e.split} · 프레임 ${e.span[0]}–${e.span[1]} · ${e.n_frames}f (${e.sec}s)</span>
-            <span style="margin-left:auto;color:var(--acc)">▶ 구간 보기</span>
-          </div>
-          <div style="position:relative;height:16px;margin-top:5px;border-radius:4px;overflow:hidden;background:#0c0e13">
-            <div title="이 조각: ${e.span[0]}–${e.span[1]}" style="position:absolute;left:0;width:100%;top:0;bottom:0;background:${col};opacity:.85"></div>
-            <span style="position:absolute;left:6px;top:0;bottom:0;display:flex;align-items:center;font-size:10px;color:#0a0a0a;font-weight:600">이 조각 = target action ${e.n_frames}스텝 × ${s.constraints?'':''}12-D</span>
-          </div>
-        </div>
-      </div></a>`).join('');
-    return `<div class="card" style="border-left:3px solid ${col}">
-      <h2 style="color:${col}">${s.short} <span class="dim" style="font-size:13px">(skill_id ${s.skill_id} · ${s.name})</span></h2>
-      <p class="dim" style="margin:0 0 4px">지시: "<b style="color:var(--tx)">${s.instruction}</b>"</p>
-      <p class="dim" style="margin:0 0 12px">성공조건: ${s.success}</p>
-      <div style="font-size:12px;color:var(--dim);margin-bottom:6px">대표 예제 (짧은/중간/긴 구간):</div>
-      ${rows}
-    </div>`;}).join('')+
-    `<p class="dim" style="margin-top:14px">각 예제 = <b>구간 영상 프레임</b>(모델 입력 obs) → <b>그 구간의 action ${''}시퀀스 12-D</b>(모델이 맞혀야 할 타깃). 구간 밖 스텝은 loss에서 제외. · 데이터: <code>rl-train-t_3ed65912/data/skill_sft/</code></p>`;
-}).catch(e=>{document.getElementById('ds-clips').innerHTML='<div class="dim">로드 실패</div>';});
+// dataset/report 탭은 제거됨(operator 2026-09-16). 관련 렌더 코드도 삭제.
+
