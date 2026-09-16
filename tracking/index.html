@@ -17,8 +17,7 @@
     <button data-tab="rltrain">RL 학습</button>
     <button data-tab="inference">Inference</button>
     <button data-tab="attend">실험 결과</button>
-    <button data-tab="dataset">데이터셋</button>
-    <button data-tab="report">작업 보고</button>
+
     <a href="http://100.86.183.64:8898/" style="color:var(--dim);text-decoration:none;font-size:13px;padding:8px 10px">↩ Hub</a>
     <div class="live"><span class="dot"></span>v4 · RTX 3090</div>
   </nav>
@@ -472,73 +471,6 @@ PLACE_OBJECT:
     <div class="exp-list-head"><span>날짜 · ID</span><span>실험</span><span>Task / 모델</span><span>상태</span></div>
     <div id="exp-list"></div>
     <p class="dim" id="exp-empty" style="display:none;margin:14px 0 0">조건에 맞는 실험이 없습니다.</p>
-  </div>
-</section>
-<!-- ===== 데이터셋 (skill-SFT) ===== -->
-<section id="dataset" class="tab">
-  <h1>SFT 학습 데이터 · 잘린 skill 조각</h1>
-  <p class="dim" id="ds-sub"></p>
-  <div id="ds-clips"></div>
-</section>
-
-<!-- ===== 작업 보고 ===== -->
-<section id="report" class="tab">
-  <h1>작업 보고</h1>
-  <div class="card">
-    <h2>파이프라인 현황</h2>
-    <table>
-      <tr><th>#</th><th>단계</th><th>상태</th></tr>
-      <tr><td>1</td><td>CUDA 12.1 포팅 · rollout 검증</td><td><span class="badge b-ok">완료</span></td></tr>
-      <tr><td>2</td><td>종류별 rollout · 실패 분류</td><td><span class="badge b-ok">완료</span></td></tr>
-      <tr><td>3</td><td>CloseBlenderLid 추가 rollout</td><td><span class="badge b-ok">완료</span></td></tr>
-      <tr><td>4</td><td>skill 3종 분해 rollout</td><td><span class="badge b-ok">완료</span></td></tr>
-      <tr><td>5</td><td>RL 환경 구축 (flow-SDE · reward)</td><td><span class="badge b-ok">완료</span></td></tr>
-      <tr><td>6</td><td>리워드 정합성 검증 (19/19)</td><td><span class="badge b-ok">통과</span></td></tr>
-      <tr><td>7</td><td>GRPO pilot 학습</td><td><span class="badge b-run">진행</span></td></tr>
-      <tr><td>8</td><td>ARM C · 스케일 학습</td><td><span class="badge b-wait">대기</span></td></tr>
-      <tr><td>9</td><td>디렉토리 개편 · 중복 통합</td><td><span class="badge b-rev">리뷰</span></td></tr>
-    </table>
-  </div>
-  <div class="card">
-    <h2>리워드 로직 (쉽게 정리)</h2>
-    <p class="dim" style="margin:0 0 14px">리워드는 모두 <b>시뮬레이터의 실제 상태(predicate)</b>에서 계산됩니다. 임의 점수가 아니라, 로봇이 실제로 무엇을 했는지에 따라 붙습니다. → 시각적 확인은 <a href="#" onclick="document.querySelector('[data-tab=rlenv]').click();return false">RL 환경 탭</a></p>
-    <table>
-      <tr><th>종류</th><th>조건 (실제 상태)</th><th>값</th></tr>
-      <tr><td><b>성공</b> (terminal)</td><td>뚜껑이 블렌더에 안착 <b>AND</b> 그리퍼가 15cm 이상 떨어짐 <b>AND</b> 수평(≤7°)</td><td class="ok">+1.0 ×0.998<sup>step</sup></td></tr>
-      <tr><td rowspan="5">단계 보너스<br><span class="dim">(에피소드당 1회)</span></td><td>뚜껑을 안정적으로 집음</td><td>+0.15</td></tr>
-      <tr><td>뚜껑을 들어올림</td><td>+0.10</td></tr>
-      <tr><td>충돌 없이 운반</td><td>+0.10</td></tr>
-      <tr><td>놓기 직전 위치 도달</td><td>+0.20</td></tr>
-      <tr><td>안착 / release / 물러남</td><td>+0.25 / +0.10 / +0.10</td></tr>
-      <tr><td rowspan="3">감점</td><td>물건 떨어뜨림</td><td class="no">−0.25</td></tr>
-      <tr><td>운반 중 금지된 충돌</td><td class="no">−0.05</td></tr>
-      <tr><td>매 스텝 / 시간 초과</td><td class="no">−0.05 / −0.10</td></tr>
-    </table>
-    <p class="dim" style="margin-top:12px">핵심 안전장치: ① 단계 보너스는 <b>처음 달성할 때 딱 1번</b>만 지급 → 경계에서 흔들어 점수 farming 불가. ② release 순간 <b>7° 넘게 기울면 성공 리워드 미지급</b> (거짓 성공 차단). ③ 놓인 뚜껑이 지지면에 닿는 건 충돌로 안 셈 → 밀집 penalty가 GRPO advantage 분산을 죽이지 않도록. ④ VLM 점수는 <b>기본 가중치 0</b>, 진단용으로만 기록.</p>
-    <p class="dim">코드: <code>rl-env-t_4f3f2b20/src/reward.py</code> · 자세한 값은 그대로 이 표와 일치</p>
-  </div>
-  <div class="card">
-    <h2>GRPO pilot 결과 (N=50, 동일 seed)</h2>
-    <table>
-      <tr><th>Arm</th><th>방식</th><th>공식 성공률 전→후</th><th>held-out</th></tr>
-      <tr><td>A</td><td>adapter만</td><td>0.20 → 0.16</td><td>0.08</td></tr>
-      <tr><td>B</td><td>adapter+expert</td><td>0.20 → 0.20</td><td>0.16</td></tr>
-      <tr><td>C</td><td>+VLM 일부</td><td>예산상 보류</td><td>—</td></tr>
-    </table>
-    <p class="dim" style="margin-top:12px">pilot 규모(30 iter × group 4)에선 순 성능 향상 없음. 확보한 것은 검증된 재현 가능 GRPO 파이프라인 + 리워드 레이어.</p>
-  </div>
-  <div class="card">
-    <h2>리워드 검증 게이트 (학습 전 필수)</h2>
-    <ul>
-      <li class="ok">✔ reward 단위 테스트 19/19 (13개 그룹) — PLACE tilt-on-release edge case 포함</li>
-      <li class="ok">✔ flow-SDE eta&gt;0 log-prob·gradient 유한, ratio=1.0</li>
-      <li class="ok">✔ 시뮬레이터 official_check와 0 불일치 (120스텝)</li>
-    </ul>
-  </div>
-  <div class="card">
-    <h2>선례 (RL 방법론)</h2>
-    <p><b>Z-1</b> (arXiv 2606.31846) — π0.5 flow VLA + task-wise GRPO, RoboCasa 24 task 80.6%(+13.2%p). shared-prefix rollout · tree branching · completion-aware reward · selective joint training.</p>
-    <p class="dim">Flow-GRPO / ReinFlow / πRL — LoRA · tighter clip · ratio guard 권고.</p>
   </div>
 </section>
 
