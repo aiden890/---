@@ -1,0 +1,53 @@
+{
+  "task": "t_32a4f9b6",
+  "why": "obs-only VLM verifier가 PLACE에서 false positive(놓는 순간 한 프레임만 보고 성공 판정). 경계판정(빠르고 관대)과 성공판정(엄격)을 분리하고, 뷰포인트 라우팅+에피소드 시간집계로 성공판정을 재설계. 측정 기반으로 계속 개선.",
+  "corpus": "random_g10_p10 (GRASP 4성공/6실패, PLACE 2성공/8실패). sim GT는 오프라인 캘리브레이션 라벨로만 사용(정책엔 미주입, obs-only 유지).",
+  "roles": [
+    {
+      "role": "경계 판정 (boundary)",
+      "module": "obs_verifier.ObsVLMVerifier",
+      "strictness": "빠름·관대 (tau 0.6 / latch 2, 온라인 per-frame)",
+      "purpose": "ADVANCE/CONTINUE/REPLAN — 스킬 조기 종료는 저렴·복구가능"
+    },
+    {
+      "role": "성공 판정 (success)",
+      "module": "success_gate.SuccessGate",
+      "strictness": "엄격 (뷰라우팅 + 에피소드 평균 + skill별 threshold)",
+      "purpose": "리포트/리워드 게이트의 진짜 성공. 보고서엔 obs_task_success로 별도 표기"
+    }
+  ],
+  "success_gate_config": {
+    "PLACE_OBJECT": "mean(place_clear@right)>=0.75 AND mean(place_seated@right)>=0.50 (min_frames 5)",
+    "GRASP_OBJECT": "mean(grasp@eye)>=0.50 (min_frames 3)"
+  },
+  "before_after": [
+    {
+      "skill": "PLACE_OBJECT",
+      "before_precision": 0.2,
+      "before_fp": 8,
+      "before_recall": 1.0,
+      "after_precision": 1.0,
+      "after_fp": 0,
+      "after_recall": 1.0,
+      "tp": 2,
+      "fn": 0,
+      "tn": 8
+    },
+    {
+      "skill": "GRASP_OBJECT",
+      "before_precision": 0.4,
+      "before_fp": 6,
+      "before_recall": 1.0,
+      "after_precision": 0.75,
+      "after_fp": 1,
+      "after_recall": 0.75,
+      "tp": 3,
+      "fn": 1,
+      "tn": 5
+    }
+  ],
+  "unit_tests": "success_gate 7/7 + obs_verifier 25/25 + check_architecture 19/19",
+  "obs_only_invariant": "success_gate.py 및 런타임 경로는 특권 predicate 미참조. sim GT는 threshold 캘리브레이션에만 사용.",
+  "loop": "cache_frame_scores.py(GPU 1회 프레임 스코어 캐시) -> calibrate/validate(CPU 무한 재생). 코퍼스 늘면 재실행만.",
+  "caveat": "PLACE positive 2개(base 정책이 PLACE 성공 드묾). 방향성 강하고 FP 메커니즘 이해·수정됨. 성공 롤아웃 늘면 threshold 재확인 필요."
+}

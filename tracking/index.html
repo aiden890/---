@@ -348,6 +348,19 @@ PLACE_OBJECT:
     <div id="infvid-player"></div>
     <p class="dim" id="infvid-desc" style="margin-top:12px"></p>
   </div>
+
+  <div class="card" id="obsv-calib-card" style="margin-top:18px">
+    <h2>Verifier 캘리브레이션 — 경계/성공 판정 분리 + PLACE false-positive 수정 <span class="dim" style="font-size:12px">(t_32a4f9b6)</span></h2>
+    <p class="dim" id="obsv-why" style="margin:0 0 12px"></p>
+    <div id="obsv-roles" style="margin-bottom:14px"></div>
+    <h3 style="margin:6px 0 8px;font-size:14px">성공판정 정밀도 (Before → After, sim GT 대비)</h3>
+    <table id="obsv-ba"><thead><tr><th>skill</th><th>precision (before→after)</th><th>false-positive (before→after)</th><th>recall</th><th>TP/FN/TN</th></tr></thead><tbody></tbody></table>
+    <p class="dim" id="obsv-cfg" style="margin:12px 0 4px"></p>
+    <p class="dim" id="obsv-loop" style="margin:4px 0"></p>
+    <p class="dim" id="obsv-inv" style="margin:4px 0"></p>
+    <p class="dim" id="obsv-caveat" style="margin:4px 0"></p>
+    <p class="dim" id="obsv-tests" style="margin:4px 0;font-size:12px"></p>
+  </div>
 </section>
 
 <!-- ===== RoboCasa Task (벤치마크 전체) ===== -->
@@ -480,5 +493,6 @@ PLACE_OBJECT:
 
 <script src="assets/site.js?v=20260916b" defer></script>
 <script src="assets/inference.js?v=20260916b" defer></script>
+<script src="assets/obs_verifier_calib.js?v=20260917a" defer></script>
 </body>
 </html>

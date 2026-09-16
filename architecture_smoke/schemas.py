@@ -147,6 +147,9 @@ class SkillResult:
     reason: str
     predicates: Mapping[str, Any] = field(default_factory=dict)
     vlm_stats: Optional[Mapping[str, Any]] = None
+    # strict, view-routed, episode-level success verdict (obs-only), SEPARATE
+    # from the boundary ADVANCE that set ``status``. See success_gate.SuccessGate.
+    success_gate: Optional[Mapping[str, Any]] = None
 
     def as_dict(self) -> dict:
         return {
@@ -159,4 +162,5 @@ class SkillResult:
             "terminated_by": self.terminated_by,
             "reason": self.reason,
             "vlm_stats": (dict(self.vlm_stats) if self.vlm_stats else None),
+            "success_gate": (dict(self.success_gate) if self.success_gate else None),
         }

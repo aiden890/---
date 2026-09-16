@@ -67,10 +67,20 @@ def run_episode(planner, manager, env, trace, registry, goal, episode_budget,
             break
 
     final_pred = env.predicates()
+    # obs-only task success: the strict PLACE success gate's verdict (view-routed,
+    # episode-level). This is the runtime-usable success signal (NO sim predicate),
+    # reported ALONGSIDE the offline sim ``task_success`` label so the reader can
+    # see boundary-advance vs strict-success vs sim-GT for each episode.
+    obs_task_success = None
+    for r in reversed(skill_log):
+        if r.get("skill") == "PLACE_OBJECT" and r.get("success_gate") is not None:
+            obs_task_success = bool(r["success_gate"].get("success"))
+            break
     summary = {
         "seed": env.seed, "goal": goal, "terminal": terminal,
         "planner_calls": planner_calls, "steps_used": steps_used,
         "task_success": bool(final_pred.get("official_check_success")),
+        "obs_task_success": obs_task_success,
         "skills": skill_log,
         "final_predicates": final_pred,
     }

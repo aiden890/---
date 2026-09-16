@@ -23,6 +23,7 @@ import socket
 import struct
 
 from obs_verifier import CAMERA_KEYS, VLMBackend
+# compose_view is defined below; forward reference resolved at call time.
 
 
 # --------------------------------------------------------------------------- #
@@ -81,6 +82,30 @@ def compose_three_cam(images: Mapping[str, Any]):
     return np.ascontiguousarray(np.concatenate([get(k) for k in CAMERA_KEYS], axis=1))
 
 
+# View routing: calibration (task t_32a4f9b6) found the wide 3-cam concat dilutes
+# the discriminative signal for the strict success judge -- a SINGLE camera view
+# separates PLACE success from failure far better (place_clear@right AUC=1.0 vs
+# full-concat 0.31). ``compose_view`` picks one named view for view-routed VQA.
+VIEW_TO_CAM = {
+    "full": None,
+    "left": CAMERA_KEYS[0],
+    "right": CAMERA_KEYS[1],
+    "eye": CAMERA_KEYS[2],
+}
+
+
+def compose_view(images: Mapping[str, Any], view: str):
+    """Return the image for one view: 'full' -> 3-cam concat, else that camera."""
+    if view == "full" or view is None:
+        return compose_three_cam(images)
+    import numpy as np
+    cam = VIEW_TO_CAM[view]
+    for cand in (cam, "video." + cam):
+        if cand in images:
+            return np.ascontiguousarray(np.asarray(images[cand], dtype=np.uint8))
+    raise KeyError(f"camera {cam!r} (view {view!r}) missing (have {sorted(images)})")
+
+
 # --------------------------------------------------------------------------- #
 #  Real Qwen3-VL backend                                                        #
 # --------------------------------------------------------------------------- #
@@ -113,9 +138,13 @@ class QwenVLMScorerBackend(VLMBackend):
         self._yes_ids, self._no_ids = vlm_scorer.resolve_yes_no_ids(tokenizer)
 
     def score(self, images: Mapping[str, Any], question_text: str) -> float:
+        return self.score_view(images, question_text, view="full")
+
+    def score_view(self, images: Mapping[str, Any], question_text: str,
+                   view: str = "full") -> float:
         import torch
 
-        image = self.compose(images)
+        image = compose_view(images, view) if view != "full" else self.compose(images)
         inputs = self._vs.build_vqa_inputs(
             self.proc, image, question_text, robot_type=self.robot_type,
             state_dim=self.state_dim, state_length=self.state_length)
@@ -192,7 +221,11 @@ class RemoteVLMScorerBackend(VLMBackend):
         return buf
 
     def score(self, images: Mapping[str, Any], question_text: str) -> float:
-        image = self.compose(images)
+        return self.score_view(images, question_text, view="full")
+
+    def score_view(self, images: Mapping[str, Any], question_text: str,
+                   view: str = "full") -> float:
+        image = compose_view(images, view) if view != "full" else self.compose(images)
         # build_vqa_inputs accepts a literal question string (falls back to it
         # when the key is not in the QUESTIONS bank), so the obs_verifier's
         # per-skill question text is used verbatim.

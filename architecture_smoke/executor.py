@@ -56,6 +56,7 @@ class ExecutionManager:
     # ------------------------------------------------------------------ #
     def _execute_vlm(self, call: SkillCall) -> SkillResult:
         from obs_verifier import ObsVLMVerifier, SKILL_QUESTIONS
+        from success_gate import make_success_gate
 
         contract = self.registry.validate_call(call)
         instruction = contract.render_instruction(call.args)
@@ -65,6 +66,11 @@ class ExecutionManager:
             question_text=SKILL_QUESTIONS[qkey],
             vlm_min_interval=self.vlm_min_interval, hysteresis_k=self.hysteresis_k,
             tau=self.tau, event_gated=self.event_gated)
+        # SECOND ROLE: strict, view-routed, episode-level success judge, SEPARATE
+        # from the boundary latch above. It accumulates per-frame P(yes) on the
+        # recorded-frame cadence and renders a strict pass/fail at skill end.
+        # None for skills without a calibrated gate (e.g. MOVE).
+        success_gate = make_success_gate(call.name, self.vlm_backend)
 
         # can_start stays obs-agnostic here: the sequential planner only issues a
         # skill when it is its turn, so we always start (no privileged precondition).
@@ -98,6 +104,14 @@ class ExecutionManager:
                 force=(queried or v.decision is Decision.ADVANCE or done or trunc))
             if fidx is not None:
                 self.trace.frame(call.name, steps, fidx)
+                # strict success judge observes the SAME recorded frames (cheap
+                # cadence); it is view-routed and episode-level, independent of
+                # the boundary latch's decision.
+                if success_gate is not None:
+                    try:
+                        success_gate.observe(obs.images if hasattr(obs, "images") else obs)
+                    except Exception:  # noqa: BLE001 -- never let the gate break the loop
+                        pass
                 if queried or v.decision is Decision.ADVANCE:
                     self.trace.vlm(call.name, steps, fidx, diag.get("vlm_prob"),
                                    diag.get("consecutive_yes"), queried,
@@ -110,6 +124,11 @@ class ExecutionManager:
                                    verifier.succeeded_step, "vlm_success", v.reason,
                                    self.env.predicates())
                 res.vlm_stats = verifier.stats()
+                # attach the strict success verdict (obs-only), SEPARATE from the
+                # boundary ADVANCE above -- the report reader can now see a skill
+                # that advanced but did NOT pass the strict success gate.
+                if success_gate is not None:
+                    res.success_gate = success_gate.verdict()
                 return res
             if v.decision is Decision.REPLAN:
                 self.trace.verify(call.name, v.decision.value, v.reason, v.elapsed, v.hold)

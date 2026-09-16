@@ -209,10 +209,22 @@ class ProprioGate:
 #  VLM backend interface                                                        #
 # --------------------------------------------------------------------------- #
 class VLMBackend:
-    """score(images, question_text) -> P(yes) in [0, 1]."""
+    """score(images, question_text) -> P(yes) in [0, 1].
+
+    ``score_view(images, question_text, view)`` optionally routes the VQA to a
+    SINGLE camera view ('left'|'right'|'eye') instead of the wide 3-cam concat
+    ('full'). Calibration (task t_32a4f9b6) found a single view separates the
+    strict success judge far better than the diluted concat. Backends that do
+    not override ``score_view`` fall back to the full-concat ``score``.
+    """
 
     def score(self, images: Mapping[str, Any], question_text: str) -> float:
         raise NotImplementedError
+
+    def score_view(self, images: Mapping[str, Any], question_text: str,
+                   view: str = "full") -> float:
+        # default: ignore the view request, score the full concat.
+        return self.score(images, question_text)
 
 
 # Per-skill completion questions. Each asks a single yes/no visual fact the real

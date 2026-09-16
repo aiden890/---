@@ -1,0 +1,359 @@
+{
+  "corpus": "/corpus",
+  "success_gate_after": {
+    "GRASP_OBJECT": {
+      "tp": 3,
+      "fp": 1,
+      "fn": 1,
+      "tn": 5,
+      "precision": 0.75,
+      "recall": 0.75,
+      "f1": 0.75
+    },
+    "PLACE_OBJECT": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "tn": 8,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    }
+  },
+  "success_baseline_before": {
+    "GRASP_OBJECT": {
+      "tp": 4,
+      "fp": 6,
+      "fn": 0,
+      "tn": 0,
+      "precision": 0.4,
+      "recall": 1.0,
+      "f1": 0.5714285714285715
+    },
+    "PLACE_OBJECT": {
+      "tp": 2,
+      "fp": 8,
+      "fn": 0,
+      "tn": 0,
+      "precision": 0.2,
+      "recall": 1.0,
+      "f1": 0.33333333333333337
+    }
+  },
+  "criteria": {
+    "PLACE_OBJECT": "clear@right>=0.75 (AUC 1.0) AND seated@right>=0.50 guard; prec 1.0 rec 1.0",
+    "GRASP_OBJECT": "eye-view hold mean >=0.50 (best measured, precision 0.75)"
+  },
+  "details": [
+    {
+      "rollout": "grasp/seed0",
+      "gt": true,
+      "pred": false,
+      "sub_scores": [
+        0.42664689818131074
+      ],
+      "sub_thresholds": [
+        0.5
+      ],
+      "sub_views": [
+        "eye"
+      ]
+    },
+    {
+      "rollout": "grasp/seed1",
+      "gt": true,
+      "pred": true,
+      "sub_scores": [
+        0.519489264795305
+      ],
+      "sub_thresholds": [
+        0.5
+      ],
+      "sub_views": [
+        "eye"
+      ]
+    },
+    {
+      "rollout": "grasp/seed2",
+      "gt": true,
+      "pred": true,
+      "sub_scores": [
+        0.6688484826021724
+      ],
+      "sub_thresholds": [
+        0.5
+      ],
+      "sub_views": [
+        "eye"
+      ]
+    },
+    {
+      "rollout": "grasp/seed3",
+      "gt": false,
+      "pred": false,
+      "sub_scores": [
+        0.4949585636199083
+      ],
+      "sub_thresholds": [
+        0.5
+      ],
+      "sub_views": [
+        "eye"
+      ]
+    },
+    {
+      "rollout": "grasp/seed4",
+      "gt": false,
+      "pred": false,
+      "sub_scores": [
+        0.47378508894229837
+      ],
+      "sub_thresholds": [
+        0.5
+      ],
+      "sub_views": [
+        "eye"
+      ]
+    },
+    {
+      "rollout": "grasp/seed5",
+      "gt": true,
+      "pred": true,
+      "sub_scores": [
+        0.5076497566293586
+      ],
+      "sub_thresholds": [
+        0.5
+      ],
+      "sub_views": [
+        "eye"
+      ]
+    },
+    {
+      "rollout": "grasp/seed6",
+      "gt": false,
+      "pred": false,
+      "sub_scores": [
+        0.26860883072862085
+      ],
+      "sub_thresholds": [
+        0.5
+      ],
+      "sub_views": [
+        "eye"
+      ]
+    },
+    {
+      "rollout": "grasp/seed7",
+      "gt": false,
+      "pred": false,
+      "sub_scores": [
+        0.46671680264385806
+      ],
+      "sub_thresholds": [
+        0.5
+      ],
+      "sub_views": [
+        "eye"
+      ]
+    },
+    {
+      "rollout": "grasp/seed8",
+      "gt": false,
+      "pred": true,
+      "sub_scores": [
+        0.6593352011844235
+      ],
+      "sub_thresholds": [
+        0.5
+      ],
+      "sub_views": [
+        "eye"
+      ]
+    },
+    {
+      "rollout": "grasp/seed9",
+      "gt": false,
+      "pred": false,
+      "sub_scores": [
+        0.4240989272465121
+      ],
+      "sub_thresholds": [
+        0.5
+      ],
+      "sub_views": [
+        "eye"
+      ]
+    },
+    {
+      "rollout": "place/seed0",
+      "gt": false,
+      "pred": false,
+      "sub_scores": [
+        0.7293780594326482,
+        0.5108095391625815
+      ],
+      "sub_thresholds": [
+        0.75,
+        0.5
+      ],
+      "sub_views": [
+        "right",
+        "right"
+      ]
+    },
+    {
+      "rollout": "place/seed1",
+      "gt": false,
+      "pred": false,
+      "sub_scores": [
+        0.20066098997941112,
+        0.34505044779565075
+      ],
+      "sub_thresholds": [
+        0.75,
+        0.5
+      ],
+      "sub_views": [
+        "right",
+        "right"
+      ]
+    },
+    {
+      "rollout": "place/seed2",
+      "gt": false,
+      "pred": false,
+      "sub_scores": [
+        0.54731327564557,
+        0.6813285799309758
+      ],
+      "sub_thresholds": [
+        0.75,
+        0.5
+      ],
+      "sub_views": [
+        "right",
+        "right"
+      ]
+    },
+    {
+      "rollout": "place/seed3",
+      "gt": false,
+      "pred": false,
+      "sub_scores": [
+        0.5817990001512341,
+        0.35890985711818874
+      ],
+      "sub_thresholds": [
+        0.75,
+        0.5
+      ],
+      "sub_views": [
+        "right",
+        "right"
+      ]
+    },
+    {
+      "rollout": "place/seed4",
+      "gt": false,
+      "pred": false,
+      "sub_scores": [
+        0.5432191626675943,
+        0.6051887037361613
+      ],
+      "sub_thresholds": [
+        0.75,
+        0.5
+      ],
+      "sub_views": [
+        "right",
+        "right"
+      ]
+    },
+    {
+      "rollout": "place/seed5",
+      "gt": false,
+      "pred": false,
+      "sub_scores": [
+        0.5938005699674682,
+        0.5310467028861293
+      ],
+      "sub_thresholds": [
+        0.75,
+        0.5
+      ],
+      "sub_views": [
+        "right",
+        "right"
+      ]
+    },
+    {
+      "rollout": "place/seed6",
+      "gt": false,
+      "pred": false,
+      "sub_scores": [
+        0.6305445547003558,
+        0.44923239494535594
+      ],
+      "sub_thresholds": [
+        0.75,
+        0.5
+      ],
+      "sub_views": [
+        "right",
+        "right"
+      ]
+    },
+    {
+      "rollout": "place/seed7",
+      "gt": false,
+      "pred": false,
+      "sub_scores": [
+        0.5809349267199488,
+        0.5315918229557205
+      ],
+      "sub_thresholds": [
+        0.75,
+        0.5
+      ],
+      "sub_views": [
+        "right",
+        "right"
+      ]
+    },
+    {
+      "rollout": "place/seed8",
+      "gt": true,
+      "pred": true,
+      "sub_scores": [
+        0.7810860849776358,
+        0.5221104909367157
+      ],
+      "sub_thresholds": [
+        0.75,
+        0.5
+      ],
+      "sub_views": [
+        "right",
+        "right"
+      ]
+    },
+    {
+      "rollout": "place/seed9",
+      "gt": true,
+      "pred": true,
+      "sub_scores": [
+        0.9707394036753424,
+        0.8468091755077757
+      ],
+      "sub_thresholds": [
+        0.75,
+        0.5
+      ],
+      "sub_views": [
+        "right",
+        "right"
+      ]
+    }
+  ]
+}
