@@ -1,0 +1,347 @@
+{
+  "config": {
+    "rollouts_root": "/rollouts",
+    "out": "/sm/out_mock_grasp",
+    "backend": "mock",
+    "model_path": "/checkpoint",
+    "device": "cpu",
+    "robot_type": "robocasa365",
+    "vlm_min_interval": 16,
+    "hysteresis_k": 2,
+    "tau": 0.6,
+    "max_steps": 500,
+    "glob": "rand10_grasp_seed*",
+    "skill": "grasp"
+  },
+  "n_rollouts": 10,
+  "n_ok": 10,
+  "metrics": {
+    "grasp": {
+      "n": 10,
+      "tp": 4,
+      "fp": 6,
+      "fn": 0,
+      "tn": 0,
+      "precision": 0.4,
+      "recall": 1.0,
+      "f1": 0.5714285714285715,
+      "timing_offset_steps": [
+        -8,
+        -113,
+        -144,
+        -139
+      ],
+      "mean_timing_offset": -101.0,
+      "median_timing_offset": -113
+    },
+    "_overall": {
+      "n": 10,
+      "mean_timing_offset": -101.0,
+      "total_vlm_calls": 23,
+      "mean_vlm_latency_ms": 0.0
+    }
+  },
+  "records": [
+    {
+      "rollout": "rand10_grasp_seed0",
+      "skill": "grasp",
+      "gt_success_step": 136,
+      "gt_success": true,
+      "obs_advance_step": 128,
+      "obs_advanced": true,
+      "n_vlm_calls": 5,
+      "vlm_seconds": 0.0,
+      "mean_vlm_latency_ms": 0.0,
+      "queries": [
+        {
+          "step": 1,
+          "prob": 0.1,
+          "yes": false,
+          "consec": 0,
+          "env_step": 0
+        },
+        {
+          "step": 17,
+          "prob": 0.1,
+          "yes": false,
+          "consec": 0,
+          "env_step": 32
+        },
+        {
+          "step": 33,
+          "prob": 0.1,
+          "yes": false,
+          "consec": 0,
+          "env_step": 64
+        },
+        {
+          "step": 49,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 1,
+          "env_step": 96
+        },
+        {
+          "step": 65,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 2,
+          "env_step": 128
+        }
+      ],
+      "n_recorded_frames": 69
+    },
+    {
+      "rollout": "rand10_grasp_seed1",
+      "skill": "grasp",
+      "gt_success_step": 145,
+      "gt_success": true,
+      "obs_advance_step": 32,
+      "obs_advanced": true,
+      "n_vlm_calls": 2,
+      "vlm_seconds": 0.0,
+      "mean_vlm_latency_ms": 0.0,
+      "queries": [
+        {
+          "step": 1,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 1,
+          "env_step": 0
+        },
+        {
+          "step": 17,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 2,
+          "env_step": 32
+        }
+      ],
+      "n_recorded_frames": 74
+    },
+    {
+      "rollout": "rand10_grasp_seed2",
+      "skill": "grasp",
+      "gt_success_step": 176,
+      "gt_success": true,
+      "obs_advance_step": 32,
+      "obs_advanced": true,
+      "n_vlm_calls": 2,
+      "vlm_seconds": 0.0,
+      "mean_vlm_latency_ms": 0.0,
+      "queries": [
+        {
+          "step": 1,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 1,
+          "env_step": 0
+        },
+        {
+          "step": 17,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 2,
+          "env_step": 32
+        }
+      ],
+      "n_recorded_frames": 89
+    },
+    {
+      "rollout": "rand10_grasp_seed3",
+      "skill": "grasp",
+      "gt_success_step": null,
+      "gt_success": false,
+      "obs_advance_step": 32,
+      "obs_advanced": true,
+      "n_vlm_calls": 2,
+      "vlm_seconds": 0.0,
+      "mean_vlm_latency_ms": 0.0,
+      "queries": [
+        {
+          "step": 1,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 1,
+          "env_step": 0
+        },
+        {
+          "step": 17,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 2,
+          "env_step": 32
+        }
+      ],
+      "n_recorded_frames": 105
+    },
+    {
+      "rollout": "rand10_grasp_seed4",
+      "skill": "grasp",
+      "gt_success_step": null,
+      "gt_success": false,
+      "obs_advance_step": 32,
+      "obs_advanced": true,
+      "n_vlm_calls": 2,
+      "vlm_seconds": 0.0,
+      "mean_vlm_latency_ms": 0.0,
+      "queries": [
+        {
+          "step": 1,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 1,
+          "env_step": 0
+        },
+        {
+          "step": 17,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 2,
+          "env_step": 32
+        }
+      ],
+      "n_recorded_frames": 105
+    },
+    {
+      "rollout": "rand10_grasp_seed5",
+      "skill": "grasp",
+      "gt_success_step": 171,
+      "gt_success": true,
+      "obs_advance_step": 32,
+      "obs_advanced": true,
+      "n_vlm_calls": 2,
+      "vlm_seconds": 0.0,
+      "mean_vlm_latency_ms": 0.0,
+      "queries": [
+        {
+          "step": 1,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 1,
+          "env_step": 0
+        },
+        {
+          "step": 17,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 2,
+          "env_step": 32
+        }
+      ],
+      "n_recorded_frames": 87
+    },
+    {
+      "rollout": "rand10_grasp_seed6",
+      "skill": "grasp",
+      "gt_success_step": null,
+      "gt_success": false,
+      "obs_advance_step": 32,
+      "obs_advanced": true,
+      "n_vlm_calls": 2,
+      "vlm_seconds": 0.0,
+      "mean_vlm_latency_ms": 0.0,
+      "queries": [
+        {
+          "step": 1,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 1,
+          "env_step": 0
+        },
+        {
+          "step": 17,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 2,
+          "env_step": 32
+        }
+      ],
+      "n_recorded_frames": 105
+    },
+    {
+      "rollout": "rand10_grasp_seed7",
+      "skill": "grasp",
+      "gt_success_step": null,
+      "gt_success": false,
+      "obs_advance_step": 32,
+      "obs_advanced": true,
+      "n_vlm_calls": 2,
+      "vlm_seconds": 0.0,
+      "mean_vlm_latency_ms": 0.01,
+      "queries": [
+        {
+          "step": 1,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 1,
+          "env_step": 0
+        },
+        {
+          "step": 17,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 2,
+          "env_step": 32
+        }
+      ],
+      "n_recorded_frames": 105
+    },
+    {
+      "rollout": "rand10_grasp_seed8",
+      "skill": "grasp",
+      "gt_success_step": null,
+      "gt_success": false,
+      "obs_advance_step": 32,
+      "obs_advanced": true,
+      "n_vlm_calls": 2,
+      "vlm_seconds": 0.0,
+      "mean_vlm_latency_ms": 0.0,
+      "queries": [
+        {
+          "step": 1,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 1,
+          "env_step": 0
+        },
+        {
+          "step": 17,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 2,
+          "env_step": 32
+        }
+      ],
+      "n_recorded_frames": 105
+    },
+    {
+      "rollout": "rand10_grasp_seed9",
+      "skill": "grasp",
+      "gt_success_step": null,
+      "gt_success": false,
+      "obs_advance_step": 32,
+      "obs_advanced": true,
+      "n_vlm_calls": 2,
+      "vlm_seconds": 0.0,
+      "mean_vlm_latency_ms": 0.0,
+      "queries": [
+        {
+          "step": 1,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 1,
+          "env_step": 0
+        },
+        {
+          "step": 17,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 2,
+          "env_step": 32
+        }
+      ],
+      "n_recorded_frames": 105
+    }
+  ]
+}

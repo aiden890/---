@@ -1,0 +1,345 @@
+{
+  "config": {
+    "rollouts_root": "/rollouts",
+    "out": "/sm/out_mock_place",
+    "backend": "mock",
+    "model_path": "/checkpoint",
+    "device": "cpu",
+    "robot_type": "robocasa365",
+    "vlm_min_interval": 16,
+    "hysteresis_k": 2,
+    "tau": 0.6,
+    "max_steps": 500,
+    "glob": "rand10_place_seed*",
+    "skill": "place"
+  },
+  "n_rollouts": 10,
+  "n_ok": 10,
+  "metrics": {
+    "place": {
+      "n": 10,
+      "tp": 2,
+      "fp": 8,
+      "fn": 0,
+      "tn": 0,
+      "precision": 0.2,
+      "recall": 1.0,
+      "f1": 0.33333333333333337,
+      "timing_offset_steps": [
+        -176,
+        -80
+      ],
+      "mean_timing_offset": -128.0,
+      "median_timing_offset": -80
+    },
+    "_overall": {
+      "n": 10,
+      "mean_timing_offset": -128.0,
+      "total_vlm_calls": 23,
+      "mean_vlm_latency_ms": 0.0
+    }
+  },
+  "records": [
+    {
+      "rollout": "rand10_place_seed0",
+      "skill": "place",
+      "gt_success_step": null,
+      "gt_success": false,
+      "obs_advance_step": 128,
+      "obs_advanced": true,
+      "n_vlm_calls": 5,
+      "vlm_seconds": 0.0,
+      "mean_vlm_latency_ms": 0.0,
+      "queries": [
+        {
+          "step": 1,
+          "prob": 0.1,
+          "yes": false,
+          "consec": 0,
+          "env_step": 0
+        },
+        {
+          "step": 17,
+          "prob": 0.1,
+          "yes": false,
+          "consec": 0,
+          "env_step": 32
+        },
+        {
+          "step": 33,
+          "prob": 0.1,
+          "yes": false,
+          "consec": 0,
+          "env_step": 64
+        },
+        {
+          "step": 49,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 1,
+          "env_step": 96
+        },
+        {
+          "step": 65,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 2,
+          "env_step": 128
+        }
+      ],
+      "n_recorded_frames": 201
+    },
+    {
+      "rollout": "rand10_place_seed1",
+      "skill": "place",
+      "gt_success_step": null,
+      "gt_success": false,
+      "obs_advance_step": 32,
+      "obs_advanced": true,
+      "n_vlm_calls": 2,
+      "vlm_seconds": 0.0,
+      "mean_vlm_latency_ms": 0.0,
+      "queries": [
+        {
+          "step": 1,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 1,
+          "env_step": 0
+        },
+        {
+          "step": 17,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 2,
+          "env_step": 32
+        }
+      ],
+      "n_recorded_frames": 201
+    },
+    {
+      "rollout": "rand10_place_seed2",
+      "skill": "place",
+      "gt_success_step": null,
+      "gt_success": false,
+      "obs_advance_step": 32,
+      "obs_advanced": true,
+      "n_vlm_calls": 2,
+      "vlm_seconds": 0.0,
+      "mean_vlm_latency_ms": 0.0,
+      "queries": [
+        {
+          "step": 1,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 1,
+          "env_step": 0
+        },
+        {
+          "step": 17,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 2,
+          "env_step": 32
+        }
+      ],
+      "n_recorded_frames": 201
+    },
+    {
+      "rollout": "rand10_place_seed3",
+      "skill": "place",
+      "gt_success_step": null,
+      "gt_success": false,
+      "obs_advance_step": 32,
+      "obs_advanced": true,
+      "n_vlm_calls": 2,
+      "vlm_seconds": 0.0,
+      "mean_vlm_latency_ms": 0.0,
+      "queries": [
+        {
+          "step": 1,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 1,
+          "env_step": 0
+        },
+        {
+          "step": 17,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 2,
+          "env_step": 32
+        }
+      ],
+      "n_recorded_frames": 201
+    },
+    {
+      "rollout": "rand10_place_seed4",
+      "skill": "place",
+      "gt_success_step": null,
+      "gt_success": false,
+      "obs_advance_step": 32,
+      "obs_advanced": true,
+      "n_vlm_calls": 2,
+      "vlm_seconds": 0.0,
+      "mean_vlm_latency_ms": 0.0,
+      "queries": [
+        {
+          "step": 1,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 1,
+          "env_step": 0
+        },
+        {
+          "step": 17,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 2,
+          "env_step": 32
+        }
+      ],
+      "n_recorded_frames": 201
+    },
+    {
+      "rollout": "rand10_place_seed5",
+      "skill": "place",
+      "gt_success_step": null,
+      "gt_success": false,
+      "obs_advance_step": 32,
+      "obs_advanced": true,
+      "n_vlm_calls": 2,
+      "vlm_seconds": 0.0,
+      "mean_vlm_latency_ms": 0.0,
+      "queries": [
+        {
+          "step": 1,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 1,
+          "env_step": 0
+        },
+        {
+          "step": 17,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 2,
+          "env_step": 32
+        }
+      ],
+      "n_recorded_frames": 201
+    },
+    {
+      "rollout": "rand10_place_seed6",
+      "skill": "place",
+      "gt_success_step": null,
+      "gt_success": false,
+      "obs_advance_step": 32,
+      "obs_advanced": true,
+      "n_vlm_calls": 2,
+      "vlm_seconds": 0.0,
+      "mean_vlm_latency_ms": 0.0,
+      "queries": [
+        {
+          "step": 1,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 1,
+          "env_step": 0
+        },
+        {
+          "step": 17,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 2,
+          "env_step": 32
+        }
+      ],
+      "n_recorded_frames": 201
+    },
+    {
+      "rollout": "rand10_place_seed7",
+      "skill": "place",
+      "gt_success_step": null,
+      "gt_success": false,
+      "obs_advance_step": 32,
+      "obs_advanced": true,
+      "n_vlm_calls": 2,
+      "vlm_seconds": 0.0,
+      "mean_vlm_latency_ms": 0.0,
+      "queries": [
+        {
+          "step": 1,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 1,
+          "env_step": 0
+        },
+        {
+          "step": 17,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 2,
+          "env_step": 32
+        }
+      ],
+      "n_recorded_frames": 201
+    },
+    {
+      "rollout": "rand10_place_seed8",
+      "skill": "place",
+      "gt_success_step": 208,
+      "gt_success": true,
+      "obs_advance_step": 32,
+      "obs_advanced": true,
+      "n_vlm_calls": 2,
+      "vlm_seconds": 0.0,
+      "mean_vlm_latency_ms": 0.0,
+      "queries": [
+        {
+          "step": 1,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 1,
+          "env_step": 0
+        },
+        {
+          "step": 17,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 2,
+          "env_step": 32
+        }
+      ],
+      "n_recorded_frames": 105
+    },
+    {
+      "rollout": "rand10_place_seed9",
+      "skill": "place",
+      "gt_success_step": 112,
+      "gt_success": true,
+      "obs_advance_step": 32,
+      "obs_advanced": true,
+      "n_vlm_calls": 2,
+      "vlm_seconds": 0.0,
+      "mean_vlm_latency_ms": 0.0,
+      "queries": [
+        {
+          "step": 1,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 1,
+          "env_step": 0
+        },
+        {
+          "step": 17,
+          "prob": 0.9,
+          "yes": true,
+          "consec": 2,
+          "env_step": 32
+        }
+      ],
+      "n_recorded_frames": 57
+    }
+  ]
+}

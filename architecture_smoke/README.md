@@ -83,3 +83,37 @@ bash run-architecture-smoke.sh          # seeds 0,1,2 -> <out>/seed{0,1,2}/
 Artifacts land in
 `/home/aiden/Desktop/lab/robot/defined-instruction-rollouts/architecture_base_smoke/`
 (`config.json`, `summary.json`, `seed<N>/{trace.jsonl,summary.json,scene.json,episode.mp4}`).
+
+## Obs-only skill-termination verifier (t_d4268a2e)
+
+The smoke-test verifier (`verifier.py`) judges skill termination from the
+simulator's **privileged** predicates (`skill_eval.Sim.predicates()` →
+`lid_on_blender`, `official_check_success`, `lid_pos` …) — object-pose / fixture
+state a real robot cannot observe, so it cannot transfer to hardware. The
+obs-only redesign judges termination from **only what the robot receives**
+(3-cam images + 14-D proprio), with the policy's own frozen Qwen3-VL backbone as
+the completion judge and a proprio event-gate for a realistic VLM cadence.
+
+| file | responsibility |
+|------|----------------|
+| `obs_verifier.py` | `ObsInput` (frozen, images+proprio only) + `assert_obs_only` guard rejecting every privileged sim predicate; `ProprioGate` (settle/gripper events → VLM cadence gate + baseline); `ObsVLMVerifier` (VLM-judged completion, hysteresis latch, realistic cadence, timeout→REPLAN) |
+| `vlm_backends.py` | `MockVLMBackend` (tests) + `QwenVLMScorerBackend` (policy's own Qwen3-VL; reuses `vlm_scorer` VQA prompt + logit→prob math, single source of truth; 3-cam horizontal concat) |
+| `test_obs_verifier.py` | 25 unit tests: obs-only schema guard, camera-key guard, proprio gate, hysteresis latch, cadence gating, timeout→REPLAN, mock e2e |
+| `validate_obs_verifier.py` | stream-replay agreement harness (obs-verifier ADVANCE vs sim ground-truth success step; precision/recall/timing-offset) |
+| `probe_vlm_discrimination.py` | real-VLM discrimination probe on gt-labeled frames (done vs not-done separation) |
+| `make_report.py` / `build_obsv_tracking.py` | assemble `REPORT/obs_verifier.{md,json}` and `tracking/obs_verifier.json` from artifacts |
+
+**Obs-only invariant:** the runtime judge input is images+proprio only; every
+privileged sim predicate key is rejected in code (`assert_obs_only`, re-checked
+each `ObsVLMVerifier.update`). Privileged predicates are used ONLY as offline
+supervision labels in the validation harness. Run:
+
+```
+python3 test_obs_verifier.py                    # 25/25 must pass (CPU, no GPU)
+# real VLM (inside xiaomi-client container, CPU or GPU):
+python3 probe_vlm_discrimination.py --rollouts-root <dir> --specs '<sub>:<skill>,...' --out out_probe
+python3 validate_obs_verifier.py --rollouts-root <dir> --glob 'rand10_grasp_seed*' --skill grasp --backend qwen --out out_qwen_grasp
+```
+
+See `REPORT/obs_verifier.md` for the validation findings (GRASP obs-judgeable,
+PLACE not single-frame; hysteresis latch load-bearing; 433 s/forward on CPU).
