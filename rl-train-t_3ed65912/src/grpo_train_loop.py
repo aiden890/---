@@ -727,9 +727,9 @@ def build_parser():
     ap.add_argument("--vlm-question", default="grasp",
                     choices=("grasp", "progress", "success"),
                     help="Which VQA question the auxiliary scorer asks each rollout.")
-    ap.add_argument("--horizon-grasp", type=int, default=120)
-    ap.add_argument("--horizon-move", type=int, default=120)
-    ap.add_argument("--horizon-place", type=int, default=150)
+    ap.add_argument("--horizon-grasp", type=int, default=208)
+    ap.add_argument("--horizon-move", type=int, default=150)
+    ap.add_argument("--horizon-place", type=int, default=200)
     ap.add_argument("--max-skill-calls", type=int, default=3)
     ap.add_argument("--save-videos", type=int, default=6)
     ap.add_argument("--skip-eval", action="store_true")
