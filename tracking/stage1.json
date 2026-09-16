@@ -25,8 +25,8 @@
     "secondary_metric": "official CloseBlenderLid success + post-step ratio/KL/clip 안정성"
   },
   "servers": {
-    "v4": {"gpu": "RTX 3090 (xiaomi-server 공존)", "arms": ["s1_sgd2e3", "s1_adamw3e6"]},
-    "amp_csi": {"gpu": "RTX 3090 (전용, 24GB free)", "arms": ["s1_adamw1e5", "s1_adamw3e5"]}
+    "v4": {"gpu": "RTX 3090 (24GB). xiaomi-server(~10.7G)+trainer(~10.1G)=20.8G면 eval 추론 activation 부족->trainer RPC drop(struct.error). operator 사전승인대로 xiaomi-server stop 후 단독 실행.", "arms": ["s1_sgd2e3", "s1_adamw3e6"]},
+    "amp_csi": {"gpu": "RTX 3090 (전용, 24GB free)", "arms": ["s1_adamw1e5", "s1_adamw3e5"], "note": "checkpoint/code/docker image 이전 완료, assets 볼륨(22.7G) per-dir 스트리밍 재이전 중."}
   },
   "arms": [
     {"id": "s1_sgd2e3", "server": "v4", "optimizer": "SGD", "lr": "2e-3", "role": "control(참고문서 audited run)", "status": "pending"},
