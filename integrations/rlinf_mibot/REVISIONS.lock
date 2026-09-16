@@ -1,0 +1,50 @@
+# RLinf-MiBoT deployment bundle — pinned upstream revisions & checksums
+# Machine-readable-ish: `KEY=VALUE` and `sha256  path` lines. Consumed by
+# bootstrap.sh / preflight.sh (git checkout of the exact RLinf commit) and by
+# the readiness report generator. Do NOT edit by hand without re-verifying.
+#
+# ── Source of truth for every pin used by this bundle ──────────────────────────
+
+## RLinf training framework (external dependency; cloned, never vendored)
+RLINF_REPO=https://github.com/RLinf/RLinf.git
+RLINF_COMMIT=bde6c918642abf9a4776cb1d5fabcc5087dfe195
+# ^ verified revision; pirl_flow_sde.py ports its openpi flow_sde equations verbatim
+#   (rlinf/models/embodiment/openpi/openpi_action_model.py).
+
+## RoboCasa / robosuite (already pinned by the existing sim/client images; kept identical)
+ROBOCASA_REPO=https://github.com/robocasa/robocasa.git
+ROBOCASA_COMMIT=4f8a2980def75a55dff96b990745b83540425f09
+ROBOSUITE_REPO=https://github.com/ARISE-Initiative/robosuite.git
+ROBOSUITE_COMMIT=5ce6643f3092639d08f7b0f90ed1c6a84f50552c
+
+## Xiaomi MiBoT checkpoint (host-mounted, never baked into the image)
+CHECKPOINT_REPO=XiaomiRobotics/Xiaomi-Robotics-1-RoboCasa365
+CHECKPOINT_SHA=3a6d0293bfa90759d34a7fc48c2c62413cd7bcf4
+CHECKPOINT_PARAMS_BF16=5053149696
+# Per-file checksums live in checkpoint.sha256 (copied from xiaomi-cu121/checkpoint.sha256).
+
+## Base image / toolchain (matches the verified xiaomi-cu121 server image)
+BASE_IMAGE=nvidia/cuda:12.1.1-devel-ubuntu22.04
+BASE_IMAGE_DIGEST=sha256:7012e535a47883527d402da998384c30b936140c05e2537158c80b8143ee7425
+CUDA_VERSION=12.1.1
+PYTHON_VERSION=3.10          # ubuntu22.04 system python3 (RLinf targets 3.10)
+TORCH_VERSION=2.5.1
+TORCH_CU=cu121
+TORCHVISION_VERSION=0.20.1
+TORCHAUDIO_VERSION=2.5.1
+FLASH_ATTN_VERSION=2.8.3
+TRANSFORMERS_VERSION=4.57.1
+# TORCH_CUDA_ARCH_LIST is a build arg (host GPU compute capability); default 8.6 (RTX 3090/A-series).
+
+## Sim/client base (reused; the sim image is built by the parent robocasa-docker Dockerfile)
+SIM_IMAGE=robocasa-sim:t_04bf4fb7
+SIM_BASE_IMAGE=python:3.11.14-slim-bookworm
+SIM_BASE_DIGEST=sha256:65a93d69fa75478d554f4ad27c85c1e69fa184956261b4301ebaf6dbb0a3543d
+
+## In-repo verified components reused by import (single source of truth — never forked)
+PIRL_SAMPLER=rl-env-t_4f3f2b20/src/pirl_flow_sde.py
+FLOW_POLICY=rl-env-t_4f3f2b20/src/flow_policy.py
+REWARD_DEF=rl-env-t_4f3f2b20/src/reward.py
+SKILL_FSM=rl-env-t_4f3f2b20/src/skill_manager.py
+SKILL_EVAL=rollouts-xiaomi-t_4a072806/tools/skill_eval.py
+ROLLOUT=xiaomi-cu121/rollout.py

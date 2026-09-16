@@ -1,6 +1,9 @@
 # --- Heavy / generated artifacts (git으로 관리하지 않음) ---
-# 대용량 vendor 소스
+# --- 대용량 vendor 소스
 vendor/
+integrations/rlinf_mibot/vendor/
+integrations/rlinf_mibot/.env
+integrations/*/results/
 
 # 렌더링 영상 · 체크포인트 · 아카이브
 *.mp4

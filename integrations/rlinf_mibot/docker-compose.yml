@@ -1,0 +1,57 @@
+# RLinf-MiBoT deployment — compose wrapper matching the existing server/client pattern.
+# Host paths & GPU come from .env (copy .env.example -> .env). No secrets, no baked assets.
+#
+# Usage:
+#   docker compose --env-file .env build       # build the pinned image (needs GPU host for flash-attn)
+#   docker compose --env-file .env run --rm smoke     # no-train health/smoke checks
+#   docker compose --env-file .env run --rm ppo-smoke # tiny adapter-only PPO smoke
+#   docker compose --env-file .env run --rm ode-eval  # deterministic ODE eval
+#
+# The single `rlinf-mibot` image is reused by all services; only the command differs.
+services:
+  build-image: &base
+    image: ${RLINF_IMAGE:-rlinf-mibot:latest}
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        TORCH_CUDA_ARCH_LIST: ${RLINF_CUDA_ARCH:-8.6}
+        MAX_JOBS: ${RLINF_MAX_JOBS:-4}
+        RLINF_COMMIT: ${RLINF_COMMIT:-bde6c918642abf9a4776cb1d5fabcc5087dfe195}
+    shm_size: "2gb"
+    network_mode: none
+    environment:
+      MUJOCO_GL: egl
+      PYOPENGL_PLATFORM: egl
+      NVIDIA_DRIVER_CAPABILITIES: compute,utility,graphics
+      HF_HOME: /cache/hf
+      HF_HUB_OFFLINE: "1"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    volumes:
+      # integration layer (this dir) + reused verified components, all read-only.
+      - .:/integration:ro
+      - ../../rl-env-t_4f3f2b20:/rl_env:ro
+      - ../../rollouts-xiaomi-t_4a072806/tools:/skill_eval_tools:ro
+      - ${RLINF_CHECKPOINT}:/checkpoint:ro
+      - ${RLINF_ASSETS}:/opt/robocasa/robocasa/models/assets:ro
+      - ${RLINF_RESULTS}:/results
+      - ${RLINF_CACHE}:/cache
+    command: ["python3", "-c", "print('build ok')"]
+
+  smoke:
+    <<: *base
+    command: ["python3", "/integration/src/smoke.py", "--all", "--out", "/results/smoke"]
+
+  ppo-smoke:
+    <<: *base
+    command: ["python3", "/integration/src/train_entry.py", "--config-name", "ppo_smoke", "results_dir=/results/ppo_smoke"]
+
+  ode-eval:
+    <<: *base
+    command: ["python3", "/integration/src/eval_entry.py", "--config-name", "ode_eval", "results_dir=/results/ode_eval"]

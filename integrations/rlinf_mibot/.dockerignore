@@ -1,0 +1,18 @@
+# Keep the RLinf-MiBoT build context minimal. The image needs only docker/Dockerfile +
+# configs/ (requirements + 10_nvidia.json). Everything else (src/, deploy/, tests/, vendor/,
+# results, .env) is mounted at run time, not copied into the image.
+vendor
+src
+deploy
+tests
+run.sh
+bootstrap.sh
+preflight.sh
+docker-compose.yml
+.env
+.env.example
+*.md
+REVISIONS.lock
+checkpoint.sha256
+__pycache__
+*.pyc

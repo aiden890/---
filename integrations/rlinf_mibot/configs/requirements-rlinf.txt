@@ -1,0 +1,20 @@
+# Direct dependencies for the RLinf-MiBoT GPU image (installed with the .lock as a
+# constraint file so transitive versions are frozen). torch/torchvision/torchaudio and
+# flash-attn are installed separately in the Dockerfile (CUDA index / --no-build-isolation).
+#
+# These mirror the VERIFIED xiaomi-cu121 inference image, plus Hydra for configs. RLinf's
+# own runtime deps are resolved by its pinned `pip install -e /opt/rlinf` in the Dockerfile;
+# the exact resolved set is frozen to /app/requirements.resolved.txt at build time.
+transformers==4.57.1
+accelerate==1.10.1
+einops==0.8.1
+pillow==11.3.0
+scipy==1.15.3
+numpy==2.2.6
+imageio==2.37.0
+imageio-ffmpeg==0.6.0
+safetensors==0.8.0
+huggingface_hub==0.36.2
+# --- config / experiment management (Hydra configs in configs/) ---
+hydra-core==1.3.2
+omegaconf==2.3.0

@@ -1,0 +1,48 @@
+{
+  "bundle": "integrations/rlinf_mibot",
+  "purpose": "Portable RLinf-MiBoT Track B deployment bundle, prepared before the new GPU server exists.",
+  "pinned": {
+    "rlinf_commit": "bde6c918642abf9a4776cb1d5fabcc5087dfe195",
+    "robocasa_commit": "4f8a2980def75a55dff96b990745b83540425f09",
+    "robosuite_commit": "5ce6643f3092639d08f7b0f90ed1c6a84f50552c",
+    "checkpoint_sha": "3a6d0293bfa90759d34a7fc48c2c62413cd7bcf4",
+    "base_image_digest": "sha256:7012e535a47883527d402da998384c30b936140c05e2537158c80b8143ee7425",
+    "torch": "2.5.1+cu121"
+  },
+  "gates": [
+    {"id": "deliverable_dockerfile",   "status": "READY",        "detail": "docker/Dockerfile (CUDA 12.1.1 base + digest, torch/flash-attn pinned, RLinf cloned at pinned commit). `docker build --check` clean."},
+    {"id": "deliverable_run_wrapper",  "status": "READY",        "detail": "run.sh + docker-compose.yml (server/client style, build/smoke/ppo-smoke/ode-eval/shell)."},
+    {"id": "deliverable_lockfiles",    "status": "READY",        "detail": "configs/requirements-rlinf.{txt,lock}; build args TORCH_CUDA_ARCH_LIST/MAX_JOBS/RLINF_COMMIT."},
+    {"id": "deliverable_env_example",  "status": "READY",        "detail": ".env.example: only path/host/GPU/port/revision placeholders, no secrets."},
+    {"id": "deliverable_bootstrap",    "status": "READY",        "detail": "bootstrap.sh: preflight -> pin RLinf -> build -> validate mounts -> smoke; stops before training."},
+    {"id": "deliverable_preflight",    "status": "READY",        "detail": "preflight.sh: driver/GPU/VRAM/docker/toolkit/disk/RAM/ports/network/mounts; never touches host drivers."},
+    {"id": "deliverable_smoke",        "status": "READY",        "detail": "src/smoke.py: imports/cuda/egl/robocasa/checkpoint/volume gates -> smoke_report.json."},
+    {"id": "deliverable_skeleton",     "status": "READY",        "detail": "src/mibot_adapter.py + src/rlinf_env.py: model/obs/12-D decode/velocity/pi-RL sampler/reward/RLinf-reg interfaces; reuse verified pirl_flow_sde.py + flow_policy.py + reward.py by import."},
+    {"id": "deliverable_hydra",        "status": "READY",        "detail": "configs/ppo_smoke.yaml (adapter-only, 1 iter, epochs>=2) + configs/ode_eval.yaml (noise=0). Long training disabled by guards."},
+    {"id": "deliverable_readme",       "status": "READY",        "detail": "deploy/README.md with required inputs, deploy/smoke/ppo/resume/rollback commands and expected outputs."},
+
+    {"id": "static_tests",             "status": "READY",        "detail": "tests/test_static.py: 31 checks PASS (imports, config parse, guard, pins, secret scan, env-placeholder scan)."},
+    {"id": "shell_syntax",             "status": "READY",        "detail": "bash -n clean on bootstrap.sh/preflight.sh/run.sh."},
+    {"id": "config_parse",             "status": "READY",        "detail": "both Hydra YAMLs parse; entry-point dry runs (no GPU) write reports and hit the NEEDS_SERVER seam."},
+    {"id": "docker_context",           "status": "READY",        "detail": "`docker build --check` on docker/Dockerfile: no warnings. .dockerignore keeps context minimal."},
+    {"id": "secret_scan",              "status": "READY",        "detail": "no embedded secrets / no absolute server-specific paths (test_static)."},
+
+    {"id": "image_build",              "status": "NEEDS_SERVER", "detail": "flash-attn build requires an NVIDIA GPU host + toolkit; validated statically here (local daemon has no GPU). Build on the new server."},
+    {"id": "gpu_cuda_egl",             "status": "NEEDS_SERVER", "detail": "CUDA tensor + EGL render smoke require the GPU."},
+    {"id": "robocasa_render",          "status": "NEEDS_SERVER", "detail": "CloseBlenderLid reset/step render needs assets mount + EGL on the server."},
+    {"id": "checkpoint_load",          "status": "NEEDS_SERVER", "detail": "MiBoT 5B load + processor + config hash record needs GPU + /checkpoint mount."},
+    {"id": "pirl_eta0_bitexact",       "status": "NEEDS_SERVER", "detail": "noise=0 == checkpoint deterministic ODE bit-for-bit; in-process GPU gate."},
+    {"id": "logprob_ratio_one",        "status": "NEEDS_SERVER", "detail": "stored-vs-recomputed log-prob ratio==1 before update; GPU gate."},
+    {"id": "rlinf_registration",       "status": "NEEDS_SERVER", "detail": "register MiBoT against the pinned RLinf API (explicit NotImplementedError seam) — wire on server."},
+    {"id": "ppo_update",               "status": "NEEDS_SERVER", "detail": "one short adapter-only PPO update + checkpoint resume; GPU gate."},
+    {"id": "ode_before_after_eval",    "status": "NEEDS_SERVER", "detail": "deterministic ODE eval on fixed seeds, base vs trained; sim + GPU gate."}
+  ],
+  "required_server_inputs": [
+    "SSH host/alias for the new server",
+    "GPU model + count + NVIDIA driver version",
+    "storage path + quota for results/caches",
+    "confirmation Docker + nvidia-container-toolkit are installed",
+    "host paths for RoboCasa assets and the Xiaomi checkpoint mounts",
+    "whether outbound network is allowed (else pre-seed RLinf clone + base image)"
+  ]
+}

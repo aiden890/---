@@ -1,0 +1,35 @@
+# Hydra config: deterministic ODE evaluation (noise_level=0). Bit-exact with the
+# checkpoint's Euler ODE. Used for before/after eval on identical seeds. No training.
+defaults:
+  - _self_
+
+run_kind: ode_eval
+results_dir: /results/ode_eval
+
+model:
+  checkpoint_dir: /checkpoint
+  device: cuda
+  dtype: bfloat16
+  num_steps: 5
+  replan_steps: 16
+  active_action_dim: 12
+  train_mode: adapter_only
+
+env:
+  task_name: CloseBlenderLid
+  robots: PandaOmron
+  skill: GRASP_OBJECT
+  horizon: 400
+  use_milestones: false
+
+sampler:
+  name: pirl_flow_sde
+  noise_level: 0.0                # eta=0 -> deterministic ODE, equals checkpoint bit-for-bit
+
+eval:
+  seeds: [0, 1, 2, 3, 4]          # fixed eval seeds; paired before/after comparison
+  adapter_checkpoint: null        # null = base policy; set a path to eval a trained adapter
+  save_videos: true
+
+guards:
+  training_enabled: false
