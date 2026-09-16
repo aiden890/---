@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "run_group": "STAGE1-GRASP-OPT-LR",
+  "task_card": "t_74a6ed7a",
+  "code_rev": "ae02598",
+  "north_star": "GRASP GRPO를 실제로 개선하는 optimizer/LR 설정을 2-GPU 병렬 스크리닝으로 찾는다. flat(0.25->0.25)의 진짜 원인은 LR이 아니라 advantage 처리+측정 방식이었다는 참고문서 진단을 코드로 고친 뒤 검증.",
+  "prereq_fixes": [
+    {"name": "advantage 처리", "detail": "all-success -> Z-1식 non-negative min-baseline(느린 성공에 음수 금지), mixed -> group-relative, all-failure/무변동(std<gate) -> skip. 기존 (r-mean)/std가 all-success 그룹의 느린 성공에 음수 advantage를 주던 버그 제거.", "test": "tests/test_advantage.py 베이스라인 14/14 + mutation 7/7 caught", "status": "done"},
+    {"name": "측정 수정", "detail": "optimizer-step '후' ratio/approx-KL/clip-fraction/ESS 재계산(_post_step_diagnostics) + adapter 파라미터 delta(L2/Linf/rel). op_config로 optimizer/LR/grad-clip/LoRA rank·alpha·targets/trainable/sampler/eta/code_rev 전부 run summary에 로깅.", "test": "v4 GPU 스모크 확인: post_ratio=1.128 post_kl=0.308 post_clip=0.883 (step 후 실제 이동)", "status": "done"},
+    {"name": "reward variant 명칭", "detail": "terminal_plus_hold 추가(+1.0 terminal AND 20-step hold shaping의 정직한 라벨). simulator_terminal_only는 hold weight 0 강제.", "status": "done"}
+  ],
+  "common_config": {
+    "sampler": "pi-RL Flow-SDE (RLinf@bde6c918)",
+    "eta_noise": 0.1,
+    "group": 8,
+    "update_epochs": 1,
+    "iters": 30,
+    "clip": 0.1,
+    "grad_clip": 0.5,
+    "reward_variant": "terminal_plus_hold",
+    "horizon_grasp": 208,
+    "eval": "20 paired + 20 held-out (paired train/eval seeds 공통)",
+    "adapter": "per-skill LoRA rank8 alpha32 into DiT qkv_proj, 3.54M trainable",
+    "primary_metric": "paired GRASP success (after - before, 동일 eval pool)",
+    "secondary_metric": "official CloseBlenderLid success + post-step ratio/KL/clip 안정성"
+  },
+  "servers": {
+    "v4": {"gpu": "RTX 3090 (xiaomi-server 공존)", "arms": ["s1_sgd2e3", "s1_adamw3e6"]},
+    "amp_csi": {"gpu": "RTX 3090 (전용, 24GB free)", "arms": ["s1_adamw1e5", "s1_adamw3e5"]}
+  },
+  "arms": [
+    {"id": "s1_sgd2e3", "server": "v4", "optimizer": "SGD", "lr": "2e-3", "role": "control(참고문서 audited run)", "status": "pending"},
+    {"id": "s1_adamw3e6", "server": "v4", "optimizer": "AdamW", "lr": "3e-6", "status": "pending"},
+    {"id": "s1_adamw1e5", "server": "amp_csi", "optimizer": "AdamW", "lr": "1e-5", "role": "RLinf OpenPI 참고 근방", "status": "pending"},
+    {"id": "s1_adamw3e5", "server": "amp_csi", "optimizer": "AdamW", "lr": "3e-5", "status": "pending"}
+  ],
+  "verdict": null,
+  "note": "결과는 finisher가 REPORT/STAGE1_FINAL.md + results/stage1/STAGE1_AGG.json에 작성(세션 종료돼도 self-complete). 선정 기준: paired GRASP Δ>0 AND post-step ratio 안정([0.5,2.0]). 아무 arm도 개선 못하면 정직 보고 후 operator에 난이도 조정 target/shaped-advantage 요청(스크리닝만으로 Stage2 진입 금지)."
+}

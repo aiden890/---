@@ -2,6 +2,20 @@
  "schema_version": 1,
  "experiments": [
   {
+   "id": "EXP-20260916-STAGE1",
+   "date": "2026-09-16",
+   "title": "GRASP GRPO optimizer/LR 스크리닝 (2-GPU 병렬)",
+   "status": "running",
+   "model": "Xiaomi-Robotics-1-RoboCasa365",
+   "checkpoint": "3a6d0293bfa90759d34a7fc48c2c62413cd7bcf4",
+   "task": "CloseBlenderLid",
+   "question": "advantage 처리+측정 방식을 참고문서대로 고친 뒤, 어떤 optimizer/LR이 GRASP GRPO를 실제로 개선하는가? (flat의 원인은 LR 약함이 아니라 advantage 버그라는 진단 검증)",
+   "summary": "선행 3건(advantage 완료-aware min-baseline+std gate, post-step 측정, reward variant 명칭)을 코드로 고치고 v4 GPU 스모크로 검증한 뒤, SGD 2e-3 / AdamW 3e-6·1e-5·3e-5 네 arm을 v4+amp_csi 2-GPU 병렬로 스크리닝.",
+   "page": "experiments/exp-20260916-stage1-grasp-optlr.html",
+   "data": "stage1.json",
+   "tags": ["GRPO", "GRASP", "optimizer", "learning-rate", "advantage", "2-GPU", "screening"]
+  },
+  {
    "id": "EXP-20260916-01",
    "date": "2026-09-16",
    "title": "정의된 skill instruction zero-shot rollout",

@@ -1,0 +1,64 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>GRASP GRPO optimizer/LR 스크리닝 (2-GPU 병렬)</title><link rel="stylesheet" href="style.css"></head>
+<body><header><div class="bar"><a href="../index.html#attend">← 실험 목록</a><b>RoboCasa · Xiaomi VLA</b></div></header>
+<main id="app"><p class="dim">실험 정보를 불러오는 중…</p></main>
+<script>
+const fmt=v=>v==null?'—':v;
+const pct=v=>v==null?'—':(v*100).toFixed(0)+'%';
+function statusChip(s){const m={done:'ok',running:'',pending:'dim',pilot:''};return `<span class="chip ${m[s]||''}">${s}</span>`;}
+Promise.all([
+  fetch('../experiments.json').then(r=>r.json()),
+  fetch('../stage1.json').then(r=>r.json()),
+  fetch('../stage1_agg.json').then(r=>r.ok?r.json():null).catch(()=>null)
+]).then(([db,s,agg])=>{
+  const e=db.experiments.find(x=>x.id==='EXP-20260916-STAGE1')||{};
+  document.title=s.run_group;
+  const c=s.common_config;
+  // arm progress table (live-updates from agg if available)
+  const aggRows=(agg&&agg.rows)?Object.fromEntries(agg.rows.map(r=>[r.arm,r])):{};
+  const armRows=s.arms.map(a=>{
+    const r=aggRows[a.id];
+    const done=!!r;
+    const gb=r?pct(r.grasp_before):'—', ga=r?pct(r.grasp_after):'—';
+    const dg=r&&r.delta_grasp!=null?(r.delta_grasp>0?'<span class="ok">+'+(r.delta_grasp*100).toFixed(1)+'%p</span>':'<span class="no">'+(r.delta_grasp*100).toFixed(1)+'%p</span>'):'—';
+    const ho=r?pct(r.grasp_heldout):'—';
+    const post=r?`${fmt(r.post_ratio)} / ${fmt(r.post_kl)} / ${fmt(r.post_clip)}`:'—';
+    const gated=r?`${fmt(r.n_gated)}/${fmt(r.n_iters)}`:'—';
+    return `<tr>
+      <td>${a.id}</td><td>${a.server}</td><td>${a.optimizer}</td><td>${a.lr}</td>
+      <td>${gb} → ${ga} <b>(${dg})</b></td><td>${ho}</td><td>${post}</td><td>${gated}</td>
+      <td>${done?statusChip('done'):statusChip(a.status||'pending')}</td></tr>`;
+  }).join('');
+  const selected=agg&&agg.selected?agg.selected:null;
+  document.getElementById('app').innerHTML=`
+    <div class="dim">EXP-20260916-STAGE1 · ${new Date().toISOString().slice(0,10)}</div>
+    <h1>${s.run_group} — GRASP optimizer/LR 스크리닝 (2-GPU 병렬)</h1>
+    <div class="meta"><span class="chip">Xiaomi RoboCasa365</span><span class="chip">CloseBlenderLid</span><span class="chip">code ${s.code_rev}</span><span class="chip">card ${s.task_card}</span></div>
+    <div class="question"><b>🎯 목적</b><br>${s.north_star}</div>
+
+    <div class="card"><h2>선행 수정 (GPU 스윕 전 필수 — 참고문서 핵심)</h2>
+      <table><thead><tr><th>항목</th><th>내용</th><th>검증</th><th>상태</th></tr></thead><tbody>
+      ${s.prereq_fixes.map(f=>`<tr><td><b>${f.name}</b></td><td>${f.detail}</td><td class="dim">${f.test||'—'}</td><td>${statusChip(f.status)}</td></tr>`).join('')}
+      </tbody></table></div>
+
+    <div class="card"><h2>공통 설정 (모든 arm 동일 → paired 비교 유효)</h2>
+      <table><tbody>
+      <tr><td>sampler</td><td>${c.sampler}, eta=${c.eta_noise}</td></tr>
+      <tr><td>group / update_epochs / iters</td><td>${c.group} / ${c.update_epochs} / ${c.iters}</td></tr>
+      <tr><td>clip / grad_clip</td><td>${c.clip} / ${c.grad_clip}</td></tr>
+      <tr><td>reward / horizon</td><td>${c.reward_variant} / ${c.horizon_grasp}</td></tr>
+      <tr><td>eval</td><td>${c.eval}</td></tr>
+      <tr><td>adapter</td><td>${c.adapter}</td></tr>
+      <tr><td>주지표</td><td>${c.primary_metric}</td></tr>
+      <tr><td>부지표</td><td>${c.secondary_metric}</td></tr>
+      </tbody></table></div>
+
+    <div class="card"><h2>arm별 진행 + paired GRASP 성공 / post-step 진단</h2>
+      <table><thead><tr><th>arm</th><th>서버</th><th>opt</th><th>lr</th><th>GRASP before→after (Δ)</th><th>heldout</th><th>post ratio/KL/clip</th><th>gated it</th><th>상태</th></tr></thead>
+      <tbody>${armRows}</tbody></table>
+      <p class="dim">post-step 지표는 optimizer step '후' 재계산값(업데이트 강도 진단). step '전' epoch-0 ratio=1/KL=0은 정합성 체크일 뿐.</p></div>
+
+    ${selected?`<div class="verdict"><div><b>선정</b>${selected.arm} (optimizer=${selected.optimizer}, lr=${selected.lr}) — paired GRASP Δ=${selected.delta_grasp}. Stage 2로 진행.</div></div>`:`<div class="card"><h2>결과 대기</h2><p class="dim">${s.note}</p></div>`}
+
+    <div class="artifact">산출물: <code>rl-train-t_3ed65912/results/stage1/</code> · finisher <code>REPORT/STAGE1_FINAL.md</code> · agg <code>results/stage1/STAGE1_AGG.json</code> · 스크립트 <code>scripts/stage1_sweep.sh</code>, <code>scripts/stage1_finisher.sh</code></div>`;
+}).catch(err=>{document.getElementById('app').innerHTML='<p class="no">실험 정보를 불러오지 못했습니다.</p>';console.error(err);});
+</script></body></html>
