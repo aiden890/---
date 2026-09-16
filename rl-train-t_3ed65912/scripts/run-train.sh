@@ -57,8 +57,17 @@ case "${1:-help}" in
       --entrypoint python3 "$server_image" \
       /train/scripts/audit_p0_verify.py --out /out/audit_p0_verify.json "${@:2}"
     ;;
+  pirl-gates)
+    # Faithful pi-RL Flow-SDE in-process GPU validation gates (G1/G2/G3/G4/G5-stats/G6/G8)
+    # on the REAL pinned checkpoint. Own short-lived container, no trainer/shared server
+    # needed (loads model in-process). Script lives in the env card (single source of truth).
+    out="$train/results/pirl"; mkdir -p "$out"
+    docker run --rm --gpus all --shm-size=2g --network none \
+      -v "$parent/checkpoint:/checkpoint:ro" -v "$rlenv:/rl_env:ro" -v "$train:/train" -v "$out:/out" \
+      --entrypoint python3 "$server_image" \
+      /rl_env/scripts/pirl_sampler_gpu_gates.py --out /out/pirl_gpu_gates.json "${@:2}"
+    ;;
   audit-branch)
-    # AUDIT item #4 integration test (client image = sim+assets, networked to trainer).
     # Needs the trainer server up (for actions). Verifies real simulator state restore +
     # shared-prefix group branching.
     docker ps --format '{{.Names}}' | grep -q "^${trainer}$" || { echo "start trainer first: bash $0 trainer-start" >&2; exit 5; }
@@ -103,6 +112,6 @@ case "${1:-help}" in
        --model /checkpoint --port $port --cache /train/hf_cache --out /out ${*:3}" 2>&1 | tee "$out/sft.log"
     ;;
   *)
-    echo "Usage: bash run-train.sh {probe|trainer-start [server args]|trainer-stop|audit-p0|audit-branch|train <run> [args]|sft <run> [sft args]}" >&2
+    echo "Usage: bash run-train.sh {probe|trainer-start [server args]|trainer-stop|audit-p0|pirl-gates [args]|audit-branch|train <run> [args]|sft <run> [sft args]}" >&2
     exit 2;;
 esac
