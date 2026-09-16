@@ -455,6 +455,139 @@ def build_difficulty_band_pool(factory, client, args, reward_cfg, candidate_seed
     return good, per_seed
 
 
+class AdaptiveCurriculum:
+    """Online moving-band difficulty sampler (operator redesign, t_2907de4f).
+
+    Replaces the upfront prefilter scan. There is NO separate scan phase: the group
+    rollout each train iteration ALREADY measures how hard that seed is for the CURRENT
+    policy (n_succ of `group` stochastic members). We reuse that free signal — after every
+    iteration `update(seed, n_succ)` folds n_succ into an EMA per-seed difficulty cache, so
+    the difficulty estimate tracks the policy as it improves (no wasted rollouts).
+
+    `next_seed()` biases the per-iter env seed toward the MID-difficulty band [lo,hi]
+    (n_succ in [lo,hi] == a `mixed` group == a real GRPO advantage signal; 0/group and
+    group/group are GATED and thrown away). Concretely:
+      * With prob `explore_frac`, or whenever no in-band seed is known yet, draw an UNSEEN
+        seed from the candidate universe (difficulty unknown -> probe it). This is how the
+        band discovers newly-mid seeds as the policy shifts.
+      * Otherwise draw (exploit) uniformly among seeds whose current EMA difficulty is in
+        [lo,hi], excluding the last `avoid_recent` distinct seeds so no single seed is
+        overfit (every iter still gets a different seed).
+    The band MOVES automatically: when the policy improves, a formerly-mixed seed's EMA
+    climbs to group/group, it leaves the band, and a formerly-too-hard seed whose EMA has
+    risen into [lo,hi] enters it — a difficulty curriculum that advances with skill.
+
+    Reproducible: a single random.Random(seed) drives every draw, so two paired arms with
+    the same seed + rules + (initially) the same policy make identical early draws and only
+    diverge as their policies diverge (inherent to an adaptive curriculum). State persists
+    to seed_difficulty.json for resume + audit.
+    """
+
+    def __init__(self, seed_base, universe, band, group, explore_frac=0.25,
+                 ema=0.5, rng_seed=12345, avoid_recent=3):
+        import random as _random
+        self.seed_base = int(seed_base)
+        self.universe = [int(seed_base) + i for i in range(int(universe))]
+        self.lo, self.hi = int(band[0]), int(band[1])
+        self.group = int(group)
+        self.explore_frac = float(explore_frac)
+        self.ema = float(ema)
+        self.avoid_recent = int(avoid_recent)
+        self.rng = _random.Random(int(rng_seed))
+        # seed -> {"ema": float difficulty (n_succ scale 0..group), "count": times seen,
+        #          "last_n": last raw n_succ}
+        self.difficulty = {}
+        self.recent = []          # last distinct seeds drawn (diversity guard)
+        self.history = []         # [{iter, seed, n_succ, source}] audit trail
+
+    # ---- persistence -------------------------------------------------------
+    def to_dict(self):
+        return {
+            "seed_base": self.seed_base, "universe": len(self.universe),
+            "band": [self.lo, self.hi], "group": self.group,
+            "explore_frac": self.explore_frac, "ema": self.ema,
+            "avoid_recent": self.avoid_recent,
+            "difficulty": {str(k): v for k, v in self.difficulty.items()},
+            "recent": list(self.recent),
+            "rng_state": json.dumps(self.rng.getstate()),
+            "history": self.history,
+        }
+
+    def load_state(self, d):
+        self.difficulty = {int(k): v for k, v in d.get("difficulty", {}).items()}
+        self.history = list(d.get("history", []))
+        self.recent = [int(s) for s in d.get("recent", [])]
+        # Restore the EXACT rng state so a resumed run continues the same draw stream
+        # (each next_seed consumes a variable number of rng draws, so naive replay would
+        # desync — getstate/setstate is exact). Fall back to replay for old caches.
+        rs = d.get("rng_state")
+        if rs is not None:
+            try:
+                st = json.loads(rs)
+                # json turns tuples into lists; random.setstate needs (int, tuple, x)
+                self.rng.setstate((st[0], tuple(st[1]), st[2]))
+                return
+            except Exception:
+                pass
+        for _ in self.history:
+            self.rng.random()
+
+    # ---- sampling ----------------------------------------------------------
+    def _in_band(self):
+        return [s for s, v in self.difficulty.items()
+                if self.lo <= v.get("ema", -1) <= self.hi]
+
+    def _unseen(self):
+        return [s for s in self.universe if s not in self.difficulty]
+
+    def next_seed(self, it):
+        in_band = self._in_band()
+        unseen = self._unseen()
+        # decide explore vs exploit BEFORE consuming rng, so the draw order is deterministic
+        r = self.rng.random()
+        explore = (r < self.explore_frac) or (not in_band)
+        source = "explore"
+        if explore and unseen:
+            seed = self.rng.choice(unseen)
+        elif in_band:
+            # exploit: prefer in-band seeds not among the last `avoid_recent` distinct draws
+            pool = [s for s in in_band if s not in self.recent[-self.avoid_recent:]] or in_band
+            seed = self.rng.choice(pool)
+            source = "exploit"
+        elif unseen:
+            seed = self.rng.choice(unseen)
+        else:
+            # universe fully seen and nothing in band -> pick the seed whose EMA is closest
+            # to the band centre so we keep probing the most-promising difficulty.
+            centre = (self.lo + self.hi) / 2.0
+            seed = min(self.universe,
+                       key=lambda s: abs(self.difficulty[s]["ema"] - centre))
+            source = "nearest"
+        if not self.recent or self.recent[-1] != seed:
+            self.recent.append(seed)
+        return int(seed), source
+
+    def update(self, seed, n_succ, it=None, source=None):
+        seed = int(seed)
+        n = int(n_succ)
+        cur = self.difficulty.get(seed)
+        if cur is None:
+            self.difficulty[seed] = {"ema": float(n), "count": 1, "last_n": n}
+        else:
+            cur["ema"] = self.ema * n + (1.0 - self.ema) * cur["ema"]
+            cur["count"] += 1
+            cur["last_n"] = n
+        self.history.append({"iter": it, "seed": seed, "n_succ": n, "source": source})
+
+    def band_stats(self):
+        """Snapshot for logging: how many known seeds sit in / below / above band."""
+        below = sum(1 for v in self.difficulty.values() if v["ema"] < self.lo)
+        inb = sum(1 for v in self.difficulty.values() if self.lo <= v["ema"] <= self.hi)
+        above = sum(1 for v in self.difficulty.values() if v["ema"] > self.hi)
+        return {"seen": len(self.difficulty), "below": below,
+                "in_band": inb, "above": above}
+
+
 def eval_skill_from_entry(sim, client, args, reward_cfg, seed, skill,
                           entry_from_grasp, out_dir=None, tag=""):
     """Single-skill deterministic (eta=0) eval from the skill's entry-state.
@@ -891,6 +1024,29 @@ def build_parser():
                     help="RNG seed for the per-iter WITHOUT-REPLACEMENT random draw from the "
                          "band-filtered train pool (reproducible; both arms share it so the "
                          "paired comparison uses the same pool + same iter-seed order).")
+    # Online adaptive curriculum (operator redesign t_2907de4f, moving band). NO upfront
+    # scan: reuse each iter's group rollout n_succ as the seed's current difficulty (EMA
+    # cache), and bias the NEXT iter's seed toward the mid band [LOW,HIGH]. The band moves
+    # with the policy. Mutually exclusive with the static --train-difficulty-band prefilter.
+    ap.add_argument("--adaptive-band", type=int, nargs=2, default=None,
+                    metavar=("LOW", "HIGH"),
+                    help="Enable the ONLINE adaptive-curriculum sampler: bias per-iter train "
+                         "seeds toward those whose CURRENT-policy group n_succ (EMA) is in "
+                         "[LOW,HIGH]. E.g. 1 7 with group 8 targets mixed groups, avoiding "
+                         "0/8 & 8/8 GATED. The band tracks the policy (no upfront scan).")
+    ap.add_argument("--adaptive-universe", type=int, default=0,
+                    help="With --adaptive-band: size of the candidate seed universe "
+                         "(seed_base .. seed_base+N-1) to sample from. 0 = auto (iters*8).")
+    ap.add_argument("--adaptive-explore-frac", type=float, default=0.25,
+                    help="With --adaptive-band: probability of drawing an UNSEEN seed to "
+                         "probe its difficulty (exploration) vs exploiting known in-band "
+                         "seeds. Also forced when no in-band seed is known yet.")
+    ap.add_argument("--adaptive-ema", type=float, default=0.5,
+                    help="With --adaptive-band: EMA weight on the newest n_succ when "
+                         "updating a seed's difficulty (higher = tracks the policy faster).")
+    ap.add_argument("--adaptive-avoid-recent", type=int, default=3,
+                    help="With --adaptive-band: exclude the last N distinct drawn seeds from "
+                         "the exploit pool so no single seed is overfit (per-iter diversity).")
     return ap
 
 
@@ -1065,6 +1221,31 @@ def main():
     # so a pool larger than iters gives every step a different mid-difficulty seed and no
     # single seed is overfit. entry_mode keeps its cycle; legacy keeps seed_base+it.
     band_mode = (not entry_mode) and my.train_difficulty_band is not None and bool(train_seeds)
+    # Online adaptive curriculum (operator redesign t_2907de4f): NO upfront scan, seed
+    # chosen per-iter from a moving band driven by the running per-seed difficulty EMA.
+    adaptive_mode = (not entry_mode) and (my.adaptive_band is not None) and (not band_mode)
+    curriculum = None
+    if adaptive_mode:
+        universe = my.adaptive_universe or (my.iters * 8)
+        curriculum = AdaptiveCurriculum(
+            seed_base=my.seed_base, universe=universe, band=tuple(my.adaptive_band),
+            group=my.group, explore_frac=my.adaptive_explore_frac, ema=my.adaptive_ema,
+            rng_seed=my.seed, avoid_recent=my.adaptive_avoid_recent)
+        cache = out / "seed_difficulty.json"
+        if cache.exists():
+            try:
+                curriculum.load_state(json.loads(cache.read_text()))
+                print(f"[adaptive] resumed seed_difficulty.json: "
+                      f"{len(curriculum.difficulty)} seeds known", flush=True)
+            except Exception as _e:
+                print(f"[adaptive] cache load failed (fresh start): {_e}", flush=True)
+        log["adaptive_curriculum"] = {
+            "band": list(my.adaptive_band), "universe": universe,
+            "explore_frac": my.adaptive_explore_frac, "ema": my.adaptive_ema,
+            "avoid_recent": my.adaptive_avoid_recent, "rng_seed": my.seed}
+        print(f"[train] adaptive moving-band mode: band={tuple(my.adaptive_band)} "
+              f"universe={universe} explore_frac={my.adaptive_explore_frac} "
+              f"ema={my.adaptive_ema} (rng seed {my.seed})", flush=True)
     iter_seeds = None
     if band_mode:
         import random as _random
@@ -1084,9 +1265,13 @@ def main():
         for it in range(my.iters):
             # In entry_mode with a prefiltered pool, iterate over grasp-entry seeds
             # (cycled if fewer were found than iters) so every train step gets a real
-            # entry-state instead of being SKIPPED. In band mode, draw the precomputed
-            # without-replacement schedule. Otherwise seed_base+it as before.
-            if band_mode:
+            # entry-state instead of being SKIPPED. In adaptive mode, ASK the curriculum
+            # (moving band). In band mode, draw the precomputed without-replacement
+            # schedule. Otherwise seed_base+it as before.
+            adaptive_source = None
+            if adaptive_mode:
+                seed, adaptive_source = curriculum.next_seed(it)
+            elif band_mode:
                 seed = iter_seeds[it]
             elif train_seeds:
                 seed = train_seeds[it % len(train_seeds)]
@@ -1095,12 +1280,26 @@ def main():
             m = train_iteration(client, args, reward_cfg, seed, it)
             m["iter"] = it
             m["seed"] = seed
+            if adaptive_mode:
+                # Fold this iter's group n_succ into the seed's difficulty EMA so the band
+                # moves with the policy; persist the cache each iter for resume + audit.
+                n_succ = int(m.get("n_success_group") or 0)
+                curriculum.update(seed, n_succ, it=it, source=adaptive_source)
+                bstats = curriculum.band_stats()
+                m["adaptive_source"] = adaptive_source
+                m["adaptive_band_stats"] = bstats
+                try:
+                    cache.write_text(json.dumps(curriculum.to_dict(), indent=2))
+                except Exception:
+                    pass
             curve.append({"iter": it, "loss": m["loss"], "mean_return": m["mean_return"],
                           "grad_norm": m["grad_norm"], "mean_ratio": m["mean_ratio"],
                           "n_success_group": m.get("n_success_group"),
                           "group_composition": m.get("group_composition"),
                           "advantage_mode": m.get("advantage_mode"),
                           "gated": m.get("gated"),
+                          "adaptive_source": m.get("adaptive_source"),
+                          "adaptive_band_stats": m.get("adaptive_band_stats"),
                           "post_step_mean_ratio": m.get("post_step_mean_ratio"),
                           "post_step_mean_kl": m.get("post_step_mean_kl"),
                           "post_step_clip_fraction": m.get("post_step_clip_fraction"),
@@ -1108,16 +1307,17 @@ def main():
                           "adapter_delta_l2": m.get("adapter_delta_l2"),
                           "skipped": m.get("skipped")})
             fh.write(json.dumps(m) + "\n"); fh.flush()
+            _asrc = f" src={m['adaptive_source']}" if adaptive_mode else ""
             if m.get("skipped"):
-                print(f"[train] it={it} SKIPPED ({m['skipped']}) — no entry-state this seed", flush=True)
+                print(f"[train] it={it} seed={seed}{_asrc} SKIPPED ({m['skipped']}) — no entry-state this seed", flush=True)
             elif m.get("gated"):
-                print(f"[train] it={it} GATED ({m['gated']}) comp={m.get('group_composition')} "
+                print(f"[train] it={it} seed={seed}{_asrc} GATED ({m['gated']}) comp={m.get('group_composition')} "
                       f"n_succ={m.get('n_success_group')}/{args.group} std={m.get('reward_std', 0.0):.4f} "
                       f"— no optimizer step", flush=True)
             else:
                 def _f(x, d=3):
                     return f"{x:.{d}f}" if isinstance(x, (int, float)) else str(x)
-                print(f"[train] it={it} comp={m.get('group_composition')}({m.get('advantage_mode')}) "
+                print(f"[train] it={it} seed={seed}{_asrc} comp={m.get('group_composition')}({m.get('advantage_mode')}) "
                       f"n_succ={m.get('n_success_group')}/{args.group} "
                       f"loss={m['loss']:.4f} return={m['mean_return']:.3f} "
                       f"grad_norm={m['grad_norm']:.1f} post_ratio={_f(m.get('post_step_mean_ratio'))} "
@@ -1125,6 +1325,10 @@ def main():
                       f"adapter_dL2={_f(m.get('adapter_delta_l2'),5)} "
                       f"n_succ_hold={m.get('n_success_hold')} mem={m.get('peak_mem_gb')}", flush=True)
     log["phases"]["train_curve"] = curve
+    if adaptive_mode and curriculum is not None:
+        log["adaptive_curriculum"]["final_band_stats"] = curriculum.band_stats()
+        log["adaptive_curriculum"]["difficulty"] = {
+            str(k): v for k, v in curriculum.difficulty.items()}
 
     # Checkpoint path must be on the TRAINER SERVER's filesystem, which has /train mounted
     # (= /home/v4/rl-train-t_3ed65912 on the host). /out is only visible to the CLIENT.
