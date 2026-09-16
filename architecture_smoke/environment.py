@@ -78,6 +78,24 @@ class RoboCasaEnvironment:
         """Compact, machine-readable reference to the current observation."""
         return f"seed{self.seed}:step{self._step_count}"
 
+    def obs_for_verifier(self):
+        """Build the obs-only verifier input from the CURRENT observation.
+
+        Returns exactly what the real robot receives: the 3 camera images
+        (rollout.collect_images -> CAMERA_KEYS) + the 14-D proprio state
+        (rollout.observation_to_state). NO privileged simulator predicate is
+        included, so the runtime VLM verifier is obs-only by construction.
+        """
+        from obs_verifier import ObsInput
+        rollout = self._rollout
+        images = {k: v for k, v in rollout.collect_images(self._obs).items()}
+        proprio = list(rollout.observation_to_state(self._obs))
+        return ObsInput(images=images, proprio=proprio, step=self._step_count)
+
+    def processor(self):
+        """The policy client's HF processor (single source of truth for VQA inputs)."""
+        return None
+
     # ---- policy I/O ------------------------------------------------------- #
     def build_policy_input(self, instruction, adapter_mode, adapter_checkpoint=None):
         rollout = self._rollout

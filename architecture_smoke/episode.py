@@ -12,8 +12,16 @@ from schemas import PlannerContext, SkillStatus
 
 
 def run_episode(planner, manager, env, trace, registry, goal, episode_budget,
-                max_planner_calls=12):
-    """Drive one end-to-end episode. Returns a machine-readable summary dict."""
+                max_planner_calls=12, obs_only=False):
+    """Drive one end-to-end episode. Returns a machine-readable summary dict.
+
+    ``obs_only=True`` (VLM-verifier pipeline): skill termination and next-skill
+    selection are obs-only, so the loop does NOT break on the privileged sim
+    ``official_check_success`` predicate mid-episode -- it runs until the planner
+    returns None (all skills attempted) or the budget is exhausted. The sim
+    predicate is still read ONCE at the end and recorded as the offline
+    ``task_success`` evaluation label (never a runtime judge input).
+    """
     env.reset()
     planner_calls = 0
     steps_used = 0
@@ -22,21 +30,21 @@ def run_episode(planner, manager, env, trace, registry, goal, episode_budget,
     terminal = "budget_exhausted"
 
     while planner_calls < max_planner_calls and steps_used < episode_budget:
-        pred = env.predicates()
+        pred = {} if obs_only else env.predicates()
         ctx = PlannerContext(goal=goal, predicates=pred, skill_catalog=registry.names,
                              last_result=last_result,
                              step_budget_remaining=episode_budget - steps_used,
                              planner_calls=planner_calls)
         call = planner.plan(ctx)
         rationale = planner.rationale(call, last_result)
-        trace.plan(planner_calls, env.observation_ref(), pred,
+        trace.plan(planner_calls, env.observation_ref(), (env.predicates() if not obs_only else {}),
                    call.as_dict() if call else None,
                    registry.render(call) if call else None,
                    rationale, planner.kind)
         planner_calls += 1
 
         if call is None:
-            terminal = "task_success"
+            terminal = "planner_done" if obs_only else "task_success"
             break
 
         result = manager.execute(call)
@@ -54,7 +62,7 @@ def run_episode(planner, manager, env, trace, registry, goal, episode_budget,
             next_hint = "retry"
         trace.skill_result(result.as_dict(), next_skill=next_hint)
 
-        if env.predicates().get("official_check_success"):
+        if not obs_only and env.predicates().get("official_check_success"):
             terminal = "task_success"
             break
 

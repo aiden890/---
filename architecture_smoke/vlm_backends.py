@@ -18,6 +18,10 @@ from __future__ import annotations
 
 from typing import Any, Callable, Mapping, Optional, Sequence
 
+import pickle
+import socket
+import struct
+
 from obs_verifier import CAMERA_KEYS, VLMBackend
 
 
@@ -131,3 +135,76 @@ class QwenVLMScorerBackend(VLMBackend):
             )
             logits_last = out.logits[0, -1, :]
             return self._vs.answer_probability(logits_last, self._yes_ids, self._no_ids)
+
+
+# --------------------------------------------------------------------------- #
+#  Remote Qwen3-VL backend (RPCs the combined infer+verify GPU server)          #
+# --------------------------------------------------------------------------- #
+class RemoteVLMScorerBackend(VLMBackend):
+    """Obs-only VLM verifier backend that RPCs ``op=vlm_score`` to the GPU server.
+
+    The client (CPU sim container) owns the processor and builds the VQA inputs
+    with the env card's ``vlm_scorer.build_vqa_inputs`` (single source of truth
+    for the prompt + tokenisation); the server (GPU) runs ``model.vlm(...)`` and
+    returns just the scalar P(yes). The 3-cam dict is composed into one wide RGB
+    image exactly as ``rollout.make_video_frame`` (horizontal concat), so the VLM
+    sees every view the policy sees. No simulator predicate is ever referenced.
+
+    This backend holds its OWN persistent socket to the same server the action
+    client uses (the server threads + a CUDA lock serialise the two request
+    types), so no second model load is needed.
+    """
+
+    def __init__(self, processor, host, port, *, robot_type: str,
+                 state_dim: int = 60, state_length: int = 4,
+                 compose: Callable[[Mapping[str, Any]], Any] = None):
+        import vlm_scorer
+        self._vs = vlm_scorer
+        self.processor = processor
+        self.host = host
+        self.port = port
+        self.robot_type = robot_type
+        self.state_dim = state_dim
+        self.state_length = state_length
+        self.compose = compose or compose_three_cam
+        self._sock = None
+        self._connect()
+
+    def _connect(self):
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((self.host, self.port))
+        self._sock = s
+
+    def _rpc(self, req: dict) -> dict:
+        payload = pickle.dumps(req, protocol=pickle.HIGHEST_PROTOCOL)
+        self._sock.sendall(struct.pack(">I", len(payload)) + payload)
+        ln = self._recv_all(4)
+        n = struct.unpack(">I", ln)[0]
+        return pickle.loads(self._recv_all(n))
+
+    def _recv_all(self, n: int) -> bytes:
+        buf = b""
+        while len(buf) < n:
+            pkt = self._sock.recv(n - len(buf))
+            if not pkt:
+                raise ConnectionError("verifier socket closed mid-response")
+            buf += pkt
+        return buf
+
+    def score(self, images: Mapping[str, Any], question_text: str) -> float:
+        image = self.compose(images)
+        # build_vqa_inputs accepts a literal question string (falls back to it
+        # when the key is not in the QUESTIONS bank), so the obs_verifier's
+        # per-skill question text is used verbatim.
+        inputs = self._vs.build_vqa_inputs(
+            self.processor, image, question_text, robot_type=self.robot_type,
+            state_dim=self.state_dim, state_length=self.state_length)
+        resp = self._rpc({"op": "vlm_score", "inputs": inputs, "question": question_text})
+        return float(resp["prob"])
+
+    def close(self):
+        if self._sock is not None:
+            try:
+                self._sock.close()
+            finally:
+                self._sock = None

@@ -54,6 +54,18 @@ class Trace:
         self._write("verify", skill=skill, decision=decision, reason=reason,
                     elapsed=elapsed, hold=hold)
 
+    def vlm(self, skill, step, frame_index, prob, consecutive_yes, queried,
+            decision, proprio_candidate, proprio_gripper_closed):
+        """One obs-only VLM verifier judgement at a step (offline-auditable overlay).
+
+        Carries ONLY obs-derived diagnostics (VLM P(yes) + proprio-gate flags) and
+        the recorded frame index; NO privileged simulator predicate.
+        """
+        self._write("vlm", skill=skill, step=step, frame_index=frame_index,
+                    prob=prob, consecutive_yes=consecutive_yes, queried=queried,
+                    decision=decision, proprio_candidate=proprio_candidate,
+                    proprio_gripper_closed=proprio_gripper_closed)
+
     def skill_result(self, result: dict, next_skill):
         self._write("skill_result", next_skill=next_skill, **result)
 

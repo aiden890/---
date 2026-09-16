@@ -62,3 +62,55 @@ class OraclePlanner:
         if last is not None and last.status is not SkillStatus.SUCCESS:
             return f"{base} (retry after previous {last.skill}={last.status.value})"
         return base
+
+
+class SequentialPlanner:
+    """Obs-only planner: advances GRASP_OBJECT -> MOVE_OBJECT -> PLACE_OBJECT on the
+    verifier's SUCCESS, NOT on any privileged simulator predicate.
+
+    Used with the obs-only VLM verifier so the ENTIRE runtime (skill termination
+    AND next-skill selection) reads only what the robot receives: the VLM verifier
+    ADVANCE (obs P(yes) latch) drives progression; a FAILED/TIMEOUT re-issues the
+    same skill up to ``max_retries`` before moving on. It never queries
+    ``ctx.predicates`` (the sim ground-truth), so the pipeline is transferable.
+
+    This is still a SCRIPTED stub (fixed subgoal order), NOT a learned planner.
+    """
+
+    kind = "sequential_obs_stub"
+    SEQUENCE = ("GRASP_OBJECT", "MOVE_OBJECT", "PLACE_OBJECT")
+
+    def __init__(self, registry: SkillRegistry, max_retries: int = 1):
+        self.registry = registry
+        self.max_retries = max_retries
+        self._idx = 0
+        self._retries = 0
+        self._last_seen = None
+
+    def plan(self, ctx: PlannerContext) -> SkillCall | None:
+        last = ctx.last_result
+        # advance/retry based ONLY on the obs-only verifier outcome
+        if last is not None and last is not self._last_seen:
+            self._last_seen = last
+            if last.status is SkillStatus.SUCCESS:
+                self._idx += 1
+                self._retries = 0
+            else:
+                self._retries += 1
+                if self._retries > self.max_retries:
+                    self._idx += 1        # give up on this skill, move on honestly
+                    self._retries = 0
+        if self._idx >= len(self.SEQUENCE):
+            return None                    # all skills attempted -> episode done
+        name = self.SEQUENCE[self._idx]
+        contract = self.registry.get(name)
+        return SkillCall(name=name, args=dict(contract.default_args))
+
+    @staticmethod
+    def rationale(call: SkillCall | None, last: SkillResult | None) -> str:
+        if call is None:
+            return "all skills attempted (obs-only verifier); terminate episode"
+        base = f"sequential obs-only plan -> {call.name}"
+        if last is not None and last.status is not SkillStatus.SUCCESS:
+            return f"{base} (retry after {last.skill}={last.status.value})"
+        return base

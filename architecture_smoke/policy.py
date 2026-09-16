@@ -58,6 +58,10 @@ class BasePolicyClient:
         return {"model_path": self.model_path, "adapter_mode": self.adapter_mode.value,
                 "adapter_checkpoint": self.adapter_checkpoint, "replan_steps": self.replan_steps}
 
+    def processor(self):
+        """The checkpoint's HF processor (single source of truth for VQA inputs)."""
+        return self._client.processor
+
     def close(self):
         self._client.close()
 

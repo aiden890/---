@@ -146,6 +146,7 @@ class SkillResult:
     terminated_by: str
     reason: str
     predicates: Mapping[str, Any] = field(default_factory=dict)
+    vlm_stats: Optional[Mapping[str, Any]] = None
 
     def as_dict(self) -> dict:
         return {
@@ -157,4 +158,5 @@ class SkillResult:
             "success_step": self.success_step,
             "terminated_by": self.terminated_by,
             "reason": self.reason,
+            "vlm_stats": (dict(self.vlm_stats) if self.vlm_stats else None),
         }

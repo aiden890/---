@@ -20,15 +20,124 @@ from schemas import (AdapterMode, Decision, SkillCall, SkillResult, SkillStatus,
 from verifier import PredicateVerifier
 
 
+# Map the generic skill contract names to the obs_verifier question keys.
+_SKILL_QUESTION_KEY = {
+    "GRASP_OBJECT": "GRASP_OBJECT",
+    "MOVE_OBJECT": "MOVE_OBJECT",
+    "PLACE_OBJECT": "PLACE_OBJECT",
+}
+
+
 class ExecutionManager:
-    def __init__(self, registry, policy, environment, trace, adapter_mode=AdapterMode.DISABLED):
+    def __init__(self, registry, policy, environment, trace, adapter_mode=AdapterMode.DISABLED,
+                 vlm_backend=None, vlm_min_interval=16, hysteresis_k=2, tau=0.6,
+                 event_gated=True):
         self.registry = registry
         self.policy = policy
         self.env = environment
         self.trace = trace
         self.adapter_mode = adapter_mode
+        # When a VLM backend is supplied, skill termination is judged obs-only by
+        # the policy's own frozen Qwen3-VL (ObsVLMVerifier); otherwise the parent
+        # privileged-predicate PredicateVerifier is used.
+        self.vlm_backend = vlm_backend
+        self.vlm_min_interval = vlm_min_interval
+        self.hysteresis_k = hysteresis_k
+        self.tau = tau
+        self.event_gated = event_gated
 
     def execute(self, call: SkillCall) -> SkillResult:
+        if self.vlm_backend is not None:
+            return self._execute_vlm(call)
+        return self._execute_predicate(call)
+
+    # ------------------------------------------------------------------ #
+    #  obs-only VLM verifier path (Qwen3-VL VQA, proprio-gated)            #
+    # ------------------------------------------------------------------ #
+    def _execute_vlm(self, call: SkillCall) -> SkillResult:
+        from obs_verifier import ObsVLMVerifier, SKILL_QUESTIONS
+
+        contract = self.registry.validate_call(call)
+        instruction = contract.render_instruction(call.args)
+        qkey = _SKILL_QUESTION_KEY.get(call.name, call.name)
+        verifier = ObsVLMVerifier(
+            qkey, self.vlm_backend, max_steps=contract.max_steps,
+            question_text=SKILL_QUESTIONS[qkey],
+            vlm_min_interval=self.vlm_min_interval, hysteresis_k=self.hysteresis_k,
+            tau=self.tau, event_gated=self.event_gated)
+
+        # can_start stays obs-agnostic here: the sequential planner only issues a
+        # skill when it is its turn, so we always start (no privileged precondition).
+        self.trace.route(call.name, self.adapter_mode.value, None, contract.max_steps, True)
+
+        action_plan = []
+        last_v: VerificationResult | None = None
+        steps = 0
+        while steps < contract.max_steps:
+            if not action_plan:
+                pin = self.env.build_policy_input(instruction, self.adapter_mode, None)
+                out = self.policy.infer(pin)
+                assert out.adapter_checkpoint is None, "adapter checkpoint leaked into policy output"
+                assert out.adapter_mode in (AdapterMode.DISABLED, AdapterMode.BASE_ONLY)
+                action_plan = list(out.action_chunk)
+                self.trace.window(call.name, steps, out.chunk_len, len(action_plan),
+                                  out.adapter_mode.value, "EXECUTE", verifier.consecutive_yes,
+                                  {"judge": "obs_vlm"})
+            action = action_plan.pop(0)
+            _, done, trunc, _ = self.env.step(action)
+            steps += 1
+
+            obs = self.env.obs_for_verifier()          # obs-only: 3-cam + 14D proprio
+            v = verifier.update(obs)
+            last_v = v
+            diag = v.predicates
+            queried = bool(diag.get("vlm_queried_this_step"))
+            # record a frame on a VLM query, on ADVANCE, or on env end, so the
+            # overlay shows every judgement moment.
+            fidx = self.env.maybe_record_frame(
+                force=(queried or v.decision is Decision.ADVANCE or done or trunc))
+            if fidx is not None:
+                self.trace.frame(call.name, steps, fidx)
+                if queried or v.decision is Decision.ADVANCE:
+                    self.trace.vlm(call.name, steps, fidx, diag.get("vlm_prob"),
+                                   diag.get("consecutive_yes"), queried,
+                                   v.decision.value, diag.get("proprio_candidate_stop"),
+                                   diag.get("proprio_gripper_closed"))
+
+            if v.decision is Decision.ADVANCE:
+                self.trace.verify(call.name, v.decision.value, v.reason, v.elapsed, v.hold)
+                res = self._result(SkillStatus.SUCCESS, call, instruction, steps,
+                                   verifier.succeeded_step, "vlm_success", v.reason,
+                                   self.env.predicates())
+                res.vlm_stats = verifier.stats()
+                return res
+            if v.decision is Decision.REPLAN:
+                self.trace.verify(call.name, v.decision.value, v.reason, v.elapsed, v.hold)
+                res = self._result(SkillStatus.TIMEOUT, call, instruction, steps, None,
+                                   "vlm_timeout", v.reason, self.env.predicates())
+                res.vlm_stats = verifier.stats()
+                return res
+            if done or trunc:
+                self.trace.verify(call.name, "TERMINATED", f"env done={done} trunc={trunc}",
+                                  v.elapsed, v.hold)
+                res = self._result(SkillStatus.FAILED, call, instruction, steps, None,
+                                   "env_terminated", f"env done={done} trunc={trunc}",
+                                   self.env.predicates())
+                res.vlm_stats = verifier.stats()
+                return res
+
+        reason = last_v.reason if last_v else "budget exhausted"
+        self.trace.verify(call.name, Decision.REPLAN.value, reason,
+                          last_v.elapsed if last_v else steps, last_v.hold if last_v else 0)
+        res = self._result(SkillStatus.TIMEOUT, call, instruction, steps, None,
+                           "vlm_timeout", reason, self.env.predicates())
+        res.vlm_stats = verifier.stats()
+        return res
+
+    # ------------------------------------------------------------------ #
+    #  privileged-predicate path (original behaviour)                     #
+    # ------------------------------------------------------------------ #
+    def _execute_predicate(self, call: SkillCall) -> SkillResult:
         contract = self.registry.validate_call(call)          # schema validation
         instruction = contract.render_instruction(call.args)  # fixed NL render
         verifier = PredicateVerifier(contract)
