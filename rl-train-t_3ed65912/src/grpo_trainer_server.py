@@ -234,6 +234,107 @@ class GRPOTrainerServer:
         return {"actions": res.actions.cpu(), "logprob": old_logp,
                 "derived_seed": derived_seed, "chunk_index": chunk_index}
 
+    def _forward_new_logp(self, chunk):
+        """Recompute the CURRENT policy's transition log-prob for one stored rollout chunk.
+
+        Single source of truth for the new-policy log-prob, used by BOTH the optimizer
+        epoch loop (grad flows) and the post-step diagnostic pass (under no_grad). Keeping
+        one implementation guarantees the epoch-0 ratio==1 correctness probe and the
+        post-step ratio use identical math. MiBoT velocity at t_m = 1 - t_o.
+        """
+        state, action_mask, vlm = self._split(dict(chunk["inputs_cpu"]))
+        set_active_skill(self.wrappers, chunk["skill"])
+        xs = [x.to(device=self.model.device, dtype=self.model.dtype) for x in chunk["xs_cpu"]]
+        exec_mask = chunk["exec_mask_cpu"].to(self.model.device)
+        vfield, shape, dev, dt = build_velocity_field(self.model, state, action_mask, **vlm)
+        sampler = getattr(self.a, "sampler", "fixed_noise")
+        if sampler == "pirl":
+            ts = openpi_timesteps(self.a.num_steps)
+            sig = openpi_sigmas(self.a.num_steps, self.a.eta)
+            means = []
+            for k in range(self.a.num_steps):
+                t_o = float(ts[k]); t_next = float(ts[k + 1])
+                t_m = torch.full((shape[0], 1, 1), 1.0 - t_o, device=dev, dtype=action_mask.dtype)
+                if self.a.grad_checkpoint:
+                    v = torch.utils.checkpoint.checkpoint(vfield, xs[k], t_m, use_reentrant=False)
+                else:
+                    v = vfield(xs[k], t_m)
+                m, _ = pirl_step_mean_std(xs[k], v, t_o, t_next, float(sig[k]))
+                means.append(m)
+            new_logp = pirl_transition_logprob(xs, means, chunk.get("pirl_stds"),
+                                               executed_mask=exec_mask)[0]
+        else:
+            dtc = 1.0 / self.a.num_steps
+            means = []
+            for k in range(self.a.num_steps):
+                t_k = torch.full((shape[0], 1, 1), k / self.a.num_steps, device=dev, dtype=action_mask.dtype)
+                if self.a.grad_checkpoint:
+                    v = torch.utils.checkpoint.checkpoint(vfield, xs[k], t_k, use_reentrant=False)
+                else:
+                    v = vfield(xs[k], t_k)
+                means.append(xs[k] + v * dtc)
+            new_logp = transition_logprob(xs, means, eta=self.a.eta,
+                                          num_steps=self.a.num_steps, executed_mask=exec_mask)[0]
+        return new_logp
+
+    def _adapter_vector(self):
+        """Flattened detached copy of every trainable parameter (for the adapter-delta metric)."""
+        with torch.no_grad():
+            return torch.cat([p.detach().float().flatten() for p in self.trainable_params]).clone()
+
+    def _post_step_diagnostics(self, active, clip, ratio_max):
+        """AUDIT/measurement fix: recompute ratio/approx-KL/clip-fraction/ESS AFTER the
+        optimizer step, under no_grad. With update_epochs=1 the epoch-0 metrics are the
+        pre-step correctness probe (ratio==1, KL==0) and say NOTHING about update strength;
+        THIS pass measures how far the updated policy actually moved off the rollout policy.
+        """
+        import numpy as _np
+        ratios = []; kl_sum = 0.0; n_clipped = 0; n_chunks = 0; n_nonfinite = 0
+        with torch.no_grad():
+            for traj_id, chunks, adv in active:
+                for chunk in chunks:
+                    new_logp = self._forward_new_logp(chunk)
+                    old_logp = torch.tensor(chunk["old_logp"], device=self.model.device)
+                    logratio = new_logp - old_logp
+                    if not torch.isfinite(logratio):
+                        n_nonfinite += 1
+                        continue
+                    logratio_c = torch.clamp(logratio, math.log(1.0 / ratio_max), math.log(ratio_max))
+                    ratio = float(torch.exp(logratio_c).detach().cpu())
+                    lr_c = float(logratio_c.detach().cpu())
+                    kl_sum += (math.exp(lr_c) - 1.0) - lr_c
+                    ratios.append(ratio)
+                    if abs(ratio - 1.0) > clip:
+                        n_clipped += 1
+                    n_chunks += 1
+        ess = None
+        if ratios:
+            w = _np.asarray(ratios, dtype=_np.float64)
+            ess = float((w.sum() ** 2) / ((w ** 2).sum() * len(w))) if (w ** 2).sum() > 0 else None
+        return {
+            "post_step_mean_ratio": (sum(ratios) / len(ratios) if ratios else None),
+            "post_step_mean_abs_ratio_dev": (sum(abs(r - 1.0) for r in ratios) / len(ratios) if ratios else None),
+            "post_step_clip_fraction": (n_clipped / n_chunks if n_chunks else None),
+            "post_step_mean_kl": (kl_sum / n_chunks if n_chunks else None),
+            "post_step_ess": ess, "post_step_n_chunks": n_chunks,
+            "post_step_n_nonfinite": n_nonfinite,
+        }
+
+    def op_config(self, req):
+        """Full trainer configuration for the run summary (optimizer/LR/schedule/grad-clip/
+        weight-decay/LoRA rank-alpha-targets/trainable count/sampler/eta/code rev). The
+        client logs this verbatim so every run summary is self-describing (measurement fix).
+        """
+        cfg = vars(self.a)
+        n_train = sum(p.numel() for p in self.trainable_params)
+        opt_groups = []
+        for g in self.opt.param_groups:
+            opt_groups.append({"lr": g.get("lr"), "weight_decay": g.get("weight_decay"),
+                               "n_params": sum(p.numel() for p in g["params"])})
+        return {"config": cfg, "trainable_params": int(n_train),
+                "optimizer": type(self.opt).__name__, "optimizer_groups": opt_groups,
+                "code_rev": req.get("code_rev"), "dropout_report": self.dropout_report}
+
     def op_update(self, req):
         advantages = req["advantages"]           # {traj_id: advantage float}
         clip = float(req.get("clip", self.a.clip))
@@ -251,6 +352,7 @@ class GRPOTrainerServer:
 
         active = [(tid, chunks, max(-adv_clip, min(adv_clip, float(advantages.get(tid, 0.0)))))
                   for tid, chunks in self.store.items() if float(advantages.get(tid, 0.0)) != 0.0]
+        adapter_before = self._adapter_vector()  # measurement fix: snapshot for adapter-delta
         epoch_stats = []
         grad_norm = 0.0
         n_chunks_last = 0
@@ -261,44 +363,11 @@ class GRPOTrainerServer:
             for traj_id, chunks, adv in active:
                 adv_t = torch.tensor(adv, device=self.model.device)
                 for chunk in chunks:
-                    state, action_mask, vlm = self._split(dict(chunk["inputs_cpu"]))
-                    set_active_skill(self.wrappers, chunk["skill"])
-                    xs = [x.to(device=self.model.device, dtype=self.model.dtype) for x in chunk["xs_cpu"]]
-                    exec_mask = chunk["exec_mask_cpu"].to(self.model.device)
+                    # Faithful pi-RL recompute (shared with the post-step diagnostic): rebuild
+                    # per-step means with the SAME corrected-drift equations and REUSE the stored
+                    # per-step stds so epoch-0 ratio==1 exactly (on-policy correctness probe).
+                    new_logp = self._forward_new_logp(chunk)
                     old_logp = torch.tensor(chunk["old_logp"], device=self.model.device)
-                    vfield, shape, dev, dt = build_velocity_field(self.model, state, action_mask, **vlm)
-                    sampler = getattr(self.a, "sampler", "fixed_noise")
-                    if sampler == "pirl":
-                        # Faithful pi-RL recompute: rebuild per-step means with the SAME
-                        # corrected-drift equations and REUSE the stored per-step stds so
-                        # epoch-0 ratio==1 exactly. MiBoT velocity at t_m = 1 - t_o.
-                        ts = openpi_timesteps(self.a.num_steps)
-                        sig = openpi_sigmas(self.a.num_steps, self.a.eta)
-                        means = []
-                        for k in range(self.a.num_steps):
-                            t_o = float(ts[k]); t_next = float(ts[k + 1])
-                            t_m = torch.full((shape[0], 1, 1), 1.0 - t_o, device=dev, dtype=action_mask.dtype)
-                            if self.a.grad_checkpoint:
-                                v = torch.utils.checkpoint.checkpoint(vfield, xs[k], t_m, use_reentrant=False)
-                            else:
-                                v = vfield(xs[k], t_m)
-                            m, _ = pirl_step_mean_std(xs[k], v, t_o, t_next, float(sig[k]))
-                            means.append(m)
-                        pirl_stds = chunk.get("pirl_stds")
-                        new_logp = pirl_transition_logprob(xs, means, pirl_stds,
-                                                           executed_mask=exec_mask)[0]
-                    else:
-                        dtc = 1.0 / self.a.num_steps
-                        means = []
-                        for k in range(self.a.num_steps):
-                            t_k = torch.full((shape[0], 1, 1), k / self.a.num_steps, device=dev, dtype=action_mask.dtype)
-                            if self.a.grad_checkpoint:
-                                v = torch.utils.checkpoint.checkpoint(vfield, xs[k], t_k, use_reentrant=False)
-                            else:
-                                v = vfield(xs[k], t_k)
-                            means.append(xs[k] + v * dtc)
-                        new_logp = transition_logprob(xs, means, eta=self.a.eta,
-                                                      num_steps=self.a.num_steps, executed_mask=exec_mask)[0]
                     logratio = new_logp - old_logp
                     if not torch.isfinite(logratio):
                         n_nonfinite += 1
@@ -340,14 +409,28 @@ class GRPOTrainerServer:
                 "mean_kl": kl_sum / max(n_chunks, 1), "grad_norm": gn, "ess": ess,
             })
             grad_norm = gn; n_chunks_last = n_chunks
+        # measurement fix: adapter-parameter delta from this update (L2 + Linf over trainables)
+        adapter_after = self._adapter_vector()
+        with torch.no_grad():
+            d = (adapter_after - adapter_before)
+            adapter_delta_l2 = float(torch.linalg.vector_norm(d).cpu())
+            adapter_delta_linf = float(d.abs().max().cpu()) if d.numel() else 0.0
+            adapter_rel = adapter_delta_l2 / (float(torch.linalg.vector_norm(adapter_before).cpu()) + 1e-12)
+        # measurement fix: recompute ratio/KL/clip/ESS AFTER the optimizer step (real
+        # update-strength diagnostic, unlike the pre-step epoch-0 correctness probe).
+        post = self._post_step_diagnostics(active, clip, ratio_max)
         self.store.clear()
         first, last = epoch_stats[0], epoch_stats[-1]
-        return {"loss": last["loss"], "n_chunks": n_chunks_last, "n_dropped": last["n_dropped"],
+        out = {"loss": last["loss"], "n_chunks": n_chunks_last, "n_dropped": last["n_dropped"],
                 "grad_norm": grad_norm, "mean_ratio": last["mean_ratio"], "mean_kl": last["mean_kl"],
                 "update_epochs": update_epochs, "epoch0_mean_ratio": first["mean_ratio"],
                 "epochLast_mean_ratio": last["mean_ratio"], "epochLast_clip_fraction": last["clip_fraction"],
                 "epoch_stats": epoch_stats,
+                "adapter_delta_l2": adapter_delta_l2, "adapter_delta_linf": adapter_delta_linf,
+                "adapter_delta_rel": adapter_rel,
                 "peak_mem_gb": round(torch.cuda.max_memory_allocated() / 1e9, 2)}
+        out.update(post)
+        return out
 
     def op_save(self, req):
         path = Path(req["path"]); path.parent.mkdir(parents=True, exist_ok=True)
@@ -550,7 +633,7 @@ class GRPOTrainerServer:
 
     def handle(self, req):
         fn = {"sample": self.op_sample, "update": self.op_update, "save": self.op_save,
-              "load": self.op_load, "metrics": self.op_metrics,
+              "load": self.op_load, "metrics": self.op_metrics, "config": self.op_config,
               "vlm_score": self.op_vlm_score,
               "sft_update": self.op_sft_update, "sft_val": self.op_sft_val}.get(req.get("op"))
         return fn(req) if fn else {"error": f"unknown op {req.get('op')}"}

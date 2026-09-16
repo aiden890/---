@@ -43,6 +43,7 @@ sys.path.insert(0, "/skill_eval_tools")   # skill_eval.py (predicates/sim)
 sys.path.insert(0, "/rl_env/src")         # env card: reward, skill_manager, randomization
 import rollout  # noqa: E402
 import skill_eval  # noqa: E402
+from advantage import compute_group_advantages  # noqa: E402  (this card's src dir on sys.path[0])
 from reward import RewardConfig, RewardManager, official_success, HoldConfig, hold_step_reward  # noqa: E402
 from skill_manager import (  # noqa: E402
     MonitorConfig, OraclePlanner, Skill, SkillMonitor, SkillOutcome,
@@ -148,6 +149,11 @@ class TrainerClient:
 
     def save(self, path):
         return self._rpc({"op": "save", "path": path})
+
+    def config(self, code_rev=None):
+        """Fetch the full trainer configuration (optimizer/LR/grad-clip/LoRA/trainable count/
+        sampler/eta) for the run summary. Measurement fix: every run summary is self-describing."""
+        return self._rpc({"op": "config", "code_rev": code_rev})
 
     def load(self, path):
         return self._rpc({"op": "load", "path": path})
@@ -508,6 +514,7 @@ def train_iteration(client, args, reward_cfg, seed, it):
     vlm_question = getattr(args, "vlm_question", "grasp")
     returns = []
     traj_ids = []
+    successes = []          # per-member: did the trained skill succeed (for group composition)
     vlm_scores = []
     hold_stats_all = []
     entry_from_grasp = getattr(args, "entry_from_grasp", False) and skill in ENTRY_PREREQS
@@ -544,7 +551,9 @@ def train_iteration(client, args, reward_cfg, seed, it):
                     timeout_penalty=train_timeout_penalty,
                     hold_cfg=hold_cfg, hold_steps=hold_steps)
                 hold_stats_all.append(hstats)
-                if outcome is SkillOutcome.SUCCESS:
+                is_succ = outcome is SkillOutcome.SUCCESS
+                successes.append(is_succ)
+                if is_succ:
                     r += 1.0
                 if vlm_weight > 0.0:
                     vscore = client.vlm_score(_scoring_image(final_obs), vlm_question)
@@ -570,7 +579,9 @@ def train_iteration(client, args, reward_cfg, seed, it):
                     hold_cfg=hold_cfg, hold_steps=hold_steps)
                 hold_stats_all.append(hstats)
                 # terminal shaping for the skill unit: bonus if the skill's predicate is met
-                if outcome is SkillOutcome.SUCCESS:
+                is_succ = outcome is SkillOutcome.SUCCESS
+                successes.append(is_succ)
+                if is_succ:
                     r += 1.0
                 # --- REAL VLM-auxiliary channel (sim+VLM ablation only; weight>0) ---
                 # A genuine Qwen3-VL VQA judgement of the FINAL frame: P(yes) that the grasp/
@@ -585,15 +596,28 @@ def train_iteration(client, args, reward_cfg, seed, it):
             finally:
                 genv.close()
     arr = np.asarray(returns, dtype=np.float64)
-    adv = (arr - arr.mean()) / (arr.std() + 1e-8)
-    advantages = {tid: float(a) for tid, a in zip(traj_ids, adv)}
-    metrics = client.update(advantages, clip=args.clip, kl_coef=args.kl_coef,
-                            ratio_max=args.ratio_max, adv_clip=args.adv_clip,
-                            update_epochs=getattr(args, "update_epochs", 1))
+    succ_arr = np.asarray(successes, dtype=bool)
+    adv_arr, adv_info = compute_group_advantages(
+        arr, succ_arr,
+        std_gate=getattr(args, "reward_std_gate", 0.05))
+    advantages = {tid: float(a) for tid, a in zip(traj_ids, adv_arr)}
+    # low-variance / all-failure / all-equal groups are gated: every advantage is 0, so the
+    # trainer's active-filter (adv!=0) skips the optimizer step entirely (no noisy update).
+    if adv_info["gated"]:
+        metrics = {"loss": 0.0, "grad_norm": 0.0, "mean_ratio": 1.0, "n_chunks": 0,
+                   "gated": adv_info["reason"], "reward_std": adv_info["reward_std"]}
+    else:
+        metrics = client.update(advantages, clip=args.clip, kl_coef=args.kl_coef,
+                                ratio_max=args.ratio_max, adv_clip=args.adv_clip,
+                                update_epochs=getattr(args, "update_epochs", 1))
     metrics["mean_return"] = float(arr.mean())
     metrics["max_return"] = float(arr.max())
     metrics["returns"] = [round(x, 4) for x in returns]
     metrics["reward_std"] = float(arr.std())
+    metrics["n_success_group"] = int(succ_arr.sum())
+    metrics["group_composition"] = adv_info["composition"]      # all_success|mixed|all_failure|constant
+    metrics["advantage_mode"] = adv_info["mode"]                # group_relative|nonneg_min_baseline|gated
+    metrics["advantages"] = {tid: round(float(a), 4) for tid, a in zip(traj_ids, adv_arr)}
     if vlm_scores:
         metrics["vlm_mean"] = round(float(np.mean(vlm_scores)), 4)
         metrics["vlm_scores"] = [round(x, 4) for x in vlm_scores]
@@ -717,7 +741,16 @@ def build_parser():
     ap.add_argument("--eval-seed-base", type=int, default=5000)
     ap.add_argument("--heldout-seed-base", type=int, default=9000)
     ap.add_argument("--reward-variant", default="simulator_milestones",
-                    choices=("simulator_milestones", "simulator_terminal_only"))
+                    choices=("simulator_milestones", "simulator_terminal_only", "terminal_plus_hold"),
+                    help="Reward composition label. simulator_milestones: per-milestone bonuses. "
+                         "terminal_plus_hold: terminal success (+1.0) PLUS the 20-step post-success "
+                         "hold shaping (the ACTUAL reward when --hold-steps>0; the honest rename of "
+                         "the mislabeled 'terminal_only'). simulator_terminal_only: pure terminal "
+                         "predicate with hold weights forced to zero (verifier condition retained).")
+    ap.add_argument("--reward-std-gate", type=float, default=0.05,
+                    help="Minimum within-group reward std for an optimizer update. Groups with a "
+                         "smaller std (all-failure or effectively-constant reward) are gated: "
+                         "advantage is zeroed and the step is skipped (advantage-handling fix).")
     ap.add_argument("--vlm-weight", type=float, default=0.0,
                     help="Weight of the REAL Qwen3-VL VQA auxiliary score added to the GRPO "
                          "return during TRAINING. 0.0 = sim-only; >0 = sim+VLM ablation.")
@@ -771,11 +804,20 @@ def main():
     for k in ("group", "eta", "clip", "kl_coef", "ratio_max", "adv_clip", "train_skill",
               "horizon_grasp", "horizon_move", "horizon_place",
               "max_skill_calls", "seed_base", "save_videos", "split",
-              "vlm_weight", "vlm_question", "update_epochs",
+              "vlm_weight", "vlm_question", "update_epochs", "reward_std_gate",
               "hold_steps", "hold_stay_bonus", "hold_drift_penalty",
               "hold_stay_radius", "hold_drop_penalty", "entry_from_grasp"):
         setattr(args, k, getattr(my, k))
     out = Path(my.out); out.mkdir(parents=True, exist_ok=True)
+
+    # simulator_terminal_only forces a PURE terminal-only ablation: zero the hold shaping
+    # weights (the hold window is retained only as a verifier condition, not a reward).
+    # terminal_plus_hold keeps the hold shaping (the honest label for the run that ships
+    # +1.0 terminal AND the 20-step hold bonus). simulator_milestones enables milestones.
+    if my.reward_variant == "simulator_terminal_only":
+        args.hold_stay_bonus = 0.0
+        args.hold_drift_penalty = 0.0
+        args.hold_drop_penalty = 0.0
 
     reward_cfg = RewardConfig(mode="simulator", horizon=my.horizon_place,
                               use_milestones=(my.reward_variant == "simulator_milestones"))
@@ -795,6 +837,14 @@ def main():
     log = {"config": {**vars(my), "reward_variant": my.reward_variant,
                       "vlm_weight": my.vlm_weight, "vlm_question": my.vlm_question},
            "phases": {}}
+    # measurement fix: capture the full trainer-side config (optimizer/LR/grad-clip/LoRA
+    # rank-alpha-targets/trainable count/sampler/eta/code rev) so the run summary is
+    # self-describing. code_rev from env (set by the launcher) if available.
+    try:
+        import os as _os
+        log["trainer_config"] = client.config(code_rev=_os.environ.get("CODE_REV"))
+    except Exception as _e:
+        log["trainer_config"] = {"error": str(_e)}
     (out / "train_log.jsonl").write_text("")
 
     eval_seeds = [my.eval_seed_base + i for i in range(my.eval_n)]
@@ -881,13 +931,32 @@ def main():
             m["seed"] = seed
             curve.append({"iter": it, "loss": m["loss"], "mean_return": m["mean_return"],
                           "grad_norm": m["grad_norm"], "mean_ratio": m["mean_ratio"],
+                          "n_success_group": m.get("n_success_group"),
+                          "group_composition": m.get("group_composition"),
+                          "advantage_mode": m.get("advantage_mode"),
+                          "gated": m.get("gated"),
+                          "post_step_mean_ratio": m.get("post_step_mean_ratio"),
+                          "post_step_mean_kl": m.get("post_step_mean_kl"),
+                          "post_step_clip_fraction": m.get("post_step_clip_fraction"),
+                          "post_step_ess": m.get("post_step_ess"),
+                          "adapter_delta_l2": m.get("adapter_delta_l2"),
                           "skipped": m.get("skipped")})
             fh.write(json.dumps(m) + "\n"); fh.flush()
             if m.get("skipped"):
                 print(f"[train] it={it} SKIPPED ({m['skipped']}) — no entry-state this seed", flush=True)
+            elif m.get("gated"):
+                print(f"[train] it={it} GATED ({m['gated']}) comp={m.get('group_composition')} "
+                      f"n_succ={m.get('n_success_group')}/{args.group} std={m.get('reward_std', 0.0):.4f} "
+                      f"— no optimizer step", flush=True)
             else:
-                print(f"[train] it={it} loss={m['loss']:.4f} mean_return={m['mean_return']:.3f} "
-                      f"grad_norm={m['grad_norm']:.3f} ratio={m['mean_ratio']:.3f} "
+                def _f(x, d=3):
+                    return f"{x:.{d}f}" if isinstance(x, (int, float)) else str(x)
+                print(f"[train] it={it} comp={m.get('group_composition')}({m.get('advantage_mode')}) "
+                      f"n_succ={m.get('n_success_group')}/{args.group} "
+                      f"loss={m['loss']:.4f} return={m['mean_return']:.3f} "
+                      f"grad_norm={m['grad_norm']:.1f} post_ratio={_f(m.get('post_step_mean_ratio'))} "
+                      f"post_kl={_f(m.get('post_step_mean_kl'),5)} post_clip={_f(m.get('post_step_clip_fraction'))} "
+                      f"adapter_dL2={_f(m.get('adapter_delta_l2'),5)} "
                       f"n_succ_hold={m.get('n_success_hold')} mem={m.get('peak_mem_gb')}", flush=True)
     log["phases"]["train_curve"] = curve
 
