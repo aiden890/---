@@ -19,8 +19,21 @@ import json, sys, statistics
 from pathlib import Path
 
 base = Path(sys.argv[1] if len(sys.argv) > 1 else ".")
-ARMS = [("adaptive_sgd2e3", "SGD 2e-3", "v4"),
-        ("adaptive_adamw1e5", "AdamW 1e-5", "amp_csi")]
+# Arms default to the exp1 pair, but can be overridden from argv[2:] as
+# "run:label:server" triples so the SAME aggregator serves later LR-ladder sweeps
+# without a per-experiment fork (operator anti-duplication rule).
+_DEFAULT_ARMS = [("adaptive_sgd2e3", "SGD 2e-3", "v4"),
+                 ("adaptive_adamw1e5", "AdamW 1e-5", "amp_csi")]
+if len(sys.argv) > 2:
+    ARMS = []
+    for spec in sys.argv[2:]:
+        parts = spec.split(":")
+        run = parts[0]
+        label = parts[1] if len(parts) > 1 else run
+        server = parts[2] if len(parts) > 2 else "?"
+        ARMS.append((run, label, server))
+else:
+    ARMS = _DEFAULT_ARMS
 # pre-filter baseline reference (operator-stopped run): 25 iters, 17 GATED.
 BASELINE_GATED = "17/25 (68%)"
 
