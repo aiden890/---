@@ -41,6 +41,13 @@ _THIS = Path(__file__).resolve().parent
 sys.path.insert(0, str(_THIS))
 from flow_policy import build_velocity_field  # noqa: E402
 from flow_sde import flow_sde_sample, transition_logprob, make_executed_mask  # noqa: E402
+# Faithful pi-RL marginal-preserving Flow-SDE (RLinf@bde6c918). Selected via --sampler pirl.
+# The default remains the explicitly-named fixed_noise baseline (flow_sde) for backward
+# compatibility / byte-identical reproduction of prior runs.
+from pirl_flow_sde import (  # noqa: E402
+    pirl_flow_sde_sample, pirl_transition_logprob, openpi_timesteps, openpi_sigmas,
+    pirl_step_mean_std,
+)
 from lora import (  # noqa: E402
     SKILLS, inject_per_skill_lora, set_active_skill, lora_parameters, select_trainable,
 )
@@ -178,24 +185,37 @@ class GRPOTrainerServer:
             derived_seed = (int(base_seed) * 1_000_003 + chunk_index * 9_176 + 1) % (2**31 - 1)
             gen = torch.Generator(device="cuda").manual_seed(derived_seed)
 
+        sampler = getattr(self.a, "sampler", "fixed_noise")
         if eta == 0.0:
-            # AUDIT FIX #1: route deterministic eval through the seeded flow-SDE so the
+            # AUDIT FIX #1: route deterministic eval through the seeded sampler so the
             # initial latent x0 is reproducible (the checkpoint's own forward draws x0 from
             # the global unseeded RNG -> two identical env seeds got different actions). At
-            # eta=0 the flow-SDE equals the checkpoint's Euler ODE bit-for-bit (sde_probe),
-            # so this changes reproducibility, not behaviour.
+            # eta=0 both samplers equal the checkpoint's Euler ODE bit-for-bit, so this
+            # changes reproducibility, not behaviour.
             with torch.no_grad():
                 vfield, shape, dev, dt = build_velocity_field(self.model, state, action_mask, **vlm)
-                res = flow_sde_sample(vfield, shape, num_steps=self.a.num_steps, eta=0.0, device=dev,
-                                      dtype=action_mask.dtype, generator=gen)
+                if sampler == "pirl":
+                    res = pirl_flow_sde_sample(vfield, shape, num_steps=self.a.num_steps,
+                                               noise_level=0.0, device=dev,
+                                               dtype=action_mask.dtype, generator=gen)
+                else:
+                    res = flow_sde_sample(vfield, shape, num_steps=self.a.num_steps, eta=0.0, device=dev,
+                                          dtype=action_mask.dtype, generator=gen)
             return {"actions": res.actions.cpu(), "logprob": None,
                     "derived_seed": derived_seed, "chunk_index": chunk_index}
         with torch.no_grad():
             vfield, shape, dev, dt = build_velocity_field(self.model, state, action_mask, **vlm)
             exec_mask = make_executed_mask(shape[1], shape[2], self.a.replan_steps,
                                            self.a.real_action_dim, device=dev)
-            res = flow_sde_sample(vfield, shape, num_steps=self.a.num_steps, eta=eta, device=dev,
-                                  dtype=action_mask.dtype, generator=gen, executed_mask=exec_mask)
+            if sampler == "pirl":
+                # --eta maps to the pi-RL exploration noise_level (single knob).
+                res = pirl_flow_sde_sample(vfield, shape, num_steps=self.a.num_steps,
+                                           noise_level=eta, device=dev,
+                                           dtype=action_mask.dtype, generator=gen,
+                                           executed_mask=exec_mask)
+            else:
+                res = flow_sde_sample(vfield, shape, num_steps=self.a.num_steps, eta=eta, device=dev,
+                                      dtype=action_mask.dtype, generator=gen, executed_mask=exec_mask)
         old_logp = float(res.executed_logprob().float().cpu()[0])
         chunk = {
             "inputs_cpu": {k: (v.cpu() if isinstance(v, torch.Tensor) else v) for k, v in inputs.items()},
@@ -206,6 +226,10 @@ class GRPOTrainerServer:
             "derived_seed": derived_seed,
             "chunk_index": chunk_index,
         }
+        # pi-RL uses time-dependent per-step stds; store them so the recompute path uses
+        # the IDENTICAL schedule (guarantees ratio==1 on-policy). fixed_noise has constant std.
+        if sampler == "pirl":
+            chunk["pirl_stds"] = list(res.stds)
         self.store.setdefault(req["traj_id"], []).append(chunk)
         return {"actions": res.actions.cpu(), "logprob": old_logp,
                 "derived_seed": derived_seed, "chunk_index": chunk_index}
@@ -243,17 +267,38 @@ class GRPOTrainerServer:
                     exec_mask = chunk["exec_mask_cpu"].to(self.model.device)
                     old_logp = torch.tensor(chunk["old_logp"], device=self.model.device)
                     vfield, shape, dev, dt = build_velocity_field(self.model, state, action_mask, **vlm)
-                    dtc = 1.0 / self.a.num_steps
-                    means = []
-                    for k in range(self.a.num_steps):
-                        t_k = torch.full((shape[0], 1, 1), k / self.a.num_steps, device=dev, dtype=action_mask.dtype)
-                        if self.a.grad_checkpoint:
-                            v = torch.utils.checkpoint.checkpoint(vfield, xs[k], t_k, use_reentrant=False)
-                        else:
-                            v = vfield(xs[k], t_k)
-                        means.append(xs[k] + v * dtc)
-                    new_logp = transition_logprob(xs, means, eta=self.a.eta,
-                                                  num_steps=self.a.num_steps, executed_mask=exec_mask)[0]
+                    sampler = getattr(self.a, "sampler", "fixed_noise")
+                    if sampler == "pirl":
+                        # Faithful pi-RL recompute: rebuild per-step means with the SAME
+                        # corrected-drift equations and REUSE the stored per-step stds so
+                        # epoch-0 ratio==1 exactly. MiBoT velocity at t_m = 1 - t_o.
+                        ts = openpi_timesteps(self.a.num_steps)
+                        sig = openpi_sigmas(self.a.num_steps, self.a.eta)
+                        means = []
+                        for k in range(self.a.num_steps):
+                            t_o = float(ts[k]); t_next = float(ts[k + 1])
+                            t_m = torch.full((shape[0], 1, 1), 1.0 - t_o, device=dev, dtype=action_mask.dtype)
+                            if self.a.grad_checkpoint:
+                                v = torch.utils.checkpoint.checkpoint(vfield, xs[k], t_m, use_reentrant=False)
+                            else:
+                                v = vfield(xs[k], t_m)
+                            m, _ = pirl_step_mean_std(xs[k], v, t_o, t_next, float(sig[k]))
+                            means.append(m)
+                        pirl_stds = chunk.get("pirl_stds")
+                        new_logp = pirl_transition_logprob(xs, means, pirl_stds,
+                                                           executed_mask=exec_mask)[0]
+                    else:
+                        dtc = 1.0 / self.a.num_steps
+                        means = []
+                        for k in range(self.a.num_steps):
+                            t_k = torch.full((shape[0], 1, 1), k / self.a.num_steps, device=dev, dtype=action_mask.dtype)
+                            if self.a.grad_checkpoint:
+                                v = torch.utils.checkpoint.checkpoint(vfield, xs[k], t_k, use_reentrant=False)
+                            else:
+                                v = vfield(xs[k], t_k)
+                            means.append(xs[k] + v * dtc)
+                        new_logp = transition_logprob(xs, means, eta=self.a.eta,
+                                                      num_steps=self.a.num_steps, executed_mask=exec_mask)[0]
                     logratio = new_logp - old_logp
                     if not torch.isfinite(logratio):
                         n_nonfinite += 1
@@ -562,7 +607,14 @@ def main():
                          "competence. 0 = pure BC (prior behaviour).")
     ap.add_argument("--lora-targets", default="qkv_proj")
     ap.add_argument("--num-steps", type=int, default=5)
-    ap.add_argument("--eta", type=float, default=0.6)
+    ap.add_argument("--sampler", default="fixed_noise", choices=["fixed_noise", "pirl"],
+                    help="RL rollout sampler. 'fixed_noise' = the explicitly-named baseline "
+                         "(constant sigma=eta*sqrt(dt), uncorrected drift; NOT marginal-preserving). "
+                         "'pirl' = faithful pi-RL marginal-preserving Flow-SDE (RLinf@bde6c918). "
+                         "Do NOT label the fixed_noise sampler pi-RL/Flow-SDE.")
+    ap.add_argument("--eta", type=float, default=0.6,
+                    help="Exploration noise. For fixed_noise: constant sigma=eta*sqrt(dt). "
+                         "For pirl: the noise_level in sigma=noise_level*sqrt(t/(1-t)).")
     ap.add_argument("--replan-steps", type=int, default=16)
     ap.add_argument("--real-action-dim", type=int, default=12)
     ap.add_argument("--clip", type=float, default=0.1)         # tighter than 0.2 (K=5 product)
