@@ -204,8 +204,10 @@ def main():
     cap = cv2.VideoCapture(os.path.join(seed_dir, "episode.mp4"))
     w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-    vw = cv2.VideoWriter(args.out, fourcc, args.fps, (w, h))
+    # h264 via imageio-ffmpeg so the mp4 plays in browsers (cv2 lacks an h264 encoder
+    # in the client image -> FMP4/mp4v which browsers refuse). Buffer RGB frames.
+    import imageio.v2 as imageio
+    out_frames = []
 
     fi = 0
     written = 0
@@ -221,12 +223,14 @@ def main():
             reps = args.hold_boundary if a.get("is_boundary") else 1
         else:
             reps = 1
+        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         for _ in range(reps):
-            vw.write(frame)
+            out_frames.append(rgb)
             written += 1
         fi += 1
     cap.release()
-    vw.release()
+    imageio.mimsave(args.out, out_frames, fps=args.fps, codec="libx264",
+                    macro_block_size=None, pixelformat="yuv420p")
     print(json.dumps({"seed": args.seed, "video_frames_in": fi, "frames_written": written,
                       "segments": [(s["skill"], s["verdict"],
                                     round(s["max_prob"], 3) if s["max_prob"] is not None else None)
