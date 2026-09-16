@@ -77,8 +77,9 @@ case "${1:-help}" in
       -v "$assets_volume:/opt/robocasa/robocasa/models/assets" -v "$parent:/work:ro" \
       -v "$skilltools:/skill_eval_tools:ro" -v "$rlenv:/rl_env:ro" -v "$train:/train" -v "$out:/out" \
       -v "$parent/checkpoint:/checkpoint:ro" --network "container:$trainer" \
-      --entrypoint python "$client_image" /train/scripts/audit_branch_verify.py \
-      --trainer-port $port --out /out/audit_branch_verify.json "${@:2}" 2>&1 | tee "$out/audit_branch.log"
+      --entrypoint bash "$client_image" -lc \
+      "PYTHONPATH=/train/src python /train/scripts/audit_branch_verify.py \
+       --trainer-port $port --out /out/audit_branch_verify.json ${*:2}" 2>&1 | tee "$out/audit_branch.log"
     ;;
   train)
     docker ps --format '{{.Names}}' | grep -q "^${trainer}$" || { echo "start trainer first: bash $0 trainer-start" >&2; exit 5; }
@@ -90,6 +91,22 @@ case "${1:-help}" in
       -v "$parent/checkpoint:/checkpoint:ro" --network "container:$trainer" \
       --entrypoint python "$client_image" /train/src/grpo_train_loop.py \
       --out /out --trainer-port $port "${@:3}" 2>&1 | tee "$out/train.log"
+    ;;
+  g5-sweep)
+    # G5(success): pi-RL noise-level success sweep (sim rollout). Client image networked to
+    # the trainer, which MUST be up with --sampler pirl. Reuses grpo_train_loop by import
+    # (single source of truth). Subcommand form:
+    #   bash run-train.sh g5-sweep <out-subdir> --skill grasp --noise-sweep 0.0,0.1,0.3,0.5,0.7,1.0 --n 12
+    docker ps --format '{{.Names}}' | grep -q "^${trainer}$" || { echo "start trainer first: bash $0 trainer-start --sampler pirl" >&2; exit 5; }
+    run="${2:-g5}"; out="$train/results/pirl/$run"; mkdir -p "$out"
+    docker run --rm --name "xiaomi-client-g5-$run" --gpus all --shm-size=2g \
+      -e MUJOCO_GL=egl -e PYOPENGL_PLATFORM=egl -e NVIDIA_DRIVER_CAPABILITIES=compute,utility,graphics \
+      -v "$assets_volume:/opt/robocasa/robocasa/models/assets" -v "$parent:/work:ro" \
+      -v "$skilltools:/skill_eval_tools:ro" -v "$rlenv:/rl_env:ro" -v "$train:/train" -v "$out:/out" \
+      -v "$parent/checkpoint:/checkpoint:ro" --network "container:$trainer" \
+      --entrypoint bash "$client_image" -lc \
+      "PYTHONPATH=/train/src python /train/scripts/pirl_g5_sweep.py \
+       --out /out --trainer-port $port ${*:3}" 2>&1 | tee "$out/g5_sweep.log"
     ;;
   sft)
     # Goal-3 SFT client (CFM per-skill LoRA). Uses the SERVER image (torch+hf+torchvision
@@ -112,6 +129,6 @@ case "${1:-help}" in
        --model /checkpoint --port $port --cache /train/hf_cache --out /out ${*:3}" 2>&1 | tee "$out/sft.log"
     ;;
   *)
-    echo "Usage: bash run-train.sh {probe|trainer-start [server args]|trainer-stop|audit-p0|pirl-gates [args]|audit-branch|train <run> [args]|sft <run> [sft args]}" >&2
+    echo "Usage: bash run-train.sh {probe|trainer-start [server args]|trainer-stop|audit-p0|pirl-gates [args]|audit-branch|train <run> [args]|g5-sweep <run> [args]|sft <run> [sft args]}" >&2
     exit 2;;
 esac
