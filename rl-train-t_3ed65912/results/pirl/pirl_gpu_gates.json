@@ -1,0 +1,117 @@
+{
+  "config": {
+    "checkpoint": "/checkpoint",
+    "robot_type": "robocasa365",
+    "num_steps": 5,
+    "noise_level": 0.5,
+    "noise_sweep": "0.1,0.3,0.5,0.7,1.0",
+    "group": 4,
+    "replan_steps": 16,
+    "real_action_dim": 12,
+    "eta0_tol": 0.01,
+    "ratio_tol": 0.05,
+    "out": "/out/pirl_gpu_gates.json"
+  },
+  "framework_commit": "bde6c918642abf9a4776cb1d5fabcc5087dfe195",
+  "sampler_file": "rl-env/src/pirl_flow_sde.py",
+  "equations": "RLinf openpi flow_sde: sigma=nl*sqrt(t/(1-t)); x1_weight=t_next - sigma^2*delta/(2t); std=sqrt(delta)*sigma; MiBoT remap t_o=1-t_m, v_o=-v_m",
+  "checkpoint_config_sha256": "ff3fdf7b128376b3c52626c4874c3748d3ce087afa81af5cb1b574683ad0bedf",
+  "precision": "bfloat16",
+  "denoise_steps": 5,
+  "G1_noise0_ode": {
+    "max_abs_diff": 0.0,
+    "tol": 0.01,
+    "pass": true,
+    "shape": [
+      1,
+      16,
+      60
+    ]
+  },
+  "G4_schedule": {
+    "timesteps": [
+      1.0,
+      0.800000011920929,
+      0.6000000238418579,
+      0.4000000059604645,
+      0.20000000298023224,
+      0.0
+    ],
+    "sigmas": [
+      1.1180340051651,
+      1.0,
+      0.6123724579811096,
+      0.40824827551841736,
+      0.25
+    ],
+    "stds": [
+      0.5,
+      0.447214,
+      0.273861,
+      0.182574,
+      0.111803
+    ]
+  },
+  "G2_rollout_recompute_logp": {
+    "max_abs_diff": 0.0,
+    "pass": true,
+    "rollout": [
+      -93.315,
+      -75.159,
+      -65.537,
+      -61.894
+    ],
+    "recompute": [
+      -93.315,
+      -75.159,
+      -65.537,
+      -61.894
+    ]
+  },
+  "G3_ratio_onpolicy": {
+    "ratios": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "tol": 0.05,
+    "pass": true
+  },
+  "G6_finite_grad": {
+    "logp_ratio_finite": true,
+    "kl_finite": true,
+    "loss": 0.0,
+    "total_grad_norm": 780.68103,
+    "grad_all_finite": true,
+    "grad_nonzero": true,
+    "reaches_dit": true,
+    "pass": true
+  },
+  "G5_action_stats": {
+    "note": "success sweep needs sim (separate rollout gate)",
+    "per_noise": {
+      "0.1": {
+        "mean_abs_dev_from_ode": 0.00875,
+        "sample_spread_std": 0.03007
+      },
+      "0.3": {
+        "mean_abs_dev_from_ode": 0.02946,
+        "sample_spread_std": 0.08885
+      },
+      "0.5": {
+        "mean_abs_dev_from_ode": 0.05434,
+        "sample_spread_std": 0.1489
+      },
+      "0.7": {
+        "mean_abs_dev_from_ode": 0.0852,
+        "sample_spread_std": 0.21719
+      },
+      "1.0": {
+        "mean_abs_dev_from_ode": 0.1327,
+        "sample_spread_std": 0.34011
+      }
+    }
+  },
+  "overall_inprocess_pass": true
+}
