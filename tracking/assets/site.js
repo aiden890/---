@@ -106,8 +106,10 @@ fetch('rlenv.json').then(r=>r.json()).then(RL=>{
     return clip.timeline[ans];
   }
   function paint(row, clip, idx){
-    document.getElementById('rl-cum').textContent=row.t.toFixed(2);
-    document.getElementById('rl-cum').style.color = row.t>0?'var(--ok)':(row.t<0?'var(--red)':'var(--tx)');
+    // 성공 리워드(terminal)만 누적 표시 — hold shaping은 학습 전용이라 delta에만 표시
+    const termCum = clip.timeline.slice(0,idx+1).reduce((s,r)=>s+r.d.term,0);
+    document.getElementById('rl-cum').textContent = termCum.toFixed(2);
+    document.getElementById('rl-cum').style.color = termCum>0?'var(--ok)':(termCum<0?'var(--red)':'var(--tx)');
     let dl=[];
     if(row.d.term)dl.push(`<span class="fire">스킬 성공 +${row.d.term}</span>`);
     if(row.d.shape)dl.push(`접근 shaping ${row.d.shape>0?'+':''}${row.d.shape}`);

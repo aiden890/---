@@ -499,8 +499,9 @@ def train_iteration(client, args, reward_cfg, seed, it):
     a gradient signal. Both are training-only; eval uses the official reward unchanged.
     """
     skill = {"grasp": Skill.GRASP, "move_holding": Skill.MOVE_HOLDING, "place": Skill.PLACE}[args.train_skill]
-    # approach shaping only makes sense for GRASP (lid proximity); other skills use milestone variety
-    train_approach_coef = 0.1 if skill is Skill.GRASP else 0.0
+    # approach shaping disabled (operator 2026-09-16): reward only at final success,
+    # no dense per-step distance shaping before success.
+    train_approach_coef = 0.0
     train_timeout_penalty = 0.5  # flat cost for timing out a skill
     # Boundary-compliance hold (operator decision B): reward stopping after success. Config
     # from args (0 hold_steps disables it -> identical to the pre-B behaviour).

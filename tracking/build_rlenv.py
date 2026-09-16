@@ -149,7 +149,7 @@ def replay(skill_key, steps, frames, *, hold_steps=0):
 
     # Training-only shaping constants -- identical to grpo_train_loop.train_iteration:
     #   approach_coef 0.1 for GRASP only; flat timeout cost 0.5 on TIMEOUT.
-    approach_coef = 0.1 if skill is Skill.GRASP else 0.0
+    approach_coef = 0.0  # approach shaping disabled (operator 2026-09-16): success + hold only
     timeout_penalty = 0.5
 
     cfg = RewardConfig(mode="simulator", horizon=horizon, use_milestones=False)
