@@ -360,6 +360,17 @@ PLACE_OBJECT:
     <p class="dim" id="obsv-inv" style="margin:4px 0"></p>
     <p class="dim" id="obsv-caveat" style="margin:4px 0"></p>
     <p class="dim" id="obsv-tests" style="margin:4px 0;font-size:12px"></p>
+    <h3 style="margin:14px 0 8px;font-size:14px">대표 seed 오버레이 (경계판정 vs 성공게이트 vs sim GT)</h3>
+    <div style="display:flex;gap:16px;flex-wrap:wrap">
+      <div style="flex:1;min-width:300px">
+        <div class="dim" style="font-size:13px;margin-bottom:4px">PLACE seed0 — <b>이전 false positive</b>: 경계판정은 SUCCESS라 불렀지만 sim은 실패. 새 성공게이트가 REJECT.</div>
+        <video src="media/inference/obsv_calib_place_seed0_falsepos.mp4" controls loop muted style="width:100%;border-radius:8px"></video>
+      </div>
+      <div style="flex:1;min-width:300px">
+        <div class="dim" style="font-size:13px;margin-bottom:4px">PLACE seed9 — <b>진짜 성공</b>: 성공게이트 PASS, sim GT success@112와 일치.</div>
+        <video src="media/inference/obsv_calib_place_seed9_truesucc.mp4" controls loop muted style="width:100%;border-radius:8px"></video>
+      </div>
+    </div>
   </div>
 </section>
 
