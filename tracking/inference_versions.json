@@ -4,24 +4,54 @@
     {
       "id": "balanced-vlm-verify-v3-seed40",
       "label": "balanced v3 · seed40 (PLACE timeout×2, sim=False, strict=False)",
+      "group": "e2e-transition",
       "stage": "balanced-calibration",
       "date": "2026-09-17",
+      "facts": {
+        "current_skill": "GRASP → MOVE → PLACE",
+        "boundary_verdict": "GRASP/MOVE ADVANCE · PLACE TIMEOUT×2",
+        "boundary_quality": "P/R · G .25/.067 · M .40/.133 · P .333/.067",
+        "transition": "GRASP→MOVE→PLACE · PLACE retry",
+        "strict_gate": "FAIL",
+        "sim_gt": "FALSE"
+      },
+      "quality_warning": "Boundary recall failure: PLACE ADVANCE를 찾지 못함. Architecture wiring PASS와 verifier 품질을 혼동하지 말 것.",
       "desc": "균형 코퍼스에서 선택한 boundary 설정(GRASP eye .8, MOVE left .95, PLACE eye .98)으로 end-to-end 실행. PLACE가 두 번 timeout, 공식 success=false, obs_task_success=false. 높은 threshold가 early FP를 줄이는 대신 전이를 놓치는 사례.",
       "video": "media/inference/balanced_e2e_v3_seed40.mp4"
     },
     {
       "id": "balanced-vlm-verify-v3-seed41",
       "label": "balanced v3 · seed41 (strict PASS but sim=False → 불일치)",
+      "group": "e2e-transition",
       "stage": "balanced-calibration",
       "date": "2026-09-17",
+      "facts": {
+        "current_skill": "GRASP → MOVE → PLACE",
+        "boundary_verdict": "PLACE retry 뒤 ADVANCE",
+        "boundary_quality": "P/R · G .25/.067 · M .40/.133 · P .333/.067",
+        "transition": "GRASP→MOVE→PLACE · PLACE retry",
+        "strict_gate": "PASS",
+        "sim_gt": "FALSE"
+      },
+      "quality_warning": "False-positive: strict PASS지만 official sim FALSE. ADVANCE는 정확도 성공을 뜻하지 않음.",
       "desc": "PLACE 1차 timeout 뒤 재시도 boundary SUCCESS, endpoint strict gate도 PASS했지만 공식 sim success=false. obs_task_success=true와 GT가 불일치한 잔여 false-positive이며 성공으로 포장하지 않음.",
       "video": "media/inference/balanced_e2e_v3_seed41.mp4"
     },
     {
       "id": "balanced-vlm-verify-v3-seed42",
       "label": "balanced v3 · seed42 (PLACE timeout×2, sim=False, strict=False)",
+      "group": "e2e-transition",
       "stage": "balanced-calibration",
       "date": "2026-09-17",
+      "facts": {
+        "current_skill": "GRASP → MOVE → PLACE",
+        "boundary_verdict": "GRASP/MOVE ADVANCE · PLACE TIMEOUT×2",
+        "boundary_quality": "P/R · G .25/.067 · M .40/.133 · P .333/.067",
+        "transition": "GRASP→MOVE→PLACE · PLACE retry",
+        "strict_gate": "FAIL",
+        "sim_gt": "FALSE"
+      },
+      "quality_warning": "Boundary recall failure: PLACE timeout×2. Official task success는 0/3으로 미해결.",
       "desc": "GRASP/MOVE boundary는 ADVANCE했지만 PLACE는 두 번 timeout. 공식 success=false와 strict=false가 일치. 3-seed optimized end-to-end 전체 결과는 sim success 0/3, obs/sim agreement 2/3.",
       "video": "media/inference/balanced_e2e_v3_seed42.mp4"
     },
