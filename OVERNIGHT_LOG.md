@@ -40,3 +40,15 @@
 - post-step 안정: 3e-5 kl 0.26~0.30 clip 0.89~0.92 ratio 0.91~1.02, 5e-5 kl 0.24 clip 0.87 ratio 1.04. grad_norm 높으나(1500~2200) dL2로 실제 업뎃 절제.
 - before-eval(고정 5000~5019): 양쪽 grasp 11/20=0.55 동일(같은 base ckpt), official은 노이즈로 3e-5=1/20·5e-5=3/20. after/heldout은 아직 미실행(학습 진행중) → delta 판정 불가.
 - 조치: 없음(정상, 3e-5=93%·5e-5=83% 진행). 개입=페어드 비교 파괴. 남은 ~2·5 iter→EVAL(after)+heldout→finisher가 ADAPTIVE_FINAL_exp2 자동집계. 다음 cron서 exp2 DONE + before/after delta로 LR별 개선 정직 판정(현재까진 개선 미확인, 완료 대기).
+
+## 09:18 KST — exp2 DONE(개선 없음, 가설 반증) → exp3 clip-ladder 착수
+- **exp2 AdamW LR-ladder 완료, 2차목표 미달(정직)**: 고정 eval grasp가 양쪽 다 flat.
+  - 3e-5(v4): before 0.55 → after 0.55 → heldout 0.60 grasp / official 0.05→0.10→0.10. GATED 11/29=38%.
+  - 5e-5(amp): before 0.55 → after 0.55 → heldout 0.65 grasp / official 0.15→0.10→0.20. GATED 11/29=38%.
+  - **exp1 '병목=업뎃강도' 가설 반증**: adapter_dL2를 exp1(1e-5,0.0038) 대비 4~12x(3e-5·5e-5) 키웠는데도 grasp 개선 0. 업뎃강도는 병목 아님.
+- **무료 진단(로그 실측, 추측 아님)으로 진짜 병목 지목**:
+  - (a) **on-seed 학습 자체가 안 됨**: seed 1092를 10회 직접 학습(it8~29) n_succ=5,4,5,2,3,4,4,5,4,3 — 추세 없음. 1175(4,4,2,4,4)·1181(5,6,3,7)도 동일. → transfer 문제 아니라 learning-efficacy 문제.
+  - (b) **clip 포화가 원인**: post_step clip_fraction이 양쪽 arm 전 iter 0.82~0.97(평균 ~0.90). clip=0.1 + K=5 chunk ratio곱 → PPO 목적함수의 ~90%가 clip돼 평평 → advantage gradient 억제. 이게 LR 무관(exp2 dL2 12x 범위서 개선 0)의 직접 설명.
+- **조치(단일변수, 데이터근거)**: PPO clip을 완화. adaptive_sweep.sh에 clip을 4번째 위치인자로 파라미터화(default 0.1, client+trainer 동시 적용), deploy+commit(bd951e4).
+  - exp3 clip-ladder 페어드 착수: optimizer/LR 고정(AdamW 3e-5), **clip만** 변수. v4 adaptive_adamw3e5_clip02(0.2, pid2008380) + amp_csi adaptive_adamw3e5_clip03(0.3, pid2259352), 공유 seed 12345. 양쪽 trainer Up, train 시작. finisher(exp3, pid2012299) detached 대기 → ADAPTIVE_FINAL_exp3_clip_ladder.md 자동집계.
+- 서버상태: v4 GPU 24MiB→학습중, amp 38MiB→학습중. OOM/RPC drop/에러 0. xiaomi-server 없음(경합 없음).
