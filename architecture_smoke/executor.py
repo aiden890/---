@@ -15,6 +15,8 @@ verifier is consulted after every executed step and owns termination/handoff.
 """
 from __future__ import annotations
 
+import itertools
+
 from schemas import (AdapterMode, Decision, SkillCall, SkillResult, SkillStatus,
                      VerificationResult)
 from verifier import PredicateVerifier
@@ -31,7 +33,8 @@ _SKILL_QUESTION_KEY = {
 class ExecutionManager:
     def __init__(self, registry, policy, environment, trace, adapter_mode=AdapterMode.DISABLED,
                  vlm_backend=None, vlm_min_interval=16, hysteresis_k=2, tau=0.6,
-                 event_gated=True, verifier_operating_points=None):
+                 event_gated=True, verifier_operating_points=None,
+                 synchronous_verifier=False, episode_id="episode", verifier_timeout_s=5.0):
         self.registry = registry
         self.policy = policy
         self.env = environment
@@ -46,11 +49,207 @@ class ExecutionManager:
         self.tau = tau
         self.event_gated = event_gated
         self.verifier_operating_points = verifier_operating_points or {}
+        # The target/default path is latest-only asynchronous control.  The old
+        # blocking implementation remains behind one explicit compatibility flag.
+        self.synchronous_verifier = bool(synchronous_verifier)
+        self.episode_id = str(episode_id)
+        self.verifier_timeout_s = float(verifier_timeout_s)
+        self._request_ids = itertools.count(1)
 
     def execute(self, call: SkillCall) -> SkillResult:
         if self.vlm_backend is not None:
+            if not self.synchronous_verifier:
+                return self._execute_vlm_async(call)
             return self._execute_vlm(call)
         return self._execute_predicate(call)
+
+    def _execute_vlm_async(self, call: SkillCall) -> SkillResult:
+        """Execute actions while verifier/endpoint VLM work runs in the background."""
+        from async_control import (AsyncVerifierClient, ControlRequest, ControlResponse,
+                                   RequestKind, ResponseStatus)
+        from obs_verifier import ObsVLMVerifier, SKILL_QUESTIONS
+        from success_gate import make_success_gate
+
+        contract = self.registry.validate_call(call)
+        instruction = contract.render_instruction(call.args)
+        qkey = _SKILL_QUESTION_KEY.get(call.name, call.name)
+        op = self.verifier_operating_points.get(call.name, {})
+        verifier = ObsVLMVerifier(
+            qkey, self.vlm_backend, max_steps=contract.max_steps,
+            question_text=SKILL_QUESTIONS[qkey],
+            vlm_min_interval=op.get("vlm_min_interval", self.vlm_min_interval),
+            hysteresis_k=op.get("hysteresis_k", self.hysteresis_k),
+            tau=op.get("tau", self.tau), event_gated=self.event_gated,
+            view=op.get("view", "full"), sequence_model=op.get("sequence_model"))
+        success_gate = make_success_gate(call.name, self.vlm_backend)
+
+        def transport(request, timeout_s):
+            # RemoteVLMScorerBackend/socket implementations own the actual socket
+            # deadline.  The worker serialises this entire service: max one forward.
+            if hasattr(self.vlm_backend, "set_timeout"):
+                self.vlm_backend.set_timeout(timeout_s)
+            obs = request.payload["observation"]
+            if request.request_kind is RequestKind.BOUNDARY:
+                result = verifier.update(obs)
+                # Accumulate obs-only evidence here; only ENDPOINT renders/uses the
+                # strict gate verdict, and only after a boundary candidate-stop.
+                if success_gate is not None:
+                    try:
+                        success_gate.observe(obs.images if hasattr(obs, "images") else obs)
+                    except Exception:  # noqa: BLE001 -- gate failure cannot stop control
+                        pass
+                recommendation = result.decision.value
+                payload = {
+                    "reason": result.reason, "elapsed": result.elapsed, "hold": result.hold,
+                    "candidate_stop": result.decision is Decision.ADVANCE,
+                    "diagnostics": dict(result.predicates),
+                }
+                # A remote boundary candidate never advances the skill directly.
+                if result.decision is Decision.ADVANCE:
+                    recommendation = Decision.CONTINUE.value
+                return ControlResponse.from_request(
+                    request, recommendation=recommendation, payload=payload)
+
+            if request.request_kind is RequestKind.ENDPOINT:
+                verdict = (success_gate.verdict() if success_gate is not None
+                           else {"success": True, "reason": "no_strict_gate"})
+                recommendation = (Decision.ADVANCE.value if verdict.get("success")
+                                  else Decision.CONTINUE.value)
+                return ControlResponse.from_request(
+                    request, recommendation=recommendation,
+                    payload={"success_gate": verdict, "reason": verdict.get("reason")})
+            return ControlResponse.from_request(
+                request, recommendation=Decision.CONTINUE.value,
+                payload={"reason": "planner response not consumed by skill executor"})
+
+        def telemetry(event, **payload):
+            if hasattr(self.trace, "control"):
+                self.trace.control(event, **payload)
+
+        client = AsyncVerifierClient(
+            transport, timeout_s=self.verifier_timeout_s, telemetry=telemetry)
+        client.set_context(self.episode_id, call.name)
+        self.trace.route(call.name, self.adapter_mode.value, None, contract.max_steps, True)
+
+        action_plan = []
+        steps = 0
+        endpoint_outstanding = False
+        last_obs = None
+        last_reason = "budget exhausted"
+        last_gate = None
+
+        def submit(kind, obs, step):
+            rid = f"{self.episode_id}:{call.name}:{next(self._request_ids)}"
+            client.submit(ControlRequest(
+                episode_id=self.episode_id, skill_id=call.name,
+                observation_step=step, request_id=rid, request_kind=kind,
+                payload={"observation": obs, "instruction": instruction}))
+
+        def consume():
+            nonlocal endpoint_outstanding, last_reason, last_gate
+            for response in client.poll():
+                if response.status is not ResponseStatus.OK:
+                    last_reason = response.error or response.status.value
+                    continue
+                # Manager is the sole transition authority: validate and map the
+                # advisory string here rather than allowing transport/server state.
+                try:
+                    decision = Decision(response.recommendation)
+                except (TypeError, ValueError):
+                    last_reason = "invalid remote recommendation"
+                    continue
+                last_reason = str(response.payload.get("reason", decision.value))
+                if response.request_kind is RequestKind.BOUNDARY:
+                    diag = response.payload.get("diagnostics", {})
+                    self.trace.verify(call.name, decision.value, last_reason,
+                                      response.payload.get("elapsed", 0),
+                                      response.payload.get("hold", 0))
+                    if response.payload.get("candidate_stop"):
+                        endpoint_outstanding = True
+                        submit(RequestKind.ENDPOINT, last_obs, steps)
+                    elif decision in (Decision.RETRY, Decision.REPLAN):
+                        return decision
+                    if diag.get("vlm_queried_this_step"):
+                        self.trace.vlm(call.name, response.observation_step, None,
+                                       diag.get("vlm_prob"), diag.get("consecutive_yes"), True,
+                                       decision.value, diag.get("proprio_candidate_stop"),
+                                       diag.get("proprio_gripper_closed"))
+                elif response.request_kind is RequestKind.ENDPOINT:
+                    endpoint_outstanding = False
+                    last_gate = response.payload.get("success_gate")
+                    if decision is Decision.ADVANCE:
+                        return Decision.ADVANCE
+            return Decision.CONTINUE
+
+        try:
+            while steps < contract.max_steps:
+                transition = consume()
+                if transition is Decision.ADVANCE:
+                    result = self._result(SkillStatus.SUCCESS, call, instruction, steps, steps,
+                                          "async_endpoint_success", last_reason, {})
+                    result.vlm_stats = verifier.stats()
+                    result.success_gate = last_gate
+                    return result
+                if transition is Decision.REPLAN:
+                    result = self._result(SkillStatus.TIMEOUT, call, instruction, steps, None,
+                                          "async_vlm_replan", last_reason, {})
+                    result.vlm_stats = verifier.stats()
+                    result.success_gate = last_gate
+                    return result
+                if transition is Decision.RETRY:
+                    result = self._result(SkillStatus.FAILED, call, instruction, steps, None,
+                                          "async_vlm_retry", last_reason, {})
+                    result.vlm_stats = verifier.stats()
+                    return result
+                if not action_plan:
+                    pin = self.env.build_policy_input(instruction, self.adapter_mode, None)
+                    out = self.policy.infer(pin)
+                    assert out.adapter_checkpoint is None, "adapter checkpoint leaked into policy output"
+                    assert out.adapter_mode in (AdapterMode.DISABLED, AdapterMode.BASE_ONLY)
+                    action_plan = list(out.action_chunk)
+                    self.trace.window(call.name, steps, out.chunk_len, len(action_plan),
+                                      out.adapter_mode.value, "EXECUTE", 0,
+                                      {"judge": "async_obs_vlm"})
+                action = action_plan.pop(0)
+                _, done, trunc, _ = self.env.step(action)
+                steps += 1
+                last_obs = self.env.obs_for_verifier()
+                frame_index = self.env.maybe_record_frame(force=done or trunc)
+                if frame_index is not None:
+                    self.trace.frame(call.name, steps, frame_index)
+                if not endpoint_outstanding:
+                    submit(RequestKind.BOUNDARY, last_obs, steps)
+                transition = consume()
+                if transition is Decision.ADVANCE:
+                    result = self._result(SkillStatus.SUCCESS, call, instruction, steps, steps,
+                                          "async_endpoint_success", last_reason, {})
+                    result.vlm_stats = verifier.stats()
+                    result.success_gate = last_gate
+                    return result
+                if transition is Decision.REPLAN:
+                    result = self._result(SkillStatus.TIMEOUT, call, instruction, steps, None,
+                                          "async_vlm_replan", last_reason, {})
+                    result.vlm_stats = verifier.stats()
+                    result.success_gate = last_gate
+                    return result
+                if transition is Decision.RETRY:
+                    result = self._result(SkillStatus.FAILED, call, instruction, steps, None,
+                                          "async_vlm_retry", last_reason, {})
+                    result.vlm_stats = verifier.stats()
+                    return result
+                if done or trunc:
+                    result = self._result(SkillStatus.FAILED, call, instruction, steps, None,
+                                          "env_terminated", f"env done={done} trunc={trunc}", {})
+                    result.vlm_stats = verifier.stats()
+                    return result
+        finally:
+            client.close(drain=False, timeout=self.verifier_timeout_s + 1.0)
+
+        result = self._result(SkillStatus.TIMEOUT, call, instruction, steps, None,
+                              "async_budget_exhausted", last_reason, {})
+        result.vlm_stats = verifier.stats()
+        result.success_gate = last_gate
+        return result
 
     # ------------------------------------------------------------------ #
     #  obs-only VLM verifier path (Qwen3-VL VQA, proprio-gated)            #

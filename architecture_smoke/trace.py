@@ -7,6 +7,7 @@ the architecture handoffs (typed call -> render -> base VLA -> execute -> verify
 from __future__ import annotations
 
 import json
+import threading
 import time
 from pathlib import Path
 from typing import Any
@@ -17,13 +18,15 @@ class Trace:
         self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self._fh = self.path.open("w")
+        self._lock = threading.Lock()
         self._write("episode_start", **meta)
 
     def _write(self, kind: str, **payload):
         rec = {"t": round(time.time(), 3), "type": kind}
         rec.update(payload)
-        self._fh.write(json.dumps(rec, default=str) + "\n")
-        self._fh.flush()
+        with self._lock:
+            self._fh.write(json.dumps(rec, default=str) + "\n")
+            self._fh.flush()
 
     # ---- planner boundary ------------------------------------------------- #
     def plan(self, planner_calls, obs_ref, predicates, skill_call, instruction,
@@ -66,6 +69,24 @@ class Trace:
                     decision=decision, proprio_candidate=proprio_candidate,
                     proprio_gripper_closed=proprio_gripper_closed)
 
+    def control(self, event, **payload):
+        """Record async queue/RPC lifecycle without serialising observation data."""
+        safe = {}
+        for key, value in payload.items():
+            if key in ("request", "response") and hasattr(value, "identity"):
+                safe.update({
+                    "episode_id": value.episode_id,
+                    "skill_id": value.skill_id,
+                    "observation_step": value.observation_step,
+                    "request_id": value.request_id,
+                    "request_kind": value.request_kind.value,
+                })
+            elif key == "replaced" and not isinstance(value, bool):
+                safe[key] = bool(value)
+            else:
+                safe[key] = value
+        self._write("async_control", event=event, **safe)
+
     def skill_result(self, result: dict, next_skill):
         self._write("skill_result", next_skill=next_skill, **result)
 
@@ -73,7 +94,8 @@ class Trace:
         self._write("episode_end", **payload)
 
     def close(self):
-        self._fh.close()
+        with self._lock:
+            self._fh.close()
 
 
 _DIGEST_KEYS = (

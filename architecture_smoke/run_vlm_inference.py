@@ -67,6 +67,8 @@ def main():
                     help="disable proprio candidate-stop gating (VLM cadence only)")
     ap.add_argument("--verifier-config", default=None,
                     help="JSON mapping skill names to per-skill view/tau/hysteresis_k/interval")
+    ap.add_argument("--sync-verifier", action="store_true",
+                    help="compatibility only: block the control loop on verifier RPCs")
     args = ap.parse_args()
 
     if args.verifier_config:
@@ -104,6 +106,8 @@ def main():
         "planner": {"kind": planner.kind, "note": "scripted sequential obs-only stub, NOT a learned planner"},
         "verifier": {"kind": "obs_vlm", "backbone": "policy's own frozen Qwen3-VL VQA P(yes)",
                      "input": "3-cam images + 14D proprio ONLY (no sim predicate)",
+                     "control_plane": ("synchronous_compatibility" if args.sync_verifier
+                                       else "latest_only_async_default"),
                      "vlm_min_interval": args.vlm_min_interval, "hysteresis_k": args.hysteresis_k,
                      "tau": args.tau, "event_gated": not args.no_event_gate,
                      "per_skill_operating_points": operating_points},
@@ -143,6 +147,8 @@ def main():
                     vlm_backend=vlm_backend, vlm_min_interval=args.vlm_min_interval,
                     hysteresis_k=args.hysteresis_k, tau=args.tau,
                     event_gated=not args.no_event_gate,
+                    synchronous_verifier=args.sync_verifier,
+                    episode_id=f"seed{seed}",
                     verifier_operating_points=operating_points)
                 summary = run_episode(planner, manager, env, trace, registry,
                                       bindings.GOAL, args.episode_budget,

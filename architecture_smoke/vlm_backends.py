@@ -204,12 +204,25 @@ class RemoteVLMScorerBackend(VLMBackend):
         s.connect((self.host, self.port))
         self._sock = s
 
+    def set_timeout(self, timeout_s: float) -> None:
+        """Set the RPC deadline required by AsyncVerifierClient's contract."""
+        if self._sock is not None:
+            self._sock.settimeout(timeout_s)
+
     def _rpc(self, req: dict) -> dict:
-        payload = pickle.dumps(req, protocol=pickle.HIGHEST_PROTOCOL)
-        self._sock.sendall(struct.pack(">I", len(payload)) + payload)
-        ln = self._recv_all(4)
-        n = struct.unpack(">I", ln)[0]
-        return pickle.loads(self._recv_all(n))
+        try:
+            payload = pickle.dumps(req, protocol=pickle.HIGHEST_PROTOCOL)
+            self._sock.sendall(struct.pack(">I", len(payload)) + payload)
+            ln = self._recv_all(4)
+            n = struct.unpack(">I", ln)[0]
+            return pickle.loads(self._recv_all(n))
+        except TimeoutError:
+            # A timed-out framed stream cannot be safely reused: the late reply
+            # would be mistaken for the retry. Reconnect, then let the client
+            # retry once with the same idempotent request_id.
+            self.close()
+            self._connect()
+            raise
 
     def _recv_all(self, n: int) -> bytes:
         buf = b""

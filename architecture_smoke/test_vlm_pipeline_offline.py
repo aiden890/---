@@ -111,6 +111,7 @@ def main():
     manager = ExecutionManager(registry, policy, env, trace, AdapterMode.DISABLED,
                                vlm_backend=vlm, vlm_min_interval=4, hysteresis_k=2,
                                tau=0.6, event_gated=True,
+                               synchronous_verifier=True,
                                verifier_operating_points={
                                    "MOVE_OBJECT": {"view": "right", "tau": 0.8,
                                                    "hysteresis_k": 3,
