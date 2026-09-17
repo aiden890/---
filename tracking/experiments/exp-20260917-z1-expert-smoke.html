@@ -35,17 +35,20 @@ fetch('../experiments.json').then(r=>{
   if(!e) throw new Error(`${EXP_ID} entry not found`);
   const c=e.configuration, p=e.progress, m=e.measurements, g=e.gate, a=e.artifacts;
   const status=e.status==='running'?'진행 중':e.status;
+  const notice=e.status==='running'
+    ? '<b>실행 중인 smoke입니다.</b><br>확정되지 않은 측정값은 “수집 중”으로 표시한다.'
+    : `<b>Pre-fix 진단으로 종료.</b><br>${e.summary}`;
   document.getElementById('app').innerHTML=`
     <div class="dim">${e.id} · ${e.date}</div>
     <h1>${e.title}</h1>
     <div class="meta"><span class="chip state">${status}</span><span class="chip">${e.model}</span><span class="chip">${e.task}</span><span class="chip">card ${e.kanban}</span></div>
-    <div class="notice"><b>실행 중인 smoke입니다.</b><br>확정되지 않은 측정값은 모두 “수집 중”으로 표시한다. 189 modules / 6.35M은 실행 로그에서 확인된 <b>source/provisional</b> 값이며 final artifact로 재검증하기 전까지 최종값이 아니다.</div>
+    <div class="notice">${notice}</div>
     <div class="question"><b>검증 질문</b><br>${e.question}</div>
 
     <div class="grid">
       <div class="card"><h2>모델 · adapter</h2><div class="table-wrap"><table><tbody>${rows([
         ['base model',c.base_model],['task / skill',c.task_skill],['adapter',c.adapter],['LoRA rank / alpha',`${c.lora_rank} / ${c.lora_alpha}`],
-        ['target modules',`${c.target_modules} (provisional)`],['trainable params',`${c.trainable_params} (provisional)`],['값 상태',c.adapter_count_status]
+        ['target modules',c.target_modules],['trainable params',c.trainable_params],['값 상태',c.adapter_count_status]
       ])}</tbody></table></div></div>
       <div class="card"><h2>rollout · update 규모</h2><div class="table-wrap"><table><tbody>${rows([
         ['sampler',`${c.sampler}, ${c.denoise_steps} denoise steps, eta=${c.eta}`],['control / horizon / chunk',`${c.control_hz}Hz / ${c.horizon} / ${c.action_chunk}`],
@@ -57,7 +60,7 @@ fetch('../experiments.json').then(r=>{
       ['optimizer',c.optimizer],['learning rate',c.learning_rate],['weight decay',c.weight_decay],['PPO clip',c.ppo_clip],['gradient clip',c.grad_clip],['KL coefficient',c.kl_coef],['reward',c.reward]
     ])}</tbody></table></div></div>
 
-    <div class="card"><h2>현재 관측 snapshot — final 아님</h2>
+    <div class="card"><h2>관측 snapshot</h2>
       <p class="dim">source: ${p.source} · status: <b>${p.source_status}</b></p>
       <div class="table-wrap"><table><tbody>${rows([
         ['rollouts started',p.observed_rollouts_started],['trainable chunks upper bound',`${p.observed_trainable_chunks_upper_bound} / ${c.min_trainable_chunks}`],['해석',p.note]
@@ -74,13 +77,13 @@ fetch('../experiments.json').then(r=>{
         ['rollout 총/trajectory/chunk',m.rollout_wall_clock],['reset / save / optimizer',m.reset_save_optimizer_time],['peak VRAM',m.peak_vram],['OOM',m.oom],['NaN',m.nan]
       ])}</tbody></table></div></div>
       <div class="card"><h2>성공 · reward</h2><div class="table-wrap"><table><tbody>${rows([
-        ['success / official / hold',m.success_official_hold],['reward distribution',m.reward_distribution]
+        ['success / official / hold',m.success_official_hold],['reward distribution',m.reward_distribution],['W&B',e.wandb?.note]
       ])}</tbody></table></div></div>
     </div>
 
     <div class="card"><h2>학습 정합성 · gate</h2><div class="table-wrap"><table><tbody>${rows([
       ['ratio / KL / clip / grad / delta',m.ratio_kl_clip_grad_adapter_delta],['first recompute ratio = 1',m.recompute_ratio_one],['rollout/recompute log-prob match',m.logprob_match],
-      ['smoke gate',g.status==='collecting'?'수집 중':g.status],['30-update 진행 여부',g.continue_30_updates],['30-update ETA',g.eta]
+      ['smoke gate',g.status==='collecting'?'수집 중':g.status],['30-update 진행 여부',g.continue_30_updates],['30-update ETA',g.eta],['corrected run',e.corrected_run]
     ])}</tbody></table></div></div>
 
     <div class="card"><h2>artifact</h2><div class="artifact-list">
@@ -88,6 +91,7 @@ fetch('../experiments.json').then(r=>{
       <div class="artifact-row"><b>checkpoint</b><span>${linkOrPending('checkpoint',a.checkpoint)}</span></div>
       <div class="artifact-row"><b>summary JSON</b><span>${linkOrPending('summary',a.summary_json)}</span></div>
       <div class="artifact-row"><b>train log</b><span>${linkOrPending('log',a.log)}</span></div>
+      <div class="artifact-row"><b>audit report</b><span>${linkOrPending('report',a.report)}</span></div>
     </div></div>`;
 }).catch(err=>{document.getElementById('app').innerHTML='<p class="no">실험 정보를 불러오지 못했습니다.</p>';console.error(err);});
 setTimeout(()=>location.reload(),60000);
