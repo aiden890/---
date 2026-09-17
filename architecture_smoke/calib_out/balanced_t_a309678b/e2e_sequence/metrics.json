@@ -1,0 +1,19 @@
+{
+  "task": "t_51f35471",
+  "seeds": [40, 41, 42, 43, 44, 45, 46, 47, 48, 49],
+  "n": 10,
+  "official_success": 6,
+  "official_success_rate": 0.6,
+  "obs_task_success": 1,
+  "obs_task_success_rate": 0.1,
+  "obs_sim_agreement": 5,
+  "obs_sim_agreement_rate": 0.5,
+  "task_level_false_positive": 0,
+  "task_level_false_negative": 5,
+  "skill_attempt_timeouts": {
+    "GRASP_OBJECT": 4,
+    "MOVE_OBJECT": 5,
+    "PLACE_OBJECT": 11
+  },
+  "verdict": "Official policy success reached 6/10, but obs/sim agreement missed the 0.9 target because the strict frozen-VLM success signal produced five false negatives."
+}

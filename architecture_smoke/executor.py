@@ -69,7 +69,8 @@ class ExecutionManager:
             vlm_min_interval=op.get("vlm_min_interval", self.vlm_min_interval),
             hysteresis_k=op.get("hysteresis_k", self.hysteresis_k),
             tau=op.get("tau", self.tau), event_gated=self.event_gated,
-            view=op.get("view", "full"))
+            view=op.get("view", "full"),
+            sequence_model=op.get("sequence_model"))
         # SECOND ROLE: strict, view-routed, episode-level success judge, SEPARATE
         # from the boundary latch above. It accumulates per-frame P(yes) on the
         # recorded-frame cadence and renders a strict pass/fail at skill end.

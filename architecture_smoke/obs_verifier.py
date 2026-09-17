@@ -287,7 +287,7 @@ class ObsVLMVerifier:
                  vlm_min_interval: int = 16, hysteresis_k: int = 2,
                  tau: float = 0.6, event_gated: bool = True,
                  proprio_gate: Optional[ProprioGate] = None,
-                 view: str = "full"):
+                 view: str = "full", sequence_model=None):
         self.skill_name = skill_name
         self.backend = backend
         self.max_steps = max_steps
@@ -299,6 +299,16 @@ class ObsVLMVerifier:
         if view not in ("full", "left", "right", "eye"):
             raise ValueError(f"invalid verifier view: {view}")
         self.view = view
+        if sequence_model is not None:
+            from sequence_boundary import SequenceBoundaryModel
+            self.sequence_model = (sequence_model if isinstance(sequence_model, SequenceBoundaryModel)
+                                   else SequenceBoundaryModel.from_json(sequence_model))
+            if self.sequence_model.view != self.view:
+                raise ValueError(
+                    f"sequence model expects view={self.sequence_model.view!r}, "
+                    f"verifier configured with view={self.view!r}")
+        else:
+            self.sequence_model = None
         self.gate = proprio_gate if proprio_gate is not None else ProprioGate()
 
         self.elapsed = 0
@@ -309,6 +319,7 @@ class ObsVLMVerifier:
         self._last_query_step = -10 ** 9
         self.vlm_seconds = 0.0
         self.query_log: list[dict] = []
+        self.sequence_probability: Optional[float] = None
 
     def _should_query(self) -> bool:
         due = (self.elapsed - self._last_query_step) >= self.vlm_min_interval
@@ -334,20 +345,44 @@ class ObsVLMVerifier:
             self.last_prob = prob
             yes = prob >= self.tau
             self.consecutive_yes = self.consecutive_yes + 1 if yes else 0
+            sequence_latched = False
+            if self.sequence_model is not None:
+                sequence_scores = {self.view: prob}
+                for sequence_view in self.sequence_model.views:
+                    if sequence_view == self.view:
+                        continue
+                    extra_t0 = time.time()
+                    sequence_scores[sequence_view] = float(self.backend.score_view(
+                        obs.images, self.question_text, view=sequence_view))
+                    self.vlm_seconds += time.time() - extra_t0
+                    self.n_vlm_calls += 1
+                sequence_score = self.sequence_model.aggregate_scores(sequence_scores)
+                sequence_latched, self.sequence_probability = self.sequence_model.update(
+                    sequence_score, obs.proprio, self.elapsed)
             self.query_log.append({"step": self.elapsed, "prob": round(prob, 4),
-                                   "yes": yes, "consec": self.consecutive_yes})
+                                   "yes": yes, "consec": self.consecutive_yes,
+                                   "sequence_probability": self.sequence_probability,
+                                   "sequence_latched": sequence_latched})
 
         proprio_success = self.gate.candidate_stop() and self.gate.gripper_closed()
-        latched = self.consecutive_yes >= self.hysteresis_k
+        latched = (self.sequence_model.positive_run >= self.sequence_model.dwell
+                   if self.sequence_model is not None
+                   else self.consecutive_yes >= self.hysteresis_k)
 
         if latched:
             if self.succeeded_step is None:
                 self.succeeded_step = self.elapsed
-            return self._result(
-                Decision.ADVANCE,
-                f"VLM recognised '{self.skill_name}' complete: P(yes)={self.last_prob:.3f} "
-                f">= tau={self.tau} for {self.hysteresis_k} consecutive query(ies)",
-                queried, proprio_success)
+            if self.sequence_model is not None:
+                reason = (
+                    f"sequence verifier recognised '{self.skill_name}' complete: "
+                    f"P(boundary)={self.sequence_probability:.3f} >= "
+                    f"tau={self.sequence_model.tau} for "
+                    f"{self.sequence_model.dwell} consecutive query(ies)")
+            else:
+                reason = (
+                    f"VLM recognised '{self.skill_name}' complete: P(yes)={self.last_prob:.3f} "
+                    f">= tau={self.tau} for {self.hysteresis_k} consecutive query(ies)")
+            return self._result(Decision.ADVANCE, reason, queried, proprio_success)
 
         if self.elapsed >= self.max_steps:
             return self._result(
@@ -372,9 +407,14 @@ class ObsVLMVerifier:
             "proprio_gripper_closed": self.gate.gripper_closed(),
             "proprio_candidate_stop": self.gate.candidate_stop(),
             "proprio_success_heuristic": proprio_success,
+            "sequence_probability": self.sequence_probability,
+            "sequence_positive_run": (self.sequence_model.positive_run
+                                      if self.sequence_model is not None else None),
         }
+        hold = (self.sequence_model.positive_run if self.sequence_model is not None
+                else self.consecutive_yes)
         return VerificationResult(decision=decision, reason=reason,
-                                  hold=self.consecutive_yes, elapsed=self.elapsed,
+                                  hold=hold, elapsed=self.elapsed,
                                   predicates=diag)
 
     # convenience for harness logging
@@ -385,6 +425,8 @@ class ObsVLMVerifier:
             "vlm_min_interval": self.vlm_min_interval,
             "elapsed": self.elapsed,
             "n_vlm_calls": self.n_vlm_calls, "vlm_seconds": round(self.vlm_seconds, 4),
+            "sequence_model": self.sequence_model is not None,
+            "sequence_probability": self.sequence_probability,
             "succeeded_step": self.succeeded_step,
             "mean_vlm_latency_ms": round(1000 * self.vlm_seconds / self.n_vlm_calls, 2)
             if self.n_vlm_calls else None,

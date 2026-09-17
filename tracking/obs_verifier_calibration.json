@@ -101,5 +101,18 @@
   },
   "verdict": "대량 데이터로 과거 PLACE 1.0/1.0 주장이 재현되지 않음을 확인. endpoint success gate는 개선됐지만 online skill boundary는 미해결.",
   "end_to_end": "calibrated boundary config 3 seeds: official success 0/3, obs/sim agreement 2/3. seed40/42 PLACE timeout×2, seed41 strict false-positive. tracking Inference v3 영상 3개 등록."
+ },
+ "sequence_boundary_t_51f35471": {
+  "input": "frozen VLM P(yes) + proprio14 + 8-query causal history; sim GT is offline label only",
+  "split": "whole-rollout stratified RNG(51035471), fixed 18/6/6",
+  "censored_recall_ceiling": {"GRASP": 0.333, "MOVE": 0.267, "PLACE": 0.2},
+  "held_out": {
+   "GRASP": "precision .667 recall .667 early_fp 0 mean_offset +3.0",
+   "MOVE": "precision .750 recall 1.000 early_fp 0 mean_offset +19.0",
+   "PLACE": "precision 1.000 recall .333 early_fp 0 mean_offset 0.0"
+  },
+  "end_to_end_10_seed": "seeds40-49: official success 6/10, obs/sim agreement 5/10, task-level false-positive 0, strict obs success 1/10; retry timeouts GRASP 4 MOVE 5 PLACE 11",
+  "verdict": "post-success dwell removes corpus censoring and all held-out early FP, but untouched test precision/recall and 10-seed agreement miss acceptance. Frozen VLM representation remains limiting, especially PLACE sensitivity.",
+  "artifacts": "architecture_smoke/calib_out/balanced_t_a309678b/sequence_boundary_calibration.json and e2e_sequence/"
  }
 }

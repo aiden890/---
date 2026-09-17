@@ -167,6 +167,8 @@ def main():
     ap.add_argument("--views", default="full",
                     help="comma list of views to score: full,left,right,eye")
     ap.add_argument("--skills", default="grasp,place")
+    ap.add_argument("--question-keys", default=None,
+                    help="optional comma-separated subset of the selected skills' question bank")
     ap.add_argument("--frame-stride", type=int, default=1,
                     help="score every Nth recorded frame (1 = all)")
     ap.add_argument("--peak-check-seed", action="store_true",
@@ -181,6 +183,8 @@ def main():
     from obs_verifier import CAMERA_KEYS
 
     views = args.views.split(",")
+    question_override = (set(args.question_keys.split(","))
+                         if args.question_keys else None)
     view_to_cam = {"left": CAMERA_KEYS[0], "right": CAMERA_KEYS[1],
                    "eye": CAMERA_KEYS[2]}
 
@@ -213,6 +217,10 @@ def main():
 
     for skill in args.skills.split(","):
         qkeys = SKILL_QUESTIONS[skill]
+        if question_override is not None:
+            qkeys = [key for key in qkeys if key in question_override]
+            if not qkeys:
+                raise ValueError(f"question override has no key for skill {skill}")
         seed_dirs = sorted((corpus / skill).glob("seed*"))
         for sd in seed_dirs:
             seed = int(sd.name.replace("seed", ""))
@@ -274,7 +282,8 @@ def main():
         "meta": {
             "model": args.model, "robot_type": args.robot_type,
             "questions": {k: QUESTION_BANK[k] for sk in args.skills.split(",")
-                          for k in SKILL_QUESTIONS[sk]},
+                          for k in SKILL_QUESTIONS[sk]
+                          if question_override is None or k in question_override},
             "views": views, "corpus": str(corpus),
             "frame_stride": args.frame_stride,
             "total_forwards": n_forward,

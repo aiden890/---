@@ -301,3 +301,49 @@ established**. The data-driven success reporter is materially better, but the
 online boundary controller remains the blocking component. Traces, summaries,
 and three overlay videos are stored under
 `calib_out/balanced_t_a309678b/e2e_optimized/` and tracking Inference v3.
+
+## Iteration 5 — causal sequence boundary model + uncensored dwell (task t_51f35471)
+
+Iteration 4's corpus ended at the first GT-positive frame. This censored the
+very signal an online boundary latch needs: only 5/15 GRASP, 4/15 MOVE, and
+3/15 PLACE positives had any scored observation at or after the boundary, so
+their maximum observable recalls were .333, .267, and .200 respectively.
+
+The simulator replay collector therefore reproduced successful trajectories
+and recorded 32 real post-success hold steps (camera observations + 14-D
+proprio). GT predicates were used only to label the transition. Runtime inputs
+remain the frozen VLM P(yes), the 14-D proprio state, and an 8-query causal
+history. `train_sequence_boundary.py` uses a task-seeded, whole-rollout
+stratified 18/6/6 train/calibration/test split, selects view/model/threshold/dwell
+only on calibration, and exports a standard-library-only 72-D model consumed by
+`ObsVLMVerifier`.
+
+  skill   selected model                    held-out P/R  early FP  mean offset
+  GRASP   left, logistic, tau .93, dwell 2      .667/.667       0       +3.0
+  MOVE    right, ExtraTrees, tau .63, dwell 1   .750/1.00       0      +19.0
+  PLACE   eye, ExtraTrees, tau .75, dwell 2     1.00/.333       0        0.0
+
+Calibration met P>=.9/R>=.5 for every skill, but the untouched held-out split
+did not: GRASP precision and PLACE recall are below target, and MOVE's +19-step
+delay is large. The correct conclusion is a frozen-VLM representation limit,
+not a threshold success. The sequence model removes all held-out early
+transitions and improves recall beyond the censored-data ceiling for GRASP and
+MOVE, but does not reliably separate every failed rollout or recover PLACE.
+
+### Ten-seed full-task re-check
+
+Seeds 40--49 were run with the exported sequence models and real combined
+policy/VLM RPC server. Official simulator success was 6/10 (the policy-attainable
+ceiling observed in this run), task-level obs/sim agreement was 5/10, and there
+were zero task-level false-positive success reports. The strict obs success gate
+reported only 1/10, producing five false negatives. Retry attempts timed out 4
+times in GRASP, 5 in MOVE, and 11 in PLACE. Thus the requested >=.9 agreement is
+not met; post-success sequence supervision fixes censoring but the frozen VLM
+still cannot provide a sufficiently sensitive PLACE boundary/success signal.
+
+The first RPC launch used Xiaomi's policy-only server and correctly stalled when
+the verifier opened its second connection. The validation was restarted with
+the repository's intended combined protocol (concurrent policy/VLM clients,
+one CUDA lock, and `op=vlm_score` on one frozen model load). Full calibration,
+ten summaries/traces, and ten videos are in
+`calib_out/balanced_t_a309678b/{sequence_boundary_calibration.json,e2e_sequence/}`.
