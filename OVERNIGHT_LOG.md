@@ -52,3 +52,11 @@
 - **조치(단일변수, 데이터근거)**: PPO clip을 완화. adaptive_sweep.sh에 clip을 4번째 위치인자로 파라미터화(default 0.1, client+trainer 동시 적용), deploy+commit(bd951e4).
   - exp3 clip-ladder 페어드 착수: optimizer/LR 고정(AdamW 3e-5), **clip만** 변수. v4 adaptive_adamw3e5_clip02(0.2, pid2008380) + amp_csi adaptive_adamw3e5_clip03(0.3, pid2259352), 공유 seed 12345. 양쪽 trainer Up, train 시작. finisher(exp3, pid2012299) detached 대기 → ADAPTIVE_FINAL_exp3_clip_ladder.md 자동집계.
 - 서버상태: v4 GPU 24MiB→학습중, amp 38MiB→학습중. OOM/RPC drop/에러 0. xiaomi-server 없음(경합 없음).
+
+## 10:22 KST — exp3 clip-ladder 진행중, 막힘 없음 (조치 없음)
+- v4 `adaptive_adamw3e5_clip02`(clip 0.2) it=14/30, amp_csi `adaptive_adamw3e5_clip03`(clip 0.3) it=11/30. 양쪽 trainer+client 살아있음(v4 pid2008472 trainer/2008759 client/2012299 finisher, amp 컨테이너 Up ~1h). GPU v4 10.9G/46%, amp 10.9G/0%. OOM/RPC drop/traceback 0(로그 grep 클린). xiaomi-server 없음(경합 없음).
+- **clip 완화 메커니즘 확인(단조, 실측)**: post_clip(clip_fraction)이 clip 폭 넓힐수록 하락 — exp2 clip=0.1 ~0.90 → clip02(0.2) 평균 ~0.75(0.725/0.787/0.740/0.747/0.800/0.732) → clip03(0.3) 평균 ~0.66(0.637/0.753/0.544/0.735/0.631/0.637). 즉 clip 완화가 PPO 목적함수를 실제로 더 통과시킴(가설 메커니즘 성립).
+- **그러나 on-seed n_succ는 아직 flat**: clip02 s1092(exploit) it8~14 = 5,3,4,2,3 추세없음; clip03 s1050(exploit) it7~10 = 1,2,1,2 추세없음. exp2와 동일 패턴. → clip 포화 완화만으로 learning-efficacy 개선 아직 안 보임(단 it11~14/30, 조기라 판정 유보). exp3 초기 신호는 '병목=clip포화' 가설에 우호적이지 않음.
+- post-step 안정: clip02 kl 0.18~0.37 ratio 0.89~1.19 dL2 0.011~0.028, clip03 kl 0.18~0.30 ratio 0.91~1.03 dL2 0.012~0.028. grad_norm 높으나(1128~4160) dL2로 실제 이동 절제(exp2 동일). 발산 없음.
+- GATED 비율(조기, band 워밍): clip02 9/15=60%, clip03 6/12=50%. exp2 후반 38%보다 높으나 초반 소표본 → 후반 재판정 필요.
+- 조치: 없음(정상 진행, 개입=페어드 비교 파괴). 남은 ~16·19 iter → EVAL(after)+heldout → finisher가 ADAPTIVE_FINAL_exp3_clip_ladder.md 자동집계. 다음 cron서 exp3 DONE 시 before/after delta로 clip별 개선 정직 판정. 조기신호상 개선 미확인.
