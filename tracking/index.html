@@ -279,14 +279,14 @@ PLACE_OBJECT:
 
       <article class="train-stage">
         <h3>3.3 RL 미세조정</h3>
-        <p>Zero-shot 또는 SFT gate를 통과한 정책의 성공률과 강건성만 개선한다.</p>
+        <p>현재는 Xiaomi RoboCasa365 base의 <b>GRASP 전용 LoRA adapter</b>를 Flow-GRPO로 직접 학습한다.</p>
         <ul>
-          <li>주 알고리즘: skill별 Flow-GRPO (πRL Flow-SDE)</li>
-          <li>reward: simulator predicate 중심</li>
-          <li>GRASP: 안정 파지 · MOVE: 유지/충돌 회피 · PLACE: 안착/해제/후퇴</li>
-          <li>drop · collision · timeout에 penalty</li>
-          <li>같은 entry state 안에서 group-relative advantage 계산, group 간 seed는 무작위화</li>
-          <li>LoRA adapter만 update하고 frozen base와 KL로 성능 붕괴 방지</li>
+          <li>sampler: RLinf에서 이식·검증한 πRL marginal-preserving Flow-SDE, η=0.1</li>
+          <li>group 8개가 같은 환경 seed에서 출발하고 action noise만 달리해 비교</li>
+          <li>reward: GRASP 성공 + post-success 20-step hold, timeout/drop/collision 감점</li>
+          <li>중간 milestone·접근거리 shaping·VLM reward는 현재 사용하지 않음</li>
+          <li>online moving-band curriculum이 성공 1~7/8인 seed를 우선 선택</li>
+          <li>선택된 GRASP LoRA만 업데이트하고 base VLM·DiT 본체는 고정</li>
         </ul>
       </article>
 
@@ -308,22 +308,25 @@ PLACE_OBJECT:
       <p>같은 observation과 noise seed에서 instruction별 올바른 행동이 분리되고 각 skill이 <code>done_when</code>을 달성해야 한다. 통과한 skill은 SFT 없이 RL로, 실패한 skill은 grounding SFT 후 재평가한다. 실제 실행 중단은 외부 Manager가 <code>done_when</code>을 감지해 담당한다.</p>
     </div>
 
-    <h3 class="subhead">사용할 RL 알고리즘</h3>
+    <h3 class="subhead">현재 실제 실행 알고리즘</h3>
     <div class="target-task">
-      <span class="arch-kicker">Primary algorithm</span>
-      <strong>Skill-wise Flow-GRPO · πRL Flow-SDE</strong>
-      <span>Flow policy의 ODE sampler를 marginal-preserving SDE로 변환해 rollout log-prob을 계산하고, 같은 초기 상태에서 생성한 action trajectory 그룹의 상대 보상으로 각 skill adapter를 업데이트한다.</span>
+      <span class="arch-kicker">RUNNING · GRASP</span>
+      <strong>Completion-aware Flow-GRPO · πRL Flow-SDE · adaptive curriculum</strong>
+      <span>Xiaomi-Robotics-1-RoboCasa365의 GRASP LoRA만 학습한다. 같은 초기 상태에서 8개 stochastic trajectory를 만들고, 성공 구성에 맞춘 advantage로 AdamW 업데이트를 수행한다.</span>
     </div>
     <table>
-      <tr><th>항목</th><th>선택</th><th>이유</th></tr>
-      <tr><td>정책 최적화</td><td><b>GRPO</b></td><td>별도 critic 없이 같은 entry state의 rollout 그룹으로 advantage를 계산할 수 있다.</td></tr>
-      <tr><td>Flow log-prob</td><td><b>πRL Flow-SDE</b></td><td>결정론적 flow ODE를 RL 탐색과 likelihood 계산이 가능한 SDE로 바꾼다.</td></tr>
-      <tr><td>학습 단위</td><td><b>Skill별</b></td><td>GRASP_OBJECT · MOVE_OBJECT · PLACE_OBJECT의 reward와 초기 상태가 서로 다르다.</td></tr>
-      <tr><td>업데이트 범위</td><td><b>선택된 LoRA adapter</b></td><td>RoboCasa365 base 능력을 보존하고 skill 간 간섭을 줄인다.</td></tr>
-      <tr><td>Reward</td><td><b>Simulator predicate</b></td><td>done_when 성공, milestone, collision/drop/timeout을 정확하게 계산한다.</td></tr>
-      <tr><td>안정화</td><td><b>Clipped ratio + KL-to-base</b></td><td>적은 rollout에서 adapter가 base policy를 덮어쓰는 것을 막는다.</td></tr>
+      <tr><th>구성</th><th>현재 값</th><th>실제 동작</th></tr>
+      <tr><td>기반 정책</td><td><b>Xiaomi RoboCasa365</b></td><td>현재 대상은 GRASP 한 skill이며 horizon은 208 step이다.</td></tr>
+      <tr><td>Flow sampler</td><td><b>πRL Flow-SDE · 5 steps · η=0.1</b></td><td>ODE와 같은 marginal을 유지하는 corrected drift와 시간별 noise를 사용하고, 각 transition의 Gaussian log-prob을 저장한다.</td></tr>
+      <tr><td>Rollout group</td><td><b>8 trajectories × 30 iterations</b></td><td>한 iteration의 8개 rollout은 같은 env seed에서 시작하며 action noise seed만 다르다.</td></tr>
+      <tr><td>Advantage</td><td><b>Completion-aware</b></td><td>혼합 성공/실패는 group 정규화, 전부 성공은 non-negative min-baseline, 전부 실패 또는 reward std&lt;0.05는 update를 건너뛴다.</td></tr>
+      <tr><td>Curriculum</td><td><b>moving band 1~7/8</b></td><td>성공률 EMA 0.5로 현재 중간 난이도 seed를 추적한다. 25%는 새 seed를 탐색하고 최근 3개 seed는 재사용을 피한다.</td></tr>
+      <tr><td>Reward</td><td><b>terminal + 20-step hold</b></td><td>skill 성공 +1.0, timeout −0.5, 성공 뒤 정지 +0.05/step, drift −0.10 scale, 성공 상태 이탈 −0.5. milestone·approach·VLM 보상은 꺼져 있다.</td></tr>
+      <tr><td>업데이트</td><td><b>AdamW · lr 3e-5 · 4 epochs</b></td><td>PPO clipped ratio 0.2, KL 계수 0.005, ratio guard 10, advantage clip ±3, grad clip 0.5를 적용한다.</td></tr>
+      <tr><td>학습 파라미터</td><td><b>GRASP LoRA only</b></td><td>rank 8, alpha 32, DiT qkv_proj adapter만 업데이트한다. base VLM과 DiT 본체는 고정한다.</td></tr>
+      <tr><td>평가</td><td><b>eta=0 paired eval 20 + heldout 20</b></td><td>학습 전후를 같은 고정 seed와 결정론적 action noise로 비교하고 GRASP 성공률을 주지표로 사용한다.</td></tr>
     </table>
-    <div class="implementation-note"><b>Sampler gate</b> — 현재 sampler가 정확한 πRL Flow-SDE 조건을 만족하는지 먼저 검증한다. 단순 noise 주입 sampler라면 πRL로 부르지 않고 baseline으로 분리하며, ODE/SDE action 분포와 log-prob·ratio 검증을 통과한 뒤 학습한다.</div>
+    <div class="implementation-note"><b>구현 근거</b> — πRL sampler는 RLinf <code>bde6c918</code>의 OpenPI Flow-SDE 식을 MiBoT 시간축에 맞춰 이식했다. η=0에서 checkpoint ODE와 bit-exact, rollout/recompute log-prob 일치와 epoch-0 ratio=1 검증을 통과한 구현만 현재 실행에 사용한다. <code>fixed_noise</code> baseline과는 별도다.</div>
     <div class="reference-strip">
       <a class="reference-chip" href="https://arxiv.org/abs/2505.05470" target="_blank" rel="noreferrer"><b>Flow-GRPO</b><span>ODE-to-SDE · group-relative RL</span></a>
       <a class="reference-chip" href="https://arxiv.org/abs/2510.25889" target="_blank" rel="noreferrer"><b>πRL</b><span>Flow-SDE for flow-based VLA</span></a>
