@@ -429,7 +429,12 @@ def main():
         }
         horizons = {"grasp": my.horizon_grasp, "move_holding": my.horizon_move, "place": my.horizon_place}
         results = {}
-        for skill in wanted:
+        # Snapshot-based MOVE/PLACE must run before GRASP's env reset. Some seeds
+        # select a different fixture model on reset; restoring a snapshot across
+        # model variants is invalid. GRASP is independent and safely runs last.
+        episode_order = [s for s in wanted if s != "grasp"] + \
+                        [s for s in wanted if s == "grasp"]
+        for skill in episode_order:
             rec = {"skill": skill, "instruction": instructions[skill], "seed": my.seed, "horizon": horizons[skill],
                    "replan_steps": args.replan_steps, "obs_history": args.obs_history, "obs_interval": args.obs_interval,
                    "crop_ratio": args.crop_ratio, "video_stride": args.video_stride, "video_fps": args.video_fps,
