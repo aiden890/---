@@ -80,3 +80,4 @@
 - GATED(조기 워밍): ue4 7/11=64%(초반 소표본, 이전 arm들 후반 ~38%로 하락했으므로 재판정 필요).
 - 서버상태: v4 학습중 에러0. amp_csi는 [2-3] 캘리브레이션(별도 태스크) 수행중, 경합 없음(각 GPU 전용). OOM/RPC drop 0.
 - 다음 cron: ue4 DONE 시 after-eval delta로 uepochs=4 개선 정직 판정 + ue8 체인 진행 확인.
+- 2026-09-17 14:48 KST | exp4 ue4(v4) 19/30, GATED 9/19=47%, fixed eval before grasp/official=0.55/0.15, after=pending | process+GPU normal (10.7/24.6GB), errors/OOM/RPC=0; no intervention, ue8 remains queued on v4 after ue4 (amp_csi reserved for calibration).
