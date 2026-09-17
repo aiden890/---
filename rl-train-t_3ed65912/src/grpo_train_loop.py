@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import argparse
 import collections
+import contextlib
 import json
 import pickle
 import socket
@@ -41,9 +42,10 @@ sys.path.insert(0, "/rl_env/src")         # env card: reward, skill_manager, ran
 import rollout  # noqa: E402
 import skill_eval  # noqa: E402
 from advantage import compute_group_advantages  # noqa: E402  (this card's src dir on sys.path[0])
+from adaptive_curriculum import AdaptiveCurriculum, CurriculumTransaction  # noqa: E402
 from update_batch import (  # noqa: E402
-    batch_iteration_token, group_env_seed, needs_more_groups, trajectory_action_seed,
-    validate_batch_config,
+    execute_batched_update, group_env_seed, recv_exact, retry_idempotent_rpc,
+    trajectory_action_seed, validate_batch_config,
 )
 from training_correctness import (  # noqa: E402
     ExactHoldWindow, RewardComponents, append_progress, hold_enabled_for_variant,
@@ -94,11 +96,9 @@ class TrainerClient:
     def _rpc(self, request):
         blob = pickle.dumps(request, protocol=pickle.HIGHEST_PROTOCOL)
         self.sock.sendall(struct.pack(">I", len(blob)) + blob)
-        ln = self.sock.recv(4)
+        ln = recv_exact(self.sock, 4)
         n = struct.unpack(">I", ln)[0]
-        data = b""
-        while len(data) < n:
-            data += self.sock.recv(n - len(data))
+        data = recv_exact(self.sock, n)
         resp = pickle.loads(data)
         if isinstance(resp, dict) and resp.get("error"):
             raise RuntimeError(f"server error: {resp['error']}")
@@ -142,10 +142,17 @@ class TrainerClient:
         return np.asarray(decoded, dtype=np.float32), resp.get("logprob")
 
     def update(self, advantages, clip=0.1, kl_coef=0.005, ratio_max=10.0, adv_clip=3.0,
-               update_epochs=1, target_kl=None):
-        return self._rpc({"op": "update", "advantages": advantages, "clip": clip,
-                          "kl_coef": kl_coef, "ratio_max": ratio_max, "adv_clip": adv_clip,
-                          "update_epochs": update_epochs, "target_kl": target_kl})
+               update_epochs=1, target_kl=None, update_id=None, curriculum_state=None):
+        request = {"op": "update", "advantages": advantages, "clip": clip,
+                   "kl_coef": kl_coef, "ratio_max": ratio_max, "adv_clip": adv_clip,
+                   "update_epochs": update_epochs, "target_kl": target_kl,
+                   "update_id": update_id, "curriculum_state": curriculum_state}
+        def reconnect():
+            self.close()
+            self._connect()
+        # The trainer caches completed update IDs. If the first response was lost,
+        # reconnecting and replaying this exact request does not execute the optimizer again.
+        return retry_idempotent_rpc(self._rpc, reconnect, request)
 
     def save(self, path, *, update_index=0, train_meta=None):
         return self._rpc({"op": "save", "path": path, "update_index": update_index,
@@ -483,139 +490,6 @@ def build_difficulty_band_pool(factory, client, args, reward_cfg, candidate_seed
     return good, per_seed
 
 
-class AdaptiveCurriculum:
-    """Online moving-band difficulty sampler (operator redesign, t_2907de4f).
-
-    Replaces the upfront prefilter scan. There is NO separate scan phase: the group
-    rollout each train iteration ALREADY measures how hard that seed is for the CURRENT
-    policy (n_succ of `group` stochastic members). We reuse that free signal — after every
-    iteration `update(seed, n_succ)` folds n_succ into an EMA per-seed difficulty cache, so
-    the difficulty estimate tracks the policy as it improves (no wasted rollouts).
-
-    `next_seed()` biases the per-iter env seed toward the MID-difficulty band [lo,hi]
-    (n_succ in [lo,hi] == a `mixed` group == a real GRPO advantage signal; 0/group and
-    group/group are GATED and thrown away). Concretely:
-      * With prob `explore_frac`, or whenever no in-band seed is known yet, draw an UNSEEN
-        seed from the candidate universe (difficulty unknown -> probe it). This is how the
-        band discovers newly-mid seeds as the policy shifts.
-      * Otherwise draw (exploit) uniformly among seeds whose current EMA difficulty is in
-        [lo,hi], excluding the last `avoid_recent` distinct seeds so no single seed is
-        overfit (every iter still gets a different seed).
-    The band MOVES automatically: when the policy improves, a formerly-mixed seed's EMA
-    climbs to group/group, it leaves the band, and a formerly-too-hard seed whose EMA has
-    risen into [lo,hi] enters it — a difficulty curriculum that advances with skill.
-
-    Reproducible: a single random.Random(seed) drives every draw, so two paired arms with
-    the same seed + rules + (initially) the same policy make identical early draws and only
-    diverge as their policies diverge (inherent to an adaptive curriculum). State persists
-    to seed_difficulty.json for resume + audit.
-    """
-
-    def __init__(self, seed_base, universe, band, group, explore_frac=0.25,
-                 ema=0.5, rng_seed=12345, avoid_recent=3):
-        import random as _random
-        self.seed_base = int(seed_base)
-        self.universe = [int(seed_base) + i for i in range(int(universe))]
-        self.lo, self.hi = int(band[0]), int(band[1])
-        self.group = int(group)
-        self.explore_frac = float(explore_frac)
-        self.ema = float(ema)
-        self.avoid_recent = int(avoid_recent)
-        self.rng = _random.Random(int(rng_seed))
-        # seed -> {"ema": float difficulty (n_succ scale 0..group), "count": times seen,
-        #          "last_n": last raw n_succ}
-        self.difficulty = {}
-        self.recent = []          # last distinct seeds drawn (diversity guard)
-        self.history = []         # [{iter, seed, n_succ, source}] audit trail
-
-    # ---- persistence -------------------------------------------------------
-    def to_dict(self):
-        return {
-            "seed_base": self.seed_base, "universe": len(self.universe),
-            "band": [self.lo, self.hi], "group": self.group,
-            "explore_frac": self.explore_frac, "ema": self.ema,
-            "avoid_recent": self.avoid_recent,
-            "difficulty": {str(k): v for k, v in self.difficulty.items()},
-            "recent": list(self.recent),
-            "rng_state": json.dumps(self.rng.getstate()),
-            "history": self.history,
-        }
-
-    def load_state(self, d):
-        self.difficulty = {int(k): v for k, v in d.get("difficulty", {}).items()}
-        self.history = list(d.get("history", []))
-        self.recent = [int(s) for s in d.get("recent", [])]
-        # Restore the EXACT rng state so a resumed run continues the same draw stream
-        # (each next_seed consumes a variable number of rng draws, so naive replay would
-        # desync — getstate/setstate is exact). Fall back to replay for old caches.
-        rs = d.get("rng_state")
-        if rs is not None:
-            try:
-                st = json.loads(rs)
-                # json turns tuples into lists; random.setstate needs (int, tuple, x)
-                self.rng.setstate((st[0], tuple(st[1]), st[2]))
-                return
-            except Exception:
-                pass
-        for _ in self.history:
-            self.rng.random()
-
-    # ---- sampling ----------------------------------------------------------
-    def _in_band(self):
-        return [s for s, v in self.difficulty.items()
-                if self.lo <= v.get("ema", -1) <= self.hi]
-
-    def _unseen(self):
-        return [s for s in self.universe if s not in self.difficulty]
-
-    def next_seed(self, it):
-        in_band = self._in_band()
-        unseen = self._unseen()
-        # decide explore vs exploit BEFORE consuming rng, so the draw order is deterministic
-        r = self.rng.random()
-        explore = (r < self.explore_frac) or (not in_band)
-        source = "explore"
-        if explore and unseen:
-            seed = self.rng.choice(unseen)
-        elif in_band:
-            # exploit: prefer in-band seeds not among the last `avoid_recent` distinct draws
-            pool = [s for s in in_band if s not in self.recent[-self.avoid_recent:]] or in_band
-            seed = self.rng.choice(pool)
-            source = "exploit"
-        elif unseen:
-            seed = self.rng.choice(unseen)
-        else:
-            # universe fully seen and nothing in band -> pick the seed whose EMA is closest
-            # to the band centre so we keep probing the most-promising difficulty.
-            centre = (self.lo + self.hi) / 2.0
-            seed = min(self.universe,
-                       key=lambda s: abs(self.difficulty[s]["ema"] - centre))
-            source = "nearest"
-        if not self.recent or self.recent[-1] != seed:
-            self.recent.append(seed)
-        return int(seed), source
-
-    def update(self, seed, n_succ, it=None, source=None):
-        seed = int(seed)
-        n = int(n_succ)
-        cur = self.difficulty.get(seed)
-        if cur is None:
-            self.difficulty[seed] = {"ema": float(n), "count": 1, "last_n": n}
-        else:
-            cur["ema"] = self.ema * n + (1.0 - self.ema) * cur["ema"]
-            cur["count"] += 1
-            cur["last_n"] = n
-        self.history.append({"iter": it, "seed": seed, "n_succ": n, "source": source})
-
-    def band_stats(self):
-        """Snapshot for logging: how many known seeds sit in / below / above band."""
-        below = sum(1 for v in self.difficulty.values() if v["ema"] < self.lo)
-        inb = sum(1 for v in self.difficulty.values() if self.lo <= v["ema"] <= self.hi)
-        above = sum(1 for v in self.difficulty.values() if v["ema"] > self.hi)
-        return {"seen": len(self.difficulty), "below": below,
-                "in_band": inb, "above": above}
-
-
 def eval_skill_from_entry(sim, client, args, reward_cfg, seed, skill,
                           entry_from_grasp, out_dir=None, tag=""):
     """Single-skill deterministic (eta=0) eval from the skill's entry-state.
@@ -871,121 +745,114 @@ def train_iteration(client, args, reward_cfg, seed, it, *, defer_update=False):
     return metrics
 
 
-def train_batched_update(client, args, reward_cfg, seed_base, update_index):
-    """Clear the trainer store on every failed collection/update path."""
-    try:
-        return _train_batched_update_impl(client, args, reward_cfg, seed_base, update_index)
-    except Exception:
-        client.reset_store()
-        raise
-
-
-def _train_batched_update_impl(client, args, reward_cfg, seed_base, update_index):
-    """Collect multiple independent groups, then perform exactly one optimizer update.
+def train_batched_update(client, args, reward_cfg, seed_base, update_index,
+                         curriculum=None, curriculum_cache=None):
+    """Collect multiple independent groups, then perform exactly one logical update RPC.
 
     Every group uses one shared env seed internally and a distinct env seed across groups.
     Group-relative advantages are computed before aggregation. Collection continues in
     whole groups until both floors are met: ``groups_per_update`` and
-    ``min_trainable_chunks``.
+    ``min_trainable_chunks``. The trainer may execute multiple configured optimizer
+    epochs inside that one logical update.
     """
-    min_groups = int(getattr(args, "groups_per_update", 1))
-    min_chunks = int(getattr(args, "min_trainable_chunks", 0))
-    max_groups = int(getattr(args, "max_groups_per_update", max(min_groups, 64)))
-    validate_batch_config(min_groups, min_chunks, max_groups)
-    groups = []
-    advantages = {}
-    trainable_chunks = 0
     progress_path = getattr(args, "group_progress_path", None)
     t_collect = time.time()
-    store = client.metrics()
-    if int(store.get("n_chunks", 0)) != 0:
-        raise RuntimeError(f"trainer store not empty at update start: {store}")
+    update_timing = {"seconds": 0.0}
 
-    while needs_more_groups(len(groups), trainable_chunks, min_groups, min_chunks):
-        if len(groups) >= max_groups:
-            client.reset_store()
-            raise RuntimeError(
-                f"chunk floor not reached after {max_groups} groups: "
-                f"{trainable_chunks} < {min_chunks}")
-        g = len(groups)
-        env_seed = group_env_seed(seed_base, update_index, g)
-        # The iteration token namespaces trajectory ids and action-noise seeds too.
-        iter_token = batch_iteration_token(update_index, g)
+    def select_seed(update, group, used):
+        if curriculum is not None:
+            return curriculum.next_seed(update * int(args.max_groups_per_update) + group,
+                                        exclude=used)
+        return group_env_seed(seed_base, update, group), "raw"
+
+    def collect_group(group, env_seed, iteration_token):
         t_group = time.time()
-        gm = train_iteration(client, args, reward_cfg, env_seed, iter_token,
+        gm = train_iteration(client, args, reward_cfg, env_seed, iteration_token,
                              defer_update=True)
-        gm["env_seed"] = env_seed
-        gm["group_index"] = g
         gm["wall_seconds"] = round(time.time() - t_group, 3)
-        if "_advantages" not in gm:
-            client.reset_store()
-            raise RuntimeError(f"batched group did not produce advantages: {gm.get('skipped', gm)}")
-        group_advantages = gm.pop("_advantages")
-        advantages.update(group_advantages)
-        groups.append(gm)
+        return gm
+
+    def update(advantages):
+        started = time.time()
+        result = client.update(
+            advantages, clip=args.clip, kl_coef=args.kl_coef,
+            ratio_max=args.ratio_max, adv_clip=args.adv_clip,
+            update_epochs=getattr(args, "update_epochs", 1),
+            target_kl=getattr(args, "target_kl", None),
+            update_id=f"{getattr(args, 'run_id', 'run')}:{update_index}",
+            curriculum_state=(curriculum.to_dict() if curriculum is not None else None))
+        update_timing["seconds"] = time.time() - started
+        return result
+
+    def on_group(group, accumulator):
         store = client.metrics()
-        chunks_by_traj = store.get("chunks_by_traj", {})
-        group_trainable = sum(
-            int(chunks_by_traj.get(tid, 0))
-            for tid, advantage in group_advantages.items()
-            if float(advantage) != 0.0)
-        trainable_chunks += group_trainable
-        gm["stored_chunks"] = sum(int(chunks_by_traj.get(tid, 0)) for tid in group_advantages)
-        gm["trainable_chunks"] = group_trainable
+        if curriculum is not None:
+            curriculum.update(
+                group["env_seed"], int(group.get("n_success_group") or 0),
+                it=update_index * int(args.max_groups_per_update) + group["group_index"],
+                source=group["seed_source"])
+            group["adaptive_band_stats"] = curriculum.band_stats()
         if progress_path:
             append_progress(progress_path, {
-                "update": update_index, "group": g, "env_seed": env_seed,
+                "update": update_index, "group": group["group_index"],
+                "env_seed": group["env_seed"], "seed_source": group["seed_source"],
                 "trajectories": int(args.group),
-                "stored_chunks": gm["stored_chunks"],
-                "trainable_chunks": group_trainable,
+                "stored_chunks": group["stored_chunks"],
+                "trainable_chunks": group["trainable_chunks"],
                 "stored_chunks_cumulative": int(store.get("n_chunks", 0)),
-                "trainable_chunks_cumulative": trainable_chunks,
-                "n_success": int(gm.get("n_success_group") or 0),
-                "composition": gm.get("group_composition"),
-                "gate_reason": gm.get("gated"),
-                "reset_seconds": gm.get("reset_seconds"),
-                "sample_store_rpc_seconds": gm.get("sample_store_rpc_seconds"),
-                "rollout_seconds": gm["wall_seconds"],
+                "trainable_chunks_cumulative": accumulator.trainable_chunks,
+                "n_success": int(group.get("n_success_group") or 0),
+                "composition": group.get("group_composition"),
+                "gate_reason": group.get("gated"),
+                "reset_seconds": group.get("reset_seconds"),
+                "sample_store_rpc_seconds": group.get("sample_store_rpc_seconds"),
+                "rollout_seconds": group["wall_seconds"],
                 "trainer_free_gb": store.get("free_gb"),
+                "adaptive_band_stats": group.get("adaptive_band_stats"),
             })
 
-    collect_seconds = time.time() - t_collect
-    t_update = time.time()
-    update = client.update(
-        advantages, clip=args.clip, kl_coef=args.kl_coef,
-        ratio_max=args.ratio_max, adv_clip=args.adv_clip,
-        update_epochs=getattr(args, "update_epochs", 1),
-        target_kl=getattr(args, "target_kl", None))
-    update_seconds = time.time() - t_update
+    transaction = (CurriculumTransaction(curriculum, curriculum_cache)
+                   if curriculum is not None else contextlib.nullcontext())
+    with transaction as curriculum_transaction:
+        result = execute_batched_update(
+            update_index=update_index,
+            min_groups=int(getattr(args, "groups_per_update", 1)),
+            min_trainable_chunks=int(getattr(args, "min_trainable_chunks", 0)),
+            max_groups=int(getattr(args, "max_groups_per_update", 64)),
+            select_seed=select_seed, collect_group=collect_group,
+            get_store=client.metrics, update=update, reset_store=client.reset_store,
+            on_group=on_group)
+        if curriculum_transaction is not None and curriculum is not None:
+            committed_state = result.get("curriculum_state")
+            if committed_state is not None:
+                curriculum.load_state(committed_state)
+            curriculum_transaction.commit()
+    groups = result["group_summaries"]
+    collect_seconds = time.time() - t_collect - update_timing["seconds"]
     returns = [r for g in groups for r in g.get("returns", [])]
     n_success = sum(int(g.get("n_success_group") or 0) for g in groups)
     n_traj = len(groups) * int(args.group)
-    update.update({
+    result.update({
         "mean_return": float(np.mean(returns)) if returns else 0.0,
         "max_return": float(np.max(returns)) if returns else 0.0,
         "returns": returns,
         "n_success_group": n_success,
         "n_success_hold": sum(int(g.get("n_success_hold") or 0) for g in groups),
-        "groups_collected": len(groups),
         "trajectories_collected": n_traj,
-        "stored_chunks_collected": int(store.get("n_chunks", 0)),
-        "trainable_chunks_collected": trainable_chunks,
-        "group_env_seeds": [g["env_seed"] for g in groups],
-        "group_summaries": groups,
         "group_composition": [g.get("group_composition") for g in groups],
         "advantage_mode": "per_group_then_aggregate",
         "reward_std": float(np.std(returns)) if returns else 0.0,
         "collect_seconds": round(collect_seconds, 3),
-        "optimizer_seconds": round(update_seconds, 3),
+        "optimizer_seconds": round(update_timing["seconds"], 3),
         "trajectory_mean_seconds": round(collect_seconds / max(n_traj, 1), 3),
         "reset_seconds": round(sum(float(g.get("reset_seconds", 0.0)) for g in groups), 3),
         "sample_store_rpc_seconds": round(
             sum(float(g.get("sample_store_rpc_seconds", 0.0)) for g in groups), 3),
         "sample_store_rpc_calls": sum(int(g.get("sample_store_rpc_calls", 0)) for g in groups),
     })
-    update["chunk_mean_seconds"] = round(
-        update["sample_store_rpc_seconds"] / max(update["stored_chunks_collected"], 1), 4)
-    return update
+    result["chunk_mean_seconds"] = round(
+        result["sample_store_rpc_seconds"] / max(result["stored_chunks_collected"], 1), 4)
+    return result
 
 
 def eval_pool(sim_factory, client, args, reward_cfg, seeds, out_dir, tag):
@@ -1161,6 +1028,7 @@ def main():
     if my.target_kl is not None and my.target_kl <= 0.0:
         raise ValueError("target_kl must be positive when set")
     out = Path(my.out); out.mkdir(parents=True, exist_ok=True)
+    args.run_id = out.name
     source_state = {
         "train": verify_deployment_manifest("/train", my.train_source_manifest),
         "env": verify_deployment_manifest("/rl_env", my.env_source_manifest),
@@ -1331,13 +1199,17 @@ def main():
     # chosen per-iter from a moving band driven by the running per-seed difficulty EMA.
     adaptive_mode = (not entry_mode) and (my.adaptive_band is not None) and (not band_mode)
     batch_mode = my.groups_per_update > 1 or my.min_trainable_chunks > 0
-    if batch_mode and (adaptive_mode or band_mode or entry_mode):
-        raise ValueError("multi-group update batching currently requires raw GRASP seed mode; "
-                         "adaptive-band, static difficulty-band, and entry-state modes need "
-                         "a per-group seed scheduler")
+    if batch_mode and (band_mode or entry_mode):
+        raise ValueError("multi-group update batching supports raw or adaptive GRASP seeds; "
+                         "static difficulty-band and entry-state modes still require a "
+                         "per-group scheduler")
     curriculum = None
+    cache = None
     if adaptive_mode:
         universe = my.adaptive_universe or (my.iters * 8)
+        if batch_mode and universe < my.max_groups_per_update:
+            raise ValueError("adaptive universe must be >= max_groups_per_update so every "
+                             "group in one update can use a distinct env seed")
         curriculum = AdaptiveCurriculum(
             seed_base=my.seed_base, universe=universe, band=tuple(my.adaptive_band),
             group=my.group, explore_frac=my.adaptive_explore_frac, ema=my.adaptive_ema,
@@ -1380,7 +1252,7 @@ def main():
             # (moving band). In band mode, draw the precomputed without-replacement
             # schedule. Otherwise seed_base+it as before.
             adaptive_source = None
-            if adaptive_mode:
+            if adaptive_mode and not batch_mode:
                 seed, adaptive_source = curriculum.next_seed(it)
             elif band_mode:
                 seed = iter_seeds[it]
@@ -1389,12 +1261,16 @@ def main():
             else:
                 seed = my.seed_base + it
             if batch_mode:
-                m = train_batched_update(client, args, reward_cfg, my.seed_base, it)
+                m = train_batched_update(
+                    client, args, reward_cfg, my.seed_base, it,
+                    curriculum=curriculum if adaptive_mode else None,
+                    curriculum_cache=cache if adaptive_mode else None)
+                seed = m["group_env_seeds"][0]
             else:
                 m = train_iteration(client, args, reward_cfg, seed, it)
             m["iter"] = it
             m["seed"] = seed
-            if adaptive_mode:
+            if adaptive_mode and not batch_mode:
                 # Fold this iter's group n_succ into the seed's difficulty EMA so the band
                 # moves with the policy; persist the cache each iter for resume + audit.
                 n_succ = int(m.get("n_success_group") or 0)
@@ -1406,6 +1282,10 @@ def main():
                     cache.write_text(json.dumps(curriculum.to_dict(), indent=2))
                 except Exception:
                     pass
+            elif adaptive_mode:
+                m["adaptive_source"] = [
+                    group.get("seed_source") for group in m["group_summaries"]]
+                m["adaptive_band_stats"] = curriculum.band_stats()
             curve.append({"iter": it, "loss": m["loss"], "mean_return": m["mean_return"],
                           "grad_norm": m["grad_norm"], "mean_ratio": m["mean_ratio"],
                           "n_success_group": m.get("n_success_group"),

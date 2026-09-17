@@ -30,8 +30,27 @@ server_image=xiaomi-cu121:t_9f03a613
 client_image=xiaomi-client:t_9f03a613
 assets_volume=robocasa-assets-t_5af7225b
 port=10088
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 case "${1:-help}" in
+  multigroup-dry-run)
+    # CPU/static validation only: never calls Docker, deploy.sh, SSH, or the GPU.
+    run="${2:-multigroup_gate}"
+    python3 "$script_dir/multigroup_production.py" \
+      --config "$script_dir/../configs/multigroup_grasp_v1.json" \
+      --run "$run" --dry-run
+    ;;
+  multigroup-gpu-gate)
+    # Canonical config-driven execution. The caller must complete clean deploy/GPU preflight.
+    run="${2:-multigroup_gate}"
+    if docker ps -a --format '{{.Names}}' | grep -q "^${trainer}$"; then
+      echo "trainer already exists; refusing canonical gate: $trainer" >&2
+      exit 6
+    fi
+    python3 "$script_dir/multigroup_production.py" \
+      --config "$script_dir/../configs/multigroup_grasp_v1.json" \
+      --run "$run" --execute --runner "$script_dir/run-train.sh"
+    ;;
   probe)
     out="$train/results"; mkdir -p "$out"
     docker run --rm --gpus all --shm-size=2g --network none \
@@ -150,6 +169,6 @@ case "${1:-help}" in
        --model /checkpoint --port $port --cache /train/hf_cache --out /out ${*:3}" 2>&1 | tee "$out/sft.log"
     ;;
   *)
-    echo "Usage: bash run-train.sh {probe|trainer-start [server args]|trainer-stop|audit-p0|pirl-gates [args]|audit-branch|train <run> [args]|g5-sweep <run> [args]|diag <run> [args]|sft <run> [sft args]}" >&2
+    echo "Usage: bash run-train.sh {multigroup-dry-run <run>|multigroup-gpu-gate <run>|probe|trainer-start [server args]|trainer-stop|audit-p0|pirl-gates [args]|audit-branch|train <run> [args]|g5-sweep <run> [args]|diag <run> [args]|sft <run> [sft args]}" >&2
     exit 2;;
 esac

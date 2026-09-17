@@ -61,6 +61,7 @@ from training_correctness import (  # noqa: E402
 from checkpoint_schema import (  # noqa: E402
     build_checkpoint_metadata, rng_state_for_restore, validate_checkpoint_metadata,
 )
+from update_batch import IdempotentUpdateCache  # noqa: E402
 
 # Goal-3 SFT sends DATASET skill names; map them to the per-skill LoRA keys used by
 # inject_per_skill_lora (grasp/move_holding/place) -- same roles the GRPO loop's
@@ -154,6 +155,7 @@ class GRPOTrainerServer:
         else:
             raise ValueError(a.optimizer)
         self.store: dict = {}
+        self.update_cache = IdempotentUpdateCache()
         print("Model loaded.", flush=True)
 
     # ---- wire helpers ----
@@ -389,10 +391,27 @@ class GRPOTrainerServer:
 
     def op_update(self, req):
         """Update atomically with respect to the rollout store, including failures."""
-        try:
-            return self._op_update_impl(req)
-        finally:
+        update_id = req.get("update_id")
+        if update_id in self.update_cache.completed:
+            # A client may reconnect after the optimizer committed but its response was
+            # lost. Drop any replayed rollout store and return the original result.
             self.store.clear()
+            replay = self.update_cache.run(update_id, lambda: None)
+            replay["replayed_update"] = True
+            return replay
+
+        def perform():
+            try:
+                result = self._op_update_impl(req)
+                result["replayed_update"] = False
+                result["curriculum_state"] = req.get("curriculum_state")
+                return result
+            finally:
+                self.store.clear()
+
+        if update_id:
+            return self.update_cache.run(update_id, perform)
+        return perform()
 
     def _op_update_impl(self, req):
         advantages = req["advantages"]           # {traj_id: advantage float}
