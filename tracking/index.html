@@ -354,7 +354,7 @@ PLACE_OBJECT:
   </div>
 
   <div class="card" id="obsv-calib-card" style="margin-top:18px">
-    <h2>Verifier 캘리브레이션 — 경계/성공 판정 분리 + PLACE false-positive 수정 <span class="dim" style="font-size:12px">(t_32a4f9b6)</span></h2>
+    <h2>Verifier 캘리브레이션 — skill별 15+/15- 균형 재측정 <span class="dim" style="font-size:12px">(t_a309678b)</span></h2>
     <p class="dim" id="obsv-why" style="margin:0 0 12px"></p>
     <div id="obsv-roles" style="margin-bottom:14px"></div>
     <h3 style="margin:6px 0 8px;font-size:14px">성공판정 정밀도 (Before → After, sim GT 대비)</h3>
@@ -367,12 +367,12 @@ PLACE_OBJECT:
     <h3 style="margin:14px 0 8px;font-size:14px">대표 seed 오버레이 (경계판정 vs 성공게이트 vs sim GT)</h3>
     <div style="display:flex;gap:16px;flex-wrap:wrap">
       <div style="flex:1;min-width:300px">
-        <div class="dim" style="font-size:13px;margin-bottom:4px">PLACE seed0 — <b>이전 false positive</b>: 경계판정은 SUCCESS라 불렀지만 sim은 실패. 새 성공게이트가 REJECT.</div>
-        <video src="media/inference/obsv_calib_place_seed0_falsepos.mp4" controls loop muted style="width:100%;border-radius:8px"></video>
+        <div class="dim" style="font-size:13px;margin-bottom:4px">PLACE seed15 — <b>실패</b>: endpoint 성공게이트 REJECT, sim GT FAILURE.</div>
+        <video src="media/inference/obsv_balanced_place_seed15_fail.mp4" controls loop muted style="width:100%;border-radius:8px"></video>
       </div>
       <div style="flex:1;min-width:300px">
-        <div class="dim" style="font-size:13px;margin-bottom:4px">PLACE seed9 — <b>진짜 성공</b>: 성공게이트 PASS, sim GT success@112와 일치.</div>
-        <video src="media/inference/obsv_calib_place_seed9_truesucc.mp4" controls loop muted style="width:100%;border-radius:8px"></video>
+        <div class="dim" style="font-size:13px;margin-bottom:4px">PLACE seed18 — <b>진짜 성공</b>: endpoint 성공게이트 PASS, sim GT success@124.</div>
+        <video src="media/inference/obsv_balanced_place_seed18_success.mp4" controls loop muted style="width:100%;border-radius:8px"></video>
       </div>
     </div>
   </div>

@@ -4,8 +4,7 @@ sim GT (task t_32a4f9b6), to make the false-positive fix legible to a human.
 Uses the ALREADY-recorded corpus frames (<skill>.mp4) + the cached per-view
 P(yes) (cache_perview.json). No GPU, no simulator. For each frame it draws:
   * boundary judge (OLD single-Q latch): P(yes) + FIRE->SUCCESS,
-  * strict success gate (NEW): running episode-mean of the calibrated view-
-    routed facts + PASS/REJECT vs thresholds,
+  * strict success gate (NEW): calibrated final-frame combined@eye checkpoint,
   * sim GT (offline label): success step / never.
 A seed the OLD boundary judge calls SUCCESS while the strict gate + sim GT say
 FAILURE (the PLACE false positive this task fixes) is explicit on screen.
@@ -37,7 +36,7 @@ def main():
     ap.add_argument("--skill", default="place")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--out", required=True)
-    ap.add_argument("--boundary-tau", type=float, default=0.6)
+    ap.add_argument("--boundary-tau", type=float, default=0.98)
     ap.add_argument("--boundary-k", type=int, default=2)
     args = ap.parse_args()
 
@@ -45,8 +44,7 @@ def main():
     ro = load_cache_rollout(cache, args.skill, args.seed)
     gt_step, gt_succ = ro["gt_success_step"], ro["gt_success"]
 
-    clear_key, clear_thr = "place_clear@right", 0.75
-    seated_key, seated_thr = "place_seated@right", 0.50
+    gate_key, gate_thr = "place_combined@eye", 0.899728536605835
 
     mp4 = Path(args.corpus) / args.skill / f"seed{args.seed}" / f"{args.skill}.mp4"
     frames = list(imageio.mimread(mp4, memtest=False))
@@ -55,7 +53,6 @@ def main():
     pad = 150
     out_frames = []
     boundary_run, boundary_fired = 0, False
-    clear_sum = seated_sum = 0.0
     n_obs = 0
 
     def col(c):
@@ -72,7 +69,7 @@ def main():
         rec = by_fidx.get(fidx)
         if rec is not None:
             sc = rec["scores"]
-            bkey = clear_key  # boundary approximated on the discriminative view
+            bkey = gate_key
             bp = sc.get(bkey, 0.0)
             if bp >= args.boundary_tau:
                 boundary_run += 1
@@ -80,11 +77,9 @@ def main():
                     boundary_fired = True
             else:
                 boundary_run = 0
-            clear_sum += sc.get(clear_key, 0.0)
-            seated_sum += sc.get(seated_key, 0.0)
             n_obs += 1
-            cm, sm = clear_sum / n_obs, seated_sum / n_obs
-            gate_pass = (cm >= clear_thr and sm >= seated_thr and n_obs >= 5)
+            endpoint_p = sc.get(gate_key, 0.0)
+            gate_pass = endpoint_p >= gate_thr and n_obs >= 5
 
             y = H + 8
             d.text((10, y), f"{args.skill.upper()} seed{args.seed}  frame {fidx}",
@@ -94,8 +89,7 @@ def main():
                    f"{'FIRE->SUCCESS' if boundary_fired else 'waiting'}",
                    fill=(120, 220, 80) if boundary_fired else (170, 170, 170))
             d.text((10, y + 52),
-                   f"SUCCESS GATE (new): clear@right={cm:.2f}>={clear_thr}  "
-                   f"seated@right={sm:.2f}>={seated_thr}  "
+                   f"SUCCESS GATE (new endpoint): combined@eye={endpoint_p:.2f}>={gate_thr:.2f}  "
                    f"-> {'PASS' if gate_pass else 'REJECT'}",
                    fill=(120, 220, 80) if gate_pass else (240, 130, 60))
             d.text((10, y + 78),

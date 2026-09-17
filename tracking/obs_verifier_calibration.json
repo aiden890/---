@@ -1,7 +1,7 @@
 {
- "task": "t_32a4f9b6",
- "why": "obs-only VLM verifier가 PLACE에서 false positive(놓는 순간 한 프레임만 보고 성공 판정). 경계판정(빠르고 관대)과 성공판정(엄격)을 분리하고, 뷰포인트 라우팅+에피소드 시간집계로 성공판정을 재설계. 측정 기반으로 계속 개선.",
- "corpus": "random_g10_p10 (GRASP 4성공/6실패, PLACE 2성공/8실패). sim GT는 오프라인 캘리브레이션 라벨로만 사용(정책엔 미주입, obs-only 유지).",
+ "task": "t_a309678b",
+ "why": "obs-only VLM verifier를 2-positive 데모가 아니라 skill별 15성공/15실패 균형 코퍼스로 재검증. sim GT는 오프라인 라벨로만 쓰고 question×view×단일프레임/시간윈도우를 측정해 PLACE false-positive를 줄임.",
+ "corpus": "balanced_t_a309678b: GRASP/MOVE/PLACE 각각 15성공+15실패(총 90 skill episodes), 3-cam + proprio14 + per-step sim GT + video. GT는 런타임 입력에 미주입.",
  "roles": [
   {
    "role": "경계 판정 (boundary)",
@@ -12,44 +12,44 @@
   {
    "role": "성공 판정 (success)",
    "module": "success_gate.SuccessGate",
-   "strictness": "엄격 (뷰라우팅 + 에피소드 평균 + skill별 threshold)",
+   "strictness": "엄격 (뷰라우팅 + endpoint/시간윈도우 + skill별 threshold)",
    "purpose": "리포트/리워드 게이트의 진짜 성공. 보고서엔 obs_task_success로 별도 표기"
   }
  ],
  "success_gate_config": {
-  "PLACE_OBJECT": "mean(place_clear@right)>=0.75 AND mean(place_seated@right)>=0.50 (min_frames 5)",
-  "GRASP_OBJECT": "mean(grasp@eye)>=0.50 (min_frames 3)"
+  "PLACE_OBJECT": "final(place_combined@eye)>=0.89973 (min_frames 5)",
+  "GRASP_OBJECT": "mean(last10 grasp@eye)>=0.45327 (min_frames 5)"
  },
  "before_after": [
   {
    "skill": "PLACE_OBJECT",
-   "before_precision": 0.2,
-   "before_fp": 8,
-   "before_recall": 1.0,
-   "after_precision": 1.0,
-   "after_fp": 0,
-   "after_recall": 1.0,
-   "tp": 2,
-   "fn": 0,
-   "tn": 8
+   "before_precision": 0.4,
+   "before_fp": 15,
+   "before_recall": 0.667,
+   "after_precision": 0.9,
+   "after_fp": 1,
+   "after_recall": 0.6,
+   "tp": 9,
+   "fn": 6,
+   "tn": 14
   },
   {
    "skill": "GRASP_OBJECT",
-   "before_precision": 0.4,
-   "before_fp": 6,
-   "before_recall": 1.0,
-   "after_precision": 0.75,
-   "after_fp": 1,
-   "after_recall": 0.75,
-   "tp": 3,
+   "before_precision": 0.538,
+   "before_fp": 12,
+   "before_recall": 0.933,
+   "after_precision": 0.667,
+   "after_fp": 7,
+   "after_recall": 0.933,
+   "tp": 14,
    "fn": 1,
-   "tn": 5
+   "tn": 8
   }
  ],
- "unit_tests": "success_gate 7/7 + obs_verifier 25/25 + check_architecture 19/19",
+ "unit_tests": "calibration 10/10 + success_gate 6/6 + obs_verifier 26/26 + check_architecture 19/19",
  "obs_only_invariant": "success_gate.py 및 런타임 경로는 특권 predicate 미참조. sim GT는 threshold 캘리브레이션에만 사용.",
  "loop": "cache_frame_scores.py(GPU 1회 프레임 스코어 캐시) -> calibrate/validate(CPU 무한 재생). 코퍼스 늘면 재실행만.",
- "caveat": "PLACE positive 2개(base 정책이 PLACE 성공 드묾). 방향성 강하고 FP 메커니즘 이해·수정됨. 성공 롤아웃 늘면 threshold 재확인 필요.",
+ "caveat": "PLACE endpoint는 precision .90/recall .60 달성. 그러나 온라인 earliest-boundary는 GRASP .25/.067, MOVE .40/.133, PLACE .333/.067로 여전히 부정확하며 calibrated end-to-end도 official success 0/3, obs/sim agreement 2/3. endpoint 개선을 경계 제어 성공으로 포장하지 않음.",
  "confidence_analysis_t_a309678b": {
   "why": "[2-3] operator: shipped 정확도가 코퍼스가 작고 편향되어(PLACE 2성공, GRASP 4성공, MOVE 0) 통계적으로 못 믿음. calib_stats.py로 불확실성 정량화(운영점 재선택 아님, GPU 불필요).",
   "engine": "architecture_smoke/calib_stats.py (기존 cache_perview.json 재사용, shipped success_gate 재평가)",
@@ -85,5 +85,21 @@
   "free_tuning_exhausted": "모든 cached question×view×{mean,last5} 스윕 결과 shipped 운영점이 현 코퍼스 최적. 정확도 개선=positive 샘플 증가(GPU 수집) 필요.",
   "blocker": "대량 균형 수집엔 policy 서버(~10.7G)가 필요하나 단일 3090은 보호대상 [1-1] exp4 GRPO 트레이너 점유(간섭금지, 여유~11.7G, 동거시 RPC drop). rl-env 추가 롤아웃 15개는 전부 grasp 실패→positive 0.",
   "artifact": "architecture_smoke/calib_out/calib_stats.json, CALIBRATION_LOG.md Iteration 3"
+ },
+ "balanced_recalibration_t_a309678b": {
+  "manifest": "architecture_smoke/calib_out/balanced_t_a309678b/manifest.json",
+  "gpu_cache": "per-view 10182 forwards / 710.7s / peak 10.41GB; full baseline 3067 forwards / 265.6s",
+  "endpoint_metrics": {
+   "GRASP": "precision .667 recall .933 (best F1; >=.90 precision이면 recall<=.133)",
+   "MOVE": "precision .900 recall .600 (diagnostic endpoint)",
+   "PLACE": "precision .900 recall .600 (deployed strict success gate)"
+  },
+  "boundary_metrics": {
+   "GRASP": "precision .250 recall .067 AUC .665",
+   "MOVE": "precision .400 recall .133 AUC .712",
+   "PLACE": "precision .333 recall .067 AUC .896"
+  },
+  "verdict": "대량 데이터로 과거 PLACE 1.0/1.0 주장이 재현되지 않음을 확인. endpoint success gate는 개선됐지만 online skill boundary는 미해결.",
+  "end_to_end": "calibrated boundary config 3 seeds: official success 0/3, obs/sim agreement 2/3. seed40/42 PLACE timeout×2, seed41 strict false-positive. tracking Inference v3 영상 3개 등록."
  }
 }

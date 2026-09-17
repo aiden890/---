@@ -24,7 +24,10 @@ assets_volume=robocasa-assets-t_5af7225b
 server=vlm-infer-server-t_fc5e73d5
 client=vlm-infer-client-t_fc5e73d5
 port=10086
-out="$pkg/out"
+out="${OUT_DIR:-$pkg/out}"
+verifier_config="${VERIFIER_CONFIG:-}"
+verifier_args=()
+[ -z "$verifier_config" ] || verifier_args=(--verifier-config "$verifier_config")
 mkdir -p "$out"
 
 # clean any stale containers from a previous run
@@ -67,6 +70,7 @@ docker run --rm --name "$client" --gpus all --shm-size=2g \
   --network "container:$server" xiaomi-client:t_9f03a613 \
   python /pkg/run_vlm_inference.py --out /output --seeds "$seeds" \
     --model-path /checkpoint --server-addr 127.0.0.1 --server-port "$port" \
+    "${verifier_args[@]}" \
     2>&1 | tee "$out/run.log"
 
 nvidia-smi --query-gpu=memory.used,memory.total --format=csv,noheader > "$out/gpu_after.txt"

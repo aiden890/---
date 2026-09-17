@@ -218,3 +218,86 @@ that widens the margin, so tuning cannot substitute for more positives.
 
 Conclusion: further accuracy requires MORE POSITIVES (GPU collection), not more
 tuning. Honest per operator's "성공 포장 금지".
+
+## Iteration 4 — balanced 15+/15- corpus and re-calibration (task t_a309678b)
+
+The positive-data blocker was removed by dedicating amp_csi's RTX3090 to
+collection. The new seed-major corpus contains per-step 3-camera observations,
+14-D proprio, sim predicates / success_step (offline labels only), and videos.
+`build_balanced_corpus.py` selected exactly 15 success + 15 failure episodes for
+each of GRASP, MOVE, and PLACE (90 skill episodes total). Raw eligible counts at
+selection time were GRASP +15/-15, MOVE +18/-15, PLACE +15/-27.
+
+Primary per-view cache pass: 10,182 forwards, 710.7 s, GPU peak 10.41 GB,
+frame-stride 4. A separate full-concat baseline cache used 3,067 forwards and
+265.6 s. All threshold/view/question/aggregation replay after caching was CPU
+only. The temporal label is strict: a frame before `success_step` is negative;
+an early ADVANCE counts as both FP and FN.
+
+### What the larger dataset changed
+
+The old 2-positive PLACE claim did not survive: the shipped right-view episode
+mean gate fell to precision 0.60 / recall 0.20. The larger corpus therefore
+confirmed the operator's complaint rather than validating the earlier result.
+
+The new endpoint/window sweep found:
+
+  skill   rule / aggregation                         precision  recall  TP FP FN TN
+  GRASP   grasp@eye final-10 mean >= 0.45327             .667    .933  14  7  1  8
+  MOVE    move@left final-5 mean >= 0.88857              .900    .600   9  1  6 14
+  PLACE   combined@eye final frame >= 0.89973             .900    .600   9  1  6 14
+
+PLACE and GRASP reporting gates were updated to these measured points. MOVE is
+a waypoint and remains a diagnostic endpoint metric rather than a strict final
+task gate. The cache-replayed shipped SuccessGate now measures:
+
+  SUCCESS judge AFTER                 precision  recall  TP FP FN TN
+  GRASP_OBJECT                            .667    .933  14  7  1  8
+  PLACE_OBJECT                            .900    .600   9  1  6 14
+
+  old full-concat latch BEFORE         precision  recall  TP FP FN TN
+  GRASP_OBJECT                            .538    .933  14 12  1  3
+  PLACE_OBJECT                            .400    .667  10 15  5  0
+
+Thus PLACE false positives fall 15 -> 1 and precision rises .40 -> .90, with a
+small recall cost (.667 -> .60). GRASP improves but still misses the .90
+precision target; forcing precision >=.90 leaves recall <=.133, so the deployed
+point uses the higher-F1 .667/.933 trade-off and is labelled as such.
+
+### Boundary judgment remains the unsolved part
+
+The strict online earliest-transition replay is poor even after sweeping every
+question x view x tau x latch x hold combination:
+
+  GRASP best precision .25 / recall .067 (frame AUC best .665)
+  MOVE  best precision .40 / recall .133 (frame AUC best .712)
+  PLACE best precision .333 / recall .067 (frame AUC best .896)
+
+The same VLM can recognize a final completion checkpoint for MOVE/PLACE, but it
+cannot reliably identify the earliest safe transition frame. This is not hidden
+by the endpoint result. An end-to-end run may therefore still advance early or
+time out; the strict endpoint gate improves honest reporting, not the online
+boundary controller. Full JSON and manifests are in
+`calib_out/balanced_t_a309678b/`.
+
+### End-to-end re-check with the calibrated boundary config
+
+Three fresh full-task seeds used the emitted per-skill boundary config
+(GRASP eye/tau .80, MOVE left/.95, PLACE eye/.98) plus the new endpoint gates.
+All execution decisions remained obs-only; sim predicates were read only after
+the episode for evaluation.
+
+  seed  sim task success  obs_task_success  outcome
+   40        false             false         PLACE timeout twice
+   41        false             true          residual strict false-positive
+   42        false             false         PLACE timeout twice
+
+Result: official success **0/3**, obs-vs-sim agreement **2/3**. This is worse
+than the lenient uncalibrated boundary's 1/3 official success on the same seeds:
+the high-precision temporal operating points trade early false alarms for PLACE
+timeouts, and seed41 still produces one endpoint false-positive. Therefore the
+requested "model-only architecture smoothly progresses" claim is **not
+established**. The data-driven success reporter is materially better, but the
+online boundary controller remains the blocking component. Traces, summaries,
+and three overlay videos are stored under
+`calib_out/balanced_t_a309678b/e2e_optimized/` and tracking Inference v3.

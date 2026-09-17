@@ -1,0 +1,93 @@
+{
+  "task": "CloseBlenderLid",
+  "goal": "Close the blender lid securely.",
+  "seeds": [
+    40,
+    41,
+    42
+  ],
+  "split": "pretrain",
+  "planner": {
+    "kind": "sequential_obs_stub",
+    "note": "scripted sequential obs-only stub, NOT a learned planner"
+  },
+  "verifier": {
+    "kind": "obs_vlm",
+    "backbone": "policy's own frozen Qwen3-VL VQA P(yes)",
+    "input": "3-cam images + 14D proprio ONLY (no sim predicate)",
+    "vlm_min_interval": 16,
+    "hysteresis_k": 2,
+    "tau": 0.6,
+    "event_gated": true,
+    "per_skill_operating_points": {
+      "GRASP_OBJECT": {
+        "view": "eye",
+        "tau": 0.8,
+        "hysteresis_k": 2,
+        "vlm_min_interval": 16
+      },
+      "MOVE_OBJECT": {
+        "view": "left",
+        "tau": 0.95,
+        "hysteresis_k": 2,
+        "vlm_min_interval": 16
+      },
+      "PLACE_OBJECT": {
+        "view": "eye",
+        "tau": 0.98,
+        "hysteresis_k": 2,
+        "vlm_min_interval": 16
+      }
+    }
+  },
+  "adapter_mode": "disabled",
+  "adapter_checkpoint": null,
+  "policy_provenance": {
+    "model_path": "/checkpoint",
+    "adapter_mode": "disabled",
+    "adapter_checkpoint": null,
+    "replan_steps": 16
+  },
+  "replan_steps": 16,
+  "obs_history": 4,
+  "obs_interval": 2,
+  "crop_ratio": 0.95,
+  "video_stride": 2,
+  "video_fps": 20,
+  "episode_budget": 600,
+  "skill_catalog": [
+    {
+      "name": "GRASP_OBJECT",
+      "description": "Grasp an object at a named grasp region and lift it clear.",
+      "args": [
+        "object",
+        "grasp_region"
+      ],
+      "instruction": "Grasp the blender lid securely at its handle and lift it clear.",
+      "done_when": "held AND lifted>=0.05m AND stable_for(20) AND no_disallowed_contact",
+      "max_steps": 208
+    },
+    {
+      "name": "MOVE_OBJECT",
+      "description": "Move a held object to a named destination region.",
+      "args": [
+        "object",
+        "destination"
+      ],
+      "instruction": "Move the held blender lid to the pre-place region above the blender while maintaining a stable grasp and avoiding disallowed contact.",
+      "done_when": "held AND at_target(xy<=0.06m,z 0.015-0.25m) AND stable_for(3) AND no_disallowed_contact",
+      "max_steps": 288
+    },
+    {
+      "name": "PLACE_OBJECT",
+      "description": "Place a held object on a support, release, and retreat.",
+      "args": [
+        "object",
+        "destination"
+      ],
+      "instruction": "Place the blender lid on the blender, release it after it is stably supported, then move the gripper clear.",
+      "done_when": "supported_by AND released AND upright_error<=7deg AND gripper_clear>=0.15m",
+      "max_steps": 96
+    }
+  ]
+}
