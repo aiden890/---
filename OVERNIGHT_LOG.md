@@ -82,3 +82,4 @@
 - 다음 cron: ue4 DONE 시 after-eval delta로 uepochs=4 개선 정직 판정 + ue8 체인 진행 확인.
 - 2026-09-17 14:48 KST | exp4 ue4(v4) 19/30, GATED 9/19=47%, fixed eval before grasp/official=0.55/0.15, after=pending | process+GPU normal (10.7/24.6GB), errors/OOM/RPC=0; no intervention, ue8 remains queued on v4 after ue4 (amp_csi reserved for calibration).
 2026-09-17 15:48 KST | exp4 ue4 26/30 | GATED 10/26=38.5% (mixed 16/26) | eval before grasp/official 0.55/0.15, after pending | healthy; no intervention, ue8 remains chained on v4 after ue4 for same-hardware comparison (amp_csi now free)
+2026-09-17 16:52 KST | exp4 ue4 stopped 26/30 by operator, GATED 10/26=38.5%, eval before grasp/official 0.55/0.15, after unavailable | no restart: t_4c421da6 Z-1 all-linear smoke owns v4 GPU; tracking finalized, no base-beating improvement proved.

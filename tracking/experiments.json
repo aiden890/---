@@ -85,13 +85,13 @@
     {
       "id": "EXP-20260917-ADAPTIVE",
       "date": "2026-09-17",
-      "title": "Adaptive curriculum GRASP GRPO — 병목 진단 스윕 (exp1→3)",
-      "status": "running",
+      "title": "Adaptive curriculum GRASP GRPO — 병목 진단 스윕 (exp1→4)",
+      "status": "complete",
       "model": "Xiaomi-Robotics-1-RoboCasa365",
       "checkpoint": "3a6d0293bfa90759d34a7fc48c2c62413cd7bcf4",
       "task": "CloseBlenderLid",
       "why": "고정 prefilter 대신 매 iter n_succ로 seed 난이도를 온라인 추적→중간밴드 편향 샘플러로 GRPO 신호(mixed group)를 복구하고, 고정 eval set에서 GRASP 성공률을 base(0.55 grasp)/official 위로 실제 개선.",
-      "question": "어떤 개입이 adaptive-curriculum GRASP GRPO의 고정 eval 성공률을 실제로 올리는가? (1차: GATED 비율↓ 달성. 2차: eval delta>0 미해결 — 병목이 무엇인가?)",
+      "question": "Adaptive curriculum이 GATED 비율을 낮추고 고정 eval GRASP 성공률을 base 위로 올렸는가?",
       "arms": [
         {
           "exp": "exp1",
@@ -119,14 +119,22 @@
           "var": "PPO clip (AdamW 3e-5 고정)",
           "v4": "clip 0.2",
           "amp": "clip 0.3",
-          "verdict": "진행중. 진단: on-seed n_succ 무추세(seed 1092 10회 학습 5,4,5,2,3,4,4,5,4,3) + clip_fraction~0.90(clip=0.1 포화) → advantage gradient 억제가 진짜 병목으로 지목. clip 완화가 이를 푸는지 검증.",
+          "verdict": "가설 기각. clip_fraction은 clip 0.1≈0.90 → 0.2≈0.75 → 0.3≈0.66으로 낮아졌지만 grasp는 0.55→0.60/0.55, official은 양쪽 모두 0.05로 하락. clip 포화 완화만으로 학습효과가 살아나지 않음.",
           "wandb_runs": [
             "http://100.86.183.64:8080/aiden-lab-desktop/robocasa-grpo/runs/grpo-adaptive_adamw3e5_clip02",
             "http://100.86.183.64:8080/aiden-lab-desktop/robocasa-grpo/runs/grpo-adaptive_adamw3e5_clip03"
           ]
+        },
+        {
+          "exp": "exp4",
+          "var": "update epochs (AdamW 3e-5, clip 0.2 고정)",
+          "v4": "update_epochs=4",
+          "amp": "update_epochs=8 (operator GPU 재할당으로 조기중단)",
+          "verdict": "ue4는 26/30에서 operator 결정으로 종료되어 after eval 없음. GATED 10/26=38.5%, mixed 16/26; 평균 post ratio 0.962/KL 0.327/clip 0.824/grad_norm 2028.5/adapter_dL2 0.04247. on-seed n_succ 상승 추세가 없어 개선 증거 없음. ue8도 GPU 우선순위 전환으로 완료 못함.",
+          "wandb_runs": []
         }
       ],
-      "summary": "온라인 adaptive band 커리큘럼(band 1~7, universe 240, explore 0.25). exp1 optimizer / exp2 LR / exp3 clip 페어드 단일변수 스윕. exp1이 GATED 비율은 절반으로 낮췄으나 고정 eval delta는 exp1·exp2 모두 0. 로그 실측 진단으로 병목을 clip 포화(learning-efficacy)로 지목, exp3에서 clip 완화 검증 중.",
+      "summary": "완료: adaptive band는 GATED를 baseline 68%에서 대체로 32~38%까지 낮춰 mixed 학습신호는 늘렸다. 그러나 optimizer/LR/clip/update-epochs 단일변수 실험 모두 고정 eval에서 base 초과 개선을 입증하지 못했다. exp3 official success는 양쪽 0.05로 하락했고, exp4는 후속 action-expert 실험에 GPU를 양보하라는 operator 결정으로 ue4 26/30(후평가 없음)에서 종료됐다.",
       "data": "../rl-train-t_3ed65912/results/adaptive/",
       "tags": [
         "GRPO",
@@ -136,7 +144,10 @@
         "learning-rate",
         "clip",
         "2-GPU",
-        "diagnosis"
+        "diagnosis",
+        "update-epochs",
+        "no-improvement",
+        "stopped-early"
       ],
       "kanban": "t_2907de4f",
       "wandb": {
@@ -149,7 +160,8 @@
           "adaptive_adamw3e5_clip02": "http://100.86.183.64:8080/aiden-lab-desktop/robocasa-grpo/runs/grpo-adaptive_adamw3e5_clip02",
           "adaptive_adamw3e5_clip03": "http://100.86.183.64:8080/aiden-lab-desktop/robocasa-grpo/runs/grpo-adaptive_adamw3e5_clip03"
         }
-      }
+      },
+      "verdict": "1차목표(GATED 감소)는 달성했지만 2차목표(base 초과 성공률)는 미달. 성능 개선 주장 불가."
     },
     {
       "id": "EXP-20260916-STAGE1",
