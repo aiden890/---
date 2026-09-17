@@ -109,6 +109,7 @@
       "kanban": "t_2bb64447",
       "source": {
         "commit": "3154248851cceb3703b9b60931ce1e1627282bbd",
+        "checkpoint_load_fix_commit": "6fc53e6d121352b6c41f904c93da05fae07f2ee7",
         "manifest_sha256": "06679ca1cf5a74e3c8de860a4242f4a91f4f004dd9533b93e3133c573560cbb6",
         "dirty": false
       },

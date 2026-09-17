@@ -3,6 +3,7 @@
 Task: `t_2bb64447`
 Correctness base commit: `be7df4f537b4b35a921c55d5d9e46cb65eca45b0`
 Unique-checkpoint launcher fix: `3154248851cceb3703b9b60931ce1e1627282bbd`
+Checkpoint RNG restore fix: `6fc53e6d121352b6c41f904c93da05fae07f2ee7`
 GPU run: `corrected_exact_3154248_micro_lr1e6`
 Classification: correctness/feasibility micro only; `--skip-eval`; no policy-improvement claim.
 
@@ -43,11 +44,11 @@ The first exact-`be7df4f` launch exposed the remaining launcher bug: `run-train.
 
 ## Checkpoint gate
 
-A fresh trainer with the same strict named layout loaded:
+The first fresh-trainer load of the real checkpoint failed with `RNG state must be a torch.ByteTensor`: `torch.load(..., map_location=cuda)` had moved saved CPU RNG tensors to CUDA before `torch.set_rng_state`. Commit `6fc53e6` normalizes both the CPU RNG tensor and each saved CUDA RNG tensor to CPU before restore, with a regression/mutation test. After deploying `6fc53e6`, a fresh trainer with the same strict named layout loaded:
 
 `/train/results/corrected_exact_3154248_micro_lr1e6/grpo_trained.pt`
 
-The load returned schema version 2, 378 named LoRA tensors, 0 extra tensors, adapter skill `grasp`, the 189 target names, rank/alpha, optimizer/RNG state metadata, update index 1, base model, sampler/config, exact source commit, and source manifest hash. Missing/unexpected/shape mismatch checks remain fail-fast in the schema tests.
+The post-fix load returned schema version 2, 378 named LoRA tensors, 0 extra tensors, adapter skill `grasp`, the 189 target names, rank/alpha, optimizer/RNG state metadata, update index 1, base model, sampler/config, exact source commit, and source manifest hash. The checkpoint correctly retains its generating source commit `3154248`; the loader fix is `6fc53e6`. Missing/unexpected/shape mismatch checks remain fail-fast in the schema tests.
 
 ## Stability verdict
 
