@@ -1,381 +1,436 @@
 {
- "schema_version": 1,
- "experiments": [
-  {
-   "id": "EXP-20260916-STAGE1",
-   "date": "2026-09-16",
-   "title": "GRASP GRPO optimizer/LR 스크리닝 (2-GPU 병렬)",
-   "status": "running",
-   "model": "Xiaomi-Robotics-1-RoboCasa365",
-   "checkpoint": "3a6d0293bfa90759d34a7fc48c2c62413cd7bcf4",
-   "task": "CloseBlenderLid",
-   "question": "advantage 처리+측정 방식을 참고문서대로 고친 뒤, 어떤 optimizer/LR이 GRASP GRPO를 실제로 개선하는가? (flat의 원인은 LR 약함이 아니라 advantage 버그라는 진단 검증)",
-   "summary": "선행 3건(advantage 완료-aware min-baseline+std gate, post-step 측정, reward variant 명칭)을 코드로 고치고 v4 GPU 스모크로 검증한 뒤, SGD 2e-3 / AdamW 3e-6·1e-5·3e-5 네 arm을 v4+amp_csi 2-GPU 병렬로 스크리닝.",
-   "page": "experiments/exp-20260916-stage1-grasp-optlr.html",
-   "data": "stage1.json",
-   "tags": ["GRPO", "GRASP", "optimizer", "learning-rate", "advantage", "2-GPU", "screening"]
-  },
-  {
-   "id": "EXP-20260916-01",
-   "date": "2026-09-16",
-   "title": "정의된 skill instruction zero-shot rollout",
-   "status": "pilot",
-   "model": "Xiaomi-Robotics-1-RoboCasa365",
-   "checkpoint": "3a6d0293bfa90759d34a7fc48c2c62413cd7bcf4",
-   "task": "CloseBlenderLid",
-   "seed": 9,
-   "question": "새로 정의한 generic skill instruction을 기존 checkpoint가 추가 학습 없이 수행하는가?",
-   "setup": [
-    "Checkpoint와 sampler를 변경하지 않은 zero-shot baseline",
-    "GRASP=공식 reset, MOVE=grasp 완료 snapshot, PLACE=pre-place snapshot",
-    "action chunk 16 steps, deterministic baseline rollout",
-    "성공 후 최대 32 steps를 추가 실행해 predicate 유지와 행동 지속을 관찰"
-   ],
-   "verdict": "[Randomized 10x10] GRASP_OBJECT 4/10 (40%), PLACE_OBJECT 2/10 (20%) zero-shot 성공. PLACE 10 seed 전부 유효한 pre-place entry 생성. 폐기된 same-state 반복 실험 대체.",
-   "decision": "현재 근거로는 GRASP_OBJECT가 grounding 또는 policy 개선 후보이며, MOVE_OBJECT와 PLACE_OBJECT는 우선 SFT 생략 후보이다.",
-   "artifact_path": "/home/aiden/Desktop/lab/robot/defined-instruction-rollouts/defined_inst_probe_s9",
-   "videos": [
+  "schema_version": 1,
+  "experiments": [
     {
-     "skill": "GRASP_OBJECT",
-     "adapter": "grasp",
-     "instruction": "Grasp the blender lid securely at its handle and lift it clear.",
-     "start_state": "official reset",
-     "outcome": "FAIL",
-     "steps": 208,
-     "success_step": null,
-     "post_steps": 0,
-     "post_predicate_fraction": null,
-     "post_eef_displacement_m": null,
-     "mp4": "media/experiments/exp-20260916-defined-inst-s9/grasp_object.mp4",
-     "note": "horizon까지 stable grasp 조건을 달성하지 못함"
+      "id": "EXP-20260917-ADAPTIVE",
+      "date": "2026-09-17",
+      "title": "Adaptive curriculum GRASP GRPO — 병목 진단 스윕 (exp1→3)",
+      "status": "running",
+      "model": "Xiaomi-Robotics-1-RoboCasa365",
+      "checkpoint": "3a6d0293bfa90759d34a7fc48c2c62413cd7bcf4",
+      "task": "CloseBlenderLid",
+      "why": "고정 prefilter 대신 매 iter n_succ로 seed 난이도를 온라인 추적→중간밴드 편향 샘플러로 GRPO 신호(mixed group)를 복구하고, 고정 eval set에서 GRASP 성공률을 base(0.55 grasp)/official 위로 실제 개선.",
+      "question": "어떤 개입이 adaptive-curriculum GRASP GRPO의 고정 eval 성공률을 실제로 올리는가? (1차: GATED 비율↓ 달성. 2차: eval delta>0 미해결 — 병목이 무엇인가?)",
+      "arms": [
+        {
+          "exp": "exp1",
+          "var": "optimizer",
+          "v4": "SGD 2e-3",
+          "amp": "AdamW 1e-5",
+          "verdict": "1차목표 달성(GATED 68%→33/36%). 2차 미달: SGD dL2~0.001(정지)·grasp 0.60→0.55 REGRESSED; AdamW dL2 0.0038(유일 이동)·grasp+0.05. 병목=업뎃강도로 가설."
+        },
+        {
+          "exp": "exp2",
+          "var": "learning rate (AdamW 고정)",
+          "v4": "AdamW 3e-5",
+          "amp": "AdamW 5e-5",
+          "verdict": "가설 반증. dL2를 exp1 대비 4~12x 키웠으나 양쪽 eval grasp flat 0.55→0.55. 업뎃강도는 병목 아님."
+        },
+        {
+          "exp": "exp3",
+          "var": "PPO clip (AdamW 3e-5 고정)",
+          "v4": "clip 0.2",
+          "amp": "clip 0.3",
+          "verdict": "진행중. 진단: on-seed n_succ 무추세(seed 1092 10회 학습 5,4,5,2,3,4,4,5,4,3) + clip_fraction~0.90(clip=0.1 포화) → advantage gradient 억제가 진짜 병목으로 지목. clip 완화가 이를 푸는지 검증."
+        }
+      ],
+      "summary": "온라인 adaptive band 커리큘럼(band 1~7, universe 240, explore 0.25). exp1 optimizer / exp2 LR / exp3 clip 페어드 단일변수 스윕. exp1이 GATED 비율은 절반으로 낮췄으나 고정 eval delta는 exp1·exp2 모두 0. 로그 실측 진단으로 병목을 clip 포화(learning-efficacy)로 지목, exp3에서 clip 완화 검증 중.",
+      "data": "../rl-train-t_3ed65912/results/adaptive/",
+      "tags": [
+        "GRPO",
+        "GRASP",
+        "adaptive-curriculum",
+        "optimizer",
+        "learning-rate",
+        "clip",
+        "2-GPU",
+        "diagnosis"
+      ],
+      "kanban": "t_2907de4f"
     },
     {
-     "skill": "MOVE_OBJECT",
-     "adapter": "move_holding",
-     "instruction": "Move the held blender lid to the pre-place region above the blender while maintaining a stable grasp and avoiding disallowed contact.",
-     "start_state": "grasp-success snapshot",
-     "outcome": "SUCCESS",
-     "steps": 108,
-     "success_step": 76,
-     "post_steps": 32,
-     "post_predicate_fraction": 0.697,
-     "post_eef_displacement_m": 0.0797,
-     "mp4": "media/experiments/exp-20260916-defined-inst-s9/move_object.mp4",
-     "note": "성공 후 32 steps 동안 7.97cm 이동했고 성공 predicate 유지율은 69.7%"
+      "id": "EXP-20260916-STAGE1",
+      "date": "2026-09-16",
+      "title": "GRASP GRPO optimizer/LR 스크리닝 (2-GPU 병렬)",
+      "status": "running",
+      "model": "Xiaomi-Robotics-1-RoboCasa365",
+      "checkpoint": "3a6d0293bfa90759d34a7fc48c2c62413cd7bcf4",
+      "task": "CloseBlenderLid",
+      "question": "advantage 처리+측정 방식을 참고문서대로 고친 뒤, 어떤 optimizer/LR이 GRASP GRPO를 실제로 개선하는가? (flat의 원인은 LR 약함이 아니라 advantage 버그라는 진단 검증)",
+      "summary": "선행 3건(advantage 완료-aware min-baseline+std gate, post-step 측정, reward variant 명칭)을 코드로 고치고 v4 GPU 스모크로 검증한 뒤, SGD 2e-3 / AdamW 3e-6·1e-5·3e-5 네 arm을 v4+amp_csi 2-GPU 병렬로 스크리닝.",
+      "page": "experiments/exp-20260916-stage1-grasp-optlr.html",
+      "data": "stage1.json",
+      "tags": [
+        "GRPO",
+        "GRASP",
+        "optimizer",
+        "learning-rate",
+        "advantage",
+        "2-GPU",
+        "screening"
+      ]
     },
     {
-     "skill": "PLACE_OBJECT",
-     "adapter": "place",
-     "instruction": "Place the blender lid on the blender, release it after it is stably supported, then move the gripper clear.",
-     "start_state": "pre-place snapshot",
-     "outcome": "SUCCESS",
-     "steps": 96,
-     "success_step": 93,
-     "post_steps": 3,
-     "post_predicate_fraction": 1.0,
-     "post_eef_displacement_m": 0.0375,
-     "mp4": "media/experiments/exp-20260916-defined-inst-s9/place_object.mp4",
-     "note": "성공했지만 budget에 3 steps만 남아 post-success 평가는 추가 rollout 필요"
+      "id": "EXP-20260916-01",
+      "date": "2026-09-16",
+      "title": "정의된 skill instruction zero-shot rollout",
+      "status": "pilot",
+      "model": "Xiaomi-Robotics-1-RoboCasa365",
+      "checkpoint": "3a6d0293bfa90759d34a7fc48c2c62413cd7bcf4",
+      "task": "CloseBlenderLid",
+      "seed": 9,
+      "question": "새로 정의한 generic skill instruction을 기존 checkpoint가 추가 학습 없이 수행하는가?",
+      "setup": [
+        "Checkpoint와 sampler를 변경하지 않은 zero-shot baseline",
+        "GRASP=공식 reset, MOVE=grasp 완료 snapshot, PLACE=pre-place snapshot",
+        "action chunk 16 steps, deterministic baseline rollout",
+        "성공 후 최대 32 steps를 추가 실행해 predicate 유지와 행동 지속을 관찰"
+      ],
+      "verdict": "[Randomized 10x10] GRASP_OBJECT 4/10 (40%), PLACE_OBJECT 2/10 (20%) zero-shot 성공. PLACE 10 seed 전부 유효한 pre-place entry 생성. 폐기된 same-state 반복 실험 대체.",
+      "decision": "현재 근거로는 GRASP_OBJECT가 grounding 또는 policy 개선 후보이며, MOVE_OBJECT와 PLACE_OBJECT는 우선 SFT 생략 후보이다.",
+      "artifact_path": "/home/aiden/Desktop/lab/robot/defined-instruction-rollouts/defined_inst_probe_s9",
+      "videos": [
+        {
+          "skill": "GRASP_OBJECT",
+          "adapter": "grasp",
+          "instruction": "Grasp the blender lid securely at its handle and lift it clear.",
+          "start_state": "official reset",
+          "outcome": "FAIL",
+          "steps": 208,
+          "success_step": null,
+          "post_steps": 0,
+          "post_predicate_fraction": null,
+          "post_eef_displacement_m": null,
+          "mp4": "media/experiments/exp-20260916-defined-inst-s9/grasp_object.mp4",
+          "note": "horizon까지 stable grasp 조건을 달성하지 못함"
+        },
+        {
+          "skill": "MOVE_OBJECT",
+          "adapter": "move_holding",
+          "instruction": "Move the held blender lid to the pre-place region above the blender while maintaining a stable grasp and avoiding disallowed contact.",
+          "start_state": "grasp-success snapshot",
+          "outcome": "SUCCESS",
+          "steps": 108,
+          "success_step": 76,
+          "post_steps": 32,
+          "post_predicate_fraction": 0.697,
+          "post_eef_displacement_m": 0.0797,
+          "mp4": "media/experiments/exp-20260916-defined-inst-s9/move_object.mp4",
+          "note": "성공 후 32 steps 동안 7.97cm 이동했고 성공 predicate 유지율은 69.7%"
+        },
+        {
+          "skill": "PLACE_OBJECT",
+          "adapter": "place",
+          "instruction": "Place the blender lid on the blender, release it after it is stably supported, then move the gripper clear.",
+          "start_state": "pre-place snapshot",
+          "outcome": "SUCCESS",
+          "steps": 96,
+          "success_step": 93,
+          "post_steps": 3,
+          "post_predicate_fraction": 1.0,
+          "post_eef_displacement_m": 0.0375,
+          "mp4": "media/experiments/exp-20260916-defined-inst-s9/place_object.mp4",
+          "note": "성공했지만 budget에 3 steps만 남아 post-success 평가는 추가 rollout 필요"
+        }
+      ],
+      "page": "experiments/exp-20260916-defined-inst-s9.html",
+      "summary": "정의된 세 skill instruction의 zero-shot 성공 여부와 성공 후 행동을 확인한 pilot.",
+      "tags": [
+        "zero-shot",
+        "skill instruction",
+        "SFT gate",
+        "video"
+      ],
+      "random": {
+        "note": "운영자 요구에 따라 same-state 반복 실험을 폐기하고, 매 seed마다 RoboCasa 환경을 randomize한 zero-shot rollout을 GRASP·PLACE 각 10회 수행. 체크포인트/샘플러 불변. PLACE는 seed별로 같은 randomized scene에서 pre-place entry를 새로 생성(스냅샷 재사용 없음).",
+        "grasp": {
+          "instruction": "Grasp the blender lid securely at its handle and lift it clear.",
+          "success_count": 4,
+          "n": 10,
+          "success_rate": 0.4,
+          "start_state": "official reset(seed) — 매 seed 다른 randomized scene",
+          "runs": [
+            {
+              "seed": 0,
+              "outcome": "SUCCESS",
+              "success_step": 136,
+              "steps": 136,
+              "terminated_by": "success",
+              "entry_valid": true,
+              "failure_reason": null,
+              "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/grasp/grasp_seed0.mp4",
+              "video_frames": 69
+            },
+            {
+              "seed": 1,
+              "outcome": "SUCCESS",
+              "success_step": 145,
+              "steps": 145,
+              "terminated_by": "success",
+              "entry_valid": true,
+              "failure_reason": null,
+              "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/grasp/grasp_seed1.mp4",
+              "video_frames": 74
+            },
+            {
+              "seed": 2,
+              "outcome": "SUCCESS",
+              "success_step": 176,
+              "steps": 176,
+              "terminated_by": "success",
+              "entry_valid": true,
+              "failure_reason": null,
+              "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/grasp/grasp_seed2.mp4",
+              "video_frames": 89
+            },
+            {
+              "seed": 3,
+              "outcome": "FAIL",
+              "success_step": null,
+              "steps": 208,
+              "terminated_by": "horizon",
+              "entry_valid": true,
+              "failure_reason": "never held lid lifted for 20 consecutive steps (contact=False lifted=False)",
+              "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/grasp/grasp_seed3.mp4",
+              "video_frames": 105
+            },
+            {
+              "seed": 4,
+              "outcome": "FAIL",
+              "success_step": null,
+              "steps": 208,
+              "terminated_by": "horizon",
+              "entry_valid": true,
+              "failure_reason": "never held lid lifted for 20 consecutive steps (contact=False lifted=False)",
+              "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/grasp/grasp_seed4.mp4",
+              "video_frames": 105
+            },
+            {
+              "seed": 5,
+              "outcome": "SUCCESS",
+              "success_step": 171,
+              "steps": 171,
+              "terminated_by": "success",
+              "entry_valid": true,
+              "failure_reason": null,
+              "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/grasp/grasp_seed5.mp4",
+              "video_frames": 87
+            },
+            {
+              "seed": 6,
+              "outcome": "FAIL",
+              "success_step": null,
+              "steps": 208,
+              "terminated_by": "horizon",
+              "entry_valid": true,
+              "failure_reason": "never held lid lifted for 20 consecutive steps (contact=True lifted=True)",
+              "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/grasp/grasp_seed6.mp4",
+              "video_frames": 105
+            },
+            {
+              "seed": 7,
+              "outcome": "FAIL",
+              "success_step": null,
+              "steps": 208,
+              "terminated_by": "horizon",
+              "entry_valid": true,
+              "failure_reason": "never held lid lifted for 20 consecutive steps (contact=False lifted=False)",
+              "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/grasp/grasp_seed7.mp4",
+              "video_frames": 105
+            },
+            {
+              "seed": 8,
+              "outcome": "FAIL",
+              "success_step": null,
+              "steps": 208,
+              "terminated_by": "horizon",
+              "entry_valid": true,
+              "failure_reason": "never held lid lifted for 20 consecutive steps (contact=False lifted=False)",
+              "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/grasp/grasp_seed8.mp4",
+              "video_frames": 105
+            },
+            {
+              "seed": 9,
+              "outcome": "FAIL",
+              "success_step": null,
+              "steps": 208,
+              "terminated_by": "horizon",
+              "entry_valid": true,
+              "failure_reason": "never held lid lifted for 20 consecutive steps (contact=True lifted=False)",
+              "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/grasp/grasp_seed9.mp4",
+              "video_frames": 105
+            }
+          ]
+        },
+        "place": {
+          "instruction": "Place the blender lid on the blender, release it after it is stably supported, then move the gripper clear.",
+          "success_count": 2,
+          "n": 10,
+          "success_rate": 0.2,
+          "entry_valid_count": 10,
+          "start_state": "seed별 full-task VLA generation으로 새로 만든 pre-place snapshot (lid grasped, lid_on_blender=False)",
+          "runs": [
+            {
+              "seed": 0,
+              "outcome": "FAIL",
+              "success_step": null,
+              "steps": 400,
+              "terminated_by": "horizon",
+              "entry_valid": true,
+              "failure_reason": "lid_on_blender=False gripper_far=True dist_to_closed=0.020",
+              "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/place/place_seed0.mp4",
+              "video_frames": 201
+            },
+            {
+              "seed": 1,
+              "outcome": "FAIL",
+              "success_step": null,
+              "steps": 400,
+              "terminated_by": "horizon",
+              "entry_valid": true,
+              "failure_reason": "lid_on_blender=True gripper_far=False dist_to_closed=0.026",
+              "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/place/place_seed1.mp4",
+              "video_frames": 201
+            },
+            {
+              "seed": 2,
+              "outcome": "FAIL",
+              "success_step": null,
+              "steps": 400,
+              "terminated_by": "horizon",
+              "entry_valid": true,
+              "failure_reason": "lid_on_blender=False gripper_far=True dist_to_closed=0.031",
+              "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/place/place_seed2.mp4",
+              "video_frames": 201
+            },
+            {
+              "seed": 3,
+              "outcome": "FAIL",
+              "success_step": null,
+              "steps": 400,
+              "terminated_by": "horizon",
+              "entry_valid": true,
+              "failure_reason": "lid_on_blender=False gripper_far=False dist_to_closed=0.015",
+              "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/place/place_seed3.mp4",
+              "video_frames": 201
+            },
+            {
+              "seed": 4,
+              "outcome": "FAIL",
+              "success_step": null,
+              "steps": 400,
+              "terminated_by": "horizon",
+              "entry_valid": true,
+              "failure_reason": "lid_on_blender=False gripper_far=True dist_to_closed=0.019",
+              "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/place/place_seed4.mp4",
+              "video_frames": 201
+            },
+            {
+              "seed": 5,
+              "outcome": "FAIL",
+              "success_step": null,
+              "steps": 400,
+              "terminated_by": "horizon",
+              "entry_valid": true,
+              "failure_reason": "lid_on_blender=False gripper_far=True dist_to_closed=0.014",
+              "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/place/place_seed5.mp4",
+              "video_frames": 201
+            },
+            {
+              "seed": 6,
+              "outcome": "FAIL",
+              "success_step": null,
+              "steps": 400,
+              "terminated_by": "horizon",
+              "entry_valid": true,
+              "failure_reason": "lid_on_blender=False gripper_far=True dist_to_closed=0.024",
+              "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/place/place_seed6.mp4",
+              "video_frames": 201
+            },
+            {
+              "seed": 7,
+              "outcome": "FAIL",
+              "success_step": null,
+              "steps": 400,
+              "terminated_by": "horizon",
+              "entry_valid": true,
+              "failure_reason": "lid_on_blender=False gripper_far=True dist_to_closed=0.051",
+              "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/place/place_seed7.mp4",
+              "video_frames": 201
+            },
+            {
+              "seed": 8,
+              "outcome": "SUCCESS",
+              "success_step": 208,
+              "steps": 208,
+              "terminated_by": "success",
+              "entry_valid": true,
+              "failure_reason": null,
+              "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/place/place_seed8.mp4",
+              "video_frames": 105
+            },
+            {
+              "seed": 9,
+              "outcome": "SUCCESS",
+              "success_step": 112,
+              "steps": 112,
+              "terminated_by": "success",
+              "entry_valid": true,
+              "failure_reason": null,
+              "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/place/place_seed9.mp4",
+              "video_frames": 57
+            }
+          ]
+        },
+        "artifact_path": "/home/aiden/Desktop/lab/robot/defined-instruction-rollouts/random_g10_p10"
+      }
+    },
+    {
+      "id": "EXP-20260915-INSTRUCTION-ATTENDANCE",
+      "date": "2026-09-15",
+      "title": "Instruction Attendance 분석",
+      "status": "complete",
+      "model": "Xiaomi-Robotics-1-RoboCasa365",
+      "task": "CloseBlenderLid",
+      "seed": 9,
+      "question": "정책이 instruction을 실제 제어 신호로 사용하는가?",
+      "summary": "고정 observation에서 instruction만 변경해 action 차이를 측정. 시작 상태에서는 instruction, 중간 상태에서는 observation 영향이 강했다.",
+      "page": "experiments/exp-20260915-instruction-attendance.html",
+      "tags": [
+        "instruction attention",
+        "action divergence",
+        "fixed observation"
+      ]
+    },
+    {
+      "id": "EXP-20260916-02",
+      "date": "2026-09-16",
+      "title": "훈련 롤아웃 GRASP horizon 진단 (120 vs 208)",
+      "summary": "훈련 루프 롤아웃 폴리시로 GRASP 10 seed 롤아웃 — GRASP 저성공의 원인이 horizon_grasp=120 절단임을 확증.",
+      "question": "훈련 루프의 GRASP 저성공(16.7%)이 진짜 모델 한계인가, 아니면 horizon 설정(120) 때문인가?",
+      "task": "CloseBlenderLid",
+      "model": "Xiaomi-Robotics-1-RoboCasa365",
+      "seed": 0,
+      "checkpoint": "3a6d0293bfa90759d34a7fc48c2c62413cd7bcf4",
+      "status": "complete",
+      "tags": [
+        "diagnosis",
+        "GRASP",
+        "horizon",
+        "GRPO",
+        "training-rollout"
+      ],
+      "setup": [
+        "훈련 롤아웃 경로 그대로 사용: grpo_train_loop._run_one_skill + grpo_trainer_server op_sample",
+        "폴리시 = 사전학습 base (per-skill LoRA zero-init, op=update 미적용 → 체크포인트와 bit-for-bit)",
+        "동일 seed 0~9, split=pretrain (standalone 40% 레퍼런스와 동일 조건)",
+        "eta=0(결정론, standalone 샘플러와 동일) + eta=0.1(GRPO 훈련이 실제 쓰는 확률적 롤아웃) 둘 다",
+        "horizon_grasp 120(훈련 기본) vs 208(standalone) 비교, GRASP_HOLD_STEPS=20 동일"
+      ],
+      "verdict": "horizon이 원인. horizon 120: eta0=0/10, eta0.1=0/10 (전부 시간부족 절단). horizon 208: eta0=5/10(50%), eta0.1=4/10(40%) — standalone 40%와 일치. 폴리시/샘플러는 동일; 훈련 기본값 horizon_grasp=120이 20-hold 완성(최이른 step 128~136)을 잘라 성공을 0으로 만든 것.",
+      "decision": "훈련 루프의 horizon_grasp를 GRASP 성공이 담기는 값(>=180, 권장 208)으로 상향해야 함. RL '신호 없음'은 모델 한계가 아니라 롤아웃 horizon 절단 버그. eta>0 탐색은 성공 seed를 바꿀 뿐 총 성공률은 horizon에 지배됨.",
+      "page": "experiments/exp-20260916-grasp-horizon.html",
+      "data": "grasp_horizon.json"
     }
-   ],
-   "page": "experiments/exp-20260916-defined-inst-s9.html",
-   "summary": "정의된 세 skill instruction의 zero-shot 성공 여부와 성공 후 행동을 확인한 pilot.",
-   "tags": [
-    "zero-shot",
-    "skill instruction",
-    "SFT gate",
-    "video"
-   ],
-   "random": {
-    "note": "운영자 요구에 따라 same-state 반복 실험을 폐기하고, 매 seed마다 RoboCasa 환경을 randomize한 zero-shot rollout을 GRASP·PLACE 각 10회 수행. 체크포인트/샘플러 불변. PLACE는 seed별로 같은 randomized scene에서 pre-place entry를 새로 생성(스냅샷 재사용 없음).",
-    "grasp": {
-     "instruction": "Grasp the blender lid securely at its handle and lift it clear.",
-     "success_count": 4,
-     "n": 10,
-     "success_rate": 0.4,
-     "start_state": "official reset(seed) — 매 seed 다른 randomized scene",
-     "runs": [
-      {
-       "seed": 0,
-       "outcome": "SUCCESS",
-       "success_step": 136,
-       "steps": 136,
-       "terminated_by": "success",
-       "entry_valid": true,
-       "failure_reason": null,
-       "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/grasp/grasp_seed0.mp4",
-       "video_frames": 69
-      },
-      {
-       "seed": 1,
-       "outcome": "SUCCESS",
-       "success_step": 145,
-       "steps": 145,
-       "terminated_by": "success",
-       "entry_valid": true,
-       "failure_reason": null,
-       "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/grasp/grasp_seed1.mp4",
-       "video_frames": 74
-      },
-      {
-       "seed": 2,
-       "outcome": "SUCCESS",
-       "success_step": 176,
-       "steps": 176,
-       "terminated_by": "success",
-       "entry_valid": true,
-       "failure_reason": null,
-       "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/grasp/grasp_seed2.mp4",
-       "video_frames": 89
-      },
-      {
-       "seed": 3,
-       "outcome": "FAIL",
-       "success_step": null,
-       "steps": 208,
-       "terminated_by": "horizon",
-       "entry_valid": true,
-       "failure_reason": "never held lid lifted for 20 consecutive steps (contact=False lifted=False)",
-       "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/grasp/grasp_seed3.mp4",
-       "video_frames": 105
-      },
-      {
-       "seed": 4,
-       "outcome": "FAIL",
-       "success_step": null,
-       "steps": 208,
-       "terminated_by": "horizon",
-       "entry_valid": true,
-       "failure_reason": "never held lid lifted for 20 consecutive steps (contact=False lifted=False)",
-       "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/grasp/grasp_seed4.mp4",
-       "video_frames": 105
-      },
-      {
-       "seed": 5,
-       "outcome": "SUCCESS",
-       "success_step": 171,
-       "steps": 171,
-       "terminated_by": "success",
-       "entry_valid": true,
-       "failure_reason": null,
-       "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/grasp/grasp_seed5.mp4",
-       "video_frames": 87
-      },
-      {
-       "seed": 6,
-       "outcome": "FAIL",
-       "success_step": null,
-       "steps": 208,
-       "terminated_by": "horizon",
-       "entry_valid": true,
-       "failure_reason": "never held lid lifted for 20 consecutive steps (contact=True lifted=True)",
-       "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/grasp/grasp_seed6.mp4",
-       "video_frames": 105
-      },
-      {
-       "seed": 7,
-       "outcome": "FAIL",
-       "success_step": null,
-       "steps": 208,
-       "terminated_by": "horizon",
-       "entry_valid": true,
-       "failure_reason": "never held lid lifted for 20 consecutive steps (contact=False lifted=False)",
-       "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/grasp/grasp_seed7.mp4",
-       "video_frames": 105
-      },
-      {
-       "seed": 8,
-       "outcome": "FAIL",
-       "success_step": null,
-       "steps": 208,
-       "terminated_by": "horizon",
-       "entry_valid": true,
-       "failure_reason": "never held lid lifted for 20 consecutive steps (contact=False lifted=False)",
-       "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/grasp/grasp_seed8.mp4",
-       "video_frames": 105
-      },
-      {
-       "seed": 9,
-       "outcome": "FAIL",
-       "success_step": null,
-       "steps": 208,
-       "terminated_by": "horizon",
-       "entry_valid": true,
-       "failure_reason": "never held lid lifted for 20 consecutive steps (contact=True lifted=False)",
-       "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/grasp/grasp_seed9.mp4",
-       "video_frames": 105
-      }
-     ]
-    },
-    "place": {
-     "instruction": "Place the blender lid on the blender, release it after it is stably supported, then move the gripper clear.",
-     "success_count": 2,
-     "n": 10,
-     "success_rate": 0.2,
-     "entry_valid_count": 10,
-     "start_state": "seed별 full-task VLA generation으로 새로 만든 pre-place snapshot (lid grasped, lid_on_blender=False)",
-     "runs": [
-      {
-       "seed": 0,
-       "outcome": "FAIL",
-       "success_step": null,
-       "steps": 400,
-       "terminated_by": "horizon",
-       "entry_valid": true,
-       "failure_reason": "lid_on_blender=False gripper_far=True dist_to_closed=0.020",
-       "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/place/place_seed0.mp4",
-       "video_frames": 201
-      },
-      {
-       "seed": 1,
-       "outcome": "FAIL",
-       "success_step": null,
-       "steps": 400,
-       "terminated_by": "horizon",
-       "entry_valid": true,
-       "failure_reason": "lid_on_blender=True gripper_far=False dist_to_closed=0.026",
-       "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/place/place_seed1.mp4",
-       "video_frames": 201
-      },
-      {
-       "seed": 2,
-       "outcome": "FAIL",
-       "success_step": null,
-       "steps": 400,
-       "terminated_by": "horizon",
-       "entry_valid": true,
-       "failure_reason": "lid_on_blender=False gripper_far=True dist_to_closed=0.031",
-       "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/place/place_seed2.mp4",
-       "video_frames": 201
-      },
-      {
-       "seed": 3,
-       "outcome": "FAIL",
-       "success_step": null,
-       "steps": 400,
-       "terminated_by": "horizon",
-       "entry_valid": true,
-       "failure_reason": "lid_on_blender=False gripper_far=False dist_to_closed=0.015",
-       "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/place/place_seed3.mp4",
-       "video_frames": 201
-      },
-      {
-       "seed": 4,
-       "outcome": "FAIL",
-       "success_step": null,
-       "steps": 400,
-       "terminated_by": "horizon",
-       "entry_valid": true,
-       "failure_reason": "lid_on_blender=False gripper_far=True dist_to_closed=0.019",
-       "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/place/place_seed4.mp4",
-       "video_frames": 201
-      },
-      {
-       "seed": 5,
-       "outcome": "FAIL",
-       "success_step": null,
-       "steps": 400,
-       "terminated_by": "horizon",
-       "entry_valid": true,
-       "failure_reason": "lid_on_blender=False gripper_far=True dist_to_closed=0.014",
-       "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/place/place_seed5.mp4",
-       "video_frames": 201
-      },
-      {
-       "seed": 6,
-       "outcome": "FAIL",
-       "success_step": null,
-       "steps": 400,
-       "terminated_by": "horizon",
-       "entry_valid": true,
-       "failure_reason": "lid_on_blender=False gripper_far=True dist_to_closed=0.024",
-       "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/place/place_seed6.mp4",
-       "video_frames": 201
-      },
-      {
-       "seed": 7,
-       "outcome": "FAIL",
-       "success_step": null,
-       "steps": 400,
-       "terminated_by": "horizon",
-       "entry_valid": true,
-       "failure_reason": "lid_on_blender=False gripper_far=True dist_to_closed=0.051",
-       "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/place/place_seed7.mp4",
-       "video_frames": 201
-      },
-      {
-       "seed": 8,
-       "outcome": "SUCCESS",
-       "success_step": 208,
-       "steps": 208,
-       "terminated_by": "success",
-       "entry_valid": true,
-       "failure_reason": null,
-       "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/place/place_seed8.mp4",
-       "video_frames": 105
-      },
-      {
-       "seed": 9,
-       "outcome": "SUCCESS",
-       "success_step": 112,
-       "steps": 112,
-       "terminated_by": "success",
-       "entry_valid": true,
-       "failure_reason": null,
-       "mp4": "media/experiments/exp-20260916-defined-inst-s9/random/place/place_seed9.mp4",
-       "video_frames": 57
-      }
-     ]
-    },
-    "artifact_path": "/home/aiden/Desktop/lab/robot/defined-instruction-rollouts/random_g10_p10"
-   }
-  },
-  {
-   "id": "EXP-20260915-INSTRUCTION-ATTENDANCE",
-   "date": "2026-09-15",
-   "title": "Instruction Attendance 분석",
-   "status": "complete",
-   "model": "Xiaomi-Robotics-1-RoboCasa365",
-   "task": "CloseBlenderLid",
-   "seed": 9,
-   "question": "정책이 instruction을 실제 제어 신호로 사용하는가?",
-   "summary": "고정 observation에서 instruction만 변경해 action 차이를 측정. 시작 상태에서는 instruction, 중간 상태에서는 observation 영향이 강했다.",
-   "page": "experiments/exp-20260915-instruction-attendance.html",
-   "tags": [
-    "instruction attention",
-    "action divergence",
-    "fixed observation"
-   ]
-  },
-  {
-   "id": "EXP-20260916-02",
-   "date": "2026-09-16",
-   "title": "훈련 롤아웃 GRASP horizon 진단 (120 vs 208)",
-   "summary": "훈련 루프 롤아웃 폴리시로 GRASP 10 seed 롤아웃 — GRASP 저성공의 원인이 horizon_grasp=120 절단임을 확증.",
-   "question": "훈련 루프의 GRASP 저성공(16.7%)이 진짜 모델 한계인가, 아니면 horizon 설정(120) 때문인가?",
-   "task": "CloseBlenderLid",
-   "model": "Xiaomi-Robotics-1-RoboCasa365",
-   "seed": 0,
-   "checkpoint": "3a6d0293bfa90759d34a7fc48c2c62413cd7bcf4",
-   "status": "complete",
-   "tags": [
-    "diagnosis",
-    "GRASP",
-    "horizon",
-    "GRPO",
-    "training-rollout"
-   ],
-   "setup": [
-    "훈련 롤아웃 경로 그대로 사용: grpo_train_loop._run_one_skill + grpo_trainer_server op_sample",
-    "폴리시 = 사전학습 base (per-skill LoRA zero-init, op=update 미적용 → 체크포인트와 bit-for-bit)",
-    "동일 seed 0~9, split=pretrain (standalone 40% 레퍼런스와 동일 조건)",
-    "eta=0(결정론, standalone 샘플러와 동일) + eta=0.1(GRPO 훈련이 실제 쓰는 확률적 롤아웃) 둘 다",
-    "horizon_grasp 120(훈련 기본) vs 208(standalone) 비교, GRASP_HOLD_STEPS=20 동일"
-   ],
-   "verdict": "horizon이 원인. horizon 120: eta0=0/10, eta0.1=0/10 (전부 시간부족 절단). horizon 208: eta0=5/10(50%), eta0.1=4/10(40%) — standalone 40%와 일치. 폴리시/샘플러는 동일; 훈련 기본값 horizon_grasp=120이 20-hold 완성(최이른 step 128~136)을 잘라 성공을 0으로 만든 것.",
-   "decision": "훈련 루프의 horizon_grasp를 GRASP 성공이 담기는 값(>=180, 권장 208)으로 상향해야 함. RL '신호 없음'은 모델 한계가 아니라 롤아웃 horizon 절단 버그. eta>0 탐색은 성공 seed를 바꿀 뿐 총 성공률은 horizon에 지배됨.",
-   "page": "experiments/exp-20260916-grasp-horizon.html",
-   "data": "grasp_horizon.json"
-  }
- ]
+  ]
 }
