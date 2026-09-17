@@ -72,3 +72,11 @@
 - **exp3 최종(양쪽 정상종료)**: clip02(v4,clip0.2) grasp 0.55→0.60, official 0.15→**0.05**(regress), heldout 0.55/0.05. clip03(amp,clip0.3) grasp 0.55→0.55, official 0.20→**0.05**(regress), heldout 0.55/0.10. → clip 완화는 clip_fraction 낮췄으나(메커니즘 성립) grasp 학습 못 살림. LR·clip 등 update-magnitude 레버 3연속(exp1/2/3) null/regress.
 - **조치(단일변수)**: exp1-3 전부 --update-epochs 1(롤아웃당 grad step 1회)로 돌아 under-optimization 미검증. trainer_server에 멀티에폭 PPO(old_logp캐시+clip/KL guard) 구현돼 있으나 미사용, env비용 0. adaptive_sweep.sh에 update-epochs 5번째 위치인자로 파라미터화, deploy+commit(ae6befc). exp4 페어드 착수: AdamW3e-5/clip0.2 고정, uepochs만 변수 — v4 ue4(=4) + amp ue8(=8), seed 12345.
 - **막힘 자동복구**: amp_csi 1차착수 cuDNN INTERNAL_ERROR로 rc=1(exp3 종료 프로세스가 GPU 11.6G 잔여경합). trainer-stop→GPU clean(38MiB)→재시도 정상. 현재 양쪽 eval_before 진행, GPU~13G, 에러0. 다음 cron서 uepochs별 before/after delta 판정.
+
+## 13:45 KST — exp4 uepochs-ladder: amp_csi ue8은 계획대로 정지됨(내 오해 아님), v4서 ue8 재체이닝 / ue4 정상
+- **핵심 확인(추측 금지, 실측)**: amp_csi `ue8` arm이 rc=137로 12:57 죽음 — 그러나 train.log에 CUDA/OOM/traceback 0. **자기 OOM 아니라 외부 SIGKILL**. 타임라인 대조: ue8 13:06 종료 → [2-3] 캘리브레이션 태스크(t_a309678b)의 `xiaomi-server-t_460aea68`가 13:12 기동해 amp_csi GPU 10.7G 점유 중. [2-3] 코멘트(operator 결정, 13:07)에 **"exp4 ue8 arm 정지, amp_csi 24GB를 캘리브레이션에 통째 양보"**가 명시됨. → ue8 죽음은 버그가 아니라 **operator 의도된 조치**. amp_csi에 ue8 재기동하면 캘리브레이션과 GPU 경합→과거 기록된 trainer RPC struct.error drop 재발. **재기동 안 함(옳음).**
+- **조치(경합 0으로 uepochs 비교 복구)**: ue8을 **v4에서** ue4 종료 후 자동 체이닝. `/tmp/ue8_chain.sh`(waiter pid 2138009)가 ue4 sweep pid 2101397 종료+trainer/client GPU clear 대기 후 `adaptive_sweep.sh adaptive_adamw3e5_ue8 adamw 3e-5 0.2 8` 기동. 동일 하드웨어(v4)서 ue4 vs ue8 페어드 → 더 깨끗한 비교. amp_csi는 캘리브레이션 전용 유지.
+- **ue4 정상(v4, pid2101397/trainer2101485/client2101768)**: it=10/30, GPU 10.7G/20%. eval_before grasp=0.55 official=0.15. **exp4 레버 작동 확인**: update-epochs=4가 adapter_dL2를 0.046~0.089로 = exp2/exp3 단일에폭(~0.011~0.028) 대비 ~4x. under-optimization 가설대로 업뎃량 실제 증가. 단 on-seed n_succ(s1092 it8~10=5,3,5)는 아직 flat(exp1-3 동일 패턴). it10/30 조기라 판정 유보 — after-eval delta가 판정 기준.
+- GATED(조기 워밍): ue4 7/11=64%(초반 소표본, 이전 arm들 후반 ~38%로 하락했으므로 재판정 필요).
+- 서버상태: v4 학습중 에러0. amp_csi는 [2-3] 캘리브레이션(별도 태스크) 수행중, 경합 없음(각 GPU 전용). OOM/RPC drop 0.
+- 다음 cron: ue4 DONE 시 after-eval delta로 uepochs=4 개선 정직 판정 + ue8 체인 진행 확인.
