@@ -188,6 +188,56 @@
       }
     },
     {
+      "id": "EXP-20260917-GRPO-NONJOINT-ALLLINEAR-30",
+      "date": "2026-09-17",
+      "title": "Non-joint Flow-SDE all-linear GRASP 30-update",
+      "status": "running",
+      "model": "Xiaomi-Robotics-1-RoboCasa365",
+      "task": "CloseBlenderLid / GRASP",
+      "question": "RLinf Flow-SDE의 non-joint 정책비를 정확히 적용하면 all-linear adapter가 안정적으로 30 updates를 끝내고 paired/held-out GRASP를 개선하는가?",
+      "summary": "근본 원인 수정 micro는 LR 1e-6에서 KL 0.000215, clip 0.00180, ESS 0.99957과 strict mutation roundtrip을 통과했다. 동일 exact source/config로 30 updates와 paired eta=0 20 + held-out 20 평가를 실행 중이다.",
+      "data": "../rl-train-t_3ed65912/results/nonjoint_abbb8c8_alllinear30/",
+      "tags": ["GRPO", "GRASP", "all-linear", "flow-sde", "non-joint", "running"],
+      "kanban": "t_80f3cba3",
+      "source": {
+        "commit": "abbb8c824456e75fb91274ff7abf5bbf9e9bcb01",
+        "dirty": false
+      },
+      "configuration": {
+        "optimizer": "AdamW",
+        "learning_rate": 0.000001,
+        "update_epochs": 2,
+        "target_kl": 0.05,
+        "ppo_clip": 0.2,
+        "group_size": 8,
+        "updates": 30,
+        "sampler": "pi-RL Flow-SDE; one stochastic denoise transition; elementwise ratios",
+        "reward": "decayed GRASP terminal + exact 20-step hold",
+        "evaluation": "paired eta=0 20 + disjoint held-out 20"
+      },
+      "micro_gate": {
+        "run": "nonjoint_abbb8c8_micro_lr1e6",
+        "post_step_kl": 0.00021458689278529847,
+        "post_step_clip_fraction": 0.0017981150793650793,
+        "post_step_ess": 0.9995656253305436,
+        "adapter_delta_l2": 0.003716385457664728,
+        "strict_roundtrip": "PASS"
+      },
+      "measurements": "수집 중",
+      "gate": {
+        "production_stability": "PASS",
+        "continue_30_updates": true,
+        "performance": "수집 중"
+      },
+      "artifacts": {
+        "remote_result_dir": "/home/v4/rl-train-t_3ed65912/results/nonjoint_abbb8c8_alllinear30/"
+      },
+      "wandb": {
+        "status": "discovery pending",
+        "project": "http://100.86.183.64:8080/aiden-lab-desktop/robocasa-grpo"
+      }
+    },
+    {
       "id": "EXP-20260917-ADAPTIVE",
       "date": "2026-09-17",
       "title": "Adaptive curriculum GRASP GRPO — 병목 진단 스윕 (exp1→4)",
