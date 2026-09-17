@@ -195,7 +195,24 @@ fetch('experiments.json').then(r=>r.json()).then(db=>{
   task.innerHTML+=[...uniq('task')].map(x=>`<option>${x}</option>`).join('');model.innerHTML+=[...uniq('model')].map(x=>`<option>${x}</option>`).join('');
   const badge=s=>s==='complete'?'<span class="badge b-ok">완료</span>':s==='running'?'<span class="badge b-run">진행</span>':'<span class="badge b-rev">Pilot</span>';
   document.getElementById('exp-kpi').innerHTML=`<div><div class="n">${exps.length}</div><div class="l">전체 실험</div></div><div><div class="n">${exps.filter(e=>e.status==='complete').length}</div><div class="l">완료</div></div><div><div class="n">${new Set(exps.map(e=>e.task)).size}</div><div class="l">Task</div></div><div><div class="n">${new Set(exps.map(e=>e.model)).size}</div><div class="l">모델</div></div>`;
-  function render(){const q=search.value.trim().toLowerCase();const rows=exps.filter(e=>(!task.value||e.task===task.value)&&(!model.value||e.model===model.value)&&(!status.value||e.status===status.value)&&(!q||[e.id,e.title,e.question,e.summary,e.model,e.task,...(e.tags||[])].join(' ').toLowerCase().includes(q)));document.getElementById('exp-empty').style.display=rows.length?'none':'block';document.getElementById('exp-list').innerHTML=rows.map(e=>`<a class="exp-list-row" href="${e.page}"><span class="exp-date"><b>${e.date}</b><small>${e.id}</small></span><span class="exp-title"><b>${e.title}</b><small>${e.summary}</small></span><span class="exp-context"><b>${e.task}</b><small>${e.model}</small></span><span class="go">${badge(e.status)}<small>상세 →</small></span></a>`).join('')}
+  function render(){
+    const q=search.value.trim().toLowerCase();
+    const rows=exps.filter(e=>(!task.value||e.task===task.value)&&(!model.value||e.model===model.value)&&(!status.value||e.status===status.value)&&(!q||[e.id,e.title,e.question,e.summary,e.model,e.task,...(e.tags||[])].join(' ').toLowerCase().includes(q)));
+    document.getElementById('exp-empty').style.display=rows.length?'none':'block';
+    document.getElementById('exp-list').innerHTML=rows.map(e=>{
+      const wb=e.wandb;
+      const wbUrl=wb?(wb.workspace||wb.project):null;
+      const wbBtn=wbUrl?`<a href="${wbUrl}" target="_blank" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:3px;margin-top:4px;font-size:11px;color:var(--acc);text-decoration:none;opacity:.85" title="wandb 대시보드 열기">📊 wandb</a>`:'';
+      const armRuns=(e.arms||[]).filter(a=>(a.wandb_runs||[]).length).map(a=>{
+        const label=a.exp||a.name||'arm';
+        const links=a.wandb_runs.map((u,i)=>`<a href="${u}" target="_blank" onclick="event.stopPropagation()" style="color:var(--acc);text-decoration:none;margin-right:4px" title="${u}">run${a.wandb_runs.length>1?i+1:''}</a>`).join('');
+        return `<span style="font-size:11px;color:var(--dim);margin-right:8px">${label}: ${links}</span>`;
+      }).join('');
+      const armSection=armRuns?`<div style="margin-top:4px;line-height:1.6">${armRuns}</div>`:'';
+      const goNav=e.page?`<small>상세 →</small>`:'';
+      return `<a class="exp-list-row" href="${e.page||'#'}" ${!e.page?'onclick="return false"':''}><span class="exp-date"><b>${e.date}</b><small>${e.id}</small></span><span class="exp-title"><b>${e.title}</b><small>${e.summary}</small>${armSection}</span><span class="exp-context"><b>${e.task}</b><small>${e.model}</small></span><span class="go">${badge(e.status)}${goNav}${wbBtn}</span></a>`;
+    }).join('');
+  }
   [search,task,model,status].forEach(x=>x.addEventListener(x===search?'input':'change',render));render();
 }).catch(()=>document.getElementById('exp-list').innerHTML='<p class="no">실험 목록을 불러오지 못했습니다.</p>');
 
