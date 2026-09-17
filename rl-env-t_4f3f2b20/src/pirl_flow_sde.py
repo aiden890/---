@@ -169,6 +169,7 @@ def pirl_flow_sde_sample(
     executed_mask: Optional[torch.Tensor] = None,
     x0: Optional[torch.Tensor] = None,
     noise_sequence: Optional[list[torch.Tensor]] = None,
+    denoise_index: Optional[int] = None,
 ) -> PiRLFlowSDEResult:
     """Integrate the faithful pi-RL Flow-SDE, recording every transition's log-prob.
 
@@ -177,6 +178,8 @@ def pirl_flow_sde_sample(
                         transition log-probs (corrected drift + tau-dependent sigma).
     """
     B, L, A = shape
+    if denoise_index is not None and not 0 <= int(denoise_index) < num_steps:
+        raise ValueError(f"denoise_index must be in [0, {num_steps}): {denoise_index}")
     ts = openpi_timesteps(num_steps, device=device, dtype=torch.float32)
     sigmas = openpi_sigmas(num_steps, noise_level, device=device, dtype=torch.float32)
 
@@ -200,7 +203,10 @@ def pirl_flow_sde_sample(
         v_m = velocity_field(x, t_m)
         sigma_i = float(sigmas[k].item())
 
-        if noise_level == 0.0:
+        stochastic_step = noise_level != 0.0 and (
+            denoise_index is None or k == int(denoise_index)
+        )
+        if not stochastic_step:
             # Degenerate ODE limit. At sigma=0 the corrected-drift step reduces EXACTLY to
             # the checkpoint's Euler update x_{k+1} = x_k + v_m*delta (proof: with sigma=0,
             # x0_weight=1-t_next, x1_weight=t_next -> mean = x + v_m*(t_o-t_next)). We compute
@@ -243,8 +249,29 @@ def pirl_flow_sde_sample(
         noise_level=noise_level,
         executed_mask=executed_mask,
         meta={"ts": ts.tolist(), "sigmas": sigmas.tolist(),
-              "framework": "RLinf@bde6c918", "sampler": "pirl_flow_sde"},
+              "framework": "RLinf@bde6c918", "sampler": "pirl_flow_sde",
+              "denoise_index": denoise_index},
     )
+
+
+def pirl_transition_logprob_elements(
+    xs: list[torch.Tensor],
+    means: list[torch.Tensor],
+    stds: list[float],
+    denoise_index: int,
+) -> torch.Tensor:
+    """Elementwise log-prob for RLinf's non-joint Flow-SDE transition.
+
+    RLinf configures Flow-SDE with ``joint_logprob=False``: exactly one denoising
+    transition is stochastic and PPO keeps its [B,L,A] ratios independent. Summing
+    them before exponentiating creates a dimension-dependent joint ratio instead.
+    """
+    idx = int(denoise_index)
+    if not 0 <= idx < len(means):
+        raise ValueError(f"denoise_index must be in [0, {len(means)}): {idx}")
+    if float(stds[idx]) <= 0.0:
+        raise ValueError("selected Flow-SDE transition must have positive std")
+    return _gaussian_logprob(xs[idx + 1], means[idx], stds[idx])
 
 
 def pirl_transition_logprob(

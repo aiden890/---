@@ -47,7 +47,7 @@ from flow_sde import flow_sde_sample, transition_logprob, make_executed_mask  # 
 # The default remains the explicitly-named fixed_noise baseline (flow_sde) for backward
 # compatibility / byte-identical reproduction of prior runs.
 from pirl_flow_sde import (  # noqa: E402
-    pirl_flow_sde_sample, pirl_transition_logprob, openpi_timesteps, openpi_sigmas,
+    pirl_flow_sde_sample, pirl_transition_logprob_elements, openpi_timesteps, openpi_sigmas,
     pirl_step_mean_std,
 )
 from lora import (  # noqa: E402
@@ -227,12 +227,18 @@ class GRPOTrainerServer:
             vfield, shape, dev, dt = build_velocity_field(self.model, state, action_mask, **vlm)
             exec_mask = make_executed_mask(shape[1], shape[2], self.a.replan_steps,
                                            self.a.real_action_dim, device=dev)
+            denoise_index = None
             if sampler == "pirl":
                 # --eta maps to the pi-RL exploration noise_level (single knob).
+                # RLinf Flow-SDE uses joint_logprob=False: one randomly selected denoise
+                # transition is stochastic; all other denoise steps follow the ODE.
+                denoise_index = (int(derived_seed) % self.a.num_steps
+                                 if derived_seed is not None else chunk_index % self.a.num_steps)
                 res = pirl_flow_sde_sample(vfield, shape, num_steps=self.a.num_steps,
                                            noise_level=eta, device=dev,
                                            dtype=action_mask.dtype, generator=gen,
-                                           executed_mask=exec_mask)
+                                           executed_mask=exec_mask,
+                                           denoise_index=denoise_index)
             else:
                 res = flow_sde_sample(vfield, shape, num_steps=self.a.num_steps, eta=eta, device=dev,
                                       dtype=action_mask.dtype, generator=gen, executed_mask=exec_mask)
@@ -250,17 +256,22 @@ class GRPOTrainerServer:
         # the IDENTICAL schedule (guarantees ratio==1 on-policy). fixed_noise has constant std.
         if sampler == "pirl":
             chunk["pirl_stds"] = list(res.stds)
+            chunk["denoise_index"] = denoise_index
+            chunk["old_logp_elements_cpu"] = (
+                res.perstep_perdim_logprob[0, denoise_index].detach().cpu())
         self.store.setdefault(req["traj_id"], []).append(chunk)
         return {"actions": res.actions.cpu(), "logprob": old_logp,
                 "derived_seed": derived_seed, "chunk_index": chunk_index}
 
-    def _forward_new_logp(self, chunk):
-        """Recompute the CURRENT policy's transition log-prob for one stored rollout chunk.
+    def _forward_new_logp_terms(self, chunk):
+        """Recompute CURRENT-policy ratio terms for one stored rollout chunk.
 
-        Single source of truth for the new-policy log-prob, used by BOTH the optimizer
+        Single source of truth used by BOTH the optimizer
         epoch loop (grad flows) and the post-step diagnostic pass (under no_grad). Keeping
         one implementation guarantees the epoch-0 ratio==1 correctness probe and the
-        post-step ratio use identical math. MiBoT velocity at t_m = 1 - t_o.
+        post-step ratio use identical math. For pi-RL Flow-SDE these are independent
+        [executed timestep, action-dimension] terms from ONE selected denoise transition,
+        matching RLinf's ``joint_logprob=False`` path. MiBoT time is t_m = 1 - t_o.
         """
         state, action_mask, vlm = self._split(dict(chunk["inputs_cpu"]))
         set_active_skill(self.wrappers, chunk["skill"])
@@ -272,6 +283,7 @@ class GRPOTrainerServer:
             ts = openpi_timesteps(self.a.num_steps)
             sig = openpi_sigmas(self.a.num_steps, self.a.eta)
             means = []
+            selected = int(chunk["denoise_index"])
             for k in range(self.a.num_steps):
                 t_o = float(ts[k]); t_next = float(ts[k + 1])
                 t_m = torch.full((shape[0], 1, 1), 1.0 - t_o, device=dev, dtype=action_mask.dtype)
@@ -279,10 +291,14 @@ class GRPOTrainerServer:
                     v = torch.utils.checkpoint.checkpoint(vfield, xs[k], t_m, use_reentrant=False)
                 else:
                     v = vfield(xs[k], t_m)
-                m, _ = pirl_step_mean_std(xs[k], v, t_o, t_next, float(sig[k]))
+                if k == selected:
+                    m, _ = pirl_step_mean_std(xs[k], v, t_o, t_next, float(sig[k]))
+                else:
+                    m = xs[k] + v * (t_o - t_next)
                 means.append(m)
-            new_logp = pirl_transition_logprob(xs, means, chunk.get("pirl_stds"),
-                                               executed_mask=exec_mask)[0]
+            per = pirl_transition_logprob_elements(
+                xs, means, chunk["pirl_stds"], selected)[0]
+            return per[exec_mask]
         else:
             dtc = 1.0 / self.a.num_steps
             means = []
@@ -295,7 +311,16 @@ class GRPOTrainerServer:
                 means.append(xs[k] + v * dtc)
             new_logp = transition_logprob(xs, means, eta=self.a.eta,
                                           num_steps=self.a.num_steps, executed_mask=exec_mask)[0]
-        return new_logp
+            return new_logp.reshape(1)
+
+    def _old_logp_terms(self, chunk):
+        if getattr(self.a, "sampler", "fixed_noise") == "pirl":
+            old = chunk.get("old_logp_elements_cpu")
+            if old is None:
+                raise RuntimeError("pi-RL rollout is missing independent old log-prob terms")
+            mask = chunk["exec_mask_cpu"].to(torch.bool)
+            return old[mask].to(device=self.model.device, dtype=torch.float32)
+        return torch.tensor([chunk["old_logp"]], device=self.model.device, dtype=torch.float32)
 
     def _adapter_vector(self):
         """Flattened detached copy of every trainable parameter (for the adapter-delta metric)."""
@@ -313,21 +338,20 @@ class GRPOTrainerServer:
         with torch.no_grad():
             for traj_id, chunks, adv in active:
                 for chunk in chunks:
-                    new_logp = self._forward_new_logp(chunk)
-                    old_logp = torch.tensor(chunk["old_logp"], device=self.model.device)
-                    logratio = new_logp - old_logp
-                    if not torch.isfinite(logratio):
-                        n_nonfinite += 1
-                        continue
-                    raw = float(logratio.detach().cpu())
-                    ratio = guarded_ratio(raw, ratio_max)
-                    if ratio is None:
-                        n_dropped += 1
-                        continue
-                    kl_sum += (math.exp(raw) - 1.0) - raw
-                    ratios.append(ratio)
-                    if abs(ratio - 1.0) > clip:
-                        n_clipped += 1
+                    new_terms = self._forward_new_logp_terms(chunk)
+                    old_terms = self._old_logp_terms(chunk)
+                    for raw in (new_terms - old_terms).detach().float().cpu().tolist():
+                        if not math.isfinite(raw):
+                            n_nonfinite += 1
+                            continue
+                        ratio = guarded_ratio(raw, ratio_max)
+                        if ratio is None:
+                            n_dropped += 1
+                            continue
+                        kl_sum += (math.exp(raw) - 1.0) - raw
+                        ratios.append(ratio)
+                        if abs(ratio - 1.0) > clip:
+                            n_clipped += 1
                     n_chunks += 1
         ess = None
         if ratios:
@@ -336,9 +360,10 @@ class GRPOTrainerServer:
         return {
             "post_step_mean_ratio": (sum(ratios) / len(ratios) if ratios else None),
             "post_step_mean_abs_ratio_dev": (sum(abs(r - 1.0) for r in ratios) / len(ratios) if ratios else None),
-            "post_step_clip_fraction": (n_clipped / n_chunks if n_chunks else None),
-            "post_step_mean_kl": (kl_sum / n_chunks if n_chunks else None),
+            "post_step_clip_fraction": (n_clipped / len(ratios) if ratios else None),
+            "post_step_mean_kl": (kl_sum / len(ratios) if ratios else None),
             "post_step_ess": ess, "post_step_n_chunks": n_chunks,
+            "post_step_n_ratio_terms": len(ratios),
             "post_step_n_nonfinite": n_nonfinite,
             "post_step_n_dropped": n_dropped,
         }
@@ -401,30 +426,31 @@ class GRPOTrainerServer:
                     # Faithful pi-RL recompute (shared with the post-step diagnostic): rebuild
                     # per-step means with the SAME corrected-drift equations and REUSE the stored
                     # per-step stds so epoch-0 ratio==1 exactly (on-policy correctness probe).
-                    new_logp = self._forward_new_logp(chunk)
-                    old_logp = torch.tensor(chunk["old_logp"], device=self.model.device)
-                    logratio = new_logp - old_logp
-                    if not torch.isfinite(logratio):
-                        n_nonfinite += 1
+                    new_terms = self._forward_new_logp_terms(chunk)
+                    old_terms = self._old_logp_terms(chunk)
+                    logratio = new_terms - old_terms
+                    finite = torch.isfinite(logratio)
+                    within = logratio.abs() <= math.log(ratio_max)
+                    valid = finite & within
+                    n_nonfinite += int((~finite).sum().item())
+                    n_dropped += int((finite & ~within).sum().item())
+                    if not bool(valid.any()):
                         continue
-                    raw_logratio = float(logratio.detach().cpu())
-                    if guarded_ratio(raw_logratio, ratio_max) is None:
-                        n_dropped += 1
-                        continue
-                    ratio = torch.exp(logratio)
+                    valid_lr = logratio[valid]
+                    ratio = torch.exp(valid_lr)
                     pg = -torch.min(ratio * adv_t, torch.clamp(ratio, 1 - clip, 1 + clip) * adv_t)
-                    kl = (torch.exp(logratio) - 1.0) - logratio   # KL(new||old) approx
-                    loss = pg + kl_coef * kl
+                    kl = (ratio - 1.0) - valid_lr   # KL(new||old) approx, per scalar term
+                    loss = pg.mean() + kl_coef * kl.mean()
                     loss.backward()
-                    total_loss += float(pg.detach().cpu())
-                    kl_sum += float(kl.detach().cpu())
-                    r = float(ratio.detach().cpu())
-                    ratios.append(r); logratios.append(float(logratio.detach().cpu()))
-                    if abs(r - 1.0) > clip:
-                        n_clipped += 1
+                    total_loss += float(pg.mean().detach().cpu())
+                    kl_sum += float(kl.sum().detach().cpu())
+                    rs = ratio.detach().float().cpu().tolist()
+                    lrs = valid_lr.detach().float().cpu().tolist()
+                    ratios.extend(rs); logratios.extend(lrs)
+                    n_clipped += sum(abs(r - 1.0) > clip for r in rs)
                     n_chunks += 1
             gn = 0.0
-            mean_kl_pre = kl_sum / max(n_chunks, 1)
+            mean_kl_pre = kl_sum / max(len(ratios), 1)
             stop_for_kl = should_stop_for_kl(epoch, mean_kl_pre, target_kl)
             if n_chunks > 0 and not stop_for_kl:
                 # Chunk-wise backward above accumulates a SUM. Divide gradients before
@@ -447,8 +473,9 @@ class GRPOTrainerServer:
                 "n_dropped": n_dropped, "n_nonfinite": n_nonfinite,
                 "mean_ratio": (sum(ratios) / len(ratios) if ratios else 0.0),
                 "mean_abs_logratio": (sum(abs(x) for x in logratios) / len(logratios) if logratios else 0.0),
-                "clip_fraction": (n_clipped / n_chunks if n_chunks else 0.0),
-                "mean_kl": kl_sum / max(n_chunks, 1), "grad_norm": gn, "ess": ess,
+                "clip_fraction": (n_clipped / len(ratios) if ratios else 0.0),
+                "mean_kl": kl_sum / max(len(ratios), 1), "grad_norm": gn, "ess": ess,
+                "n_ratio_terms": len(ratios),
                 "early_stop_target_kl": stop_for_kl,
             })
             grad_norm = gn; n_chunks_last = n_chunks

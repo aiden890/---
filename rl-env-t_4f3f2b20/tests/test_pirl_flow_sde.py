@@ -29,6 +29,7 @@ from pirl_flow_sde import (  # noqa: E402
     openpi_sigmas,
     pirl_flow_sde_sample,
     pirl_transition_logprob,
+    pirl_transition_logprob_elements,
     pirl_step_mean_std,
 )
 
@@ -156,6 +157,37 @@ def test_gate3_rollout_recompute_logprob_match():
     assert max_abs < 1e-4, f"logp mismatch {max_abs}"
     assert (ratio - 1.0).abs().max().item() < 1e-4
     print(f"[Gate3] rollout-vs-recompute logp max_abs={max_abs:.2e}, ratio~1 PASS")
+
+
+def test_nonjoint_flow_sde_uses_one_transition_and_preserves_elementwise_ratios():
+    """Mutation gate: Flow-SDE must not exponentiate a high-dimensional joint sum."""
+    data = torch.randn(B, L, A)
+    vf = _mibot_velocity_field(data)
+    selected = 2
+    res = pirl_flow_sde_sample(
+        vf, (B, L, A), num_steps=N, noise_level=0.6,
+        generator=torch.Generator().manual_seed(123), denoise_index=selected,
+    )
+    assert [s > 0 for s in res.stds] == [k == selected for k in range(N)]
+    ts = openpi_timesteps(N)
+    sigmas = openpi_sigmas(N, 0.6)
+    means = []
+    for k in range(N):
+        t_o = float(ts[k]); t_next_o = float(ts[k + 1])
+        t_m = torch.full((B, 1, 1), 1.0 - t_o)
+        v_m = vf(res.xs[k], t_m)
+        if k == selected:
+            mean, _ = pirl_step_mean_std(res.xs[k], v_m, t_o, t_next_o, float(sigmas[k]))
+        else:
+            mean = res.xs[k] + v_m * (t_o - t_next_o)
+        means.append(mean)
+    old = res.perstep_perdim_logprob[:, selected]
+    new = pirl_transition_logprob_elements(res.xs, means, res.stds, selected)
+    assert torch.allclose(new, old, atol=1e-5)
+
+    scalar_logratios = torch.full((1, 16, 12), 0.001)
+    assert torch.exp(scalar_logratios).sub(1).abs().max() < 0.2
+    assert torch.exp(scalar_logratios.sum()).sub(1).abs() > 0.2
 
 
 def test_gate6_finite_logprobs():
