@@ -226,6 +226,7 @@ if __name__ == "__main__":
     test_gate4_drift_and_sigma_match_rlinf_reference()
     test_gate4_sigma_schedule_values()
     test_gate3_rollout_recompute_logprob_match()
+    test_nonjoint_flow_sde_uses_one_transition_and_preserves_elementwise_ratios()
     test_gate6_finite_logprobs()
     test_marginal_std_matches_analytic()
     print("\nALL CPU MATH GATES PASS")
