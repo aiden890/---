@@ -286,7 +286,8 @@ class ObsVLMVerifier:
                  max_steps: int, question_text: Optional[str] = None,
                  vlm_min_interval: int = 16, hysteresis_k: int = 2,
                  tau: float = 0.6, event_gated: bool = True,
-                 proprio_gate: Optional[ProprioGate] = None):
+                 proprio_gate: Optional[ProprioGate] = None,
+                 view: str = "full"):
         self.skill_name = skill_name
         self.backend = backend
         self.max_steps = max_steps
@@ -295,6 +296,9 @@ class ObsVLMVerifier:
         self.hysteresis_k = max(1, int(hysteresis_k))
         self.tau = float(tau)
         self.event_gated = bool(event_gated)
+        if view not in ("full", "left", "right", "eye"):
+            raise ValueError(f"invalid verifier view: {view}")
+        self.view = view
         self.gate = proprio_gate if proprio_gate is not None else ProprioGate()
 
         self.elapsed = 0
@@ -322,7 +326,8 @@ class ObsVLMVerifier:
         if self._should_query():
             queried = True
             t0 = time.time()
-            prob = float(self.backend.score(obs.images, self.question_text))
+            prob = float(self.backend.score_view(obs.images, self.question_text,
+                                                 view=self.view))
             self.vlm_seconds += time.time() - t0
             self.n_vlm_calls += 1
             self._last_query_step = self.elapsed
@@ -375,7 +380,10 @@ class ObsVLMVerifier:
     # convenience for harness logging
     def stats(self) -> dict:
         return {
-            "skill": self.skill_name, "elapsed": self.elapsed,
+            "skill": self.skill_name, "view": self.view,
+            "tau": self.tau, "hysteresis_k": self.hysteresis_k,
+            "vlm_min_interval": self.vlm_min_interval,
+            "elapsed": self.elapsed,
             "n_vlm_calls": self.n_vlm_calls, "vlm_seconds": round(self.vlm_seconds, 4),
             "succeeded_step": self.succeeded_step,
             "mean_vlm_latency_ms": round(1000 * self.vlm_seconds / self.n_vlm_calls, 2)

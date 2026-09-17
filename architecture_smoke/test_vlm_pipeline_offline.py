@@ -110,7 +110,12 @@ def main():
     env.reset()
     manager = ExecutionManager(registry, policy, env, trace, AdapterMode.DISABLED,
                                vlm_backend=vlm, vlm_min_interval=4, hysteresis_k=2,
-                               tau=0.6, event_gated=True)
+                               tau=0.6, event_gated=True,
+                               verifier_operating_points={
+                                   "MOVE_OBJECT": {"view": "right", "tau": 0.8,
+                                                   "hysteresis_k": 3,
+                                                   "vlm_min_interval": 2},
+                               })
     summary = run_episode(planner, manager, env, trace, registry, bindings.GOAL,
                           episode_budget=600, max_planner_calls=8, obs_only=True)
     trace.close()
@@ -125,6 +130,9 @@ def main():
         vs = s.get("vlm_stats")
         assert vs and vs.get("succeeded_step") is not None, s
         assert vs["n_vlm_calls"] >= 2, vs
+    move_stats = summary["skills"][1]["vlm_stats"]
+    assert (move_stats["view"], move_stats["tau"], move_stats["hysteresis_k"],
+            move_stats["vlm_min_interval"]) == ("right", 0.8, 3, 2), move_stats
     # trace has 'vlm' records and NO forbidden sim predicate leaked to the judge
     recs = [json.loads(l) for l in (tmp / "trace.jsonl").read_text().splitlines()]
     vlm_recs = [r for r in recs if r["type"] == "vlm"]

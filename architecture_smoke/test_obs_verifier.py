@@ -20,7 +20,7 @@ import sys
 
 from schemas import Decision
 from obs_verifier import (CAMERA_KEYS, STATE_DIM, ObsInput, ProprioGate,
-                          ObsVLMVerifier, assert_obs_only,
+                          ObsVLMVerifier, VLMBackend, assert_obs_only,
                           FORBIDDEN_PREDICATE_KEYS)
 from vlm_backends import MockVLMBackend, compose_three_cam  # noqa: F401
 
@@ -42,6 +42,18 @@ def _proprio(ee=(0.0, 0.0, 0.0), grip=(0.03, -0.03)):
     v[0], v[1], v[2] = ee
     v[6], v[7] = grip
     return v
+
+
+class RecordingViewBackend(VLMBackend):
+    def __init__(self):
+        self.views = []
+
+    def score(self, images, question_text):
+        raise AssertionError("view-routed verifier must call score_view")
+
+    def score_view(self, images, question_text, view="full"):
+        self.views.append(view)
+        return 0.9
 
 
 def main():
@@ -100,6 +112,12 @@ def main():
                           "video." + CAMERA_KEYS[1]: [[0]],
                           "video." + CAMERA_KEYS[2]: [[0]]}, proprio=None)
     check("guard.video_prefixed_camera_accepted", set(ok.images) and True)
+
+    routed = RecordingViewBackend()
+    view_v = ObsVLMVerifier("MOVE_OBJECT", routed, max_steps=10,
+                            vlm_min_interval=1, hysteresis_k=1, view="right")
+    view_v.update(ObsInput(images=_imgs(), proprio=_proprio()))
+    check("view.routes_boundary_question", routed.views == ["right"])
 
     # 3. proprio gate ------------------------------------------------------ #
     g = ProprioGate(settle_eps=1e-2, settle_window=3, grip_eps=1e-2)

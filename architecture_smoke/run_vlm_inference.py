@@ -65,7 +65,12 @@ def main():
     ap.add_argument("--tau", type=float, default=0.6, help="P(yes) threshold")
     ap.add_argument("--no-event-gate", action="store_true",
                     help="disable proprio candidate-stop gating (VLM cadence only)")
+    ap.add_argument("--verifier-config", default=None,
+                    help="JSON mapping skill names to per-skill view/tau/hysteresis_k/interval")
     args = ap.parse_args()
+
+    operating_points = (json.loads(Path(args.verifier_config).read_text())
+                        if args.verifier_config else {})
 
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
@@ -97,7 +102,8 @@ def main():
         "verifier": {"kind": "obs_vlm", "backbone": "policy's own frozen Qwen3-VL VQA P(yes)",
                      "input": "3-cam images + 14D proprio ONLY (no sim predicate)",
                      "vlm_min_interval": args.vlm_min_interval, "hysteresis_k": args.hysteresis_k,
-                     "tau": args.tau, "event_gated": not args.no_event_gate},
+                     "tau": args.tau, "event_gated": not args.no_event_gate,
+                     "per_skill_operating_points": operating_points},
         "adapter_mode": AdapterMode.DISABLED.value, "adapter_checkpoint": None,
         "policy_provenance": provenance,
         "replan_steps": args.replan_steps, "obs_history": args.obs_history,
@@ -133,7 +139,8 @@ def main():
                     registry, policy, env, trace, AdapterMode.DISABLED,
                     vlm_backend=vlm_backend, vlm_min_interval=args.vlm_min_interval,
                     hysteresis_k=args.hysteresis_k, tau=args.tau,
-                    event_gated=not args.no_event_gate)
+                    event_gated=not args.no_event_gate,
+                    verifier_operating_points=operating_points)
                 summary = run_episode(planner, manager, env, trace, registry,
                                       bindings.GOAL, args.episode_budget,
                                       args.max_planner_calls, obs_only=True)

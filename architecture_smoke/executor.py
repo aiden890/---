@@ -31,7 +31,7 @@ _SKILL_QUESTION_KEY = {
 class ExecutionManager:
     def __init__(self, registry, policy, environment, trace, adapter_mode=AdapterMode.DISABLED,
                  vlm_backend=None, vlm_min_interval=16, hysteresis_k=2, tau=0.6,
-                 event_gated=True):
+                 event_gated=True, verifier_operating_points=None):
         self.registry = registry
         self.policy = policy
         self.env = environment
@@ -45,6 +45,7 @@ class ExecutionManager:
         self.hysteresis_k = hysteresis_k
         self.tau = tau
         self.event_gated = event_gated
+        self.verifier_operating_points = verifier_operating_points or {}
 
     def execute(self, call: SkillCall) -> SkillResult:
         if self.vlm_backend is not None:
@@ -61,11 +62,14 @@ class ExecutionManager:
         contract = self.registry.validate_call(call)
         instruction = contract.render_instruction(call.args)
         qkey = _SKILL_QUESTION_KEY.get(call.name, call.name)
+        op = self.verifier_operating_points.get(call.name, {})
         verifier = ObsVLMVerifier(
             qkey, self.vlm_backend, max_steps=contract.max_steps,
             question_text=SKILL_QUESTIONS[qkey],
-            vlm_min_interval=self.vlm_min_interval, hysteresis_k=self.hysteresis_k,
-            tau=self.tau, event_gated=self.event_gated)
+            vlm_min_interval=op.get("vlm_min_interval", self.vlm_min_interval),
+            hysteresis_k=op.get("hysteresis_k", self.hysteresis_k),
+            tau=op.get("tau", self.tau), event_gated=self.event_gated,
+            view=op.get("view", "full"))
         # SECOND ROLE: strict, view-routed, episode-level success judge, SEPARATE
         # from the boundary latch above. It accumulates per-frame P(yes) on the
         # recorded-frame cadence and renders a strict pass/fail at skill end.
