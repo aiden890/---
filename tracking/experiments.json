@@ -9,7 +9,7 @@
       "model": "Xiaomi-Robotics-1-RoboCasa365",
       "task": "CloseBlenderLid / GRASP",
       "question": "action-expert 전체 linear LoRA를 Z-1 규모의 group-relative update로 RTX 3090 24GB에서 안전하게 학습할 수 있는가?",
-      "summary": "Pre-fix smoke는 optimizer update 0/2에서 종료됐다. --skip-eval이므로 성능 비교가 아니며, reward·hold·mean-loss·ratio guard·checkpoint/source gate 수정 전 진단 자료로만 보존한다. W&B mirror는 이 alllinear_grasp_smoke2 run을 포함하지 않는다.",
+      "summary": "요청된 pre-fix 1024-chunk smoke는 optimizer update 0/2로 FAIL했다. corrected exact-source micro는 RTX 3090에서 실제 forward/backward/update와 strict checkpoint reload까지 functional PASS했지만, LR 1e-6에서도 KL 0.2903·clip 0.7927로 production stability FAIL하여 30-update와 성능 비교는 시작하지 않았다. W&B mirror는 두 run을 포함하지 않는다.",
       "page": "experiments/exp-20260917-z1-expert-smoke.html",
       "data": "../rl-train-t_3ed65912/results/alllinear_grasp_smoke2/",
       "tags": [
@@ -29,8 +29,8 @@
         "lora_rank": 8,
         "lora_alpha": 32,
         "target_modules": 189,
-        "trainable_params": "6.35M",
-        "adapter_count_status": "실행 로그 확인값; pre-fix capacity 진단용",
+        "trainable_params": "6,352,288 / 5,059,501,984 (0.1256%)",
+        "adapter_count_status": "corrected exact-source artifact로 최종 재검증; VLM adapter 없음",
         "sampler": "piRL Flow-SDE",
         "denoise_steps": 5,
         "eta": 0.1,
@@ -72,8 +72,8 @@
       },
       "gate": {
         "status": "FAIL — 0/2 optimizer updates; capacity threshold 미달",
-        "continue_30_updates": "금지 — corrected exact-source micro gate 대기",
-        "eta": "해당 없음"
+        "continue_30_updates": "미진행 — corrected exact-source micro의 production stability FAIL",
+        "eta": "해당 없음; 안정성 gate 통과 전 산정하지 않음"
       },
       "artifacts": {
         "result_dir": "rl-train-t_3ed65912/results/alllinear_grasp_smoke2/",
@@ -84,9 +84,42 @@
       },
       "wandb": {
         "status": "not_mirrored",
-        "note": "기존 hard-coded mirror가 alllinear_grasp_smoke2를 포함하지 않아 이 run의 W&B 기록은 없다."
+        "note": "기존 hard-coded mirror가 alllinear_grasp_smoke2와 corrected exact-source micro를 포함하지 않아 두 run의 W&B 기록은 없다."
       },
-      "corrected_run": "EXP-20260917-GRPO-CORRECTNESS-MICRO-V2"
+      "corrected_run": "EXP-20260917-GRPO-CORRECTNESS-MICRO-V2",
+      "corrected_micro": {
+        "classification": "correctness/capacity validation; 성능 비교 아님 (--skip-eval)",
+        "source_commit": "3154248851cceb3703b9b60931ce1e1627282bbd",
+        "checkpoint_load_fix": "6fc53e6d121352b6c41f904c93da05fae07f2ee7",
+        "configuration": "AdamW lr 1e-6, wd 0.01, PPO clip 0.2, target KL 0.05, 2 requested epochs; corrected decayed terminal + exact 20-step hold",
+        "updates": [
+          {
+            "update": 1,
+            "rollouts": 16,
+            "groups": 2,
+            "trainable_chunks": 82,
+            "ratio_kl_clip": "epoch0 1.0 / 0.0 / 0.0; post-step 0.897178 / 0.290280 / 0.792683",
+            "grad_norm": 296.0,
+            "adapter_delta": "L2 0.00195697; Linf 1.01328e-6"
+          }
+        ],
+        "timing": "instrumented collect 418.191 s; rollout wall-clock 424.1 s; 26.51 s/trajectory; 0.3715 s/stored chunk; optimizer 271.049 s; reset/save 분리값 unavailable",
+        "resources": "peak allocated VRAM 10.52 GB; OOM 없음; nonfinite/dropped chunks 0/0",
+        "success": "GRASP 15/16; official task success unavailable (--skip-eval); exact 20-step hold 15/15 successes",
+        "reward_distribution": "group 0: 8/8 success, zero-variance gated; group 1: 7/8 success, 82 trainable chunks; success terminal 0.982143 또는 0.984112 + hold 1.0; failure timeout -0.5",
+        "correctness": "epoch-0 recompute ratio=1.0; rollout/recompute piRL math gate PASS; adapter delta >0; strict reload PASS (schema 2, 378 named LoRA tensors, 0 extra)",
+        "gate": "capacity PASS; production stability FAIL (KL/clip overshoot); requested 1024-chunk gate NOT MET",
+        "continue_30_updates": "NOT STARTED — production stability gate failed",
+        "eta": "해당 없음; 안정성 gate 통과 전 산정하지 않음",
+        "performance_comparison": "NOT RUN — unsafe update로 qkv-only paired/held-out 주장을 만들지 않음",
+        "artifacts": {
+          "remote_result_dir": "/home/v4/rl-train-t_3ed65912/results/corrected_exact_3154248_micro_lr1e6/",
+          "checkpoint": "/home/v4/rl-train-t_3ed65912/results/corrected_exact_3154248_micro_lr1e6/grpo_trained.pt",
+          "summary_json": "/home/v4/rl-train-t_3ed65912/results/corrected_exact_3154248_micro_lr1e6/run_summary.json",
+          "train_log": "/home/v4/rl-train-t_3ed65912/results/corrected_exact_3154248_micro_lr1e6/train_log.jsonl",
+          "report": "reports/alllinear-grasp-corrected-micro.html"
+        }
+      }
     },
     {
       "id": "EXP-20260917-GRPO-CORRECTNESS-MICRO-V2",

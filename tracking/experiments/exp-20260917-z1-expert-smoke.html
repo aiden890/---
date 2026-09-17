@@ -32,7 +32,7 @@ fetch('../experiments.json').then(r=>{
 }).then(db=>{
   const e=db.experiments.find(x=>x.id===EXP_ID);
   if(!e) throw new Error(`${EXP_ID} entry not found`);
-  const c=e.configuration, p=e.progress, m=e.measurements, g=e.gate, a=e.artifacts;
+  const c=e.configuration, p=e.progress, m=e.measurements, g=e.gate, a=e.artifacts, x=e.corrected_micro;
   const status=e.status==='running'?'진행 중':e.status;
   const unavailable='<span class="pending">미생성</span>';
   const linkOrStatus=(label,path)=>path?`<a href="../${path}">${label}</a> <code>${path}</code>`:(e.status==='running'?pending:unavailable);
@@ -85,6 +85,28 @@ fetch('../experiments.json').then(r=>{
     <div class="card"><h2>학습 정합성 · gate</h2><div class="table-wrap"><table><tbody>${rows([
       ['ratio / KL / clip / grad / delta',m.ratio_kl_clip_grad_adapter_delta],['first recompute ratio = 1',m.recompute_ratio_one],['rollout/recompute log-prob match',m.logprob_match],
       ['smoke gate',g.status==='collecting'?'수집 중':g.status],['30-update 진행 여부',g.continue_30_updates],['30-update ETA',g.eta],['corrected run',e.corrected_run]
+    ])}</tbody></table></div></div>
+
+    <div class="notice"><b>Corrected exact-source micro</b><br>${x.classification}</div>
+    <div class="card"><h2>corrected 설정 · provenance</h2><div class="table-wrap"><table><tbody>${rows([
+      ['source commit',x.source_commit],['checkpoint load fix',x.checkpoint_load_fix],['optimizer / reward',x.configuration]
+    ])}</tbody></table></div></div>
+    <div class="card"><h2>corrected update 실측</h2><div class="table-wrap"><table>
+      <thead><tr><th>update</th><th>rollouts</th><th>groups</th><th>trainable chunks</th><th>ratio / KL / clip</th><th>grad norm</th><th>adapter delta</th></tr></thead>
+      <tbody>${x.updates.map(u=>`<tr><td>${u.update}</td><td>${u.rollouts}</td><td>${u.groups}</td><td>${u.trainable_chunks}</td><td>${u.ratio_kl_clip}</td><td>${u.grad_norm}</td><td>${u.adapter_delta}</td></tr>`).join('')}</tbody>
+    </table></div></div>
+    <div class="grid">
+      <div class="card"><h2>corrected 시간 · 자원</h2><div class="table-wrap"><table><tbody>${rows([
+        ['wall-clock',x.timing],['VRAM / OOM / finite',x.resources],['정합성',x.correctness]
+      ])}</tbody></table></div></div>
+      <div class="card"><h2>corrected 성공 · reward</h2><div class="table-wrap"><table><tbody>${rows([
+        ['success / official / hold',x.success],['reward distribution',x.reward_distribution],['performance comparison',x.performance_comparison]
+      ])}</tbody></table></div></div>
+    </div>
+    <div class="card"><h2>corrected 최종 gate · artifact</h2><div class="table-wrap"><table><tbody>${rows([
+      ['gate',x.gate],['30-update',x.continue_30_updates],['ETA',x.eta],['result directory',`<code>${x.artifacts.remote_result_dir}</code>`],
+      ['checkpoint',`<code>${x.artifacts.checkpoint}</code>`],['summary JSON',`<code>${x.artifacts.summary_json}</code>`],['train log',`<code>${x.artifacts.train_log}</code>`],
+      ['final report',`<a href="../${x.artifacts.report}">report</a> <code>${x.artifacts.report}</code>`]
     ])}</tbody></table></div></div>
 
     <div class="card"><h2>artifact</h2><div class="artifact-list">
