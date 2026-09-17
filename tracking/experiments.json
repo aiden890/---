@@ -191,13 +191,13 @@
       "id": "EXP-20260917-GRPO-NONJOINT-ALLLINEAR-30",
       "date": "2026-09-17",
       "title": "Non-joint Flow-SDE all-linear GRASP 30-update",
-      "status": "running",
+      "status": "complete",
       "model": "Xiaomi-Robotics-1-RoboCasa365",
       "task": "CloseBlenderLid / GRASP",
       "question": "RLinf Flow-SDE의 non-joint 정책비를 정확히 적용하면 all-linear adapter가 안정적으로 30 updates를 끝내고 paired/held-out GRASP를 개선하는가?",
-      "summary": "근본 원인 수정 micro는 LR 1e-6에서 KL 0.000215, clip 0.00180, ESS 0.99957과 strict mutation roundtrip을 통과했다. 동일 exact source/config로 30 updates와 paired eta=0 20 + held-out 20 평가를 실행 중이다.",
+      "summary": "960-term joint 정책비를 one-denoise-step elementwise ratio로 수정해 안정성은 회복했다. 30 iterations 중 20 optimizer updates가 모두 KL/clip/ESS gate를 통과했지만 paired GRASP 0.60→0.60, official 0.15→0.15로 정책 개선은 없었다.",
       "data": "../rl-train-t_3ed65912/results/nonjoint_abbb8c8_alllinear30/",
-      "tags": ["GRPO", "GRASP", "all-linear", "flow-sde", "non-joint", "running"],
+      "tags": ["GRPO", "GRASP", "all-linear", "flow-sde", "non-joint", "complete", "flat"],
       "kanban": "t_80f3cba3",
       "source": {
         "commit": "abbb8c824456e75fb91274ff7abf5bbf9e9bcb01",
@@ -223,18 +223,39 @@
         "adapter_delta_l2": 0.003716385457664728,
         "strict_roundtrip": "PASS"
       },
-      "measurements": "수집 중",
+      "measurements": {
+        "rollout_iterations": 30,
+        "optimizer_updates": 20,
+        "gated_iterations": 10,
+        "trajectories": 240,
+        "train_success_hold": "127/240",
+        "group_composition": "mixed 18 / all-success 7 / all-failure 5",
+        "post_step_kl_mean_max": "0.00025694 / 0.00031111",
+        "post_step_clip_mean_max": "0.00226446 / 0.00287624",
+        "post_step_ess_mean_min": "0.99948710 / 0.99939747",
+        "nonfinite_dropped": "0 / 0",
+        "paired_grasp": "0.60 → 0.60 (1 gain, 1 loss)",
+        "paired_official": "0.15 → 0.15 (2 gains, 2 losses)",
+        "heldout_grasp": 0.55,
+        "heldout_official": 0.1,
+        "completion_step": "not logged"
+      },
       "gate": {
         "production_stability": "PASS",
         "continue_30_updates": true,
-        "performance": "수집 중"
+        "performance": "FLAT — improvement not demonstrated"
       },
       "artifacts": {
-        "remote_result_dir": "/home/v4/rl-train-t_3ed65912/results/nonjoint_abbb8c8_alllinear30/"
+        "remote_result_dir": "/home/v4/rl-train-t_3ed65912/results/nonjoint_abbb8c8_alllinear30/",
+        "checkpoint": "/home/v4/rl-train-t_3ed65912/results/nonjoint_abbb8c8_alllinear30/grpo_trained.pt",
+        "checkpoint_sha256": "54c51e7cf8958a1643acb88adba55eacbe14195324fc1386594280c9d1849883",
+        "local_result_dir": "../rl-train-t_3ed65912/results/nonjoint_abbb8c8_alllinear30/",
+        "report": "../rl-train-t_3ed65912/REPORT/NONJOINT_ALLLINEAR_GRASP_30_FINAL.md"
       },
       "wandb": {
-        "status": "discovery pending",
-        "project": "http://100.86.183.64:8080/aiden-lab-desktop/robocasa-grpo"
+        "status": "finished; API-verified unique stable run ID",
+        "project": "http://100.86.183.64:8080/aiden-lab-desktop/robocasa-grpo",
+        "run": "http://100.86.183.64:8080/aiden-lab-desktop/robocasa-grpo/runs/grpo-nonjoint_abbb8c8_alllinear30"
       }
     },
     {
