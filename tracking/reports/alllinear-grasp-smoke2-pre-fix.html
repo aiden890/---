@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Z-1 expert adapter smoke test — pre-fix diagnostic report</title>
+  <style>
+    :root{color-scheme:light dark;font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+    body{max-width:980px;margin:0 auto;padding:28px;background:#0f1115;color:#e7eaf0}
+    pre{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55}
+    .error{color:#ff8d8d}
+  </style>
+</head>
+<body>
+<pre id="report">보고서를 불러오는 중…</pre>
+<script>
+fetch('ALLLINEAR_GRASP_SMOKE2_PRE_FIX.md')
+  .then(response => {
+    if (!response.ok) throw new Error(`report HTTP ${response.status}`);
+    return response.text();
+  })
+  .then(text => { document.getElementById('report').textContent = text; })
+  .catch(error => {
+    const report = document.getElementById('report');
+    report.className = 'error';
+    report.textContent = `보고서를 불러오지 못했습니다: ${error.message}`;
+  });
+</script>
+</body>
+</html>

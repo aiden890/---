@@ -4,7 +4,7 @@
     {
       "id": "EXP-20260917-Z1-EXPERT-SMOKE",
       "date": "2026-09-17",
-      "title": "Z-1 expert adapter smoke test — pre-fix diagnostic",
+      "title": "Z-1 expert adapter smoke test",
       "status": "complete",
       "model": "Xiaomi-Robotics-1-RoboCasa365",
       "task": "CloseBlenderLid / GRASP",
@@ -80,7 +80,7 @@
         "checkpoint": null,
         "summary_json": null,
         "log": null,
-        "report": "../rl-train-t_3ed65912/REPORT/ALLLINEAR_GRASP_SMOKE2_PRE_FIX.md"
+        "report": "reports/alllinear-grasp-smoke2-pre-fix.html"
       },
       "wandb": {
         "status": "not_mirrored",

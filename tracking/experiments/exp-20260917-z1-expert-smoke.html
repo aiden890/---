@@ -25,7 +25,6 @@ const EXP_ID='EXP-20260917-Z1-EXPERT-SMOKE';
 const pending='<span class="pending">수집 중</span>';
 const shown=v=>v===null||v===undefined||v===''?pending:String(v);
 const rows=items=>items.map(([k,v])=>`<tr><td>${k}</td><td>${shown(v)}</td></tr>`).join('');
-const linkOrPending=(label,path)=>path?`<a href="../${path}">${label}</a> <code>${path}</code>`:pending;
 
 fetch('../experiments.json').then(r=>{
   if(!r.ok) throw new Error(`experiments.json HTTP ${r.status}`);
@@ -35,6 +34,8 @@ fetch('../experiments.json').then(r=>{
   if(!e) throw new Error(`${EXP_ID} entry not found`);
   const c=e.configuration, p=e.progress, m=e.measurements, g=e.gate, a=e.artifacts;
   const status=e.status==='running'?'진행 중':e.status;
+  const unavailable='<span class="pending">미생성</span>';
+  const linkOrStatus=(label,path)=>path?`<a href="../${path}">${label}</a> <code>${path}</code>`:(e.status==='running'?pending:unavailable);
   const notice=e.status==='running'
     ? '<b>실행 중인 smoke입니다.</b><br>확정되지 않은 측정값은 “수집 중”으로 표시한다.'
     : `<b>Pre-fix 진단으로 종료.</b><br>${e.summary}`;
@@ -69,7 +70,7 @@ fetch('../experiments.json').then(r=>{
 
     <div class="card"><h2>update별 수집 결과</h2><div class="table-wrap"><table>
       <thead><tr><th>update</th><th>rollouts</th><th>groups</th><th>trainable chunks</th><th>ratio / KL / clip</th><th>grad norm</th><th>adapter delta</th></tr></thead>
-      <tbody>${m.updates?m.updates.map(u=>`<tr><td>${shown(u.update)}</td><td>${shown(u.rollouts)}</td><td>${shown(u.groups)}</td><td>${shown(u.trainable_chunks)}</td><td>${shown(u.ratio_kl_clip)}</td><td>${shown(u.grad_norm)}</td><td>${shown(u.adapter_delta)}</td></tr>`).join(''):`<tr><td colspan="7">${pending}</td></tr>`}</tbody>
+      <tbody>${m.updates?.length?m.updates.map(u=>`<tr><td>${shown(u.update)}</td><td>${shown(u.rollouts)}</td><td>${shown(u.groups)}</td><td>${shown(u.trainable_chunks)}</td><td>${shown(u.ratio_kl_clip)}</td><td>${shown(u.grad_norm)}</td><td>${shown(u.adapter_delta)}</td></tr>`).join(''):`<tr><td colspan="7">${e.status==='running'?pending:'완료된 optimizer update 없음 (0/2)'}</td></tr>`}</tbody>
     </table></div></div>
 
     <div class="grid">
@@ -88,10 +89,10 @@ fetch('../experiments.json').then(r=>{
 
     <div class="card"><h2>artifact</h2><div class="artifact-list">
       <div class="artifact-row"><b>result directory</b><code>${a.result_dir}</code></div>
-      <div class="artifact-row"><b>checkpoint</b><span>${linkOrPending('checkpoint',a.checkpoint)}</span></div>
-      <div class="artifact-row"><b>summary JSON</b><span>${linkOrPending('summary',a.summary_json)}</span></div>
-      <div class="artifact-row"><b>train log</b><span>${linkOrPending('log',a.log)}</span></div>
-      <div class="artifact-row"><b>audit report</b><span>${linkOrPending('report',a.report)}</span></div>
+      <div class="artifact-row"><b>checkpoint</b><span>${linkOrStatus('checkpoint',a.checkpoint)}</span></div>
+      <div class="artifact-row"><b>summary JSON</b><span>${linkOrStatus('summary',a.summary_json)}</span></div>
+      <div class="artifact-row"><b>train log</b><span>${linkOrStatus('log',a.log)}</span></div>
+      <div class="artifact-row"><b>audit report</b><span>${linkOrStatus('report',a.report)}</span></div>
     </div></div>`;
 }).catch(err=>{document.getElementById('app').innerHTML='<p class="no">실험 정보를 불러오지 못했습니다.</p>';console.error(err);});
 setTimeout(()=>location.reload(),60000);
