@@ -50,6 +50,8 @@ The first fresh-trainer load of the real checkpoint failed with `RNG state must 
 
 The post-fix load returned schema version 2, 378 named LoRA tensors, 0 extra tensors, adapter skill `grasp`, the 189 target names, rank/alpha, optimizer/RNG state metadata, update index 1, base model, sampler/config, exact source commit, and source manifest hash. The checkpoint correctly retains its generating source commit `3154248`; the loader fix is `6fc53e6`. Missing/unexpected/shape mismatch checks remain fail-fast in the schema tests.
 
+Commit `d419ad6` adds a non-trivial real-checkpoint roundtrip gate. On v4 it loaded this same all-linear checkpoint, saved all 378 named LoRA tensors plus a seeded eta=0 action, mutated all 189 LoRA-B tensors, and proved the mutation changed the action (`max_abs=2.783203125`). A second strict load restored every named tensor bit-exactly (0 mismatches) and restored the action bit-exactly (`max_abs=0.0`). The machine-readable artifact is `results/corrected_exact_3154248_micro_lr1e6/roundtrip_gate_d419ad6.json` on v4.
+
 ## Stability verdict
 
 Functional correctness gate: PASS.
@@ -67,6 +69,7 @@ Central/std-lib checks rerun:
 - all-linear smoke gate unit test: pass
 - source-manifest tests: pass
 - unique checkpoint path baseline + mutation: 2/2 pass
+- real all-linear checkpoint mutation + strict parameter/action roundtrip: 7/7 pass
 
 Inside the real trainer image:
 
