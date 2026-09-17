@@ -90,7 +90,7 @@ def _p(**kw):
 
 
 def test_milestones_paid_once():
-    cfg = RewardConfig()
+    cfg = RewardConfig(use_milestones=True)
     rm = RewardManager(cfg)
     # grasp becomes true at step 10 and stays true
     fire_counts = {}
@@ -104,28 +104,15 @@ def test_milestones_paid_once():
     print("[ok] skill milestones are paid at most once per episode")
 
 
-def test_terminal_decay_and_primary_no_vlm():
+def test_terminal_decay_and_primary_reward():
     cfg = RewardConfig(terminal_decay_gamma=0.998)
     rm = RewardManager(cfg)
     p = _p(lid_on_blender=True, gripper_far=True, official_check_success=True)
-    rb = rm.step_reward(100, p, done=True, vlm_score=0.9)
+    rb = rm.step_reward(100, p, done=True)
     expected_terminal = 1.0 * (0.998 ** 100)
     assert abs(rb.terminal - expected_terminal) < 1e-9
-    # VLM score recorded but NOT in primary
-    assert rb.vlm_aux == 0.9
     assert abs(rb.primary - (rb.terminal + rb.milestone + rb.penalty)) < 1e-9
-    assert abs(rb.total(cfg.vlm_weight) - rb.primary) < 1e-9, "vlm_weight=0 -> total==primary"
-    print("[ok] terminal reward uses gamma^step decay; VLM never enters primary reward")
-
-
-def test_vlm_ablation_switch():
-    cfg = RewardConfig().with_vlm(0.05)
-    assert cfg.mode == "simulator+vlm" and cfg.vlm_weight == 0.05
-    rm = RewardManager(cfg)
-    p = _p()
-    rb = rm.step_reward(5, p, vlm_score=1.0)
-    assert abs(rb.total(cfg.vlm_weight) - (rb.primary + 0.05)) < 1e-9
-    print("[ok] reward-only ablation is a pure config switch (simulator vs simulator+vlm)")
+    print("[ok] terminal reward uses gamma^step decay and primary is the simulator total")
 
 
 def test_z1_baseline():

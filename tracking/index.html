@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RoboCasa · Xiaomi VLA</title>
-<link rel="stylesheet" href="assets/site.css?v=20260917j">
+<link rel="stylesheet" href="assets/site.css?v=20260917k">
 <link rel="stylesheet" href="assets/inference.css">
 <script src="assets/theme.js"></script>
 </head>
@@ -57,25 +57,103 @@
   <h1>Skill VLA Framework</h1>
   <p class="framework-lede">End-to-end skill inference · CloseBlenderLid</p>
 
-  <div class="card framework-card overview-card">
-    <div class="section-head"><h2>Overall planning and execution framework</h2><span class="badge b-ok">PLANNER → EXECUTION</span></div>
-    <p class="dim">상위 VLM Planner가 task와 camera context를 해석해 정의된 contract의 SkillCall을 순서대로 선택하고, Manager가 실행·경계판정·재계획을 연결한다.</p>
-    <div class="overview-flow" aria-label="전체 Skill VLA planning and execution framework">
-      <div class="overview-node context"><small>Context</small><b>Task + cameras</b><span>goal · eye · wrist · right</span></div>
-      <span>→</span>
-      <div class="overview-node planner"><small>Planning</small><b>VLM Planner</b><span>next SkillCall 선택</span></div>
-      <span>→</span>
-      <div class="overview-node contract"><small>Typed plan</small><b>Ordered SkillCall</b><span>name · args · instruction · contract</span></div>
-      <span>→</span>
-      <div class="overview-node manager"><small>Orchestration</small><b>Skill Manager</b><span>adapter · budget · retry</span></div>
-      <span>→</span>
-      <div class="overview-node execution"><small>Execution loop</small><b>Xiaomi VLA + RoboCasa</b><span>16-step chunk · observations</span></div>
-      <span>→</span>
-      <div class="overview-node verifier"><small>Online boundary</small><b>ObsVLMVerifier</b><span>advance · continue · timeout</span></div>
-      <span>→</span>
-      <div class="overview-node next"><small>Control return</small><b>Next SkillCall / replan</b><span>Manager → Planner</span></div>
+  <div class="card framework-card architecture-card">
+    <div class="section-head"><h2>Overall module architecture</h2><span class="badge b-rev">PROPOSED DEPLOYMENT TOPOLOGY</span></div>
+    <p class="dim">정책 추론과 verifier 요청을 독립 logical lane으로 분리하되, <b>한 물리 GPU · 한 Qwen3-VL model instance</b>를 공유하는 target architecture다. verifier는 control loop를 막지 않지만 GPU compute overhead까지 사라지는 것은 아니다.</p>
+
+    <div class="architecture-status" aria-label="Target architecture와 current implementation 구분">
+      <div class="target"><small>TARGET ARCHITECTURE</small><b>Shared GPU inference server · two logical API queues</b><span>one Qwen3-VL instance · priority-scheduled CUDA execution</span></div>
+      <div class="current"><small>CURRENT IMPLEMENTATION</small><b>SequentialPlanner scripted obs-only stub</b><span>NOT learned VLM planner · shared-GPU topology not deployed</span></div>
     </div>
-    <div class="overview-endpoint"><span>PLACE endpoint only</span><b>SuccessGate → PASS / FAIL</b><small>strict task report · sim GT는 evaluation에서만 비교</small></div>
+
+    <div class="architecture-scroll" role="region" aria-label="Skill VLA module and host architecture" tabindex="0">
+      <div class="architecture-map">
+        <section class="arch-plane planning-plane">
+          <header><span>PLANNING PLANE</span><small>high-level target service</small></header>
+          <div class="plane-modules planning-modules">
+            <div class="arch-module"><small>INPUT</small><b>Task / Goal Input</b><span>goal · initial scene</span></div>
+            <div class="arch-edge solid"><span>task goal + scene observation<br>+ plan history</span><i>→</i></div>
+            <div class="arch-module target-module"><small>TARGET</small><b>VLM Planner Service</b><span>high-level decomposition</span></div>
+            <div class="arch-edge solid"><span>ordered plan</span><i>→</i></div>
+            <div class="arch-module"><small>PLAN STATE</small><b>Ordered SkillCall / Plan State</b><span>next · retry · replan</span></div>
+          </div>
+          <div class="registry-row">
+            <div class="arch-module registry"><small>CANONICAL SOURCE</small><b>Skill Contract Registry</b><span>tracking/inference.json + architecture_smoke/bindings.py</span></div>
+            <div class="arch-edge split"><span>skill schema · args · can_start · done condition<br>instruction · max_steps → Planner / Manager</span><i>↗</i></div>
+          </div>
+          <div class="plane-output"><span>Planner → Manager</span><b>SkillCall{name, args, instruction, contract, budget}</b></div>
+        </section>
+
+        <section class="arch-plane execution-plane">
+          <header><span>EXECUTION PLANE</span><small>control host · local authority</small></header>
+          <div class="plane-modules execution-modules">
+            <div class="arch-module manager-module"><small>ORCHESTRATOR</small><b>Execution Manager / Router</b><span>policy lane · budget · retry</span></div>
+            <div class="arch-edge local"><span>latest observation<br>candidate stop</span><i>⇄</i></div>
+            <div class="arch-module verifier-client"><small>ASYNC CLIENT</small><b>Async Verifier Client</b><span>queue 1 · ≤1 in flight · stale reject</span></div>
+            <div class="arch-module telemetry"><small>LOCAL SINK</small><b>Trace / Telemetry</b><span>calls · actions · verdicts · timing</span></div>
+          </div>
+          <div class="local-decision"><b>LOCAL DECISION</b><span>hysteresis + episode_id / skill_id / observation_step guard</span><strong>ADVANCE · CONTINUE · RETRY · REPLAN</strong></div>
+          <div class="plane-output result"><span>Manager → Planner</span><b>SkillResult{SUCCESS/TIMEOUT/FAILED, steps, reason, final obs}</b></div>
+        </section>
+
+        <div class="host-row">
+          <section class="arch-plane compact shared-gpu-plane">
+            <header><span>SHARED GPU INFERENCE SERVER</span><small>one physical GPU · one model instance</small></header>
+            <div class="shared-gpu-modules">
+              <div class="arch-module"><small>HIGH PRIORITY · POLICY API</small><b>Xiaomi VLA Policy Server</b><span>60-D model action · active dims 0–11 · 16-step chunk</span></div>
+              <div class="arch-module target-module"><small>LOW PRIORITY · ASYNC</small><b>Verifier API</b><span>frozen Qwen3-VL boundary / endpoint modes</span></div>
+            </div>
+            <div class="gpu-scheduler"><b>Priority scheduler / single Qwen3-VL model instance</b><span>shared compute · CUDA execution serialized / scheduled · no duplicate model load</span></div>
+          </section>
+          <section class="arch-plane compact robot-plane">
+            <header><span>ENVIRONMENT / ROBOT</span><small>20Hz control</small></header>
+            <div class="arch-module"><small>SIM / ROBOT</small><b>RoboCasa / Robot Control</b><span>eye · wrist/left · right + proprio14</span></div>
+          </section>
+          <section class="arch-plane compact verification-plane">
+            <header><span>VERIFICATION OUTPUT</span><small>same shared service</small></header>
+            <div class="arch-module target-module"><small>LOGICAL SERVICE</small><b>Frozen Qwen3-VL Verifier Service</b><span>P(yes) · view · metadata · model latency</span></div>
+            <div class="arch-module endpoint"><small>FINAL WINDOW</small><b>Endpoint SuccessGate</b><span>strict PASS / FAIL + score</span></div>
+          </section>
+        </div>
+
+        <div class="connection-stack" aria-label="Labeled cross-host connections">
+          <div><b>Manager</b><span class="runtime-arrow">3-cam obs + proprio14 + current skill instruction →</span><b>Policy API</b></div>
+          <div><b>Policy API</b><span class="runtime-arrow">16-step action chunk →</span><b>Manager</b></div>
+          <div><b>Manager</b><span class="runtime-arrow">one action / 20Hz step →</span><b>Robot</b></div>
+          <div><b>Robot</b><span class="runtime-arrow">new cameras + proprio14 + done/trunc →</span><b>Manager</b></div>
+          <div class="async"><b>Async client</b><span>latest frame(s) + skill/question + episode_id/skill_id/step ⇄ P(yes) + view + timestamp/step + model latency</span><b>Verifier API</b></div>
+          <div><b>Manager</b><span class="runtime-arrow">SkillCall + action window + verifier result + transition + timing →</span><b>Trace</b></div>
+        </div>
+
+        <section class="arch-plane evaluation-plane">
+          <header><span>EVALUATION-ONLY PLANE</span><small>never feeds runtime components</small></header>
+          <div class="evaluation-path"><div class="arch-module"><small>GROUND TRUTH</small><b>Simulator GT / official predicates</b></div><span>official success / predicates · offline calibration / evaluation / tracking only ⇢</span><div class="arch-module"><small>OFFLINE ONLY</small><b>Evaluation &amp; Calibration</b></div></div>
+        </section>
+      </div>
+    </div>
+
+    <div class="control-note"><b>Async control semantics · shared compute cost</b><span>Action chunk 수신 뒤 16 actions 실행 중 low-priority verifier를 예약한다. 기본 cadence는 chunk당 1회(0.8 s control time) + rising-edge candidate-stop 1회이며, superseded frame은 버리고 backlog를 만들지 않는다. VLM 85ms 기준 verifier는 약 10.6% GPU duty를 쓰며, policy와 충돌하면 scheduling에 따라 최대 85–170ms 지연될 수 있다.</span></div>
+
+    <h3 class="interface-title">Interface contract</h3>
+    <div class="interface-table-wrap">
+      <table class="interface-table">
+        <thead><tr><th>Producer</th><th>Consumer</th><th>Payload</th><th>Cadence</th><th>Sync / Async</th></tr></thead>
+        <tbody>
+          <tr><td>Goal input</td><td>Planner</td><td>task goal + scene observation + plan history</td><td>task / replan</td><td>Sync</td></tr>
+          <tr><td>Registry</td><td>Planner + Manager</td><td>schema, args, guards, instruction, max_steps</td><td>plan / skill</td><td>Sync</td></tr>
+          <tr><td>Planner</td><td>Manager</td><td>SkillCall{name,args,instruction,contract,budget}</td><td>skill boundary</td><td>Sync</td></tr>
+          <tr><td>Manager</td><td>Policy API · shared GPU</td><td>3-cam obs + proprio14 + skill instruction</td><td>16 steps</td><td>High-priority RPC</td></tr>
+          <tr><td>Policy API · shared GPU</td><td>Manager</td><td>16-step action chunk</td><td>16 steps</td><td>High-priority RPC</td></tr>
+          <tr><td>Manager</td><td>Robot</td><td>one action</td><td>20Hz</td><td>Sync</td></tr>
+          <tr><td>Robot</td><td>Manager</td><td>cameras + proprio14 + done/trunc</td><td>20Hz</td><td>Sync</td></tr>
+          <tr><td>Verifier client</td><td>Verifier API · shared GPU</td><td>latest frame(s), skill/question, request metadata</td><td>chunk + candidate stop</td><td>Low-priority async · queue 1</td></tr>
+          <tr><td>Verifier API · shared GPU</td><td>Verifier client</td><td>P(yes), view, model latency, request metadata</td><td>≤1 in flight</td><td>Async</td></tr>
+          <tr><td>Manager</td><td>Planner</td><td>SkillResult + final observation</td><td>skill boundary</td><td>Sync</td></tr>
+          <tr><td>Manager</td><td>Trace</td><td>calls, actions, verifier, transition, timing</td><td>event</td><td>Async sink</td></tr>
+          <tr class="eval-row"><td>Simulator GT</td><td>Offline evaluation</td><td>official success / predicates</td><td>offline</td><td>Evaluation only</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <div class="card framework-card contract-card">
@@ -111,83 +189,9 @@
     </div>
   </div>
 
-  <div class="card framework-card">
-    <div class="section-head">
-      <h2>Runtime control loop</h2>
-      <span class="badge b-run">OBS-ONLY RUNTIME</span>
-    </div>
-    <p class="dim">세 카메라 관측에서 action을 만들고, 빠른 boundary 판정이 Manager의 다음 상태를 결정한다.</p>
-    <div class="runtime-flow" aria-label="Camera observations에서 skill state transition까지의 runtime loop">
-      <div class="runtime-node input"><small>Runtime input</small><b>Camera observations</b><span>eye · wrist · right</span></div>
-      <span class="flow-arrow" aria-hidden="true">→</span>
-      <div class="runtime-node policy"><small>Policy</small><b>Xiaomi VLA</b><span>skill instruction</span></div>
-      <span class="flow-arrow" aria-hidden="true">→</span>
-      <div class="runtime-node"><small>Output</small><b>16-step chunk</b><span>robot actions</span></div>
-      <span class="flow-arrow" aria-hidden="true">→</span>
-      <div class="runtime-node world"><small>Environment</small><b>RoboCasa</b><span>new observations</span></div>
-      <span class="flow-arrow" aria-hidden="true">→</span>
-      <div class="runtime-node verifier"><small>Online boundary</small><b>ObsVLMVerifier</b><span>visual evidence only</span></div>
-      <span class="flow-arrow" aria-hidden="true">→</span>
-      <div class="runtime-node manager"><small>Controller</small><b>Manager decision</b><span>advance · continue · recover</span></div>
-    </div>
-
-    <div class="decision-grid">
-      <article><b class="decision advance">ADVANCE</b><span>다음 skill로 전환</span></article>
-      <article><b class="decision continue">CONTINUE</b><span>현재 skill 유지</span></article>
-      <article><b class="decision recover">TIMEOUT / REPLAN</b><span>같은 skill 재시도 또는 planner 복귀</span></article>
-    </div>
-
-    <div class="skill-state" aria-label="GRASP MOVE PLACE state transition">
-      <div><small>01</small><b>GRASP</b></div><span>ADVANCE →</span>
-      <div><small>02</small><b>MOVE</b></div><span>ADVANCE →</span>
-      <div><small>03</small><b>PLACE</b></div><span>endpoint →</span>
-      <div class="success-state"><small>Strict report</small><b>SuccessGate</b><em>PASS / FAIL</em></div>
-    </div>
-    <div class="loopback">↺ CONTINUE는 observation을 갱신해 현재 skill의 다음 16-step chunk를 실행한다.</div>
-  </div>
-
-  <div class="signal-layout">
-    <div class="card signal-card runtime-signal">
-      <span class="signal-label">RUNTIME PATH · SOLID</span>
-      <h2>Policy와 verifier가 보는 신호</h2>
-      <ul>
-        <li>eye / wrist / right camera observations</li>
-        <li>현재 skill과 language instruction</li>
-        <li>ObsVLMVerifier의 obs-only boundary evidence</li>
-      </ul>
-    </div>
-    <div class="card signal-card eval-signal">
-      <span class="signal-label">EVALUATION ONLY · DOTTED</span>
-      <h2>보고서에서만 비교하는 신호</h2>
-      <ul>
-        <li>sim ground truth와 official predicates</li>
-        <li>offline calibration label과 agreement</li>
-        <li><b>runtime VLM 입력이나 Manager 결정에는 미사용</b></li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="card framework-card">
-    <div class="section-head"><h2>Boundary와 endpoint는 다른 질문이다</h2><span class="badge b-rev">분리된 책임</span></div>
-    <div class="gate-compare">
-      <article>
-        <span>FAST · ONLINE · REPEATED</span>
-        <h3>ObsVLMVerifier</h3>
-        <p>“현재 skill을 끝내고 다음 skill을 호출할 만큼 경계에 도달했나?”</p>
-        <b>ADVANCE / CONTINUE</b>
-      </article>
-      <div class="versus">≠</div>
-      <article>
-        <span>STRICT · ENDPOINT · ONCE</span>
-        <h3>SuccessGate</h3>
-        <p>“PLACE 종료 뒤 전체 task 성공으로 보고해도 되는가?”</p>
-        <b>PASS / FAIL</b>
-      </article>
-    </div>
-  </div>
-
   <div class="card evidence-card">
-    <div class="section-head"><h2>Balanced v3 · 실제 E2E 3 seeds</h2><span class="badge b-blk">OFFICIAL SUCCESS 0 / 3</span></div>
+    <div class="section-head"><h2>Current validation / known limitations</h2><span class="badge b-blk">OFFICIAL SUCCESS 0 / 3</span></div>
+    <h3 class="validation-subtitle">Balanced v3 · 실제 E2E 3 seeds</h3>
     <p class="dim">전체 framework 중 <b>verifier와 handoff 하위 경로</b>에 대한 검증 결과다. ADVANCE 관측 자체는 정확도 성공을 뜻하지 않는다.</p>
     <div class="framework-status" aria-label="검증 결과 요약">
       <div class="status-pass"><small>Architecture wiring</small><b>verified · verdict가 실제 전환/재시도를 유발</b></div>
@@ -205,6 +209,18 @@
     </div>
     <p class="evidence-conclusion"><b>결론:</b> Manager 배선과 GRASP → MOVE → PLACE skill transition은 동작한다. 그러나 online PLACE boundary와 최종 성공 판정 정확도는 아직 해결되지 않았다.</p>
     <a class="framework-cta" href="#inference">Inference 영상으로 검증 <span>→</span></a>
+  </div>
+
+  <div class="card framework-card reference-card">
+    <div class="section-head"><h2>Reference architecture</h2><span class="badge b-rev">CONCEPTUAL REFERENCES</span></div>
+    <p class="dim">아래 연구의 계층형 계획·언어 기반 affordance·closed-loop feedback 개념을 참고했으며, 특정 논문의 시스템을 정확히 재현했다는 주장은 아니다.</p>
+    <div class="reference-strip architecture-references">
+      <a class="reference-chip" href="https://arxiv.org/abs/2502.19417" target="_blank" rel="noreferrer"><b>Hi Robot</b><span>hierarchical interactive robot learning</span></a>
+      <a class="reference-chip" href="https://arxiv.org/abs/2506.22827" target="_blank" rel="noreferrer"><b>Hierarchical VLM Planning</b><span>multi-step humanoid manipulation</span></a>
+      <a class="reference-chip" href="https://arxiv.org/abs/2204.01691" target="_blank" rel="noreferrer"><b>SayCan</b><span>language plans grounded by affordance</span></a>
+      <a class="reference-chip" href="https://arxiv.org/abs/2207.05608" target="_blank" rel="noreferrer"><b>Inner Monologue</b><span>closed-loop environment feedback</span></a>
+      <a class="reference-chip" href="https://arxiv.org/abs/2606.10267" target="_blank" rel="noreferrer"><b>Hierarchical VLA study</b><span>systematic architecture study</span></a>
+    </div>
   </div>
 
   <details class="card training-details">
