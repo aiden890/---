@@ -1,0 +1,140 @@
+{
+  "seed": 5,
+  "goal": "Close the blender lid securely.",
+  "terminal": "planner_done",
+  "planner_calls": 5,
+  "steps_used": 243,
+  "task_success": false,
+  "skills": [
+    {
+      "status": "SUCCESS",
+      "skill": "GRASP_OBJECT",
+      "args": {
+        "object": "blender_lid",
+        "grasp_region": "lid_handle"
+      },
+      "instruction": "Grasp the blender lid securely at its handle and lift it clear.",
+      "steps": 46,
+      "success_step": 46,
+      "terminated_by": "vlm_success",
+      "reason": "VLM recognised 'GRASP_OBJECT' complete: P(yes)=0.651 >= tau=0.6 for 2 consecutive query(ies)",
+      "vlm_stats": {
+        "skill": "GRASP_OBJECT",
+        "elapsed": 46,
+        "n_vlm_calls": 4,
+        "vlm_seconds": 0.4028,
+        "succeeded_step": 46,
+        "mean_vlm_latency_ms": 100.7
+      }
+    },
+    {
+      "status": "SUCCESS",
+      "skill": "MOVE_OBJECT",
+      "args": {
+        "object": "blender_lid",
+        "destination": "closed_preplace_region"
+      },
+      "instruction": "Move the held blender lid to the pre-place region above the blender while maintaining a stable grasp and avoiding disallowed contact.",
+      "steps": 5,
+      "success_step": 5,
+      "terminated_by": "vlm_success",
+      "reason": "VLM recognised 'MOVE_OBJECT' complete: P(yes)=0.729 >= tau=0.6 for 2 consecutive query(ies)",
+      "vlm_stats": {
+        "skill": "MOVE_OBJECT",
+        "elapsed": 5,
+        "n_vlm_calls": 2,
+        "vlm_seconds": 0.3174,
+        "succeeded_step": 5,
+        "mean_vlm_latency_ms": 158.72
+      }
+    },
+    {
+      "status": "TIMEOUT",
+      "skill": "PLACE_OBJECT",
+      "args": {
+        "object": "blender_lid",
+        "destination": "blender"
+      },
+      "instruction": "Place the blender lid on the blender, release it after it is stably supported, then move the gripper clear.",
+      "steps": 96,
+      "success_step": null,
+      "terminated_by": "vlm_timeout",
+      "reason": "step budget 96 exhausted without VLM latch (last P(yes)=0.11796560883522034)",
+      "vlm_stats": {
+        "skill": "PLACE_OBJECT",
+        "elapsed": 96,
+        "n_vlm_calls": 64,
+        "vlm_seconds": 7.5388,
+        "succeeded_step": null,
+        "mean_vlm_latency_ms": 117.79
+      }
+    },
+    {
+      "status": "TIMEOUT",
+      "skill": "PLACE_OBJECT",
+      "args": {
+        "object": "blender_lid",
+        "destination": "blender"
+      },
+      "instruction": "Place the blender lid on the blender, release it after it is stably supported, then move the gripper clear.",
+      "steps": 96,
+      "success_step": null,
+      "terminated_by": "vlm_timeout",
+      "reason": "step budget 96 exhausted without VLM latch (last P(yes)=0.32674866914749146)",
+      "vlm_stats": {
+        "skill": "PLACE_OBJECT",
+        "elapsed": 96,
+        "n_vlm_calls": 58,
+        "vlm_seconds": 7.1841,
+        "succeeded_step": null,
+        "mean_vlm_latency_ms": 123.86
+      }
+    }
+  ],
+  "final_predicates": {
+    "gripper_lid_contact": true,
+    "lid_on_counter": false,
+    "lid_lifted": true,
+    "lid_grasped": true,
+    "lid_dz_from_rest": 0.37820488934605045,
+    "lid_xy_to_closed_pos": 0.009193274653233873,
+    "lid_dz_to_closed_pos": -0.017447854611285507,
+    "lid_dist_to_closed_pos": 0.019721661425608883,
+    "in_preplace_region": false,
+    "lid_on_blender": true,
+    "lid_upright_7deg": true,
+    "gripper_lid_far_0.15": false,
+    "eef_lid_dist": 0.049061596366522596,
+    "official_check_success": false,
+    "finger_qpos": [
+      0.033526100135981236,
+      -0.020758723416158108
+    ],
+    "gripper_ramp_action": [
+      -1.0,
+      1.0
+    ],
+    "lid_other_contacts": [
+      "blender_island_group_1_g30",
+      "blender_island_group_1_g9",
+      "blender_island_group_1_pitcher_handle_3"
+    ],
+    "lid_pos": [
+      3.7432119801875356,
+      -4.256870304739559,
+      1.321484868181112
+    ],
+    "eef_pos": [
+      3.7478542328549618,
+      -4.263430345034347,
+      1.3698837896518856
+    ],
+    "base_pos": [
+      4.061334136139268,
+      -4.349119679975289,
+      0.7001401075768445
+    ]
+  },
+  "video": "episode.mp4",
+  "video_frames": 187
+}

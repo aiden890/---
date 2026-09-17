@@ -1,0 +1,173 @@
+{
+  "skill": "place",
+  "instruction": "Place the blender lid on the blender, release it after it is stably supported, then move the gripper clear.",
+  "seed": 9,
+  "horizon": 96,
+  "replan_steps": 16,
+  "obs_history": 4,
+  "obs_interval": 2,
+  "crop_ratio": 0.95,
+  "video_stride": 2,
+  "video_fps": 20,
+  "model_path": "/checkpoint",
+  "start_state_source": "snapshot from generation attempt at gen step 265 (VLA-driven, full instruction; excluded from video)",
+  "snapshot_predicates_before_restore": {
+    "gripper_lid_contact": true,
+    "lid_on_counter": false,
+    "lid_lifted": true,
+    "lid_grasped": true,
+    "lid_dz_from_rest": 0.45905633697808446,
+    "lid_xy_to_closed_pos": 0.0547152615680213,
+    "lid_dz_to_closed_pos": 0.0576509813312136,
+    "lid_dist_to_closed_pos": 0.07948204512283845,
+    "in_preplace_region": true,
+    "lid_on_blender": false,
+    "lid_upright_7deg": false,
+    "gripper_lid_far_0.15": false,
+    "eef_lid_dist": 0.027943020973229298,
+    "official_check_success": false,
+    "finger_qpos": [
+      0.029330406660221547,
+      -0.028624574008598976
+    ],
+    "gripper_ramp_action": [
+      -1.0,
+      1.0
+    ],
+    "lid_other_contacts": [],
+    "lid_pos": [
+      2.0651333483632537,
+      -3.4958624397658746,
+      1.4002565137957392
+    ],
+    "eef_pos": [
+      2.075022193242612,
+      -3.497522723043437,
+      1.426338435264461
+    ],
+    "base_pos": [
+      2.358744778425542,
+      -3.5710160630033174,
+      0.7000610996339045
+    ]
+  },
+  "init_step_kind": "restore + 1 hold step (zero motion, gripper closed)",
+  "init_predicates": {
+    "gripper_lid_contact": true,
+    "lid_on_counter": false,
+    "lid_lifted": true,
+    "lid_grasped": true,
+    "lid_dz_from_rest": 0.45894636648871634,
+    "lid_xy_to_closed_pos": 0.05314998199079199,
+    "lid_dz_to_closed_pos": 0.057541010841845486,
+    "lid_dist_to_closed_pos": 0.0783319124898843,
+    "in_preplace_region": true,
+    "lid_on_blender": false,
+    "lid_upright_7deg": false,
+    "gripper_lid_far_0.15": false,
+    "eef_lid_dist": 0.027945311883246067,
+    "official_check_success": false,
+    "finger_qpos": [
+      0.02932602224343295,
+      -0.028628168626725226
+    ],
+    "gripper_ramp_action": [
+      -1.0,
+      1.0
+    ],
+    "lid_other_contacts": [],
+    "lid_pos": [
+      2.0639859060368484,
+      -3.494505644236557,
+      1.4001465433063711
+    ],
+    "eef_pos": [
+      2.0735948351621443,
+      -3.4961041612145043,
+      1.4263391697647496
+    ],
+    "base_pos": [
+      2.3587389746643868,
+      -3.571010529319957,
+      0.7000491416411858
+    ]
+  },
+  "scene": {
+    "layout_id": 32,
+    "style_id": 14,
+    "lid_fixture_name": "blender_island_group_1_auxiliary_island_group_1",
+    "lid_xml": "/opt/robocasa/robocasa/models/assets/fixtures/blenders/Blender028/Blender028_Lid/model.xml",
+    "lid_size_wdh": [
+      0.19,
+      0.17812579536067513,
+      0.049126777700877415
+    ],
+    "lid_closed_pos": [
+      2.014392094108873,
+      -3.4753908749710356,
+      1.3426055324645256
+    ],
+    "rest_lid_pos": [
+      1.9830752500206272,
+      -3.6910960588986197,
+      0.9412001768176548
+    ]
+  },
+  "vla_start_frame_index": 1,
+  "frame0": "settled start state (before any VLA action)",
+  "success": true,
+  "steps": 96,
+  "success_step": 93,
+  "post_success_hold": 32,
+  "post_success_steps": 3,
+  "infer_calls": 6,
+  "infer_seconds": 1.79201340675354,
+  "final_predicates": {
+    "gripper_lid_contact": false,
+    "lid_on_counter": false,
+    "lid_lifted": true,
+    "lid_grasped": false,
+    "lid_dz_from_rest": 0.3996696229695036,
+    "lid_xy_to_closed_pos": 0.0003049664236006142,
+    "lid_dz_to_closed_pos": -0.0017357326773672632,
+    "lid_dist_to_closed_pos": 0.0017623201885027242,
+    "in_preplace_region": false,
+    "lid_on_blender": true,
+    "lid_upright_7deg": true,
+    "gripper_lid_far_0.15": true,
+    "eef_lid_dist": 0.17971808102922865,
+    "official_check_success": true,
+    "finger_qpos": [
+      0.03954631042639945,
+      -0.03961354644242084
+    ],
+    "gripper_ramp_action": [
+      1.0,
+      -1.0
+    ],
+    "lid_other_contacts": [
+      "blender_island_group_1_g25",
+      "blender_island_group_1_g28",
+      "blender_island_group_1_g50"
+    ],
+    "lid_pos": [
+      2.0140922787148043,
+      -3.475335060555307,
+      1.3408697997871584
+    ],
+    "eef_pos": [
+      2.162280273019409,
+      -3.4838418985908417,
+      1.442193739206449
+    ],
+    "base_pos": [
+      2.3586118315974347,
+      -3.571355153679581,
+      0.700101106620516
+    ]
+  },
+  "terminated_by": "post_success_hold",
+  "video": "place.mp4",
+  "video_frames": 51,
+  "status": "done"
+}

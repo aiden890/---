@@ -1,0 +1,85 @@
+{"t": 1789574944.516, "type": "episode_start", "seed": 0, "task": "CloseBlenderLid", "adapter_mode": "disabled", "adapter_checkpoint": null, "planner_kind": "sequential_obs_stub", "verifier_kind": "obs_vlm", "policy_provenance": {"model_path": "/checkpoint", "adapter_mode": "disabled", "adapter_checkpoint": null, "replan_steps": 16}}
+{"t": 1789574956.026, "type": "plan", "planner_calls": 0, "planner_kind": "sequential_obs_stub", "observation_ref": "seed0:step0", "selected_skill": "GRASP_OBJECT", "skill_args": {"object": "blender_lid", "grasp_region": "lid_handle"}, "rendered_instruction": "Grasp the blender lid securely at its handle and lift it clear.", "rationale": "sequential obs-only plan -> GRASP_OBJECT", "predicates_digest": {}}
+{"t": 1789574956.026, "type": "route", "skill": "GRASP_OBJECT", "adapter_mode": "disabled", "adapter_checkpoint": null, "max_steps": 208, "can_start": true}
+{"t": 1789574957.374, "type": "window", "skill": "GRASP_OBJECT", "step": 0, "chunk_len": 16, "executed": 16, "adapter_mode": "disabled", "decision": "EXECUTE", "hold": 0, "predicates_digest": {"judge": "obs_vlm"}}
+{"t": 1789574957.952, "type": "frame", "skill": "GRASP_OBJECT", "step": 1, "frame_index": 1}
+{"t": 1789574957.952, "type": "vlm", "skill": "GRASP_OBJECT", "step": 1, "frame_index": 1, "prob": 0.9792922735214233, "consecutive_yes": 1, "queried": true, "decision": "CONTINUE", "proprio_candidate": false, "proprio_gripper_closed": true}
+{"t": 1789574958.007, "type": "frame", "skill": "GRASP_OBJECT", "step": 2, "frame_index": 2}
+{"t": 1789574958.08, "type": "frame", "skill": "GRASP_OBJECT", "step": 4, "frame_index": 3}
+{"t": 1789574958.153, "type": "frame", "skill": "GRASP_OBJECT", "step": 6, "frame_index": 4}
+{"t": 1789574958.225, "type": "frame", "skill": "GRASP_OBJECT", "step": 8, "frame_index": 5}
+{"t": 1789574958.298, "type": "frame", "skill": "GRASP_OBJECT", "step": 10, "frame_index": 6}
+{"t": 1789574958.37, "type": "frame", "skill": "GRASP_OBJECT", "step": 12, "frame_index": 7}
+{"t": 1789574958.442, "type": "frame", "skill": "GRASP_OBJECT", "step": 14, "frame_index": 8}
+{"t": 1789574958.515, "type": "frame", "skill": "GRASP_OBJECT", "step": 16, "frame_index": 9}
+{"t": 1789574958.839, "type": "window", "skill": "GRASP_OBJECT", "step": 16, "chunk_len": 16, "executed": 16, "adapter_mode": "disabled", "decision": "EXECUTE", "hold": 1, "predicates_digest": {"judge": "obs_vlm"}}
+{"t": 1789574958.992, "type": "frame", "skill": "GRASP_OBJECT", "step": 17, "frame_index": 10}
+{"t": 1789574958.992, "type": "vlm", "skill": "GRASP_OBJECT", "step": 17, "frame_index": 10, "prob": 0.3531881868839264, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": false, "proprio_gripper_closed": false}
+{"t": 1789574959.03, "type": "frame", "skill": "GRASP_OBJECT", "step": 18, "frame_index": 11}
+{"t": 1789574959.103, "type": "frame", "skill": "GRASP_OBJECT", "step": 20, "frame_index": 12}
+{"t": 1789574959.175, "type": "frame", "skill": "GRASP_OBJECT", "step": 22, "frame_index": 13}
+{"t": 1789574959.247, "type": "frame", "skill": "GRASP_OBJECT", "step": 24, "frame_index": 14}
+{"t": 1789574959.319, "type": "frame", "skill": "GRASP_OBJECT", "step": 26, "frame_index": 15}
+{"t": 1789574959.391, "type": "frame", "skill": "GRASP_OBJECT", "step": 28, "frame_index": 16}
+{"t": 1789574959.463, "type": "frame", "skill": "GRASP_OBJECT", "step": 30, "frame_index": 17}
+{"t": 1789574959.536, "type": "frame", "skill": "GRASP_OBJECT", "step": 32, "frame_index": 18}
+{"t": 1789574959.863, "type": "window", "skill": "GRASP_OBJECT", "step": 32, "chunk_len": 16, "executed": 16, "adapter_mode": "disabled", "decision": "EXECUTE", "hold": 0, "predicates_digest": {"judge": "obs_vlm"}}
+{"t": 1789574960.012, "type": "frame", "skill": "GRASP_OBJECT", "step": 33, "frame_index": 19}
+{"t": 1789574960.012, "type": "vlm", "skill": "GRASP_OBJECT", "step": 33, "frame_index": 19, "prob": 0.07144053280353546, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": false, "proprio_gripper_closed": false}
+{"t": 1789574960.05, "type": "frame", "skill": "GRASP_OBJECT", "step": 34, "frame_index": 20}
+{"t": 1789574960.122, "type": "frame", "skill": "GRASP_OBJECT", "step": 36, "frame_index": 21}
+{"t": 1789574960.194, "type": "frame", "skill": "GRASP_OBJECT", "step": 38, "frame_index": 22}
+{"t": 1789574960.324, "type": "frame", "skill": "GRASP_OBJECT", "step": 39, "frame_index": 23}
+{"t": 1789574960.324, "type": "vlm", "skill": "GRASP_OBJECT", "step": 39, "frame_index": 23, "prob": 0.12718996405601501, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789574960.457, "type": "frame", "skill": "GRASP_OBJECT", "step": 40, "frame_index": 24}
+{"t": 1789574960.457, "type": "vlm", "skill": "GRASP_OBJECT", "step": 40, "frame_index": 24, "prob": 0.1752943992614746, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789574960.59, "type": "frame", "skill": "GRASP_OBJECT", "step": 41, "frame_index": 25}
+{"t": 1789574960.59, "type": "vlm", "skill": "GRASP_OBJECT", "step": 41, "frame_index": 25, "prob": 0.13789133727550507, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789574960.724, "type": "frame", "skill": "GRASP_OBJECT", "step": 42, "frame_index": 26}
+{"t": 1789574960.724, "type": "vlm", "skill": "GRASP_OBJECT", "step": 42, "frame_index": 26, "prob": 0.09475397318601608, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789574960.877, "type": "frame", "skill": "GRASP_OBJECT", "step": 43, "frame_index": 27}
+{"t": 1789574960.877, "type": "vlm", "skill": "GRASP_OBJECT", "step": 43, "frame_index": 27, "prob": 0.1346721649169922, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789574961.02, "type": "frame", "skill": "GRASP_OBJECT", "step": 44, "frame_index": 28}
+{"t": 1789574961.02, "type": "vlm", "skill": "GRASP_OBJECT", "step": 44, "frame_index": 28, "prob": 0.09607239067554474, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789574961.152, "type": "frame", "skill": "GRASP_OBJECT", "step": 45, "frame_index": 29}
+{"t": 1789574961.152, "type": "vlm", "skill": "GRASP_OBJECT", "step": 45, "frame_index": 29, "prob": 0.13084179162979126, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789574961.284, "type": "frame", "skill": "GRASP_OBJECT", "step": 46, "frame_index": 30}
+{"t": 1789574961.285, "type": "vlm", "skill": "GRASP_OBJECT", "step": 46, "frame_index": 30, "prob": 0.18694759905338287, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789574961.417, "type": "frame", "skill": "GRASP_OBJECT", "step": 47, "frame_index": 31}
+{"t": 1789574961.417, "type": "vlm", "skill": "GRASP_OBJECT", "step": 47, "frame_index": 31, "prob": 0.15356259047985077, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789574961.55, "type": "frame", "skill": "GRASP_OBJECT", "step": 48, "frame_index": 32}
+{"t": 1789574961.55, "type": "vlm", "skill": "GRASP_OBJECT", "step": 48, "frame_index": 32, "prob": 0.20652960240840912, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789574961.861, "type": "window", "skill": "GRASP_OBJECT", "step": 48, "chunk_len": 16, "executed": 16, "adapter_mode": "disabled", "decision": "EXECUTE", "hold": 0, "predicates_digest": {"judge": "obs_vlm"}}
+{"t": 1789574961.993, "type": "frame", "skill": "GRASP_OBJECT", "step": 49, "frame_index": 33}
+{"t": 1789574961.994, "type": "vlm", "skill": "GRASP_OBJECT", "step": 49, "frame_index": 33, "prob": 0.29554444551467896, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789574962.126, "type": "frame", "skill": "GRASP_OBJECT", "step": 50, "frame_index": 34}
+{"t": 1789574962.126, "type": "vlm", "skill": "GRASP_OBJECT", "step": 50, "frame_index": 34, "prob": 0.4720684289932251, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789574962.259, "type": "frame", "skill": "GRASP_OBJECT", "step": 51, "frame_index": 35}
+{"t": 1789574962.259, "type": "vlm", "skill": "GRASP_OBJECT", "step": 51, "frame_index": 35, "prob": 0.6152613759040833, "consecutive_yes": 1, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789574962.428, "type": "frame", "skill": "GRASP_OBJECT", "step": 52, "frame_index": 36}
+{"t": 1789574962.428, "type": "vlm", "skill": "GRASP_OBJECT", "step": 52, "frame_index": 36, "prob": 0.6856458187103271, "consecutive_yes": 2, "queried": true, "decision": "ADVANCE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789574962.428, "type": "verify", "skill": "GRASP_OBJECT", "decision": "ADVANCE", "reason": "VLM recognised 'GRASP_OBJECT' complete: P(yes)=0.686 >= tau=0.6 for 2 consecutive query(ies)", "elapsed": 52, "hold": 2}
+{"t": 1789574962.43, "type": "skill_result", "next_skill": "advance", "status": "SUCCESS", "skill": "GRASP_OBJECT", "args": {"object": "blender_lid", "grasp_region": "lid_handle"}, "instruction": "Grasp the blender lid securely at its handle and lift it clear.", "steps": 52, "success_step": 52, "terminated_by": "vlm_success", "reason": "VLM recognised 'GRASP_OBJECT' complete: P(yes)=0.686 >= tau=0.6 for 2 consecutive query(ies)", "vlm_stats": {"skill": "GRASP_OBJECT", "elapsed": 52, "n_vlm_calls": 17, "vlm_seconds": 2.0921, "succeeded_step": 52, "mean_vlm_latency_ms": 123.07}}
+{"t": 1789574962.43, "type": "plan", "planner_calls": 1, "planner_kind": "sequential_obs_stub", "observation_ref": "seed0:step52", "selected_skill": "MOVE_OBJECT", "skill_args": {"object": "blender_lid", "destination": "closed_preplace_region"}, "rendered_instruction": "Move the held blender lid to the pre-place region above the blender while maintaining a stable grasp and avoiding disallowed contact.", "rationale": "sequential obs-only plan -> MOVE_OBJECT", "predicates_digest": {}}
+{"t": 1789574962.43, "type": "route", "skill": "MOVE_OBJECT", "adapter_mode": "disabled", "adapter_checkpoint": null, "max_steps": 288, "can_start": true}
+{"t": 1789574962.754, "type": "window", "skill": "MOVE_OBJECT", "step": 0, "chunk_len": 16, "executed": 16, "adapter_mode": "disabled", "decision": "EXECUTE", "hold": 0, "predicates_digest": {"judge": "obs_vlm"}}
+{"t": 1789574962.909, "type": "frame", "skill": "MOVE_OBJECT", "step": 1, "frame_index": 37}
+{"t": 1789574962.909, "type": "vlm", "skill": "MOVE_OBJECT", "step": 1, "frame_index": 37, "prob": 0.8780184984207153, "consecutive_yes": 1, "queried": true, "decision": "CONTINUE", "proprio_candidate": false, "proprio_gripper_closed": false}
+{"t": 1789574962.961, "type": "frame", "skill": "MOVE_OBJECT", "step": 2, "frame_index": 38}
+{"t": 1789574963.033, "type": "frame", "skill": "MOVE_OBJECT", "step": 4, "frame_index": 39}
+{"t": 1789574963.176, "type": "frame", "skill": "MOVE_OBJECT", "step": 5, "frame_index": 40}
+{"t": 1789574963.176, "type": "vlm", "skill": "MOVE_OBJECT", "step": 5, "frame_index": 40, "prob": 0.9142879247665405, "consecutive_yes": 2, "queried": true, "decision": "ADVANCE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789574963.176, "type": "verify", "skill": "MOVE_OBJECT", "decision": "ADVANCE", "reason": "VLM recognised 'MOVE_OBJECT' complete: P(yes)=0.914 >= tau=0.6 for 2 consecutive query(ies)", "elapsed": 5, "hold": 2}
+{"t": 1789574963.178, "type": "skill_result", "next_skill": "advance", "status": "SUCCESS", "skill": "MOVE_OBJECT", "args": {"object": "blender_lid", "destination": "closed_preplace_region"}, "instruction": "Move the held blender lid to the pre-place region above the blender while maintaining a stable grasp and avoiding disallowed contact.", "steps": 5, "success_step": 5, "terminated_by": "vlm_success", "reason": "VLM recognised 'MOVE_OBJECT' complete: P(yes)=0.914 >= tau=0.6 for 2 consecutive query(ies)", "vlm_stats": {"skill": "MOVE_OBJECT", "elapsed": 5, "n_vlm_calls": 2, "vlm_seconds": 0.2058, "succeeded_step": 5, "mean_vlm_latency_ms": 102.89}}
+{"t": 1789574963.178, "type": "plan", "planner_calls": 2, "planner_kind": "sequential_obs_stub", "observation_ref": "seed0:step57", "selected_skill": "PLACE_OBJECT", "skill_args": {"object": "blender_lid", "destination": "blender"}, "rendered_instruction": "Place the blender lid on the blender, release it after it is stably supported, then move the gripper clear.", "rationale": "sequential obs-only plan -> PLACE_OBJECT", "predicates_digest": {}}
+{"t": 1789574963.178, "type": "route", "skill": "PLACE_OBJECT", "adapter_mode": "disabled", "adapter_checkpoint": null, "max_steps": 96, "can_start": true}
+{"t": 1789574963.511, "type": "window", "skill": "PLACE_OBJECT", "step": 0, "chunk_len": 16, "executed": 16, "adapter_mode": "disabled", "decision": "EXECUTE", "hold": 0, "predicates_digest": {"judge": "obs_vlm"}}
+{"t": 1789574963.667, "type": "frame", "skill": "PLACE_OBJECT", "step": 1, "frame_index": 41}
+{"t": 1789574963.667, "type": "vlm", "skill": "PLACE_OBJECT", "step": 1, "frame_index": 41, "prob": 0.960608720779419, "consecutive_yes": 1, "queried": true, "decision": "CONTINUE", "proprio_candidate": false, "proprio_gripper_closed": false}
+{"t": 1789574963.758, "type": "frame", "skill": "PLACE_OBJECT", "step": 3, "frame_index": 42}
+{"t": 1789574963.938, "type": "frame", "skill": "PLACE_OBJECT", "step": 5, "frame_index": 43}
+{"t": 1789574963.938, "type": "vlm", "skill": "PLACE_OBJECT", "step": 5, "frame_index": 43, "prob": 0.9580585360527039, "consecutive_yes": 2, "queried": true, "decision": "ADVANCE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789574963.938, "type": "verify", "skill": "PLACE_OBJECT", "decision": "ADVANCE", "reason": "VLM recognised 'PLACE_OBJECT' complete: P(yes)=0.958 >= tau=0.6 for 2 consecutive query(ies)", "elapsed": 5, "hold": 2}
+{"t": 1789574963.94, "type": "skill_result", "next_skill": "advance", "status": "SUCCESS", "skill": "PLACE_OBJECT", "args": {"object": "blender_lid", "destination": "blender"}, "instruction": "Place the blender lid on the blender, release it after it is stably supported, then move the gripper clear.", "steps": 5, "success_step": 5, "terminated_by": "vlm_success", "reason": "VLM recognised 'PLACE_OBJECT' complete: P(yes)=0.958 >= tau=0.6 for 2 consecutive query(ies)", "vlm_stats": {"skill": "PLACE_OBJECT", "elapsed": 5, "n_vlm_calls": 2, "vlm_seconds": 0.2243, "succeeded_step": 5, "mean_vlm_latency_ms": 112.13}}
+{"t": 1789574963.94, "type": "plan", "planner_calls": 3, "planner_kind": "sequential_obs_stub", "observation_ref": "seed0:step62", "selected_skill": null, "skill_args": null, "rendered_instruction": null, "rationale": "all skills attempted (obs-only verifier); terminate episode", "predicates_digest": {}}
+{"t": 1789574963.942, "type": "episode_end", "terminal": "planner_done", "planner_calls": 4, "steps_used": 62, "task_success": false}

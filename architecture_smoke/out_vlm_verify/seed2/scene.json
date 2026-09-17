@@ -1,0 +1,488 @@
+{
+  "layout_id": 52,
+  "style_id": 54,
+  "lid_fixture_name": "blender_right_group_1_auxiliary_right_group_1",
+  "lid_xml": "/opt/robocasa/robocasa/models/assets/fixtures/blenders/Blender027/Blender027_Lid/model.xml",
+  "lid_size_wdh": [
+    0.17000000000000004,
+    0.15571644374652766,
+    0.04101165796566433
+  ],
+  "lid_scale": [
+    0.7805648534604277,
+    0.7805648534604277,
+    0.7805648534604277
+  ],
+  "blender_fixture_name": "blender_right_group_1",
+  "blender_xml": "/opt/robocasa/robocasa/models/assets/fixtures/blenders/Blender027/model.xml",
+  "blender_pos": [
+    2.7574393995910267,
+    -2.392346097143728,
+    1.1517666117863423
+  ],
+  "blender_rot": -1.5708147287368774,
+  "lid_closed_pos": [
+    2.7656512787142358,
+    -2.365414160546851,
+    1.3737369100361354
+  ],
+  "lid_geoms": [
+    {
+      "name": "blender_right_group_1_auxiliary_right_group_1_g0",
+      "type": 7,
+      "size": [
+        0.029343180524127484,
+        0.07785762917677143,
+        0.07786212710756502
+      ],
+      "pos": [
+        -7.679274036044197e-13,
+        -1.8949302390829007e-07,
+        -0.005682698808954701
+      ],
+      "group": 1,
+      "contype": 0
+    },
+    {
+      "name": "blender_right_group_1_auxiliary_right_group_1_g1",
+      "type": 6,
+      "size": [
+        0.03448480434875884,
+        0.07738825538852673,
+        0.005976046751030306
+      ],
+      "pos": [
+        -0.00010884010219955373,
+        -0.0004421654595375285,
+        0.0018496361989823599
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_right_group_1_auxiliary_right_group_1_g2",
+      "type": 6,
+      "size": [
+        0.07766351645597033,
+        0.034484818887912216,
+        0.005976046751030306
+      ],
+      "pos": [
+        -0.00010884010219955373,
+        -0.0008365083723001001,
+        0.0018496361989823599
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_right_group_1_auxiliary_right_group_1_g3",
+      "type": 6,
+      "size": [
+        0.041788315422537976,
+        0.07212419245974351,
+        0.010175517275768323
+      ],
+      "pos": [
+        -0.00010064001969346927,
+        -0.00010771277259438436,
+        -0.013301592275235035
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_right_group_1_auxiliary_right_group_1_g4",
+      "type": 6,
+      "size": [
+        0.07212419245974351,
+        0.03999841478913097,
+        0.010175520183599
+      ],
+      "pos": [
+        -0.00010064001969346927,
+        -0.00010771277259438436,
+        -0.013301592275235035
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_right_group_1_auxiliary_right_group_1_g5",
+      "type": 6,
+      "size": [
+        0.019514121336510697,
+        0.018009912449964874,
+        0.010175520183599
+      ],
+      "pos": [
+        -0.044380021286522194,
+        -0.04391184310071559,
+        -0.013301592275235035
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_right_group_1_auxiliary_right_group_1_g6",
+      "type": 6,
+      "size": [
+        0.019514121336510686,
+        0.018009913903880202,
+        0.01017551945664133
+      ],
+      "pos": [
+        0.04425121311107112,
+        -0.044587131526414345,
+        -0.013301592275235035
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_right_group_1_auxiliary_right_group_1_g7",
+      "type": 6,
+      "size": [
+        0.019514121336510693,
+        0.018009912449964874,
+        0.010175520183599
+      ],
+      "pos": [
+        0.044739702494149006,
+        0.043147636120777974,
+        -0.013301592275235035
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_right_group_1_auxiliary_right_group_1_g8",
+      "type": 6,
+      "size": [
+        0.019514121336510693,
+        0.01800991390388021,
+        0.010175520183599
+      ],
+      "pos": [
+        -0.04379384333188689,
+        0.0439597147171332,
+        -0.013301592275235035
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_right_group_1_auxiliary_right_group_1_handle_main",
+      "type": 6,
+      "size": [
+        0.0317983322830465,
+        0.03188013246779071,
+        0.0024409312086496027
+      ],
+      "pos": [
+        3.2713095104060366e-05,
+        0.00019294419753617222,
+        0.021884054515202516
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_right_group_1_auxiliary_right_group_1_g10",
+      "type": 5,
+      "size": [
+        0.04129601096561329,
+        0.005840504766691481,
+        0.0
+      ],
+      "pos": [
+        -0.03494883306019091,
+        0.03507287530116416,
+        0.0020075430360073283
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_right_group_1_auxiliary_right_group_1_g11",
+      "type": 5,
+      "size": [
+        0.04129601096561329,
+        0.005840504766691481,
+        0.0
+      ],
+      "pos": [
+        0.034287438249461684,
+        0.03507287530116416,
+        0.0020075430360073283
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_right_group_1_auxiliary_right_group_1_g12",
+      "type": 5,
+      "size": [
+        0.04129601096561329,
+        0.005840504766691481,
+        0.0
+      ],
+      "pos": [
+        -0.03494883887585227,
+        -0.03465971327174589,
+        0.0020075430360073283
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_right_group_1_auxiliary_right_group_1_g13",
+      "type": 5,
+      "size": [
+        0.04129601096561329,
+        0.005840504766691481,
+        0.0
+      ],
+      "pos": [
+        0.034535598335005746,
+        -0.03465971327174589,
+        0.0020075430360073283
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_right_group_1_auxiliary_right_group_1_g14",
+      "type": 5,
+      "size": [
+        0.02472966633814641,
+        0.006220376860095354,
+        0.0
+      ],
+      "pos": [
+        0.0,
+        0.0,
+        0.0134426685883078
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_right_group_1_auxiliary_right_group_1_reg_main",
+      "type": 6,
+      "size": [
+        0.085,
+        0.07785822187326383,
+        0.020505828982832167
+      ],
+      "pos": [
+        -0.006134209402592394,
+        -9.757060668265104e-07,
+        0.0008943087639066821
+      ],
+      "group": 1,
+      "contype": 0
+    }
+  ],
+  "init_robot_base_pos": [
+    2.4380250295755443,
+    -2.477709694843221,
+    0.0
+  ],
+  "init_robot_base_ori": [
+    0.0,
+    0.0,
+    -1.8344647019441496e-05
+  ],
+  "ep_meta_fixtures": {
+    "wall_main_1_room": {
+      "cls": "Wall"
+    },
+    "wall_main_1_backing_room": {
+      "cls": "Wall"
+    },
+    "wall_right_1_room": {
+      "cls": "Wall"
+    },
+    "wall_right_1_backing_room": {
+      "cls": "Wall"
+    },
+    "wall_left_1_room": {
+      "cls": "Wall"
+    },
+    "wall_left_1_backing_room": {
+      "cls": "Wall"
+    },
+    "wall_front_1.001_room": {
+      "cls": "Wall"
+    },
+    "wall_front_1.001_backing_room": {
+      "cls": "Wall"
+    },
+    "wall_front_2.002_room": {
+      "cls": "Wall"
+    },
+    "wall_front_2.002_backing_room": {
+      "cls": "Wall"
+    },
+    "wall_front_3.003_room": {
+      "cls": "Wall"
+    },
+    "wall_front_3.003_backing_room": {
+      "cls": "Wall"
+    },
+    "floor_1_room": {
+      "cls": "Floor"
+    },
+    "floor_1_backing_room": {
+      "cls": "Floor"
+    },
+    "wallaccessory_4_room": {
+      "cls": "WallAccessory"
+    },
+    "wallaccessory_3_room": {
+      "cls": "WallAccessory"
+    },
+    "wallaccessory_2_room": {
+      "cls": "WallAccessory"
+    },
+    "cube_4_main_group_1": {
+      "cls": "Box"
+    },
+    "cube_5_main_group_1": {
+      "cls": "Box"
+    },
+    "hingecabinet_2_main_group_1": {
+      "cls": "HingeCabinet"
+    },
+    "singlecabinet_2_main_group_1": {
+      "cls": "SingleCabinet"
+    },
+    "hingecabinet_1_main_group_1": {
+      "cls": "HingeCabinet"
+    },
+    "counter_corner_1_main_group_1": {
+      "cls": "Counter"
+    },
+    "counter_corner_2_main_group_1": {
+      "cls": "Counter"
+    },
+    "counter_2_main_group_1": {
+      "cls": "Counter"
+    },
+    "counter_3_main_group_1": {
+      "cls": "Counter"
+    },
+    "stove_main_group_1": {
+      "cls": "Stove"
+    },
+    "stack_04_main_group_1_base": {
+      "cls": "Box"
+    },
+    "stack_04_main_group_1_1": {
+      "cls": "SingleCabinet"
+    },
+    "stack_03_main_group_1_base": {
+      "cls": "Box"
+    },
+    "stack_03_main_group_1_1": {
+      "cls": "SingleCabinet"
+    },
+    "coffee_machine_main_group_1": {
+      "cls": "CoffeeMachine"
+    },
+    "papertowel_main_group_1": {
+      "cls": "Accessory"
+    },
+    "hingecabinet_3_right_group_1": {
+      "cls": "HingeCabinet"
+    },
+    "hingecabinet_4_right_group_1": {
+      "cls": "HingeCabinet"
+    },
+    "hingecabinet_5_right_group_1": {
+      "cls": "HingeCabinet"
+    },
+    "sink_right_group_1": {
+      "cls": "Sink"
+    },
+    "counter_4_right_group_1": {
+      "cls": "Counter"
+    },
+    "cube_1_right_group_1": {
+      "cls": "Box"
+    },
+    "stack_2_right_group_1_base": {
+      "cls": "Box"
+    },
+    "stack_2_right_group_1_1": {
+      "cls": "HingeCabinet"
+    },
+    "stack_2_right_group_1_2": {
+      "cls": "PanelCabinet"
+    },
+    "dishwasher_1_right_group_1": {
+      "cls": "Dishwasher"
+    },
+    "cube_2_right_group_1": {
+      "cls": "Box"
+    },
+    "stack_01_right_group_1_base": {
+      "cls": "Box"
+    },
+    "stack_01_right_group_1_1": {
+      "cls": "Drawer"
+    },
+    "stack_01_right_group_1_2": {
+      "cls": "Drawer"
+    },
+    "stack_01_right_group_1_3": {
+      "cls": "Drawer"
+    },
+    "toaster_right_group_1": {
+      "cls": "Toaster"
+    },
+    "blender_right_group_1": {
+      "cls": "Blender"
+    },
+    "blender_right_group_1_auxiliary_right_group_1": {
+      "cls": "BlenderLid"
+    },
+    "counter_1_left_group_1": {
+      "cls": "Counter"
+    },
+    "stack_05_left_group_1_base": {
+      "cls": "Box"
+    },
+    "stack_05_left_group_1_1": {
+      "cls": "Drawer"
+    },
+    "stack_05_left_group_1_2": {
+      "cls": "Drawer"
+    },
+    "stack_05_left_group_1_3": {
+      "cls": "Drawer"
+    },
+    "cube_1_left_group_1": {
+      "cls": "Box"
+    },
+    "fridgebottomfreezer_left_group_1": {
+      "cls": "FridgeBottomFreezer"
+    },
+    "fridgebottomfreezer_housing_left_group_1": {
+      "cls": "HousingCabinet"
+    },
+    "hingecabinet_5_left_group_1": {
+      "cls": "HingeCabinet"
+    },
+    "singlecabinet_1_left_group_1": {
+      "cls": "SingleCabinet"
+    },
+    "microwave_left_group_1": {
+      "cls": "Microwave"
+    },
+    "cab_micro_left_group_1": {
+      "cls": "HingeCabinet"
+    }
+  }
+}

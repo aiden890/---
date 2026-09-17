@@ -1,0 +1,13 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Instruction Attendance 분석</title><link rel="stylesheet" href="style.css"></head>
+<body><header><div class="bar"><a href="../index.html#attend">← 실험 목록</a><b>RoboCasa · Xiaomi VLA</b></div></header>
+<main><div class="dim">EXP-20260915-INSTRUCTION-ATTENDANCE · 2026-09-15</div><h1>Instruction Attendance 분석</h1><p class="dim" id="sub"></p>
+<div class="question"><b>실험 질문</b><br>모델이 instruction을 실제로 보고 행동하는가, 아니면 observation만 보고 행동하는가?</div>
+<div class="verdict" style="margin-top:14px"><div><b>결론</b><span id="verdict"></span></div><div><b>해석</b>Task 시작에서는 instruction 영향이 크고, 진행 중에는 현재 observation이 phase를 강하게 규정한다.</div></div>
+<div class="card"><h2>방법</h2><p class="dim" id="method"></p></div><div id="states"></div>
+<div class="artifact">원자료: <code>experiments/instr_attend_t_8cd8d8c0/</code></div></main>
+<script>
+fetch('../attend.json').then(r=>r.json()).then(a=>{
+ document.getElementById('sub').innerHTML=`${a.model} · ${a.task} · seed ${a.seed}`;document.getElementById('verdict').textContent=a.verdict;document.getElementById('method').innerHTML=a.method;
+ document.getElementById('states').innerHTML=a.states.map(s=>{const mx=Math.max(...s.rows.map(r=>r.es),1);return `<div class="card state-card"><h2>${s.state}</h2>${s.rows.filter(r=>r.cat!=='correct').map(r=>`<div class="bar-row"><span>${r.label}</span><div class="meter"><div class="fill" style="width:${Math.round(r.es/mx*100)}%"></div></div><span>ES ${r.es}</span><span class="cos">cos ${r.cos}</span></div>`).join('')}</div>`}).join('');
+}).catch(()=>document.getElementById('states').innerHTML='<p class="no">데이터를 불러오지 못했습니다.</p>');
+</script></body></html>

@@ -330,6 +330,9 @@ def main():
     ap.add_argument("--server-port", type=int, default=10086)
     ap.add_argument("--model-path", default="/checkpoint")
     ap.add_argument("--skills", default="grasp,move_holding,place")
+    ap.add_argument("--instruction-grasp", default=None)
+    ap.add_argument("--instruction-move", default=None)
+    ap.add_argument("--instruction-place", default=None)
     ap.add_argument("--post-success-hold", type=int, default=0,
                     help="After a skill first succeeds, keep issuing the same instruction for N "
                          "more steps (default 0 = legacy break-on-success). Only affects skill "
@@ -358,6 +361,13 @@ def main():
             "reset_predicates": grasp_snap["predicates"], "thresholds": {"LIFT_DZ": LIFT_DZ, "PREPLACE_XY": PREPLACE_XY,
             "PREPLACE_DZ": PREPLACE_DZ, "GRASP_HOLD_STEPS": GRASP_HOLD_STEPS, "MOVE_HOLD_STEPS": MOVE_HOLD_STEPS}}, indent=2))
         wanted = my.skills.split(",")
+        instructions = dict(SKILLS)
+        if my.instruction_grasp is not None:
+            instructions["grasp"] = my.instruction_grasp
+        if my.instruction_move is not None:
+            instructions["move_holding"] = my.instruction_move
+        if my.instruction_place is not None:
+            instructions["place"] = my.instruction_place
 
         # ---- generation episodes (VLA, full instruction) for MOVE/PLACE snapshots ----
         snaps = {}
@@ -418,7 +428,7 @@ def main():
         horizons = {"grasp": my.horizon_grasp, "move_holding": my.horizon_move, "place": my.horizon_place}
         results = {}
         for skill in wanted:
-            rec = {"skill": skill, "instruction": SKILLS[skill], "seed": my.seed, "horizon": horizons[skill],
+            rec = {"skill": skill, "instruction": instructions[skill], "seed": my.seed, "horizon": horizons[skill],
                    "replan_steps": args.replan_steps, "obs_history": args.obs_history, "obs_interval": args.obs_interval,
                    "crop_ratio": args.crop_ratio, "video_stride": args.video_stride, "video_fps": args.video_fps,
                    "model_path": my.model_path}
@@ -446,7 +456,7 @@ def main():
             frames = [rollout.make_video_frame(obs)]
             rec["vla_start_frame_index"] = 1
             rec["frame0"] = "settled start state (before any VLA action)"
-            res = run_episode(sim, client, args, SKILLS[skill], obs, horizons[skill], conds[skill],
+            res = run_episode(sim, client, args, instructions[skill], obs, horizons[skill], conds[skill],
                               out / f"{skill}_steps.jsonl", frames, {"kind": "skill", "skill": skill},
                               post_success_hold=my.post_success_hold)
             rec.update(res)

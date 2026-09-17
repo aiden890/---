@@ -18,7 +18,7 @@
 # (inherent to an adaptive curriculum).
 #
 # Usage (on the server; RC_ROOT=/home/guest for amp_csi):
-#   nohup bash scripts/adaptive_sweep.sh <run> <opt> <lr> \
+#   nohup bash scripts/adaptive_sweep.sh <run> <opt> <lr> [clip] \
 #         > results/adaptive/<run>.nohup 2>&1 &
 #   e.g. v4:      adaptive_sweep.sh adaptive_sgd2e3   sgd   2e-3
 #        amp_csi: adaptive_sweep.sh adaptive_adamw1e5 adamw 1e-5
@@ -27,6 +27,7 @@ ROOT="${RC_ROOT:-/home/v4}"
 train="$ROOT/rl-train-t_3ed65912"
 cd "$train"
 run="${1:?run name required}"; opt="${2:?optimizer required}"; lr="${3:?lr required}"
+clip="${4:-0.1}"  # PPO clip epsilon (exp3 clip-ladder: exp2 showed clip_fraction ~0.90 at 0.1 -> objective saturated)
 base="$train/results/adaptive"; mkdir -p "$base"
 out="$base/$run"; mkdir -p "$out"
 slog="$base/${run}.log"; : > "$slog"
@@ -37,12 +38,12 @@ log(){ echo "[$(date +%H:%M:%S)] $*" | tee -a "$slog"; }
 # + --seed are grpo_train_loop CLIENT args; optimizer/lr/sampler/eta/grad-clip are
 # TRAINER-SERVER args (set at trainer-start). universe 240 candidate seeds, explore 0.25.
 COMMON="--train-skill grasp --eta 0.1 --group 8 --iters 30 --update-epochs 1 \
---clip 0.1 --hold-steps 20 --reward-variant terminal_plus_hold \
+--clip $clip --hold-steps 20 --reward-variant terminal_plus_hold \
 --horizon-grasp 208 --eval-n 20 --heldout-n 20 --save-videos 6 \
 --adaptive-band 1 7 --adaptive-universe 240 --adaptive-explore-frac 0.25 \
 --adaptive-ema 0.5 --adaptive-avoid-recent 3 --seed 12345"
 
-log "== ADAPTIVE sweep arm $run: optimizer=$opt lr=$lr (band 1 7, universe 240, explore 0.25, ema 0.5) =="
+log "== ADAPTIVE sweep arm $run: optimizer=$opt lr=$lr (band 1 7, universe 240, explore 0.25, ema 0.5, clip=$clip) =="
 
 # clean any stale client of this name + any prior trainer, then start the trainer with
 # THIS arm's optimizer/lr (pi-RL sampler, eta 0.1) FRESH so both arms start from the
@@ -51,7 +52,7 @@ docker rm -f "xiaomi-client-grpo-$run" >>"$slog" 2>&1 || true
 bash scripts/run-train.sh trainer-stop >>"$slog" 2>&1 || true
 bash scripts/run-train.sh trainer-start \
   --sampler pirl --eta 0.1 --optimizer "$opt" --lr "$lr" \
-  --grad-clip 0.5 --clip 0.1 --update-epochs 1 >>"$slog" 2>&1 \
+  --grad-clip 0.5 --clip $clip --update-epochs 1 >>"$slog" 2>&1 \
   || { log "trainer-start failed for $run"; exit 3; }
 sleep 20  # model load
 

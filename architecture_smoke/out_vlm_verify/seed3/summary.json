@@ -1,0 +1,118 @@
+{
+  "seed": 3,
+  "goal": "Close the blender lid securely.",
+  "terminal": "planner_done",
+  "planner_calls": 4,
+  "steps_used": 165,
+  "task_success": false,
+  "skills": [
+    {
+      "status": "SUCCESS",
+      "skill": "GRASP_OBJECT",
+      "args": {
+        "object": "blender_lid",
+        "grasp_region": "lid_handle"
+      },
+      "instruction": "Grasp the blender lid securely at its handle and lift it clear.",
+      "steps": 144,
+      "success_step": 144,
+      "terminated_by": "vlm_success",
+      "reason": "VLM recognised 'GRASP_OBJECT' complete: P(yes)=0.665 >= tau=0.6 for 2 consecutive query(ies)",
+      "vlm_stats": {
+        "skill": "GRASP_OBJECT",
+        "elapsed": 144,
+        "n_vlm_calls": 91,
+        "vlm_seconds": 9.5165,
+        "succeeded_step": 144,
+        "mean_vlm_latency_ms": 104.58
+      }
+    },
+    {
+      "status": "SUCCESS",
+      "skill": "MOVE_OBJECT",
+      "args": {
+        "object": "blender_lid",
+        "destination": "closed_preplace_region"
+      },
+      "instruction": "Move the held blender lid to the pre-place region above the blender while maintaining a stable grasp and avoiding disallowed contact.",
+      "steps": 5,
+      "success_step": 5,
+      "terminated_by": "vlm_success",
+      "reason": "VLM recognised 'MOVE_OBJECT' complete: P(yes)=0.668 >= tau=0.6 for 2 consecutive query(ies)",
+      "vlm_stats": {
+        "skill": "MOVE_OBJECT",
+        "elapsed": 5,
+        "n_vlm_calls": 2,
+        "vlm_seconds": 0.2128,
+        "succeeded_step": 5,
+        "mean_vlm_latency_ms": 106.41
+      }
+    },
+    {
+      "status": "SUCCESS",
+      "skill": "PLACE_OBJECT",
+      "args": {
+        "object": "blender_lid",
+        "destination": "blender"
+      },
+      "instruction": "Place the blender lid on the blender, release it after it is stably supported, then move the gripper clear.",
+      "steps": 16,
+      "success_step": 16,
+      "terminated_by": "vlm_success",
+      "reason": "VLM recognised 'PLACE_OBJECT' complete: P(yes)=0.664 >= tau=0.6 for 2 consecutive query(ies)",
+      "vlm_stats": {
+        "skill": "PLACE_OBJECT",
+        "elapsed": 16,
+        "n_vlm_calls": 13,
+        "vlm_seconds": 1.3057,
+        "succeeded_step": 16,
+        "mean_vlm_latency_ms": 100.44
+      }
+    }
+  ],
+  "final_predicates": {
+    "gripper_lid_contact": false,
+    "lid_on_counter": true,
+    "lid_lifted": false,
+    "lid_grasped": false,
+    "lid_dz_from_rest": 5.936503347125921e-06,
+    "lid_xy_to_closed_pos": 0.2266207401259394,
+    "lid_dz_to_closed_pos": -0.4281189249629459,
+    "lid_dist_to_closed_pos": 0.48439939488675776,
+    "in_preplace_region": false,
+    "lid_on_blender": false,
+    "lid_upright_7deg": true,
+    "gripper_lid_far_0.15": false,
+    "eef_lid_dist": 0.04977858045959861,
+    "official_check_success": false,
+    "finger_qpos": [
+      0.0400032323372577,
+      -0.03993956350942182
+    ],
+    "gripper_ramp_action": [
+      1.0,
+      -1.0
+    ],
+    "lid_other_contacts": [
+      "island_island_group_1_top_2",
+      "island_island_group_1_top_3"
+    ],
+    "lid_pos": [
+      4.346039945389197,
+      -3.2010028578425977,
+      0.940775769781455
+    ],
+    "eef_pos": [
+      4.331474012520913,
+      -3.181395528141909,
+      0.9841496477987348
+    ],
+    "base_pos": [
+      4.738265403614557,
+      -2.8408387944397564,
+      0.7000374416487387
+    ]
+  },
+  "video": "episode.mp4",
+  "video_frames": 138
+}

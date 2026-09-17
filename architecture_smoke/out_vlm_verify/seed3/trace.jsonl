@@ -1,0 +1,269 @@
+{"t": 1789575104.211, "type": "episode_start", "seed": 3, "task": "CloseBlenderLid", "adapter_mode": "disabled", "adapter_checkpoint": null, "planner_kind": "sequential_obs_stub", "verifier_kind": "obs_vlm", "policy_provenance": {"model_path": "/checkpoint", "adapter_mode": "disabled", "adapter_checkpoint": null, "replan_steps": 16}}
+{"t": 1789575114.484, "type": "plan", "planner_calls": 0, "planner_kind": "sequential_obs_stub", "observation_ref": "seed3:step0", "selected_skill": "GRASP_OBJECT", "skill_args": {"object": "blender_lid", "grasp_region": "lid_handle"}, "rendered_instruction": "Grasp the blender lid securely at its handle and lift it clear.", "rationale": "sequential obs-only plan -> GRASP_OBJECT", "predicates_digest": {}}
+{"t": 1789575114.484, "type": "route", "skill": "GRASP_OBJECT", "adapter_mode": "disabled", "adapter_checkpoint": null, "max_steps": 208, "can_start": true}
+{"t": 1789575114.804, "type": "window", "skill": "GRASP_OBJECT", "step": 0, "chunk_len": 16, "executed": 16, "adapter_mode": "disabled", "decision": "EXECUTE", "hold": 0, "predicates_digest": {"judge": "obs_vlm"}}
+{"t": 1789575114.986, "type": "frame", "skill": "GRASP_OBJECT", "step": 1, "frame_index": 1}
+{"t": 1789575114.986, "type": "vlm", "skill": "GRASP_OBJECT", "step": 1, "frame_index": 1, "prob": 0.06612896919250488, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": false, "proprio_gripper_closed": true}
+{"t": 1789575115.055, "type": "frame", "skill": "GRASP_OBJECT", "step": 2, "frame_index": 2}
+{"t": 1789575115.131, "type": "frame", "skill": "GRASP_OBJECT", "step": 4, "frame_index": 3}
+{"t": 1789575115.207, "type": "frame", "skill": "GRASP_OBJECT", "step": 6, "frame_index": 4}
+{"t": 1789575115.283, "type": "frame", "skill": "GRASP_OBJECT", "step": 8, "frame_index": 5}
+{"t": 1789575115.468, "type": "frame", "skill": "GRASP_OBJECT", "step": 10, "frame_index": 6}
+{"t": 1789575115.468, "type": "vlm", "skill": "GRASP_OBJECT", "step": 10, "frame_index": 6, "prob": 0.14414627850055695, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575115.621, "type": "frame", "skill": "GRASP_OBJECT", "step": 11, "frame_index": 7}
+{"t": 1789575115.621, "type": "vlm", "skill": "GRASP_OBJECT", "step": 11, "frame_index": 7, "prob": 0.027942443266510963, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575115.767, "type": "frame", "skill": "GRASP_OBJECT", "step": 12, "frame_index": 8}
+{"t": 1789575115.767, "type": "vlm", "skill": "GRASP_OBJECT", "step": 12, "frame_index": 8, "prob": 0.02956007979810238, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575115.909, "type": "frame", "skill": "GRASP_OBJECT", "step": 13, "frame_index": 9}
+{"t": 1789575115.91, "type": "vlm", "skill": "GRASP_OBJECT", "step": 13, "frame_index": 9, "prob": 0.0535556897521019, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575116.053, "type": "frame", "skill": "GRASP_OBJECT", "step": 14, "frame_index": 10}
+{"t": 1789575116.053, "type": "vlm", "skill": "GRASP_OBJECT", "step": 14, "frame_index": 10, "prob": 0.06774275749921799, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575116.206, "type": "frame", "skill": "GRASP_OBJECT", "step": 15, "frame_index": 11}
+{"t": 1789575116.206, "type": "vlm", "skill": "GRASP_OBJECT", "step": 15, "frame_index": 11, "prob": 0.34907209873199463, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575116.377, "type": "frame", "skill": "GRASP_OBJECT", "step": 16, "frame_index": 12}
+{"t": 1789575116.377, "type": "vlm", "skill": "GRASP_OBJECT", "step": 16, "frame_index": 12, "prob": 0.6087788939476013, "consecutive_yes": 1, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575116.737, "type": "window", "skill": "GRASP_OBJECT", "step": 16, "chunk_len": 16, "executed": 16, "adapter_mode": "disabled", "decision": "EXECUTE", "hold": 1, "predicates_digest": {"judge": "obs_vlm"}}
+{"t": 1789575116.885, "type": "frame", "skill": "GRASP_OBJECT", "step": 17, "frame_index": 13}
+{"t": 1789575116.885, "type": "vlm", "skill": "GRASP_OBJECT", "step": 17, "frame_index": 13, "prob": 0.5915902853012085, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575117.032, "type": "frame", "skill": "GRASP_OBJECT", "step": 18, "frame_index": 14}
+{"t": 1789575117.032, "type": "vlm", "skill": "GRASP_OBJECT", "step": 18, "frame_index": 14, "prob": 0.43764185905456543, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575117.191, "type": "frame", "skill": "GRASP_OBJECT", "step": 19, "frame_index": 15}
+{"t": 1789575117.191, "type": "vlm", "skill": "GRASP_OBJECT", "step": 19, "frame_index": 15, "prob": 0.11369068175554276, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575117.357, "type": "frame", "skill": "GRASP_OBJECT", "step": 20, "frame_index": 16}
+{"t": 1789575117.357, "type": "vlm", "skill": "GRASP_OBJECT", "step": 20, "frame_index": 16, "prob": 0.004711028188467026, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575117.517, "type": "frame", "skill": "GRASP_OBJECT", "step": 21, "frame_index": 17}
+{"t": 1789575117.517, "type": "vlm", "skill": "GRASP_OBJECT", "step": 21, "frame_index": 17, "prob": 0.014848764054477215, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575117.673, "type": "frame", "skill": "GRASP_OBJECT", "step": 22, "frame_index": 18}
+{"t": 1789575117.673, "type": "vlm", "skill": "GRASP_OBJECT", "step": 22, "frame_index": 18, "prob": 0.0027521660085767508, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575117.837, "type": "frame", "skill": "GRASP_OBJECT", "step": 23, "frame_index": 19}
+{"t": 1789575117.837, "type": "vlm", "skill": "GRASP_OBJECT", "step": 23, "frame_index": 19, "prob": 0.0040262797847390175, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575118.001, "type": "frame", "skill": "GRASP_OBJECT", "step": 24, "frame_index": 20}
+{"t": 1789575118.001, "type": "vlm", "skill": "GRASP_OBJECT", "step": 24, "frame_index": 20, "prob": 0.016274292021989822, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575118.162, "type": "frame", "skill": "GRASP_OBJECT", "step": 25, "frame_index": 21}
+{"t": 1789575118.162, "type": "vlm", "skill": "GRASP_OBJECT", "step": 25, "frame_index": 21, "prob": 0.0071510751731693745, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575118.329, "type": "frame", "skill": "GRASP_OBJECT", "step": 26, "frame_index": 22}
+{"t": 1789575118.329, "type": "vlm", "skill": "GRASP_OBJECT", "step": 26, "frame_index": 22, "prob": 0.005063567776232958, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575118.493, "type": "frame", "skill": "GRASP_OBJECT", "step": 27, "frame_index": 23}
+{"t": 1789575118.493, "type": "vlm", "skill": "GRASP_OBJECT", "step": 27, "frame_index": 23, "prob": 0.011931913904845715, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575118.655, "type": "frame", "skill": "GRASP_OBJECT", "step": 28, "frame_index": 24}
+{"t": 1789575118.655, "type": "vlm", "skill": "GRASP_OBJECT", "step": 28, "frame_index": 24, "prob": 0.011625265702605247, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575118.813, "type": "frame", "skill": "GRASP_OBJECT", "step": 29, "frame_index": 25}
+{"t": 1789575118.813, "type": "vlm", "skill": "GRASP_OBJECT", "step": 29, "frame_index": 25, "prob": 0.01772419922053814, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575118.971, "type": "frame", "skill": "GRASP_OBJECT", "step": 30, "frame_index": 26}
+{"t": 1789575118.971, "type": "vlm", "skill": "GRASP_OBJECT", "step": 30, "frame_index": 26, "prob": 0.01751178875565529, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575119.134, "type": "frame", "skill": "GRASP_OBJECT", "step": 31, "frame_index": 27}
+{"t": 1789575119.134, "type": "vlm", "skill": "GRASP_OBJECT", "step": 31, "frame_index": 27, "prob": 0.019515037536621094, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575119.297, "type": "frame", "skill": "GRASP_OBJECT", "step": 32, "frame_index": 28}
+{"t": 1789575119.297, "type": "vlm", "skill": "GRASP_OBJECT", "step": 32, "frame_index": 28, "prob": 0.011457942426204681, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575119.643, "type": "window", "skill": "GRASP_OBJECT", "step": 32, "chunk_len": 16, "executed": 16, "adapter_mode": "disabled", "decision": "EXECUTE", "hold": 0, "predicates_digest": {"judge": "obs_vlm"}}
+{"t": 1789575119.8, "type": "frame", "skill": "GRASP_OBJECT", "step": 33, "frame_index": 29}
+{"t": 1789575119.8, "type": "vlm", "skill": "GRASP_OBJECT", "step": 33, "frame_index": 29, "prob": 0.012617562897503376, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575119.961, "type": "frame", "skill": "GRASP_OBJECT", "step": 34, "frame_index": 30}
+{"t": 1789575119.961, "type": "vlm", "skill": "GRASP_OBJECT", "step": 34, "frame_index": 30, "prob": 0.010323815047740936, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575120.124, "type": "frame", "skill": "GRASP_OBJECT", "step": 35, "frame_index": 31}
+{"t": 1789575120.124, "type": "vlm", "skill": "GRASP_OBJECT", "step": 35, "frame_index": 31, "prob": 0.014830248430371284, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575120.283, "type": "frame", "skill": "GRASP_OBJECT", "step": 36, "frame_index": 32}
+{"t": 1789575120.283, "type": "vlm", "skill": "GRASP_OBJECT", "step": 36, "frame_index": 32, "prob": 0.024290069937705994, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575120.438, "type": "frame", "skill": "GRASP_OBJECT", "step": 37, "frame_index": 33}
+{"t": 1789575120.438, "type": "vlm", "skill": "GRASP_OBJECT", "step": 37, "frame_index": 33, "prob": 0.01728072389960289, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575120.623, "type": "frame", "skill": "GRASP_OBJECT", "step": 38, "frame_index": 34}
+{"t": 1789575120.624, "type": "vlm", "skill": "GRASP_OBJECT", "step": 38, "frame_index": 34, "prob": 0.023069534450769424, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575120.793, "type": "frame", "skill": "GRASP_OBJECT", "step": 39, "frame_index": 35}
+{"t": 1789575120.793, "type": "vlm", "skill": "GRASP_OBJECT", "step": 39, "frame_index": 35, "prob": 0.020672103390097618, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575120.963, "type": "frame", "skill": "GRASP_OBJECT", "step": 40, "frame_index": 36}
+{"t": 1789575120.963, "type": "vlm", "skill": "GRASP_OBJECT", "step": 40, "frame_index": 36, "prob": 0.01577565260231495, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575121.12, "type": "frame", "skill": "GRASP_OBJECT", "step": 41, "frame_index": 37}
+{"t": 1789575121.12, "type": "vlm", "skill": "GRASP_OBJECT", "step": 41, "frame_index": 37, "prob": 0.01695936545729637, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575121.27, "type": "frame", "skill": "GRASP_OBJECT", "step": 42, "frame_index": 38}
+{"t": 1789575121.27, "type": "vlm", "skill": "GRASP_OBJECT", "step": 42, "frame_index": 38, "prob": 0.018368175253272057, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575121.453, "type": "frame", "skill": "GRASP_OBJECT", "step": 43, "frame_index": 39}
+{"t": 1789575121.453, "type": "vlm", "skill": "GRASP_OBJECT", "step": 43, "frame_index": 39, "prob": 0.02816619537770748, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575121.607, "type": "frame", "skill": "GRASP_OBJECT", "step": 44, "frame_index": 40}
+{"t": 1789575121.608, "type": "vlm", "skill": "GRASP_OBJECT", "step": 44, "frame_index": 40, "prob": 0.02469155564904213, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575121.763, "type": "frame", "skill": "GRASP_OBJECT", "step": 45, "frame_index": 41}
+{"t": 1789575121.763, "type": "vlm", "skill": "GRASP_OBJECT", "step": 45, "frame_index": 41, "prob": 0.021361814811825752, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575121.898, "type": "frame", "skill": "GRASP_OBJECT", "step": 46, "frame_index": 42}
+{"t": 1789575121.898, "type": "vlm", "skill": "GRASP_OBJECT", "step": 46, "frame_index": 42, "prob": 0.03080116957426071, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575122.034, "type": "frame", "skill": "GRASP_OBJECT", "step": 47, "frame_index": 43}
+{"t": 1789575122.034, "type": "vlm", "skill": "GRASP_OBJECT", "step": 47, "frame_index": 43, "prob": 0.026926381513476372, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575122.168, "type": "frame", "skill": "GRASP_OBJECT", "step": 48, "frame_index": 44}
+{"t": 1789575122.168, "type": "vlm", "skill": "GRASP_OBJECT", "step": 48, "frame_index": 44, "prob": 0.008585818111896515, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575122.511, "type": "window", "skill": "GRASP_OBJECT", "step": 48, "chunk_len": 16, "executed": 16, "adapter_mode": "disabled", "decision": "EXECUTE", "hold": 0, "predicates_digest": {"judge": "obs_vlm"}}
+{"t": 1789575122.646, "type": "frame", "skill": "GRASP_OBJECT", "step": 49, "frame_index": 45}
+{"t": 1789575122.646, "type": "vlm", "skill": "GRASP_OBJECT", "step": 49, "frame_index": 45, "prob": 0.0072556305676698685, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575122.71, "type": "frame", "skill": "GRASP_OBJECT", "step": 50, "frame_index": 46}
+{"t": 1789575122.788, "type": "frame", "skill": "GRASP_OBJECT", "step": 52, "frame_index": 47}
+{"t": 1789575122.863, "type": "frame", "skill": "GRASP_OBJECT", "step": 54, "frame_index": 48}
+{"t": 1789575122.939, "type": "frame", "skill": "GRASP_OBJECT", "step": 56, "frame_index": 49}
+{"t": 1789575123.016, "type": "frame", "skill": "GRASP_OBJECT", "step": 58, "frame_index": 50}
+{"t": 1789575123.092, "type": "frame", "skill": "GRASP_OBJECT", "step": 60, "frame_index": 51}
+{"t": 1789575123.168, "type": "frame", "skill": "GRASP_OBJECT", "step": 62, "frame_index": 52}
+{"t": 1789575123.244, "type": "frame", "skill": "GRASP_OBJECT", "step": 64, "frame_index": 53}
+{"t": 1789575123.561, "type": "window", "skill": "GRASP_OBJECT", "step": 64, "chunk_len": 16, "executed": 16, "adapter_mode": "disabled", "decision": "EXECUTE", "hold": 0, "predicates_digest": {"judge": "obs_vlm"}}
+{"t": 1789575123.696, "type": "frame", "skill": "GRASP_OBJECT", "step": 65, "frame_index": 54}
+{"t": 1789575123.696, "type": "vlm", "skill": "GRASP_OBJECT", "step": 65, "frame_index": 54, "prob": 0.05903153121471405, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": false, "proprio_gripper_closed": false}
+{"t": 1789575123.736, "type": "frame", "skill": "GRASP_OBJECT", "step": 66, "frame_index": 55}
+{"t": 1789575123.811, "type": "frame", "skill": "GRASP_OBJECT", "step": 68, "frame_index": 56}
+{"t": 1789575123.887, "type": "frame", "skill": "GRASP_OBJECT", "step": 70, "frame_index": 57}
+{"t": 1789575123.962, "type": "frame", "skill": "GRASP_OBJECT", "step": 72, "frame_index": 58}
+{"t": 1789575124.037, "type": "frame", "skill": "GRASP_OBJECT", "step": 74, "frame_index": 59}
+{"t": 1789575124.113, "type": "frame", "skill": "GRASP_OBJECT", "step": 76, "frame_index": 60}
+{"t": 1789575124.189, "type": "frame", "skill": "GRASP_OBJECT", "step": 78, "frame_index": 61}
+{"t": 1789575124.265, "type": "frame", "skill": "GRASP_OBJECT", "step": 80, "frame_index": 62}
+{"t": 1789575124.583, "type": "window", "skill": "GRASP_OBJECT", "step": 80, "chunk_len": 16, "executed": 16, "adapter_mode": "disabled", "decision": "EXECUTE", "hold": 0, "predicates_digest": {"judge": "obs_vlm"}}
+{"t": 1789575124.718, "type": "frame", "skill": "GRASP_OBJECT", "step": 81, "frame_index": 63}
+{"t": 1789575124.718, "type": "vlm", "skill": "GRASP_OBJECT", "step": 81, "frame_index": 63, "prob": 0.6260639429092407, "consecutive_yes": 1, "queried": true, "decision": "CONTINUE", "proprio_candidate": false, "proprio_gripper_closed": false}
+{"t": 1789575124.758, "type": "frame", "skill": "GRASP_OBJECT", "step": 82, "frame_index": 64}
+{"t": 1789575124.833, "type": "frame", "skill": "GRASP_OBJECT", "step": 84, "frame_index": 65}
+{"t": 1789575124.911, "type": "frame", "skill": "GRASP_OBJECT", "step": 86, "frame_index": 66}
+{"t": 1789575124.986, "type": "frame", "skill": "GRASP_OBJECT", "step": 88, "frame_index": 67}
+{"t": 1789575125.145, "type": "frame", "skill": "GRASP_OBJECT", "step": 89, "frame_index": 68}
+{"t": 1789575125.145, "type": "vlm", "skill": "GRASP_OBJECT", "step": 89, "frame_index": 68, "prob": 0.5694435238838196, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575125.201, "type": "frame", "skill": "GRASP_OBJECT", "step": 90, "frame_index": 69}
+{"t": 1789575125.278, "type": "frame", "skill": "GRASP_OBJECT", "step": 92, "frame_index": 70}
+{"t": 1789575125.354, "type": "frame", "skill": "GRASP_OBJECT", "step": 94, "frame_index": 71}
+{"t": 1789575125.43, "type": "frame", "skill": "GRASP_OBJECT", "step": 96, "frame_index": 72}
+{"t": 1789575125.74, "type": "window", "skill": "GRASP_OBJECT", "step": 96, "chunk_len": 16, "executed": 16, "adapter_mode": "disabled", "decision": "EXECUTE", "hold": 0, "predicates_digest": {"judge": "obs_vlm"}}
+{"t": 1789575125.927, "type": "frame", "skill": "GRASP_OBJECT", "step": 98, "frame_index": 73}
+{"t": 1789575125.927, "type": "vlm", "skill": "GRASP_OBJECT", "step": 98, "frame_index": 73, "prob": 0.32368597388267517, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575126.086, "type": "frame", "skill": "GRASP_OBJECT", "step": 99, "frame_index": 74}
+{"t": 1789575126.086, "type": "vlm", "skill": "GRASP_OBJECT", "step": 99, "frame_index": 74, "prob": 0.26330453157424927, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575126.246, "type": "frame", "skill": "GRASP_OBJECT", "step": 100, "frame_index": 75}
+{"t": 1789575126.246, "type": "vlm", "skill": "GRASP_OBJECT", "step": 100, "frame_index": 75, "prob": 0.16200323402881622, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575126.399, "type": "frame", "skill": "GRASP_OBJECT", "step": 101, "frame_index": 76}
+{"t": 1789575126.399, "type": "vlm", "skill": "GRASP_OBJECT", "step": 101, "frame_index": 76, "prob": 0.08489038795232773, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575126.574, "type": "frame", "skill": "GRASP_OBJECT", "step": 102, "frame_index": 77}
+{"t": 1789575126.574, "type": "vlm", "skill": "GRASP_OBJECT", "step": 102, "frame_index": 77, "prob": 0.10085836052894592, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575126.737, "type": "frame", "skill": "GRASP_OBJECT", "step": 103, "frame_index": 78}
+{"t": 1789575126.737, "type": "vlm", "skill": "GRASP_OBJECT", "step": 103, "frame_index": 78, "prob": 0.11961480230093002, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575126.9, "type": "frame", "skill": "GRASP_OBJECT", "step": 104, "frame_index": 79}
+{"t": 1789575126.9, "type": "vlm", "skill": "GRASP_OBJECT", "step": 104, "frame_index": 79, "prob": 0.09595660120248795, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575127.08, "type": "frame", "skill": "GRASP_OBJECT", "step": 105, "frame_index": 80}
+{"t": 1789575127.08, "type": "vlm", "skill": "GRASP_OBJECT", "step": 105, "frame_index": 80, "prob": 0.061952732503414154, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575127.231, "type": "frame", "skill": "GRASP_OBJECT", "step": 106, "frame_index": 81}
+{"t": 1789575127.231, "type": "vlm", "skill": "GRASP_OBJECT", "step": 106, "frame_index": 81, "prob": 0.10999953001737595, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575127.394, "type": "frame", "skill": "GRASP_OBJECT", "step": 107, "frame_index": 82}
+{"t": 1789575127.394, "type": "vlm", "skill": "GRASP_OBJECT", "step": 107, "frame_index": 82, "prob": 0.06854628026485443, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575127.573, "type": "frame", "skill": "GRASP_OBJECT", "step": 108, "frame_index": 83}
+{"t": 1789575127.573, "type": "vlm", "skill": "GRASP_OBJECT", "step": 108, "frame_index": 83, "prob": 0.07366636395454407, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575127.727, "type": "frame", "skill": "GRASP_OBJECT", "step": 109, "frame_index": 84}
+{"t": 1789575127.727, "type": "vlm", "skill": "GRASP_OBJECT", "step": 109, "frame_index": 84, "prob": 0.03696548193693161, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575127.882, "type": "frame", "skill": "GRASP_OBJECT", "step": 110, "frame_index": 85}
+{"t": 1789575127.882, "type": "vlm", "skill": "GRASP_OBJECT", "step": 110, "frame_index": 85, "prob": 0.02776222862303257, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575128.016, "type": "frame", "skill": "GRASP_OBJECT", "step": 111, "frame_index": 86}
+{"t": 1789575128.016, "type": "vlm", "skill": "GRASP_OBJECT", "step": 111, "frame_index": 86, "prob": 0.02878005988895893, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575128.151, "type": "frame", "skill": "GRASP_OBJECT", "step": 112, "frame_index": 87}
+{"t": 1789575128.151, "type": "vlm", "skill": "GRASP_OBJECT", "step": 112, "frame_index": 87, "prob": 0.03059433586895466, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575128.464, "type": "window", "skill": "GRASP_OBJECT", "step": 112, "chunk_len": 16, "executed": 16, "adapter_mode": "disabled", "decision": "EXECUTE", "hold": 0, "predicates_digest": {"judge": "obs_vlm"}}
+{"t": 1789575128.612, "type": "frame", "skill": "GRASP_OBJECT", "step": 113, "frame_index": 88}
+{"t": 1789575128.612, "type": "vlm", "skill": "GRASP_OBJECT", "step": 113, "frame_index": 88, "prob": 0.037897106260061264, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575128.767, "type": "frame", "skill": "GRASP_OBJECT", "step": 114, "frame_index": 89}
+{"t": 1789575128.767, "type": "vlm", "skill": "GRASP_OBJECT", "step": 114, "frame_index": 89, "prob": 0.04636131599545479, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575128.964, "type": "frame", "skill": "GRASP_OBJECT", "step": 115, "frame_index": 90}
+{"t": 1789575128.964, "type": "vlm", "skill": "GRASP_OBJECT", "step": 115, "frame_index": 90, "prob": 0.03427776321768761, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575129.124, "type": "frame", "skill": "GRASP_OBJECT", "step": 116, "frame_index": 91}
+{"t": 1789575129.124, "type": "vlm", "skill": "GRASP_OBJECT", "step": 116, "frame_index": 91, "prob": 0.04135085269808769, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575129.293, "type": "frame", "skill": "GRASP_OBJECT", "step": 117, "frame_index": 92}
+{"t": 1789575129.293, "type": "vlm", "skill": "GRASP_OBJECT", "step": 117, "frame_index": 92, "prob": 0.06831159442663193, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575129.429, "type": "frame", "skill": "GRASP_OBJECT", "step": 118, "frame_index": 93}
+{"t": 1789575129.429, "type": "vlm", "skill": "GRASP_OBJECT", "step": 118, "frame_index": 93, "prob": 0.0454200804233551, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575129.58, "type": "frame", "skill": "GRASP_OBJECT", "step": 119, "frame_index": 94}
+{"t": 1789575129.58, "type": "vlm", "skill": "GRASP_OBJECT", "step": 119, "frame_index": 94, "prob": 0.025187576189637184, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575129.736, "type": "frame", "skill": "GRASP_OBJECT", "step": 120, "frame_index": 95}
+{"t": 1789575129.736, "type": "vlm", "skill": "GRASP_OBJECT", "step": 120, "frame_index": 95, "prob": 0.07548609375953674, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575129.895, "type": "frame", "skill": "GRASP_OBJECT", "step": 121, "frame_index": 96}
+{"t": 1789575129.895, "type": "vlm", "skill": "GRASP_OBJECT", "step": 121, "frame_index": 96, "prob": 0.0608585886657238, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575130.048, "type": "frame", "skill": "GRASP_OBJECT", "step": 122, "frame_index": 97}
+{"t": 1789575130.048, "type": "vlm", "skill": "GRASP_OBJECT", "step": 122, "frame_index": 97, "prob": 0.039397019892930984, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575130.222, "type": "frame", "skill": "GRASP_OBJECT", "step": 123, "frame_index": 98}
+{"t": 1789575130.222, "type": "vlm", "skill": "GRASP_OBJECT", "step": 123, "frame_index": 98, "prob": 0.0763263925909996, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575130.357, "type": "frame", "skill": "GRASP_OBJECT", "step": 124, "frame_index": 99}
+{"t": 1789575130.357, "type": "vlm", "skill": "GRASP_OBJECT", "step": 124, "frame_index": 99, "prob": 0.12077908217906952, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575130.492, "type": "frame", "skill": "GRASP_OBJECT", "step": 125, "frame_index": 100}
+{"t": 1789575130.492, "type": "vlm", "skill": "GRASP_OBJECT", "step": 125, "frame_index": 100, "prob": 0.18820124864578247, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575130.627, "type": "frame", "skill": "GRASP_OBJECT", "step": 126, "frame_index": 101}
+{"t": 1789575130.627, "type": "vlm", "skill": "GRASP_OBJECT", "step": 126, "frame_index": 101, "prob": 0.1567857414484024, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575130.762, "type": "frame", "skill": "GRASP_OBJECT", "step": 127, "frame_index": 102}
+{"t": 1789575130.762, "type": "vlm", "skill": "GRASP_OBJECT", "step": 127, "frame_index": 102, "prob": 0.17504103481769562, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575130.909, "type": "frame", "skill": "GRASP_OBJECT", "step": 128, "frame_index": 103}
+{"t": 1789575130.909, "type": "vlm", "skill": "GRASP_OBJECT", "step": 128, "frame_index": 103, "prob": 0.15983235836029053, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575131.243, "type": "window", "skill": "GRASP_OBJECT", "step": 128, "chunk_len": 16, "executed": 16, "adapter_mode": "disabled", "decision": "EXECUTE", "hold": 0, "predicates_digest": {"judge": "obs_vlm"}}
+{"t": 1789575131.384, "type": "frame", "skill": "GRASP_OBJECT", "step": 129, "frame_index": 104}
+{"t": 1789575131.384, "type": "vlm", "skill": "GRASP_OBJECT", "step": 129, "frame_index": 104, "prob": 0.12498866766691208, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575131.569, "type": "frame", "skill": "GRASP_OBJECT", "step": 130, "frame_index": 105}
+{"t": 1789575131.569, "type": "vlm", "skill": "GRASP_OBJECT", "step": 130, "frame_index": 105, "prob": 0.227488175034523, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575131.749, "type": "frame", "skill": "GRASP_OBJECT", "step": 131, "frame_index": 106}
+{"t": 1789575131.749, "type": "vlm", "skill": "GRASP_OBJECT", "step": 131, "frame_index": 106, "prob": 0.17060178518295288, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575131.921, "type": "frame", "skill": "GRASP_OBJECT", "step": 132, "frame_index": 107}
+{"t": 1789575131.921, "type": "vlm", "skill": "GRASP_OBJECT", "step": 132, "frame_index": 107, "prob": 0.31332388520240784, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575132.06, "type": "frame", "skill": "GRASP_OBJECT", "step": 133, "frame_index": 108}
+{"t": 1789575132.06, "type": "vlm", "skill": "GRASP_OBJECT", "step": 133, "frame_index": 108, "prob": 0.2955593466758728, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575132.199, "type": "frame", "skill": "GRASP_OBJECT", "step": 134, "frame_index": 109}
+{"t": 1789575132.199, "type": "vlm", "skill": "GRASP_OBJECT", "step": 134, "frame_index": 109, "prob": 0.3292117714881897, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575132.346, "type": "frame", "skill": "GRASP_OBJECT", "step": 135, "frame_index": 110}
+{"t": 1789575132.346, "type": "vlm", "skill": "GRASP_OBJECT", "step": 135, "frame_index": 110, "prob": 0.3599109947681427, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575132.487, "type": "frame", "skill": "GRASP_OBJECT", "step": 136, "frame_index": 111}
+{"t": 1789575132.487, "type": "vlm", "skill": "GRASP_OBJECT", "step": 136, "frame_index": 111, "prob": 0.44713425636291504, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575132.626, "type": "frame", "skill": "GRASP_OBJECT", "step": 137, "frame_index": 112}
+{"t": 1789575132.626, "type": "vlm", "skill": "GRASP_OBJECT", "step": 137, "frame_index": 112, "prob": 0.4619249999523163, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575132.763, "type": "frame", "skill": "GRASP_OBJECT", "step": 138, "frame_index": 113}
+{"t": 1789575132.763, "type": "vlm", "skill": "GRASP_OBJECT", "step": 138, "frame_index": 113, "prob": 0.44562244415283203, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575132.94, "type": "frame", "skill": "GRASP_OBJECT", "step": 139, "frame_index": 114}
+{"t": 1789575132.94, "type": "vlm", "skill": "GRASP_OBJECT", "step": 139, "frame_index": 114, "prob": 0.5659095644950867, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575133.079, "type": "frame", "skill": "GRASP_OBJECT", "step": 140, "frame_index": 115}
+{"t": 1789575133.079, "type": "vlm", "skill": "GRASP_OBJECT", "step": 140, "frame_index": 115, "prob": 0.5798235535621643, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575133.216, "type": "frame", "skill": "GRASP_OBJECT", "step": 141, "frame_index": 116}
+{"t": 1789575133.216, "type": "vlm", "skill": "GRASP_OBJECT", "step": 141, "frame_index": 116, "prob": 0.5408759713172913, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575133.355, "type": "frame", "skill": "GRASP_OBJECT", "step": 142, "frame_index": 117}
+{"t": 1789575133.355, "type": "vlm", "skill": "GRASP_OBJECT", "step": 142, "frame_index": 117, "prob": 0.5445646047592163, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575133.492, "type": "frame", "skill": "GRASP_OBJECT", "step": 143, "frame_index": 118}
+{"t": 1789575133.492, "type": "vlm", "skill": "GRASP_OBJECT", "step": 143, "frame_index": 118, "prob": 0.6651058793067932, "consecutive_yes": 1, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575133.631, "type": "frame", "skill": "GRASP_OBJECT", "step": 144, "frame_index": 119}
+{"t": 1789575133.631, "type": "vlm", "skill": "GRASP_OBJECT", "step": 144, "frame_index": 119, "prob": 0.665317177772522, "consecutive_yes": 2, "queried": true, "decision": "ADVANCE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575133.631, "type": "verify", "skill": "GRASP_OBJECT", "decision": "ADVANCE", "reason": "VLM recognised 'GRASP_OBJECT' complete: P(yes)=0.665 >= tau=0.6 for 2 consecutive query(ies)", "elapsed": 144, "hold": 2}
+{"t": 1789575133.633, "type": "skill_result", "next_skill": "advance", "status": "SUCCESS", "skill": "GRASP_OBJECT", "args": {"object": "blender_lid", "grasp_region": "lid_handle"}, "instruction": "Grasp the blender lid securely at its handle and lift it clear.", "steps": 144, "success_step": 144, "terminated_by": "vlm_success", "reason": "VLM recognised 'GRASP_OBJECT' complete: P(yes)=0.665 >= tau=0.6 for 2 consecutive query(ies)", "vlm_stats": {"skill": "GRASP_OBJECT", "elapsed": 144, "n_vlm_calls": 91, "vlm_seconds": 9.5165, "succeeded_step": 144, "mean_vlm_latency_ms": 104.58}}
+{"t": 1789575133.633, "type": "plan", "planner_calls": 1, "planner_kind": "sequential_obs_stub", "observation_ref": "seed3:step144", "selected_skill": "MOVE_OBJECT", "skill_args": {"object": "blender_lid", "destination": "closed_preplace_region"}, "rendered_instruction": "Move the held blender lid to the pre-place region above the blender while maintaining a stable grasp and avoiding disallowed contact.", "rationale": "sequential obs-only plan -> MOVE_OBJECT", "predicates_digest": {}}
+{"t": 1789575133.633, "type": "route", "skill": "MOVE_OBJECT", "adapter_mode": "disabled", "adapter_checkpoint": null, "max_steps": 288, "can_start": true}
+{"t": 1789575133.951, "type": "window", "skill": "MOVE_OBJECT", "step": 0, "chunk_len": 16, "executed": 16, "adapter_mode": "disabled", "decision": "EXECUTE", "hold": 0, "predicates_digest": {"judge": "obs_vlm"}}
+{"t": 1789575134.089, "type": "frame", "skill": "MOVE_OBJECT", "step": 1, "frame_index": 120}
+{"t": 1789575134.09, "type": "vlm", "skill": "MOVE_OBJECT", "step": 1, "frame_index": 120, "prob": 0.6686450242996216, "consecutive_yes": 1, "queried": true, "decision": "CONTINUE", "proprio_candidate": false, "proprio_gripper_closed": false}
+{"t": 1789575134.131, "type": "frame", "skill": "MOVE_OBJECT", "step": 2, "frame_index": 121}
+{"t": 1789575134.214, "type": "frame", "skill": "MOVE_OBJECT", "step": 4, "frame_index": 122}
+{"t": 1789575134.372, "type": "frame", "skill": "MOVE_OBJECT", "step": 5, "frame_index": 123}
+{"t": 1789575134.372, "type": "vlm", "skill": "MOVE_OBJECT", "step": 5, "frame_index": 123, "prob": 0.6683131456375122, "consecutive_yes": 2, "queried": true, "decision": "ADVANCE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575134.372, "type": "verify", "skill": "MOVE_OBJECT", "decision": "ADVANCE", "reason": "VLM recognised 'MOVE_OBJECT' complete: P(yes)=0.668 >= tau=0.6 for 2 consecutive query(ies)", "elapsed": 5, "hold": 2}
+{"t": 1789575134.374, "type": "skill_result", "next_skill": "advance", "status": "SUCCESS", "skill": "MOVE_OBJECT", "args": {"object": "blender_lid", "destination": "closed_preplace_region"}, "instruction": "Move the held blender lid to the pre-place region above the blender while maintaining a stable grasp and avoiding disallowed contact.", "steps": 5, "success_step": 5, "terminated_by": "vlm_success", "reason": "VLM recognised 'MOVE_OBJECT' complete: P(yes)=0.668 >= tau=0.6 for 2 consecutive query(ies)", "vlm_stats": {"skill": "MOVE_OBJECT", "elapsed": 5, "n_vlm_calls": 2, "vlm_seconds": 0.2128, "succeeded_step": 5, "mean_vlm_latency_ms": 106.41}}
+{"t": 1789575134.374, "type": "plan", "planner_calls": 2, "planner_kind": "sequential_obs_stub", "observation_ref": "seed3:step149", "selected_skill": "PLACE_OBJECT", "skill_args": {"object": "blender_lid", "destination": "blender"}, "rendered_instruction": "Place the blender lid on the blender, release it after it is stably supported, then move the gripper clear.", "rationale": "sequential obs-only plan -> PLACE_OBJECT", "predicates_digest": {}}
+{"t": 1789575134.374, "type": "route", "skill": "PLACE_OBJECT", "adapter_mode": "disabled", "adapter_checkpoint": null, "max_steps": 96, "can_start": true}
+{"t": 1789575134.709, "type": "window", "skill": "PLACE_OBJECT", "step": 0, "chunk_len": 16, "executed": 16, "adapter_mode": "disabled", "decision": "EXECUTE", "hold": 0, "predicates_digest": {"judge": "obs_vlm"}}
+{"t": 1789575134.893, "type": "frame", "skill": "PLACE_OBJECT", "step": 1, "frame_index": 124}
+{"t": 1789575134.894, "type": "vlm", "skill": "PLACE_OBJECT", "step": 1, "frame_index": 124, "prob": 0.5697100162506104, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": false, "proprio_gripper_closed": false}
+{"t": 1789575134.989, "type": "frame", "skill": "PLACE_OBJECT", "step": 3, "frame_index": 125}
+{"t": 1789575135.169, "type": "frame", "skill": "PLACE_OBJECT", "step": 5, "frame_index": 126}
+{"t": 1789575135.169, "type": "vlm", "skill": "PLACE_OBJECT", "step": 5, "frame_index": 126, "prob": 0.48992758989334106, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575135.308, "type": "frame", "skill": "PLACE_OBJECT", "step": 6, "frame_index": 127}
+{"t": 1789575135.308, "type": "vlm", "skill": "PLACE_OBJECT", "step": 6, "frame_index": 127, "prob": 0.5914024114608765, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575135.446, "type": "frame", "skill": "PLACE_OBJECT", "step": 7, "frame_index": 128}
+{"t": 1789575135.446, "type": "vlm", "skill": "PLACE_OBJECT", "step": 7, "frame_index": 128, "prob": 0.5750102400779724, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575135.616, "type": "frame", "skill": "PLACE_OBJECT", "step": 8, "frame_index": 129}
+{"t": 1789575135.616, "type": "vlm", "skill": "PLACE_OBJECT", "step": 8, "frame_index": 129, "prob": 0.5669635534286499, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575135.761, "type": "frame", "skill": "PLACE_OBJECT", "step": 9, "frame_index": 130}
+{"t": 1789575135.761, "type": "vlm", "skill": "PLACE_OBJECT", "step": 9, "frame_index": 130, "prob": 0.5046480298042297, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575135.905, "type": "frame", "skill": "PLACE_OBJECT", "step": 10, "frame_index": 131}
+{"t": 1789575135.905, "type": "vlm", "skill": "PLACE_OBJECT", "step": 10, "frame_index": 131, "prob": 0.49428048729896545, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575136.05, "type": "frame", "skill": "PLACE_OBJECT", "step": 11, "frame_index": 132}
+{"t": 1789575136.05, "type": "vlm", "skill": "PLACE_OBJECT", "step": 11, "frame_index": 132, "prob": 0.5527948141098022, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575136.195, "type": "frame", "skill": "PLACE_OBJECT", "step": 12, "frame_index": 133}
+{"t": 1789575136.195, "type": "vlm", "skill": "PLACE_OBJECT", "step": 12, "frame_index": 133, "prob": 0.48323097825050354, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575136.339, "type": "frame", "skill": "PLACE_OBJECT", "step": 13, "frame_index": 134}
+{"t": 1789575136.339, "type": "vlm", "skill": "PLACE_OBJECT", "step": 13, "frame_index": 134, "prob": 0.5120657682418823, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575136.481, "type": "frame", "skill": "PLACE_OBJECT", "step": 14, "frame_index": 135}
+{"t": 1789575136.481, "type": "vlm", "skill": "PLACE_OBJECT", "step": 14, "frame_index": 135, "prob": 0.5919896960258484, "consecutive_yes": 0, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575136.626, "type": "frame", "skill": "PLACE_OBJECT", "step": 15, "frame_index": 136}
+{"t": 1789575136.626, "type": "vlm", "skill": "PLACE_OBJECT", "step": 15, "frame_index": 136, "prob": 0.6349840760231018, "consecutive_yes": 1, "queried": true, "decision": "CONTINUE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575136.798, "type": "frame", "skill": "PLACE_OBJECT", "step": 16, "frame_index": 137}
+{"t": 1789575136.798, "type": "vlm", "skill": "PLACE_OBJECT", "step": 16, "frame_index": 137, "prob": 0.6641572117805481, "consecutive_yes": 2, "queried": true, "decision": "ADVANCE", "proprio_candidate": true, "proprio_gripper_closed": false}
+{"t": 1789575136.798, "type": "verify", "skill": "PLACE_OBJECT", "decision": "ADVANCE", "reason": "VLM recognised 'PLACE_OBJECT' complete: P(yes)=0.664 >= tau=0.6 for 2 consecutive query(ies)", "elapsed": 16, "hold": 2}
+{"t": 1789575136.8, "type": "skill_result", "next_skill": "advance", "status": "SUCCESS", "skill": "PLACE_OBJECT", "args": {"object": "blender_lid", "destination": "blender"}, "instruction": "Place the blender lid on the blender, release it after it is stably supported, then move the gripper clear.", "steps": 16, "success_step": 16, "terminated_by": "vlm_success", "reason": "VLM recognised 'PLACE_OBJECT' complete: P(yes)=0.664 >= tau=0.6 for 2 consecutive query(ies)", "vlm_stats": {"skill": "PLACE_OBJECT", "elapsed": 16, "n_vlm_calls": 13, "vlm_seconds": 1.3057, "succeeded_step": 16, "mean_vlm_latency_ms": 100.44}}
+{"t": 1789575136.8, "type": "plan", "planner_calls": 3, "planner_kind": "sequential_obs_stub", "observation_ref": "seed3:step165", "selected_skill": null, "skill_args": null, "rendered_instruction": null, "rationale": "all skills attempted (obs-only verifier); terminate episode", "predicates_digest": {}}
+{"t": 1789575136.801, "type": "episode_end", "terminal": "planner_done", "planner_calls": 4, "steps_used": 165, "task_success": false}

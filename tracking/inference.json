@@ -1,0 +1,31 @@
+{
+  "assumption": "Skill adapters have passed zero-shot/SFT and RL validation gates.",
+  "task": "CloseBlenderLid",
+  "goal": "Close the blender lid securely.",
+  "layers": [
+    {"id": "planner", "name": "VLM Planner", "role": "Select the next generic skill and bind its arguments from the goal and observation."},
+    {"id": "manager", "name": "Execution Manager", "role": "Validate can_start, render the instruction, enforce the step budget, and own termination."},
+    {"id": "router", "name": "Skill Router", "role": "Load the trained LoRA adapter selected by the SkillCall."},
+    {"id": "policy", "name": "RoboCasa365 VLA + Adapter", "role": "Generate a 16-step action chunk from images, robot state, goal, and skill instruction."},
+    {"id": "world", "name": "Simulator / Robot", "role": "Execute a short action window and return the next observation and exact predicates."},
+    {"id": "verifier", "name": "Predicate Verifier", "role": "Evaluate done_when and return ADVANCE, RETRY, or REPLAN to the manager."}
+  ],
+  "skills": [
+    {"name": "GRASP_OBJECT", "adapter": "grasp", "args": "object=blender_lid, grasp_region=lid_handle", "instruction": "Grasp the blender lid securely at its handle and lift it clear.", "done": "held ∧ lifted ∧ stable ∧ no_disallowed_contact"},
+    {"name": "MOVE_OBJECT", "adapter": "move_holding", "args": "object=blender_lid, destination=closed_preplace_region", "instruction": "Move the held blender lid to the pre-place region above the blender while maintaining a stable grasp and avoiding disallowed contact.", "done": "held ∧ at_target ∧ stable ∧ no_disallowed_contact"},
+    {"name": "PLACE_OBJECT", "adapter": "place", "args": "object=blender_lid, destination=blender", "instruction": "Place the blender lid on the blender, release it after it is stably supported, then move the gripper clear.", "done": "supported_by ∧ released ∧ pose_valid ∧ gripper_clear"}
+  ],
+  "trace": [
+    {"phase": "OBSERVE", "actor": "System", "skill": null, "title": "Goal과 초기 observation 수집", "input": "goal + 3 camera views + robot state", "output": "lid_on_counter=true, held=false", "decision": "PLAN"},
+    {"phase": "PLAN", "actor": "VLM Planner", "skill": "GRASP_OBJECT", "title": "첫 스킬 선택", "input": "goal + current predicates + skill catalog", "output": "SkillCall(GRASP_OBJECT, blender_lid, lid_handle)", "decision": "DISPATCH"},
+    {"phase": "ROUTE", "actor": "Execution Manager / Router", "skill": "GRASP_OBJECT", "title": "시작 조건 확인과 adapter 선택", "input": "reachable(lid)=true, held(lid)=false", "output": "adapter=grasp · rendered instruction · budget=208", "decision": "EXECUTE"},
+    {"phase": "ACT", "actor": "VLA + Simulator", "skill": "GRASP_OBJECT", "title": "Action chunk 실행", "input": "observation + goal + instruction", "output": "16-step action chunk → new observation", "decision": "VERIFY"},
+    {"phase": "VERIFY", "actor": "Predicate Verifier", "skill": "GRASP_OBJECT", "title": "파지 완료 확인", "input": "held ∧ lifted ∧ stable ∧ no_disallowed_contact", "output": "done_when=true", "decision": "ADVANCE"},
+    {"phase": "PLAN", "actor": "VLM Planner", "skill": "MOVE_OBJECT", "title": "다음 스킬 선택", "input": "goal + grasp terminal state", "output": "SkillCall(MOVE_OBJECT, blender_lid, closed_preplace_region)", "decision": "DISPATCH"},
+    {"phase": "ROUTE", "actor": "Execution Manager / Router", "skill": "MOVE_OBJECT", "title": "MOVE adapter 선택", "input": "held(lid)=true", "output": "adapter=move_holding · budget=288", "decision": "EXECUTE"},
+    {"phase": "ACT + VERIFY", "actor": "VLA / Simulator / Verifier", "skill": "MOVE_OBJECT", "title": "운반과 짧은 주기 검증", "input": "16-step chunks", "output": "held=true, at_target=true, collision=false", "decision": "ADVANCE"},
+    {"phase": "PLAN + ROUTE", "actor": "Planner / Manager", "skill": "PLACE_OBJECT", "title": "PLACE 스킬 선택", "input": "pre-place terminal state", "output": "adapter=place · rendered instruction · budget=96", "decision": "EXECUTE"},
+    {"phase": "ACT + VERIFY", "actor": "VLA / Simulator / Verifier", "skill": "PLACE_OBJECT", "title": "안착·해제·후퇴", "input": "16-step chunks", "output": "supported_by=true, released=true, pose_valid=true, gripper_clear=true", "decision": "ADVANCE"},
+    {"phase": "TERMINAL", "actor": "VLM Planner", "skill": null, "title": "전체 task 종료", "input": "official task predicate + execution trace", "output": "CloseBlenderLid=SUCCESS", "decision": "DONE"}
+  ]
+}

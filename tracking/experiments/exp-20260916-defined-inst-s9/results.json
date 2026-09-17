@@ -1,0 +1,26 @@
+{
+  "grasp": {
+    "success": false,
+    "steps": 208,
+    "success_step": null,
+    "post_success_steps": 0,
+    "terminated_by": "horizon",
+    "instruction": "Grasp the blender lid securely at its handle and lift it clear."
+  },
+  "move_holding": {
+    "success": true,
+    "steps": 108,
+    "success_step": 76,
+    "post_success_steps": 32,
+    "terminated_by": "post_success_hold",
+    "instruction": "Move the held blender lid to the pre-place region above the blender while maintaining a stable grasp and avoiding disallowed contact."
+  },
+  "place": {
+    "success": true,
+    "steps": 96,
+    "success_step": 93,
+    "post_success_steps": 3,
+    "terminated_by": "post_success_hold",
+    "instruction": "Place the blender lid on the blender, release it after it is stably supported, then move the gripper clear."
+  }
+}
