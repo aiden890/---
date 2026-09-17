@@ -89,6 +89,71 @@
       "corrected_run": "EXP-20260917-GRPO-CORRECTNESS-MICRO-V2"
     },
     {
+      "id": "EXP-20260917-GRPO-CORRECTNESS-MICRO-V2",
+      "date": "2026-09-17",
+      "title": "Corrected exact-source GRPO GPU micro",
+      "status": "complete",
+      "model": "Xiaomi-Robotics-1-RoboCasa365",
+      "task": "CloseBlenderLid / GRASP",
+      "question": "수정된 reward·hold·mean-loss·ratio guard·named checkpoint가 exact-source GPU update에서 실제로 동작하며 production 안정성 기준도 통과하는가?",
+      "summary": "정확성 micro는 source/hash, 2-group progress, epoch0 ratio=1, adapter delta, nonfinite=0, unique named checkpoint roundtrip을 통과했다. 그러나 LR 1e-6에서도 post-step KL 0.290/clip 0.793으로 target-KL 0.05를 초과해 production 안정성 gate는 FAIL이며 30-update run은 시작하지 않았다.",
+      "data": "../rl-train-t_3ed65912/results/corrected_exact_3154248_micro_lr1e6/",
+      "tags": [
+        "GRPO",
+        "GRASP",
+        "correctness-micro",
+        "exact-source",
+        "checkpoint-roundtrip",
+        "stability-fail"
+      ],
+      "kanban": "t_2bb64447",
+      "source": {
+        "commit": "3154248851cceb3703b9b60931ce1e1627282bbd",
+        "manifest_sha256": "06679ca1cf5a74e3c8de860a4242f4a91f4f004dd9533b93e3133c573560cbb6",
+        "dirty": false
+      },
+      "configuration": {
+        "optimizer": "AdamW",
+        "learning_rate": 0.000001,
+        "update_epochs": 2,
+        "target_kl": 0.05,
+        "ppo_clip": 0.2,
+        "group_size": 8,
+        "groups_collected": 2,
+        "trainable_chunks": 82,
+        "reward": "decayed skill terminal + exact 20-step hold",
+        "evaluation": "skipped — correctness micro only"
+      },
+      "measurements": {
+        "epoch0_ratio": 1.0,
+        "adapter_delta_l2": 0.0019569704309105873,
+        "post_step_ratio": 0.897177771961513,
+        "post_step_kl": 0.2902799061078548,
+        "post_step_clip_fraction": 0.7926829268292683,
+        "post_step_ess": 0.48486111934618054,
+        "nonfinite": 0,
+        "dropped": 0,
+        "peak_vram_gb": 10.52,
+        "collect_seconds": 418.191,
+        "optimizer_seconds": 271.049,
+        "grasp_success": "15/16",
+        "exact_hold_success": "15/15 successes"
+      },
+      "gate": {
+        "functional_correctness": "PASS",
+        "production_stability": "FAIL — KL/clip 과다",
+        "continue_30_updates": false
+      },
+      "artifacts": {
+        "remote_result_dir": "/home/v4/rl-train-t_3ed65912/results/corrected_exact_3154248_micro_lr1e6/",
+        "report": "../rl-train-t_3ed65912/REPORT/CORRECTED_GRPO_MICRO_FINAL.md"
+      },
+      "wandb": {
+        "status": "not_mirrored",
+        "follow_up": "t_60a33390"
+      }
+    },
+    {
       "id": "EXP-20260917-ADAPTIVE",
       "date": "2026-09-17",
       "title": "Adaptive curriculum GRASP GRPO — 병목 진단 스윕 (exp1→4)",
