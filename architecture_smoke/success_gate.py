@@ -14,22 +14,15 @@ conflated under one tau/latch:
      fooled by the "놓는 순간 flush" false positive: a single frame where the lid
      momentarily looks seated while the gripper is still there.
 
-Why they must differ (measured, see CALIBRATION_LOG.md): on the calibration
-corpus the single-frame boundary signal on the wide 3-cam concat CANNOT separate
-PLACE success from failure -- failures reach P(yes) as high as successes, so any
-tau/latch/hold on that signal yields precision ~0.22. Two calibrated changes fix
-the SUCCESS judge to precision 1.0 / recall 1.0 on the corpus:
+Why they must differ (measured, see CALIBRATION_LOG.md): on the balanced
+30-episode/skill corpus, the online transition latch cannot reach precision 0.9
+at useful recall. A separately calibrated completion checkpoint can do so for
+PLACE and MOVE because it judges the final observation/window.
 
-  * VIEW ROUTING: score a single camera view, not the diluted concat. PLACE's
-    "gripper released and clear" fact is cleanest from the right agentview
-    (place_clear@right rollout-AUC 1.0 vs 0.31 for the concat); GRASP's hold is
-    cleanest from the eye-in-hand view.
-  * EPISODE-LEVEL TEMPORAL AGGREGATION: the strict judge summarises P(yes) over
-    a window of the skill's final frames (mean over the whole executed segment
-    for the corpus operating point) rather than trusting one frame. This is the
-    "release 후 N프레임 관찰 -> 계속 seated + 그리퍼 후퇴 유지" requirement made
-    concrete: a transient flush at the release instant cannot raise the window
-    mean above threshold, but a genuinely-closed-and-cleared end state can.
+  * VIEW ROUTING: score a single camera view, not the diluted concat.
+  * ENDPOINT / TEMPORAL AGGREGATION: PLACE uses the final eye-in-hand frame;
+    GRASP uses a final 10-frame mean. These choices were selected from the same
+    question x view x aggregation sweep and are not shared with the online latch.
 
 The per-skill (view, question, aggregation, threshold) below are the operating
 points the offline sweep selected against the sim GT label. The sim GT is used
@@ -50,6 +43,12 @@ SUCCESS_QUESTIONS = {
         "These are camera views of a robot manipulation scene. Is the robot "
         "gripper firmly grasping and holding the blender lid, having lifted it "
         "clear off the counter? Answer yes or no."
+    ),
+    "PLACE_OBJECT_combined": (
+        "These are camera views of a robot manipulation scene showing a "
+        "blender. Has the blender lid been placed back on top of the blender "
+        "base so the blender is closed, AND has the robot gripper let go of the "
+        "lid and moved away from it? Answer yes or no."
     ),
     "PLACE_OBJECT_seated": (
         "These are camera views of a robot manipulation scene showing a "
@@ -96,31 +95,31 @@ class SuccessCriterion:
     note: str = ""
 
 
-# ---- calibrated operating points (offline sweep vs sim GT, corpus g10/p10) -- #
-# PLACE: clear@right episode-mean >= 0.75 is the clean separator (pos [0.78,0.97]
-#        vs neg max 0.73 -> AUC 1.0). seated@right episode-mean >= 0.50 is ANDed
-#        as a guard (pos >=0.52) so a cleared-but-not-seated end state (lid on
-#        the floor / knocked off) also fails. Together: precision 1.0 / recall
-#        1.0 on the 2-success / 8-failure corpus.
-# GRASP: eye-view hold episode-mean >= 0.50 gives precision 0.75 (the corpus is
-#        harder for grasp; kept as the best measured point, documented honestly).
+# ---- calibrated operating points (offline sweep, balanced 15+/15- per skill) -- #
+# PLACE: final combined@eye >= 0.8997285 -> precision .90 / recall .60.
+# GRASP: final-10 mean grasp@eye >= 0.4532653 is the best-F1 honest point ->
+#        precision .667 / recall .933. Precision .90 is unattainable at useful
+#        recall (the only >=.90 points recall <=.133), so do not claim otherwise.
 SUCCESS_CRITERIA = {
     "PLACE_OBJECT": SuccessCriterion(
         skill="PLACE_OBJECT",
         subs=[
-            SubQuestion(SUCCESS_QUESTIONS["PLACE_OBJECT_clear"], view="right", threshold=0.75),
-            SubQuestion(SUCCESS_QUESTIONS["PLACE_OBJECT_seated"], view="right", threshold=0.50),
+            SubQuestion(SUCCESS_QUESTIONS["PLACE_OBJECT_combined"],
+                        view="eye", threshold=0.899728536605835),
         ],
-        aggregate="mean",
+        aggregate="last_k_mean",
+        last_k=1,
         min_frames=5,
-        note="clear@right>=0.75 (AUC 1.0) AND seated@right>=0.50 guard; prec 1.0 rec 1.0",
+        note="balanced n=30: final combined@eye>=0.89973; precision .90 recall .60",
     ),
     "GRASP_OBJECT": SuccessCriterion(
         skill="GRASP_OBJECT",
-        subs=[SubQuestion(SUCCESS_QUESTIONS["GRASP_OBJECT"], view="eye", threshold=0.50)],
-        aggregate="mean",
-        min_frames=3,
-        note="eye-view hold mean >=0.50 (best measured, precision 0.75)",
+        subs=[SubQuestion(SUCCESS_QUESTIONS["GRASP_OBJECT"],
+                          view="eye", threshold=0.453265318274498)],
+        aggregate="last_k_mean",
+        last_k=10,
+        min_frames=5,
+        note="balanced n=30 best-F1: final10 grasp@eye>=0.45327; precision .667 recall .933",
     ),
     # MOVE has no strict success gate (it is a waypoint, not a task outcome).
 }
