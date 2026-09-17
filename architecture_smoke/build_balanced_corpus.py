@@ -12,6 +12,18 @@ import json
 from pathlib import Path
 
 
+def _has_proprio14(seed_dir, skill):
+    path = seed_dir / f"{skill}_steps.jsonl"
+    try:
+        for line in path.open():
+            row = json.loads(line)
+            if isinstance(row.get("proprio"), list) and len(row["proprio"]) == 14:
+                return True
+    except (OSError, json.JSONDecodeError):
+        pass
+    return False
+
+
 def build_balanced_corpus(source, dest, *, skills, positives=15, negatives=15):
     source, dest = Path(source).resolve(), Path(dest)
     rows = []
@@ -23,8 +35,9 @@ def build_balanced_corpus(source, dest, *, skills, positives=15, negatives=15):
 
     chosen = {}
     for skill in skills:
-        pos = [(s, d) for s, d, r in rows if r.get(skill, {}).get("success") is True]
-        neg = [(s, d) for s, d, r in rows if r.get(skill, {}).get("success") is False]
+        eligible = [(s, d, r) for s, d, r in rows if _has_proprio14(d, skill)]
+        pos = [(s, d) for s, d, r in eligible if r.get(skill, {}).get("success") is True]
+        neg = [(s, d) for s, d, r in eligible if r.get(skill, {}).get("success") is False]
         if len(pos) < positives:
             raise ValueError(f"{skill}: positive {len(pos)} < target {positives}")
         if len(neg) < negatives:
@@ -36,6 +49,7 @@ def build_balanced_corpus(source, dest, *, skills, positives=15, negatives=15):
         "source": str(source),
         "targets": {"positive": positives, "negative": negatives},
         "label_source": "results.json success (sim predicate GT; offline only)",
+        "eligibility": "every selected skill episode has per-step proprio[14]",
         "skills": {},
     }
     for skill, (pos, neg) in chosen.items():

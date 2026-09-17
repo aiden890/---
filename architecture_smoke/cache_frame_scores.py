@@ -226,6 +226,7 @@ def main():
             gt = gt_success_step(steps, success)
             step_by_frame = {fi: st for (st, fi) in frame_map}
             pred_by_step = {d["step"]: d.get("predicates", {}) for d in steps}
+            proprio_by_step = {d["step"]: d.get("proprio") for d in steps}
             official_by_step = {d["step"]: bool(d.get("official_success"))
                                 for d in steps}
 
@@ -249,7 +250,8 @@ def main():
                 keep["official_success"] = official_by_step.get(env_step, False)
                 frame_records.append({
                     "frame_index": fidx, "env_step": env_step,
-                    "scores": scores, "predicates_subset": keep,
+                    "scores": scores, "proprio": proprio_by_step.get(env_step),
+                    "predicates_subset": keep,
                 })
             rollouts_out.append({
                 "skill": skill, "seed": seed, "rollout": f"{skill}/{sd.name}",

@@ -120,27 +120,45 @@ def parse_views(text):
     return views
 
 
-def rule_episode_auc(rollouts, score_fn):
-    """Episode ROC AUC using the strongest frame score seen by the online judge."""
+def rule_frame_auc(rollouts, score_fn):
+    """Frame ROC AUC with sim GT used only as an offline temporal label.
+
+    Frames before ``gt_success_step`` are negatives even in an eventually
+    successful episode. This measures transition timing rather than merely
+    separating episodes that happened to end successfully.
+    """
     labels, scores = [], []
     for ro in rollouts:
-        vals = [score_fn(fr["scores"]) for fr in ro["frames"]]
-        vals = [v for v in vals if v is not None]
-        if vals:
-            labels.append(bool(ro["gt_success"]))
-            scores.append(max(vals))
+        success_step = ro.get("gt_success_step")
+        for fr in ro["frames"]:
+            score = score_fn(fr["scores"])
+            if score is None:
+                continue
+            labels.append(success_step is not None and fr["env_step"] >= success_step)
+            scores.append(score)
     return roc_auc_binary(labels, scores)
 
 
 def confusion(records):
-    tp = fp = fn = tn = 0
+    """Event-detection confusion, counting an early ADVANCE as FP *and* FN.
+
+    An early latch is unsafe and also consumes the one transition opportunity,
+    so it is both a false alarm and a missed valid boundary. Consequently event
+    counts can sum to more than the number of episodes; ``n`` remains episodes.
+    """
+    tp = fp = fn = tn = early_fp = 0
     offsets = []
     for r in records:
         gt, adv = r["gt_success"], r["advance_step"] is not None
         if gt and adv:
-            tp += 1
-            if r["gt_success_step"] is not None:
-                offsets.append(r["advance_step"] - r["gt_success_step"])
+            offset = r["advance_step"] - r["gt_success_step"]
+            if offset < 0:
+                fp += 1
+                fn += 1
+                early_fp += 1
+            else:
+                tp += 1
+                offsets.append(offset)
         elif not gt and adv:
             fp += 1
         elif gt and not adv:
@@ -152,6 +170,7 @@ def confusion(records):
     f1 = (2 * prec * rec / (prec + rec)) if (prec and rec) else None
     return {
         "n": len(records), "tp": tp, "fp": fp, "fn": fn, "tn": tn,
+        "early_fp": early_fp,
         "precision": prec, "recall": rec, "f1": f1,
         "mean_timing_offset": (sum(offsets) / len(offsets)) if offsets else None,
         "timing_offsets": offsets,
@@ -228,7 +247,7 @@ def main():
     views = parse_views(args.views)
     for skill, rollouts in by_skill.items():
         rules = candidate_rules(skill, views)
-        rule_auc = {name: rule_episode_auc(rollouts, fn)
+        rule_auc = {name: rule_frame_auc(rollouts, fn)
                     for name, fn in rules.items()}
         sweep = []
         for rname, rfn in rules.items():
@@ -238,8 +257,8 @@ def main():
                 sweep.append({
                     "rule": rname, "tau": tau, "hysteresis_k": k,
                     "hold_steps": hold, **{q: conf[q] for q in
-                        ("n", "tp", "fp", "fn", "tn", "precision", "recall",
-                         "f1", "mean_timing_offset")},
+                        ("n", "tp", "fp", "fn", "tn", "early_fp",
+                         "precision", "recall", "f1", "mean_timing_offset")},
                 })
         # pick best operating point: max recall subject to precision >= target
         target = args.place_precision_target if skill == "place" else 0.9

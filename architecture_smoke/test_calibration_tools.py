@@ -14,6 +14,31 @@ def test_binary_auc_handles_perfect_inverted_and_tied_scores():
     assert auc([False, True], [0.5, 0.5]) == 0.5
 
 
+def test_early_advance_is_false_positive_and_missed_transition():
+    records = [
+        {"gt_success": True, "gt_success_step": 10, "advance_step": 5},
+        {"gt_success": True, "gt_success_step": 10, "advance_step": 12},
+        {"gt_success": False, "gt_success_step": None, "advance_step": None},
+    ]
+    m = calibrate_obs_verifier.confusion(records)
+    assert (m["tp"], m["fp"], m["fn"], m["tn"], m["early_fp"]) == (1, 1, 1, 1, 1)
+    assert m["precision"] == 0.5
+    assert m["recall"] == 0.5
+
+
+def test_temporal_auc_labels_frames_before_success_as_negative():
+    rollout = {
+        "gt_success": True,
+        "gt_success_step": 10,
+        "frames": [
+            {"env_step": 5, "scores": {"q@right": 0.1}},
+            {"env_step": 10, "scores": {"q@right": 0.9}},
+        ],
+    }
+    fn = calibrate_obs_verifier.rule_single("q", view="right")
+    assert calibrate_obs_verifier.rule_frame_auc([rollout], fn) == 1.0
+
+
 def test_move_question_is_cached_for_move_rollouts():
     assert cache_frame_scores.SKILL_QUESTIONS["move_holding"] == ["move"]
     assert "above the blender" in cache_frame_scores.QUESTION_BANK["move"]

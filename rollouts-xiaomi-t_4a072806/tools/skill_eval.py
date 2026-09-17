@@ -268,7 +268,8 @@ def run_episode(sim, client, args, instruction, obs, horizon, success_fn, log_pa
             steps += 1
             for key, image in rollout.collect_images(obs).items():
                 image_queues[key].append(image)
-            state_queue.append(rollout.observation_to_state(obs))
+            state = rollout.observation_to_state(obs)
+            state_queue.append(state)
             p = sim.predicates()
             hold = hold + 1 if success_fn(p) else 0
             step_success = hold >= success_fn.hold
@@ -277,7 +278,8 @@ def run_episode(sim, client, args, instruction, obs, horizon, success_fn, log_pa
                 success = True  # latch: the skill succeeded at least once this episode
                 log.write(json.dumps({"type": "success", "step": steps, "success_step": steps}) + "\n")
             phase = "post_success" if success_step is not None else "pre_success"
-            rec = {"type": "step", "step": steps, "action": f(a), "predicates": p,
+            rec = {"type": "step", "step": steps, "action": f(a),
+                   "proprio": f(state), "predicates": p,
                    "official_success": bool(info.get("success", False)), "success_hold": hold,
                    "success_step": success_step, "phase": phase}
             log.write(json.dumps(rec) + "\n")
