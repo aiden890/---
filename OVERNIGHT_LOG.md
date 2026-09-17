@@ -60,3 +60,10 @@
 - post-step 안정: clip02 kl 0.18~0.37 ratio 0.89~1.19 dL2 0.011~0.028, clip03 kl 0.18~0.30 ratio 0.91~1.03 dL2 0.012~0.028. grad_norm 높으나(1128~4160) dL2로 실제 이동 절제(exp2 동일). 발산 없음.
 - GATED 비율(조기, band 워밍): clip02 9/15=60%, clip03 6/12=50%. exp2 후반 38%보다 높으나 초반 소표본 → 후반 재판정 필요.
 - 조치: 없음(정상 진행, 개입=페어드 비교 파괴). 남은 ~16·19 iter → EVAL(after)+heldout → finisher가 ADAPTIVE_FINAL_exp3_clip_ladder.md 자동집계. 다음 cron서 exp3 DONE 시 before/after delta로 clip별 개선 정직 판정. 조기신호상 개선 미확인.
+
+## 11:26 KST — exp3 clip-ladder 마무리 진행중, 막힘 없음 (조치 없음)
+- v4 `adaptive_adamw3e5_clip02`(clip 0.2) it=28/30, amp_csi `adaptive_adamw3e5_clip03`(clip 0.3) it=24/30. 양쪽 trainer+client 살아있음(v4 pid2008472 trainer/2008759 client/2012299 finisher, amp 컨테이너 Up 2h). GPU v4 13.0G/5%, amp 11.9G/10%. OOM/RPC drop/traceback 0(grep 클린). xiaomi-server 없음.
+- **GATED 비율(1차목표): 양쪽 baseline(68%) 대비 크게 하락 유지** — clip02 11/29=38%, clip03 8/25=32%. adaptive curriculum이 band 워밍 후 mixed(신호있는) seed를 실제로 우선 뽑고 있음. 1차목표(GATED 감소)는 성립.
+- **on-seed n_succ는 여전히 대체로 flat(정직)**: clip02 s1092(3,4,2,3,3,5,5) s1175(3,2,6) s1181(6,5,7) — 후반 미약한 상승 있으나 std 내 노이즈 수준; clip03 s1050(2,1,2,6,4,3,2) s1175(5,2) s1181(4,6) 추세 무. clip 완화가 learning-efficacy를 뚜렷이 살리진 못함(exp2·exp3 초기 진단과 일치).
+- EVAL(before) 양쪽 grasp=0.55 동일(official clip02=0.15 / clip03=0.20). after-eval는 run-end에 실행 — 아직 미실행이라 delta 판정 불가(2차목표 유보).
+- 조치: 없음(정상 진행 + 페어드 비교 보존). 남은 clip02 ~2iter, clip03 ~6iter → after-eval+heldout → finisher가 ADAPTIVE_FINAL_exp3_clip_ladder.md 자동집계. 다음 cron서 exp3 DONE 시 clip별 before/after delta로 정직 판정.
