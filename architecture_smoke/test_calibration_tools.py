@@ -1,6 +1,7 @@
 """Tests for data-driven multi-skill calibration tooling."""
 import cache_frame_scores
 import calibrate_obs_verifier
+from obs_verifier import SKILL_QUESTIONS as RUNTIME_SKILL_QUESTIONS
 
 
 def test_view_argument_is_parsed_as_names_not_characters():
@@ -41,7 +42,7 @@ def test_temporal_auc_labels_frames_before_success_as_negative():
 
 def test_move_question_is_cached_for_move_rollouts():
     assert cache_frame_scores.SKILL_QUESTIONS["move_holding"] == ["move"]
-    assert "above the blender" in cache_frame_scores.QUESTION_BANK["move"]
+    assert cache_frame_scores.QUESTION_BANK["move"] == RUNTIME_SKILL_QUESTIONS["MOVE_OBJECT"]
 
 
 def test_candidate_rules_cover_every_requested_view_for_move():

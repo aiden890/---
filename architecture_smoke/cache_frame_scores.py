@@ -60,8 +60,8 @@ QUESTION_BANK = {
     # ---- move: grasped lid is held above the target, ready to place ----
     "move": (
         "These are camera views of a robot manipulation scene. Is the robot "
-        "still holding the blender lid above the blender base, positioned and "
-        "ready to place it down? Answer yes or no."
+        "holding the blender lid directly above the blender base, positioned "
+        "and ready to place it down? Answer yes or no."
     ),
     # ---- place: original single combined question (baseline for before/after) ----
     "place_combined": (
