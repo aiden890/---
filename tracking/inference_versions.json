@@ -1,53 +1,53 @@
 {
-  "note": "인퍼런스 영상 버전 목록. VLM(Qwen3-VL) 기반 verifier로 판정한 인퍼런스 영상만 등록한다. sim-predicate verify 버전은 사용하지 않음(operator 결정 2026-09-16). 새 버전은 여기에 항목 추가 시 드롭다운에 자동 노출. video 경로는 tracking/ 기준 상대경로.",
+  "note": "인퍼런스 영상 버전 목록. VLM(Qwen3-VL) 기반 verifier로 판정한 인퍼런스 영상만 등록한다. sim-predicate verify 버전은 사용하지 않음(operator 결정 2026-09-16). 새 버전은 여기에 항목 추가 시 드롭다운에 자동 노출. video 경로는 tracking/ 기준 상대경로. v2(2026-09-17, t_897ecaee): 개선된 SuccessGate(경계/성공 분리 + PLACE 뷰라우팅+시간집계) 반영. 오버레이가 [1]경계판정(ADVANCE/latch)과 [2]성공판정(SuccessGate strict)을 분리 표시하고 sim GT를 병기 → PLACE false-positive가 눈으로 잡힘. 구버전(single-frame verifier) 6개는 이 v2 6개로 교체.",
   "versions": [
     {
-      "id": "base-vlm-verify-seed0",
-      "label": "학습 전 base · VLM verify · seed0 (GRASP 0.69✓ · MOVE 0.91✓ · PLACE 0.96✓)",
+      "id": "base-vlm-verify-v2-seed0",
+      "label": "base · VLM verify v2 · seed0 (PLACE 경계ADVANCE but 성공FAIL → false-pos 잡힘, strict==sim)",
       "stage": "pre-training",
       "date": "2026-09-17",
-      "desc": "학습 전 base 정책 CloseBlenderLid 인퍼런스 (seed 0). 스킬 종료 판정=정책 자신의 frozen Qwen3-VL VQA P(yes) (obs-only: 3-cam+14D proprio, 특권 predicate 미사용), proprio 이벤트 게이트+hysteresis latch(tau=0.6, 2연속). VLM 판정: GRASP 0.69✓ · MOVE 0.91✓ · PLACE 0.96✓. 공식 task predicate success=False (base 미학습이라 실제 뚜껑 안착은 미완). 주의: PLACE는 단일프레임 VQA로 낮은 신뢰(과거 검증 AUC~0.75, false pos/neg 가능).",
-      "video": "media/inference/base_vlm_verify_seed0.mp4"
+      "desc": "학습 전 base 정책 CloseBlenderLid 인퍼런스 (seed 0), 개선 SuccessGate 반영(t_897ecaee). 오버레이 이중 판정: [1] 경계판정 = ObsVLMVerifier latch(빠른 online, ADVANCE/CONTINUE) → PLACE ADVANCE(P(yes)=0.96). [2] 성공판정 = SuccessGate strict(뷰라우팅 right-cam + 에피소드 시간집계, obs-only) → FAIL (clear@right=0.69<0.75, seated@right=0.54). 즉 '경계는 ADVANCE했지만 성공판정은 FAIL' = PLACE false-positive를 정확히 잡음. sim GT(offline label): task_success=False → strict==sim (obs 성공판정이 GT와 일치). GRASP는 strict PASS(eye=0.66). obs-only 무결성 유지: sim GT는 표시/캘리브레이션만, 판정엔 미사용.",
+      "video": "media/inference/base_vlm_verify_v2_seed0.mp4"
     },
     {
-      "id": "base-vlm-verify-seed1",
-      "label": "학습 전 base · VLM verify · seed1 (GRASP 0.61✓ · MOVE 0.65✓ · PLACE 0.88✓)",
+      "id": "base-vlm-verify-v2-seed1",
+      "label": "base · VLM verify v2 · seed1 (PLACE 경계ADVANCE but 성공FAIL 0.16/0.21 → 명확히 잡힘, strict==sim)",
       "stage": "pre-training",
       "date": "2026-09-17",
-      "desc": "학습 전 base 정책 CloseBlenderLid 인퍼런스 (seed 1). 스킬 종료 판정=정책 자신의 frozen Qwen3-VL VQA P(yes) (obs-only: 3-cam+14D proprio, 특권 predicate 미사용), proprio 이벤트 게이트+hysteresis latch(tau=0.6, 2연속). VLM 판정: GRASP 0.61✓ · MOVE 0.65✓ · PLACE 0.88✓. 공식 task predicate success=False (base 미학습이라 실제 뚜껑 안착은 미완). 주의: PLACE는 단일프레임 VQA로 낮은 신뢰(과거 검증 AUC~0.75, false pos/neg 가능).",
-      "video": "media/inference/base_vlm_verify_seed1.mp4"
+      "desc": "학습 전 base 정책 CloseBlenderLid 인퍼런스 (seed 1), 개선 SuccessGate 반영. [1] 경계판정: GRASP는 1차 timeout 후 재시도 SUCCESS, PLACE ADVANCE. [2] 성공판정 strict: PLACE FAIL (clear@right=0.16<0.75, seated@right=0.21) — 뚜껑이 실제로 안 닫힌 상태를 낮은 P(yes)로 명확히 FAIL 판정. sim GT: task_success=False → strict==sim 일치. 경계 latch가 순간적으로 ADVANCE해도 성공판정이 최종적으로 실패를 잡아내는 사례.",
+      "video": "media/inference/base_vlm_verify_v2_seed1.mp4"
     },
     {
-      "id": "base-vlm-verify-seed2",
-      "label": "학습 전 base · VLM verify · seed2 (GRASP 0.95✓ · MOVE 0.79✓ · PLACE 0.74✓)",
+      "id": "base-vlm-verify-v2-seed2",
+      "label": "base · VLM verify v2 · seed2 (PLACE 경계ADVANCE but 성공FAIL, seated guard가 잡음, strict==sim)",
       "stage": "pre-training",
       "date": "2026-09-17",
-      "desc": "학습 전 base 정책 CloseBlenderLid 인퍼런스 (seed 2). 스킬 종료 판정=정책 자신의 frozen Qwen3-VL VQA P(yes) (obs-only: 3-cam+14D proprio, 특권 predicate 미사용), proprio 이벤트 게이트+hysteresis latch(tau=0.6, 2연속). VLM 판정: GRASP 0.95✓ · MOVE 0.79✓ · PLACE 0.74✓. 공식 task predicate success=False (base 미학습이라 실제 뚜껑 안착은 미완). 주의: PLACE는 단일프레임 VQA로 낮은 신뢰(과거 검증 AUC~0.75, false pos/neg 가능).",
-      "video": "media/inference/base_vlm_verify_seed2.mp4"
+      "desc": "학습 전 base 정책 CloseBlenderLid 인퍼런스 (seed 2), 개선 SuccessGate 반영. [1] 경계판정: PLACE ADVANCE(P(yes)=0.83). [2] 성공판정 strict: PLACE FAIL — clear@right=0.85(>=0.75 통과)이지만 seated@right=0.46<0.50 guard에서 FAIL. 그리퍼는 비켰지만 뚜껑이 제대로 안착되지 않은(치워졌거나 어긋난) 상태를 seated guard가 정확히 걸러냄. sim GT: task_success=False → strict==sim 일치. AND 결합(clear AND seated)이 왜 필요한지 보여주는 케이스.",
+      "video": "media/inference/base_vlm_verify_v2_seed2.mp4"
     },
     {
-      "id": "base-vlm-verify-seed3",
-      "label": "학습 전 base · VLM verify · seed3 (GRASP 0.67✓ · MOVE 0.67✓ · PLACE 0.66✓)",
+      "id": "base-vlm-verify-v2-seed3",
+      "label": "base · VLM verify v2 · seed3 (PLACE 경계ADVANCE but 성공FAIL 0.42/0.35 → 잡힘, strict==sim)",
       "stage": "pre-training",
       "date": "2026-09-17",
-      "desc": "학습 전 base 정책 CloseBlenderLid 인퍼런스 (seed 3). 스킬 종료 판정=정책 자신의 frozen Qwen3-VL VQA P(yes) (obs-only: 3-cam+14D proprio, 특권 predicate 미사용), proprio 이벤트 게이트+hysteresis latch(tau=0.6, 2연속). VLM 판정: GRASP 0.67✓ · MOVE 0.67✓ · PLACE 0.66✓. 공식 task predicate success=False (base 미학습이라 실제 뚜껑 안착은 미완). 주의: PLACE는 단일프레임 VQA로 낮은 신뢰(과거 검증 AUC~0.75, false pos/neg 가능).",
-      "video": "media/inference/base_vlm_verify_seed3.mp4"
+      "desc": "학습 전 base 정책 CloseBlenderLid 인퍼런스 (seed 3), 개선 SuccessGate 반영. [1] 경계판정: PLACE ADVANCE(P(yes)=0.72). [2] 성공판정 strict: PLACE FAIL (clear@right=0.42<0.75, seated@right=0.35<0.50). sim GT: task_success=False → strict==sim 일치. 경계 latch가 애매한 신호로 ADVANCE했지만 시간집계 성공판정이 실패로 확정.",
+      "video": "media/inference/base_vlm_verify_v2_seed3.mp4"
     },
     {
-      "id": "base-vlm-verify-seed4",
-      "label": "학습 전 base · VLM verify · seed4 (GRASP 0.75✓ · MOVE 0.61✓ · PLACE 0.60✓)",
+      "id": "base-vlm-verify-v2-seed4",
+      "label": "base · VLM verify v2 · seed4 (PLACE 성공판정 PASS but sim=False → strict!=sim 불일치, 정직 표기)",
       "stage": "pre-training",
       "date": "2026-09-17",
-      "desc": "학습 전 base 정책 CloseBlenderLid 인퍼런스 (seed 4). 스킬 종료 판정=정책 자신의 frozen Qwen3-VL VQA P(yes) (obs-only: 3-cam+14D proprio, 특권 predicate 미사용), proprio 이벤트 게이트+hysteresis latch(tau=0.6, 2연속). VLM 판정: GRASP 0.75✓ · MOVE 0.61✓ · PLACE 0.60✓. 공식 task predicate success=False (base 미학습이라 실제 뚜껑 안착은 미완). 주의: PLACE는 단일프레임 VQA로 낮은 신뢰(과거 검증 AUC~0.75, false pos/neg 가능).",
-      "video": "media/inference/base_vlm_verify_seed4.mp4"
+      "desc": "학습 전 base 정책 CloseBlenderLid 인퍼런스 (seed 4), 개선 SuccessGate 반영. [1] 경계판정: PLACE ADVANCE(P(yes)=0.70). [2] 성공판정 strict: PLACE PASS (clear@right=0.96>=0.75, seated@right=0.89>=0.50) — 두 서브팩트 모두 높게 통과. 그러나 sim GT: task_success=False → strict!=sim (불일치). 즉 obs 성공판정이 성공으로 봤지만 공식 predicate는 실패인 잔여 false-positive 1건. 성공 포장 금지 원칙에 따라 오버레이에 'strict!=sim (disagree)'로 정직 표기. 단일프레임이 아닌 뷰라우팅+시간집계로도 caliration corpus(PLACE positive 2개)의 한계상 완벽하지 않음을 그대로 보여주는 케이스(6개 중 1개).",
+      "video": "media/inference/base_vlm_verify_v2_seed4.mp4"
     },
     {
-      "id": "base-vlm-verify-seed5",
-      "label": "학습 전 base · VLM verify · seed5 (GRASP 0.65✓ · MOVE 0.73✓ · PLACE TIMEOUT · PLACE TIMEOUT)",
+      "id": "base-vlm-verify-v2-seed5",
+      "label": "base · VLM verify v2 · seed5 (PLACE 경계ADVANCE but 성공FAIL, clear 경계선서 잡힘, strict==sim)",
       "stage": "pre-training",
       "date": "2026-09-17",
-      "desc": "학습 전 base 정책 CloseBlenderLid 인퍼런스 (seed 5). 스킬 종료 판정=정책 자신의 frozen Qwen3-VL VQA P(yes) (obs-only: 3-cam+14D proprio, 특권 predicate 미사용), proprio 이벤트 게이트+hysteresis latch(tau=0.6, 2연속). VLM 판정: GRASP 0.65✓ · MOVE 0.73✓ · PLACE TIMEOUT · PLACE TIMEOUT. 공식 task predicate success=False (base 미학습이라 실제 뚜껑 안착은 미완). PLACE는 단일프레임 VQA가 latch 실패→timeout(step budget 소진). 단일프레임 PLACE 판별 약함(신뢰 낮음).",
-      "video": "media/inference/base_vlm_verify_seed5.mp4"
+      "desc": "학습 전 base 정책 CloseBlenderLid 인퍼런스 (seed 5), 개선 SuccessGate 반영. [1] 경계판정: PLACE ADVANCE(P(yes)=0.77). [2] 성공판정 strict: PLACE FAIL — clear@right=0.66<0.75(경계선 아래)에서 FAIL, seated@right=0.75는 통과했으나 AND 결합이라 전체 FAIL. sim GT: task_success=False → strict==sim 일치. GRASP는 strict PASS(eye=0.55). clear threshold(0.75)가 그리퍼가 완전히 비켜나지 않은 상태를 거르는 역할을 보여줌.",
+      "video": "media/inference/base_vlm_verify_v2_seed5.mp4"
     }
   ]
 }

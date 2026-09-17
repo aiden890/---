@@ -67,3 +67,8 @@
 - **on-seed n_succ는 여전히 대체로 flat(정직)**: clip02 s1092(3,4,2,3,3,5,5) s1175(3,2,6) s1181(6,5,7) — 후반 미약한 상승 있으나 std 내 노이즈 수준; clip03 s1050(2,1,2,6,4,3,2) s1175(5,2) s1181(4,6) 추세 무. clip 완화가 learning-efficacy를 뚜렷이 살리진 못함(exp2·exp3 초기 진단과 일치).
 - EVAL(before) 양쪽 grasp=0.55 동일(official clip02=0.15 / clip03=0.20). after-eval는 run-end에 실행 — 아직 미실행이라 delta 판정 불가(2차목표 유보).
 - 조치: 없음(정상 진행 + 페어드 비교 보존). 남은 clip02 ~2iter, clip03 ~6iter → after-eval+heldout → finisher가 ADAPTIVE_FINAL_exp3_clip_ladder.md 자동집계. 다음 cron서 exp3 DONE 시 clip별 before/after delta로 정직 판정.
+
+## 12:35 KST — exp3 clip-ladder DONE(가설 기각) → exp4 uepochs-ladder 착수
+- **exp3 최종(양쪽 정상종료)**: clip02(v4,clip0.2) grasp 0.55→0.60, official 0.15→**0.05**(regress), heldout 0.55/0.05. clip03(amp,clip0.3) grasp 0.55→0.55, official 0.20→**0.05**(regress), heldout 0.55/0.10. → clip 완화는 clip_fraction 낮췄으나(메커니즘 성립) grasp 학습 못 살림. LR·clip 등 update-magnitude 레버 3연속(exp1/2/3) null/regress.
+- **조치(단일변수)**: exp1-3 전부 --update-epochs 1(롤아웃당 grad step 1회)로 돌아 under-optimization 미검증. trainer_server에 멀티에폭 PPO(old_logp캐시+clip/KL guard) 구현돼 있으나 미사용, env비용 0. adaptive_sweep.sh에 update-epochs 5번째 위치인자로 파라미터화, deploy+commit(ae6befc). exp4 페어드 착수: AdamW3e-5/clip0.2 고정, uepochs만 변수 — v4 ue4(=4) + amp ue8(=8), seed 12345.
+- **막힘 자동복구**: amp_csi 1차착수 cuDNN INTERNAL_ERROR로 rc=1(exp3 종료 프로세스가 GPU 11.6G 잔여경합). trainer-stop→GPU clean(38MiB)→재시도 정상. 현재 양쪽 eval_before 진행, GPU~13G, 에러0. 다음 cron서 uepochs별 before/after delta 판정.
