@@ -2,7 +2,7 @@
 
 Training counterpart of the env card's inference server (rl_server.py). Holds ONE
 resident model, freezes the VLM backbone AND the DiT body/projectors, and trains only
-PER-SKILL LoRA adapters (src/lora.py) injected into each DiT attention layer, plus an
+PER-SKILL LoRA adapters (src/lora.py) injected into configured action-expert Linear layers, plus an
 optional per-skill termination head. This is the operator's per-skill-adapter direction
 and -- per the research brief (rl_finetune_brief.md: Flow-GRPO/ReinFlow/piRL/CORAL) --
 the memory-safe choice: LoRA optimizer state is a few M params, so AdamW fits (the
@@ -25,8 +25,10 @@ adapter, backprops the GRPO loss, steps, clears the store.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import math
 import pickle
+import random
 import socket
 import struct
 import sys
@@ -49,9 +51,16 @@ from pirl_flow_sde import (  # noqa: E402
     pirl_step_mean_std,
 )
 from lora import (  # noqa: E402
-    SKILLS, inject_per_skill_lora, set_active_skill, lora_parameters, select_trainable,
+    SKILLS, inject_per_skill_lora, load_lora_state_dict, lora_state_dict,
+    set_active_skill, lora_parameters, select_trainable,
 )
-import vlm_scorer  # noqa: E402  (env card: single source of truth for the VQA prompt+math)
+from training_correctness import (  # noqa: E402
+    guarded_ratio, mean_loss_scale, validate_optimizer_config,
+    verify_deployment_manifest, should_stop_for_kl,
+)
+from checkpoint_schema import (  # noqa: E402
+    build_checkpoint_metadata, validate_checkpoint_metadata,
+)
 
 # Goal-3 SFT sends DATASET skill names; map them to the per-skill LoRA keys used by
 # inject_per_skill_lora (grasp/move_holding/place) -- same roles the GRPO loop's
@@ -106,14 +115,25 @@ class GRPOTrainerServer:
             if isinstance(m, torch.nn.Dropout):
                 m.eval()
         self.dropout_report = assert_no_active_dropout(self.model)
-        targets = tuple(t.strip() for t in a.lora_targets.split(","))
-        self.wrappers = inject_per_skill_lora(self.model, skills=SKILLS, rank=a.rank,
+        targets = tuple(t.strip() for t in a.lora_targets.split(",") if t.strip())
+        adapter_skills = tuple(s.strip() for s in a.adapter_skills.split(",") if s.strip())
+        if not adapter_skills or len(set(adapter_skills)) != len(adapter_skills):
+            raise ValueError(f"--adapter-skills must be non-empty and unique: {adapter_skills}")
+        unknown_skills = sorted(set(adapter_skills) - set(SKILLS))
+        if unknown_skills:
+            raise ValueError(f"unknown --adapter-skills: {unknown_skills}")
+        self.adapter_skills = adapter_skills
+        self.wrappers = inject_per_skill_lora(self.model, skills=adapter_skills, rank=a.rank,
                                               alpha=a.alpha, targets=targets)
+        if not self.wrappers:
+            raise RuntimeError(f"LoRA target selection matched no Linear modules: {targets}")
+        self.lora_target_modules = [w.target_name for w in self.wrappers]
         n_train, groups = select_trainable(self.model, self.wrappers, a.train_mode)
         self.trainable_params = [p for p in self.model.parameters() if p.requires_grad]
         print(f"train_mode={a.train_mode} | per-skill LoRA rank={a.rank} into DiT {targets} | "
               f"trainable={n_train/1e6:.2f}M groups={groups} "
-              f"({len(self.wrappers)} wrapped x {len(SKILLS)} skills)", flush=True)
+              f"({len(self.wrappers)} wrapped x {len(adapter_skills)} skills)", flush=True)
+        print("LoRA target modules:\n  " + "\n  ".join(self.lora_target_modules), flush=True)
         # Arm B (adapter_plus_expert): the action-expert projections are pretrained weights,
         # not zero-init LoRA, so they need a MUCH lower lr than the LoRA to avoid overwriting
         # base competence. Split into two param groups (LoRA at --lr, expert/vlm at --expert-lr).
@@ -130,7 +150,7 @@ class GRPOTrainerServer:
         if a.optimizer == "sgd":
             self.opt = torch.optim.SGD(param_groups, lr=a.lr, momentum=0.0)
         elif a.optimizer == "adamw":
-            self.opt = torch.optim.AdamW(param_groups, lr=a.lr)
+            self.opt = torch.optim.AdamW(param_groups, lr=a.lr, weight_decay=a.weight_decay)
         else:
             raise ValueError(a.optimizer)
         self.store: dict = {}
@@ -289,7 +309,7 @@ class GRPOTrainerServer:
         THIS pass measures how far the updated policy actually moved off the rollout policy.
         """
         import numpy as _np
-        ratios = []; kl_sum = 0.0; n_clipped = 0; n_chunks = 0; n_nonfinite = 0
+        ratios = []; kl_sum = 0.0; n_clipped = 0; n_chunks = 0; n_nonfinite = 0; n_dropped = 0
         with torch.no_grad():
             for traj_id, chunks, adv in active:
                 for chunk in chunks:
@@ -299,10 +319,12 @@ class GRPOTrainerServer:
                     if not torch.isfinite(logratio):
                         n_nonfinite += 1
                         continue
-                    logratio_c = torch.clamp(logratio, math.log(1.0 / ratio_max), math.log(ratio_max))
-                    ratio = float(torch.exp(logratio_c).detach().cpu())
-                    lr_c = float(logratio_c.detach().cpu())
-                    kl_sum += (math.exp(lr_c) - 1.0) - lr_c
+                    raw = float(logratio.detach().cpu())
+                    ratio = guarded_ratio(raw, ratio_max)
+                    if ratio is None:
+                        n_dropped += 1
+                        continue
+                    kl_sum += (math.exp(raw) - 1.0) - raw
                     ratios.append(ratio)
                     if abs(ratio - 1.0) > clip:
                         n_clipped += 1
@@ -318,6 +340,7 @@ class GRPOTrainerServer:
             "post_step_mean_kl": (kl_sum / n_chunks if n_chunks else None),
             "post_step_ess": ess, "post_step_n_chunks": n_chunks,
             "post_step_n_nonfinite": n_nonfinite,
+            "post_step_n_dropped": n_dropped,
         }
 
     def op_config(self, req):
@@ -331,11 +354,22 @@ class GRPOTrainerServer:
         for g in self.opt.param_groups:
             opt_groups.append({"lr": g.get("lr"), "weight_decay": g.get("weight_decay"),
                                "n_params": sum(p.numel() for p in g["params"])})
+        total_params = sum(p.numel() for p in self.model.parameters())
         return {"config": cfg, "trainable_params": int(n_train),
+                "total_model_params": int(total_params),
+                "trainable_fraction": float(n_train / total_params),
+                "lora_target_modules": self.lora_target_modules,
                 "optimizer": type(self.opt).__name__, "optimizer_groups": opt_groups,
                 "code_rev": req.get("code_rev"), "dropout_report": self.dropout_report}
 
     def op_update(self, req):
+        """Update atomically with respect to the rollout store, including failures."""
+        try:
+            return self._op_update_impl(req)
+        finally:
+            self.store.clear()
+
+    def _op_update_impl(self, req):
         advantages = req["advantages"]           # {traj_id: advantage float}
         clip = float(req.get("clip", self.a.clip))
         kl_coef = float(req.get("kl_coef", self.a.kl_coef))
@@ -347,6 +381,7 @@ class GRPOTrainerServer:
         # epochs move ratio away from 1 and exercise the clip/KL. update_epochs=1 keeps the
         # legacy single-step group-relative REINFORCE behaviour.
         update_epochs = int(req.get("update_epochs", self.a.update_epochs))
+        target_kl = req.get("target_kl", self.a.target_kl)
         assert_no_active_dropout(self.model)  # AUDIT FIX #5: no stochastic dropout in recompute
         torch.cuda.reset_peak_memory_stats()
 
@@ -372,15 +407,13 @@ class GRPOTrainerServer:
                     if not torch.isfinite(logratio):
                         n_nonfinite += 1
                         continue
-                    # AUDIT FIX #6: clamp the log-ratio BEFORE exp so a large excursion cannot
-                    # overflow to inf; the ratio-explosion guard then drops the sample.
-                    logratio_c = torch.clamp(logratio, math.log(1.0 / ratio_max), math.log(ratio_max))
-                    ratio = torch.exp(logratio_c)
-                    if not torch.isfinite(ratio) or float(ratio) > ratio_max or float(ratio) < 1.0 / ratio_max:
+                    raw_logratio = float(logratio.detach().cpu())
+                    if guarded_ratio(raw_logratio, ratio_max) is None:
                         n_dropped += 1
                         continue
+                    ratio = torch.exp(logratio)
                     pg = -torch.min(ratio * adv_t, torch.clamp(ratio, 1 - clip, 1 + clip) * adv_t)
-                    kl = (torch.exp(logratio_c) - 1.0) - logratio_c   # KL(new||old) approx
+                    kl = (torch.exp(logratio) - 1.0) - logratio   # KL(new||old) approx
                     loss = pg + kl_coef * kl
                     loss.backward()
                     total_loss += float(pg.detach().cpu())
@@ -391,7 +424,16 @@ class GRPOTrainerServer:
                         n_clipped += 1
                     n_chunks += 1
             gn = 0.0
-            if n_chunks > 0:
+            mean_kl_pre = kl_sum / max(n_chunks, 1)
+            stop_for_kl = should_stop_for_kl(epoch, mean_kl_pre, target_kl)
+            if n_chunks > 0 and not stop_for_kl:
+                # Chunk-wise backward above accumulates a SUM. Divide gradients before
+                # clipping/step so the optimizer sees the mean over valid active chunks.
+                scale = mean_loss_scale(n_chunks)
+                with torch.no_grad():
+                    for p in self.trainable_params:
+                        if p.grad is not None:
+                            p.grad.mul_(scale)
                 gn = float(torch.nn.utils.clip_grad_norm_(self.trainable_params, max_norm=self.a.grad_clip))
                 self.opt.step()
             # ESS-like weight diagnostic: (sum w)^2 / sum(w^2), normalized to [0,1]
@@ -407,8 +449,12 @@ class GRPOTrainerServer:
                 "mean_abs_logratio": (sum(abs(x) for x in logratios) / len(logratios) if logratios else 0.0),
                 "clip_fraction": (n_clipped / n_chunks if n_chunks else 0.0),
                 "mean_kl": kl_sum / max(n_chunks, 1), "grad_norm": gn, "ess": ess,
+                "early_stop_target_kl": stop_for_kl,
             })
             grad_norm = gn; n_chunks_last = n_chunks
+            if stop_for_kl:
+                self.opt.zero_grad(set_to_none=True)
+                break
         # measurement fix: adapter-parameter delta from this update (L2 + Linf over trainables)
         adapter_after = self._adapter_vector()
         with torch.no_grad():
@@ -419,11 +465,12 @@ class GRPOTrainerServer:
         # measurement fix: recompute ratio/KL/clip/ESS AFTER the optimizer step (real
         # update-strength diagnostic, unlike the pre-step epoch-0 correctness probe).
         post = self._post_step_diagnostics(active, clip, ratio_max)
-        self.store.clear()
         first, last = epoch_stats[0], epoch_stats[-1]
         out = {"loss": last["loss"], "n_chunks": n_chunks_last, "n_dropped": last["n_dropped"],
                 "grad_norm": grad_norm, "mean_ratio": last["mean_ratio"], "mean_kl": last["mean_kl"],
                 "update_epochs": update_epochs, "epoch0_mean_ratio": first["mean_ratio"],
+                "epochs_completed": len(epoch_stats),
+                "early_stopped_target_kl": bool(epoch_stats[-1]["early_stop_target_kl"]),
                 "epochLast_mean_ratio": last["mean_ratio"], "epochLast_clip_fraction": last["clip_fraction"],
                 "epoch_stats": epoch_stats,
                 "adapter_delta_l2": adapter_delta_l2, "adapter_delta_linf": adapter_delta_linf,
@@ -434,11 +481,7 @@ class GRPOTrainerServer:
 
     def op_save(self, req):
         path = Path(req["path"]); path.parent.mkdir(parents=True, exist_ok=True)
-        sd = {}
-        for i, w in enumerate(self.wrappers):
-            for s in w.skills:
-                sd[f"w{i}.lora_A.{s}"] = w.lora_A[s].detach().cpu()
-                sd[f"w{i}.lora_B.{s}"] = w.lora_B[s].detach().cpu()
+        sd = lora_state_dict(self.wrappers)
         # arms B/C also open non-LoRA params (action expert / vlm slice): save those too
         extra = {n: p.detach().cpu() for n, p in self.model.named_parameters()
                  if p.requires_grad and ".lora_" not in n}
@@ -447,6 +490,7 @@ class GRPOTrainerServer:
         rng = {
             "torch": torch.get_rng_state(),
             "cuda": (torch.cuda.get_rng_state_all() if torch.cuda.is_available() else None),
+            "python": random.getstate(),
         }
         try:
             import numpy as _np
@@ -460,39 +504,56 @@ class GRPOTrainerServer:
             "model_rev": req.get("model_rev"),          # pinned XiaomiRobotics rev (from client)
             "train_meta": req.get("train_meta"),        # skill/arm/epochs/steps
         }
+        metadata = build_checkpoint_metadata(
+            adapter_skills=self.adapter_skills, targets=self.lora_target_modules,
+            rank=self.a.rank, alpha=self.a.alpha, base_model=self.a.model,
+            sampler=self.a.sampler, config=vars(self.a),
+            source_commit=self.a.source_commit,
+            source_manifest_sha256=self.a.source_manifest_sha256,
+            update_index=int(req.get("update_index", 0)),
+        )
         torch.save({"lora": sd, "extra_trainable": extra, "config": vars(self.a),
                     "optimizer": self.opt.state_dict(), "rng": rng,
-                    "provenance": provenance}, path)
+                    "provenance": provenance, "metadata": metadata}, path)
         return {"saved": str(path), "n_lora": len(sd), "n_extra": len(extra),
-                "has_optimizer": True, "has_rng": True,
+                "has_optimizer": True, "has_rng": True, "metadata": metadata,
                 "data_hash": provenance["data_hash"], "model_rev": provenance["model_rev"]}
 
     def op_load(self, req):
         blob = torch.load(req["path"], map_location=self.model.device)
+        validate_checkpoint_metadata(
+            blob.get("metadata"), adapter_skills=self.adapter_skills,
+            targets=self.lora_target_modules, rank=self.a.rank, alpha=self.a.alpha)
         sd = blob["lora"]
         with torch.no_grad():
-            for i, w in enumerate(self.wrappers):
-                for s in w.skills:
-                    w.lora_A[s].copy_(sd[f"w{i}.lora_A.{s}"].to(w.lora_A[s].dtype))
-                    w.lora_B[s].copy_(sd[f"w{i}.lora_B.{s}"].to(w.lora_B[s].dtype))
-            # AUDIT FIX #2: also restore the non-LoRA trainable slice (arms B/C open the
-            # action-expert projections and a VLM slice via extra_trainable). Without this
-            # a saved ARM B/C checkpoint loads only its LoRA and silently reverts the
-            # expert/VLM weights to pretrained -> a post-hoc eval measures the wrong model.
+            load_lora_state_dict(self.wrappers, sd)
             extra = blob.get("extra_trainable", {}) or {}
             named = dict(self.model.named_parameters())
-            n_extra = 0
-            missing = []
+            expected_extra = {n for n, p in self.model.named_parameters()
+                              if p.requires_grad and ".lora_" not in n}
+            if set(extra) != expected_extra:
+                raise RuntimeError(
+                    f"extra_trainable layout mismatch: "
+                    f"missing={sorted(expected_extra-set(extra))[:3]} "
+                    f"unexpected={sorted(set(extra)-expected_extra)[:3]}")
             for name, tensor in extra.items():
-                if name in named:
-                    named[name].copy_(tensor.to(named[name].dtype))
-                    n_extra += 1
-                else:
-                    missing.append(name)
-            if missing:
-                raise RuntimeError(f"op_load: {len(missing)} extra_trainable params not found "
-                                   f"in model (first: {missing[:3]})")
-        return {"loaded": req["path"], "n_tensors": len(sd), "n_extra": n_extra}
+                if tuple(named[name].shape) != tuple(tensor.shape):
+                    raise RuntimeError(
+                        f"extra_trainable shape mismatch for {name}: "
+                        f"expected={tuple(named[name].shape)} actual={tuple(tensor.shape)}")
+                named[name].copy_(tensor.to(device=named[name].device, dtype=named[name].dtype))
+        self.opt.load_state_dict(blob["optimizer"])
+        rng = blob["rng"]
+        torch.set_rng_state(rng["torch"])
+        if torch.cuda.is_available() and rng.get("cuda") is not None:
+            torch.cuda.set_rng_state_all(rng["cuda"])
+        if rng.get("python") is not None:
+            random.setstate(rng["python"])
+        if rng.get("numpy") is not None:
+            import numpy as _np
+            _np.random.set_state(rng["numpy"])
+        return {"loaded": req["path"], "n_tensors": len(sd),
+                "n_extra": len(extra), "metadata": blob["metadata"]}
 
     def op_reset(self, req):
         """Drop every buffered rollout chunk WITHOUT an optimizer step. The difficulty-band
@@ -506,37 +567,8 @@ class GRPOTrainerServer:
 
     def op_metrics(self, req):
         return {"n_trajs": len(self.store), "n_chunks": sum(len(v) for v in self.store.values()),
+                "chunks_by_traj": {str(k): len(v) for k, v in self.store.items()},
                 "free_gb": round(torch.cuda.mem_get_info()[0] / 1e9, 2)}
-
-    def _yes_no_ids(self):
-        """Lazily resolve+cache the yes/no answer token ids from the model's tokenizer."""
-        if getattr(self, "_yn_ids", None) is None:
-            from transformers import AutoTokenizer
-            tok = AutoTokenizer.from_pretrained(self.a.model, trust_remote_code=True)
-            self._yn_ids = vlm_scorer.resolve_yes_no_ids(tok)
-        return self._yn_ids
-
-    def op_vlm_score(self, req):
-        """Real VQA success/progress score from the policy's own frozen Qwen3-VL backbone.
-
-        Runs one VLM forward over (image + yes/no question) and returns P(yes) read from
-        the first-answer-position logits. Auxiliary/diagnostic only -- NEVER a primary
-        reward. The VLM is frozen and this runs under no_grad, so it does not perturb any
-        adapter/optimizer state (the LoRA wrappers live in the DiT, not the VLM).
-        """
-        inputs = req["inputs"]
-        data = {k: self._to_dev(v) for k, v in inputs.items()}
-        yes_ids, no_ids = self._yes_no_ids()
-        with torch.no_grad():
-            out = self.model.vlm(
-                input_ids=data["input_ids"],
-                attention_mask=data.get("attention_mask"),
-                pixel_values=data.get("pixel_values"),
-                image_grid_thw=data.get("image_grid_thw"),
-            )
-            logits_last = out.logits[0, -1, :]
-            prob = vlm_scorer.answer_probability(logits_last, yes_ids, no_ids)
-        return {"prob": prob, "question": req.get("question")}
 
     def op_sft_update(self, req):
         """Goal-3: per-skill conditional flow-matching (CFM) SFT step.
@@ -645,7 +677,6 @@ class GRPOTrainerServer:
         fn = {"sample": self.op_sample, "update": self.op_update, "save": self.op_save,
               "load": self.op_load, "metrics": self.op_metrics, "config": self.op_config,
               "reset": self.op_reset,
-              "vlm_score": self.op_vlm_score,
               "sft_update": self.op_sft_update, "sft_val": self.op_sft_val}.get(req.get("op"))
         return fn(req) if fn else {"error": f"unknown op {req.get('op')}"}
 
@@ -684,14 +715,20 @@ class GRPOTrainerServer:
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", default="/checkpoint")
+    ap.add_argument("--train-source-manifest", default="/train/source_manifest.json")
+    ap.add_argument("--env-source-manifest", default="/rl_env/source_manifest.json")
     ap.add_argument("--host", default="127.0.0.1")
     ap.add_argument("--port", type=int, default=10088)
     ap.add_argument("--lr", type=float, default=2e-3)          # SGD LoRA (brief: 1e-3..5e-3)
     ap.add_argument("--optimizer", default="sgd")
+    ap.add_argument("--weight-decay", type=float, default=0.0)
     ap.add_argument("--train-mode", default="adapter_only",
                     choices=("adapter_only", "adapter_plus_expert", "adapter_plus_expert_vlm"))
     ap.add_argument("--rank", type=int, default=8)
     ap.add_argument("--alpha", type=int, default=32)
+    ap.add_argument("--adapter-skills", default=",".join(SKILLS),
+                    help="Comma-separated per-skill adapters to instantiate. Use 'grasp' for "
+                         "a GRASP-only capacity experiment.")
     ap.add_argument("--expert-lr", type=float, default=None,
                     help="arm B/C: separate (much lower) lr for the pretrained action-expert/VLM "
                          "slice; LoRA keeps --lr. None = single lr for all trainables.")
@@ -720,9 +757,21 @@ def main():
                     help="PPO/GRPO optimizer epochs over each stored rollout batch. 1 = "
                          "single-step group-relative REINFORCE (ratio==1, no clipping); "
                          ">1 exercises the clipped objective + KL (pi-RL uses 4).")
+    ap.add_argument("--target-kl", type=float, default=None,
+                    help="Stop before a later-epoch optimizer step when mean KL exceeds this.")
     ap.add_argument("--no-grad-checkpoint", dest="grad_checkpoint", action="store_false")
     ap.set_defaults(grad_checkpoint=True)
     a = ap.parse_args()
+    validate_optimizer_config(a.update_epochs, a.ratio_max, a.clip, a.grad_clip, a.eta)
+    if a.rank <= 0 or a.alpha <= 0:
+        raise ValueError("rank and alpha must be positive")
+    if a.lr <= 0.0:
+        raise ValueError("lr must be positive")
+    train_source = verify_deployment_manifest("/train", a.train_source_manifest)
+    verify_deployment_manifest("/rl_env", a.env_source_manifest)
+    a.source_commit = train_source["commit"]
+    a.source_manifest_sha256 = hashlib.sha256(
+        Path(a.train_source_manifest).read_bytes()).hexdigest()
     GRPOTrainerServer(a).serve()
 
 

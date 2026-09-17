@@ -16,7 +16,10 @@ import torch
 import torch.nn as nn
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
-from lora import PerSkillLoRALinear, SKILLS, lora_parameters  # noqa: E402
+from lora import (  # noqa: E402
+    PerSkillLoRALinear, SKILLS, inject_per_skill_lora, load_lora_state_dict,
+    lora_parameters, lora_state_dict,
+)
 
 _FAILS = []
 
@@ -79,6 +82,100 @@ def test_param_bookkeeping():
     check(len(only_grasp) == 2, "per-skill parameter selection returns just that skill's A+B")
     n = sum(p.numel() for p in params)
     check(n == len(SKILLS) * (8 * 32 + 32 * 8), "trainable param count matches rank shapes")
+
+
+class _Block(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.attn = nn.Module()
+        self.attn.qkv_proj = nn.Linear(8, 24)
+        self.attn.o_proj = nn.Linear(8, 8)
+        self.mlp = nn.Module()
+        self.mlp.gate_proj = nn.Linear(8, 16)
+        self.mlp.up_proj = nn.Linear(8, 16)
+        self.mlp.down_proj = nn.Linear(16, 8)
+
+
+class _Expert(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.dit = nn.Module()
+        self.dit.layers = nn.ModuleList([_Block(), _Block()])
+        self.action_projector = nn.Sequential(nn.Linear(4, 8), nn.ReLU(), nn.Linear(8, 8))
+        self.action_output_layer = nn.Sequential(nn.Linear(8, 8), nn.ReLU(), nn.Linear(8, 4))
+        self.state_projector = nn.Sequential(nn.Linear(4, 8), nn.ReLU(), nn.Linear(8, 8))
+        self.t_embedder = nn.Sequential(nn.Linear(4, 8), nn.ReLU(), nn.Linear(8, 8))
+        self.t_projector = nn.Sequential(nn.Linear(8, 12))
+        self.vlm = nn.Sequential(nn.Linear(8, 8))
+
+
+def test_all_linear_targets_cover_action_expert_and_exclude_vlm():
+    model = _Expert()
+    wrappers = inject_per_skill_lora(
+        model, skills=("grasp",), rank=2, alpha=4, targets=("all_linear",))
+    names = [w.target_name for w in wrappers]
+    assert len(names) == 19  # 2 blocks * 5 + 2+2+2+2+1 projectors
+    assert "dit.layers.0.attn.qkv_proj" in names
+    assert "dit.layers.1.attn.o_proj" in names
+    assert "dit.layers.0.mlp.gate_proj" in names
+    assert "dit.layers.0.mlp.up_proj" in names
+    assert "dit.layers.0.mlp.down_proj" in names
+    assert any(n.startswith("action_projector.") for n in names)
+    assert any(n.startswith("action_output_layer.") for n in names)
+    assert any(n.startswith("state_projector.") for n in names)
+    assert any(n.startswith("t_embedder.") for n in names)
+    assert any(n.startswith("t_projector.") for n in names)
+    assert all(not n.startswith("vlm.") for n in names)
+    assert isinstance(model.vlm[0], nn.Linear)
+
+
+def test_named_target_list_matches_wrapped_modules():
+    model = _Expert()
+    wrappers = inject_per_skill_lora(
+        model, skills=("grasp",), rank=2, alpha=4,
+        targets=("qkv_proj", "o_proj", "gate_proj"))
+    assert [w.target_name for w in wrappers] == [
+        "dit.layers.0.attn.qkv_proj", "dit.layers.0.attn.o_proj",
+        "dit.layers.0.mlp.gate_proj", "dit.layers.1.attn.qkv_proj",
+        "dit.layers.1.attn.o_proj", "dit.layers.1.mlp.gate_proj",
+    ]
+
+
+def test_named_checkpoint_roundtrip_rejects_layout_mismatch():
+    source = _Expert()
+    source_wrappers = inject_per_skill_lora(
+        source, skills=("grasp",), rank=2, alpha=4, targets=("all_linear",))
+    with torch.no_grad():
+        source_wrappers[3].lora_B["grasp"].fill_(0.25)
+    state = lora_state_dict(source_wrappers)
+    assert any(key.startswith("dit.layers.0.mlp.up_proj.") for key in state)
+
+    target = _Expert()
+    target_wrappers = inject_per_skill_lora(
+        target, skills=("grasp",), rank=2, alpha=4, targets=("all_linear",))
+    load_lora_state_dict(target_wrappers, state)
+    assert torch.equal(
+        target_wrappers[3].lora_B["grasp"], source_wrappers[3].lora_B["grasp"])
+
+    wrong_layout = _Expert()
+    wrong_wrappers = inject_per_skill_lora(
+        wrong_layout, skills=("grasp",), rank=2, alpha=4, targets=("qkv_proj",))
+    try:
+        load_lora_state_dict(wrong_wrappers, state)
+    except RuntimeError:
+        pass
+    else:
+        raise AssertionError("checkpoint layout mismatch must fail")
+
+    wrong_shape = dict(state)
+    key = next(iter(wrong_shape))
+    wrong_shape[key] = wrong_shape[key][:-1]
+    try:
+        load_lora_state_dict(target_wrappers, wrong_shape)
+    except RuntimeError as exc:
+        assert "shape mismatch" in str(exc)
+    else:
+        raise AssertionError("checkpoint tensor shape mismatch must fail")
 
 
 def _run_all():

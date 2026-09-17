@@ -1,0 +1,34 @@
+from __future__ import annotations
+
+import hashlib
+import json
+import subprocess
+import tempfile
+from pathlib import Path
+
+SCRIPT = Path(__file__).resolve().parents[2] / "scripts" / "build_source_manifest.py"
+
+
+def test_manifest_reads_exact_commit_not_dirty_worktree():
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+        subprocess.run(["git", "config", "user.email", "test@example.invalid"], cwd=root, check=True)
+        subprocess.run(["git", "config", "user.name", "test"], cwd=root, check=True)
+        src = root / "project" / "src" / "x.py"
+        src.parent.mkdir(parents=True)
+        src.write_text("one\n")
+        subprocess.run(["git", "add", "."], cwd=root, check=True)
+        subprocess.run(["git", "commit", "-qm", "base"], cwd=root, check=True)
+        src.write_text("two\n")
+        out = root / "manifest.json"
+        subprocess.run(["python3", str(SCRIPT), "project", str(out), "--commit", "HEAD"],
+                       cwd=root, check=True)
+        data = json.loads(out.read_text())
+        assert data["dirty"] is False
+        assert data["files"]["src/x.py"] == hashlib.sha256(b"one\n").hexdigest()
+
+
+if __name__ == "__main__":
+    test_manifest_reads_exact_commit_not_dirty_worktree()
+    print("build source manifest tests passed")

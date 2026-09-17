@@ -4,7 +4,7 @@ Architecture (task t_3ed65912, per operator direction + research brief rl_finetu
   * VLM backbone: FROZEN.
   * DiT action-expert body + projectors: FROZEN.
   * TRAINABLE = one LoRA adapter set PER SKILL (GRASP / MOVE_HOLDING / PLACE) injected
-    into every DiT layer's attention qkv_proj (and optionally o_proj), plus an optional
+    into configured action-expert Linear layers (qkv-only legacy or all-linear), plus an optional
     per-skill termination head. Only the ACTIVE skill's adapter contributes to the
     forward pass, so each skill's adapter is trained ONLY on that skill's action
     segments -- strict parameter isolation, zero cross-skill interference (CORAL,
@@ -52,6 +52,7 @@ class PerSkillLoRALinear(nn.Module):
         self.rank = rank
         self.scaling = alpha / rank
         self.skills = tuple(skills)
+        self.target_name = ""
         self.active_skill: Optional[str] = None
         self.lora_A = nn.ParameterDict()
         self.lora_B = nn.ParameterDict()
@@ -96,20 +97,38 @@ def inject_per_skill_lora(model, skills=SKILLS, rank: int = 8, alpha: int = 32,
     """Replace targeted DiT-layer Linear submodules with PerSkillLoRALinear wrappers.
 
     Returns the list of injected wrappers so the caller can set the active skill and
-    collect the LoRA parameters. Only touches `model.dit.layers[*].attn.<target>`.
+    collect the LoRA parameters. ``targets=("all_linear",)`` covers every Linear in the
+    action expert: DiT attention/MLP plus state/action/time input and action output
+    projectors. The VLM is excluded by an explicit prefix allowlist.
     """
+    targets = tuple(targets)
+    all_linear = targets == ("all_linear",)
+    target_leaves = set(targets)
+    projector_prefixes = (
+        "action_projector.", "action_output_layer.", "state_projector.",
+        "t_embedder.", "t_projector.", "sink.",
+    )
+
+    selected = []
+    for name, module in list(model.named_modules()):
+        if not isinstance(module, nn.Linear):
+            continue
+        in_dit = name.startswith("dit.layers.")
+        if all_linear:
+            if in_dit or any(name.startswith(prefix) for prefix in projector_prefixes):
+                selected.append((name, module))
+        elif in_dit and name.rsplit(".", 1)[-1] in target_leaves:
+            selected.append((name, module))
+
     wrappers: list[PerSkillLoRALinear] = []
-    dit = model.dit
-    for layer in dit.layers:
-        attn = layer.attn
-        for tname in targets:
-            base = getattr(attn, tname)
-            if isinstance(base, PerSkillLoRALinear):
-                continue
-            wrapped = PerSkillLoRALinear(base, skills, rank=rank, alpha=alpha)
-            wrapped.to(device=base.weight.device, dtype=base.weight.dtype)
-            setattr(attn, tname, wrapped)
-            wrappers.append(wrapped)
+    for name, base in selected:
+        parent_name, leaf = name.rsplit(".", 1)
+        parent = model.get_submodule(parent_name)
+        wrapped = PerSkillLoRALinear(base, skills, rank=rank, alpha=alpha)
+        wrapped.target_name = name
+        wrapped.to(device=base.weight.device, dtype=base.weight.dtype)
+        setattr(parent, leaf, wrapped)
+        wrappers.append(wrapped)
     return wrappers
 
 
@@ -127,6 +146,46 @@ def lora_parameters(wrappers: Iterable[PerSkillLoRALinear], skill: Optional[str]
             params.append(w.lora_A[s])
             params.append(w.lora_B[s])
     return params
+
+
+def lora_state_dict(wrappers: Iterable[PerSkillLoRALinear]):
+    """Serialize adapters by stable target-module name, never wrapper-list position."""
+    state = {}
+    for w in wrappers:
+        if not w.target_name:
+            raise RuntimeError("LoRA wrapper is missing target_name")
+        for skill in w.skills:
+            state[f"{w.target_name}.lora_A.{skill}"] = w.lora_A[skill].detach().cpu()
+            state[f"{w.target_name}.lora_B.{skill}"] = w.lora_B[skill].detach().cpu()
+    return state
+
+
+def load_lora_state_dict(wrappers: Iterable[PerSkillLoRALinear], state):
+    """Strictly restore a named adapter layout; fail on missing or unexpected tensors."""
+    wrappers = list(wrappers)
+    expected = set(lora_state_dict(wrappers))
+    actual = set(state)
+    if expected != actual:
+        missing = sorted(expected - actual)
+        unexpected = sorted(actual - expected)
+        raise RuntimeError(
+            f"LoRA checkpoint layout mismatch: missing={missing[:3]} "
+            f"unexpected={unexpected[:3]}")
+    for w in wrappers:
+        for skill in w.skills:
+            for kind, params in (("lora_A", w.lora_A), ("lora_B", w.lora_B)):
+                key = f"{w.target_name}.{kind}.{skill}"
+                if tuple(state[key].shape) != tuple(params[skill].shape):
+                    raise RuntimeError(
+                        f"LoRA checkpoint shape mismatch for {key}: "
+                        f"expected={tuple(params[skill].shape)} actual={tuple(state[key].shape)}")
+    with torch.no_grad():
+        for w in wrappers:
+            for skill in w.skills:
+                for kind, params in (("lora_A", w.lora_A), ("lora_B", w.lora_B)):
+                    key = f"{w.target_name}.{kind}.{skill}"
+                    params[skill].copy_(state[key].to(
+                        device=params[skill].device, dtype=params[skill].dtype))
 
 
 def freeze_all_but_lora(model, wrappers, termination: Optional[SkillTerminationHead] = None):

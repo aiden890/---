@@ -19,10 +19,7 @@ skill FSM, and randomization -- this card adds only the GRPO training *loop*:
 Reward-only ablation (task requirement): `--reward-variant` selects
   simulator_terminal_only  : RewardConfig(use_milestones=False)  (pure terminal predicate)
   simulator_milestones     : RewardConfig(use_milestones=True)   (terminal + simulator milestones)
-Both are pure-simulator, a config switch (env card RewardConfig). The env card also
-carries a VLM-auxiliary channel (weight 0, diagnostic only); a real VLM scorer is out
-of scope for this pilot, so the genuine reward ablation we execute is terminal-only vs
-terminal+milestone-shaping. This is stated honestly in the report.
+Both are pure-simulator configurations from the environment RewardManager.
 """
 from __future__ import annotations
 
@@ -44,6 +41,15 @@ sys.path.insert(0, "/rl_env/src")         # env card: reward, skill_manager, ran
 import rollout  # noqa: E402
 import skill_eval  # noqa: E402
 from advantage import compute_group_advantages  # noqa: E402  (this card's src dir on sys.path[0])
+from update_batch import (  # noqa: E402
+    batch_iteration_token, group_env_seed, needs_more_groups, trajectory_action_seed,
+    validate_batch_config,
+)
+from training_correctness import (  # noqa: E402
+    ExactHoldWindow, RewardComponents, append_progress, hold_enabled_for_variant,
+    nonduplicated_skill_reward,
+    reset_gated_store, skill_timeout_reward, verify_deployment_manifest,
+)
 from reward import RewardConfig, RewardManager, official_success, HoldConfig, hold_step_reward  # noqa: E402
 from skill_manager import (  # noqa: E402
     MonitorConfig, OraclePlanner, Skill, SkillMonitor, SkillOutcome,
@@ -55,17 +61,6 @@ import robocasa  # noqa: E402,F401
 from robocasa.utils.env_utils import convert_action  # noqa: E402
 
 SKILL_KEY = {Skill.GRASP: "grasp", Skill.MOVE_HOLDING: "move_holding", Skill.PLACE: "place"}
-
-
-def _scoring_image(obs):
-    """The RGB frame handed to the VLM scorer: the 3-camera panorama the POLICY itself
-    sees (left + right agentview + wrist), concatenated. The wrist view is what makes the
-    official predicate legible to a vision model -- it shows whether the gripper is still
-    holding the lid or has retreated (the >0.15m clearance the terminal predicate needs),
-    which a single agentview cannot disambiguate. Using the policy's own visual input keeps
-    the scorer honest (no privileged camera) and maximises evidence.
-    """
-    return rollout.make_video_frame(obs)
 
 
 # --------------------------------------------------------------------------- #
@@ -82,6 +77,8 @@ class TrainerClient:
         self.STATE_DIM = rollout.STATE_DIM
         self.ACTION_DIM = rollout.ACTION_DIM
         self.host, self.port = host, port
+        self.sample_rpc_seconds = 0.0
+        self.sample_rpc_calls = 0
         self._connect()
 
     def _connect(self):
@@ -134,7 +131,10 @@ class TrainerClient:
         inputs = self._build_inputs(states, images, instruction)
         req = {"op": "sample", "inputs": inputs, "eta": eta, "traj_id": traj_id, "seed": seed,
                "skill": skill, "chunk_index": chunk_index}
+        t_rpc = time.perf_counter()
         resp = self._rpc(req)
+        self.sample_rpc_seconds += time.perf_counter() - t_rpc
+        self.sample_rpc_calls += 1
         actions = resp["actions"]
         decoded = self.processor.decode_action(actions, robot_type=self.robot_type)
         decoded = decoded[0, :, : self.ACTION_DIM]
@@ -142,19 +142,23 @@ class TrainerClient:
         return np.asarray(decoded, dtype=np.float32), resp.get("logprob")
 
     def update(self, advantages, clip=0.1, kl_coef=0.005, ratio_max=10.0, adv_clip=3.0,
-               update_epochs=1):
+               update_epochs=1, target_kl=None):
         return self._rpc({"op": "update", "advantages": advantages, "clip": clip,
                           "kl_coef": kl_coef, "ratio_max": ratio_max, "adv_clip": adv_clip,
-                          "update_epochs": update_epochs})
+                          "update_epochs": update_epochs, "target_kl": target_kl})
 
-    def save(self, path):
-        return self._rpc({"op": "save", "path": path})
+    def save(self, path, *, update_index=0, train_meta=None):
+        return self._rpc({"op": "save", "path": path, "update_index": update_index,
+                          "train_meta": train_meta})
 
     def reset_store(self):
         """Clear the trainer's buffered rollout chunks without an optimizer step.
         Called after the difficulty-band prefilter so its eta>0 scan rollouts do not
         leak into the first real training update."""
         return self._rpc({"op": "reset"})
+
+    def metrics(self):
+        return self._rpc({"op": "metrics"})
 
     def config(self, code_rev=None):
         """Fetch the full trainer configuration (optimizer/LR/grad-clip/LoRA/trainable count/
@@ -163,19 +167,6 @@ class TrainerClient:
 
     def load(self, path):
         return self._rpc({"op": "load", "path": path})
-
-    def vlm_score(self, image, question_key):
-        """Real VQA score P(yes) for an image + yes/no question, via the trainer server.
-
-        Builds the VLM inputs with THIS client's processor (single source of truth for
-        the prompt lives in the env card vlm_scorer), sends op=vlm_score, returns P(yes).
-        """
-        import vlm_scorer  # /rl_env/src on sys.path
-        inputs = vlm_scorer.build_vqa_inputs(self.processor, image, question_key,
-                                             robot_type=self.robot_type,
-                                             state_dim=self.STATE_DIM)
-        resp = self._rpc({"op": "vlm_score", "inputs": inputs, "question": question_key})
-        return float(resp["prob"])
 
     def close(self):
         try:
@@ -231,11 +222,14 @@ def _run_one_skill(sim, client, obs, args, skill, reward_mgr, *, eta, traj_id, s
     steps = 0
     outcome = None
     reward_sum = 0.0
+    reward_components = RewardComponents()
     chunk_idx = 0   # AUDIT FIX #2: monotonic per-skill chunk counter -> unique RNG per replan
     p = sim.predicates()
     prev_eef_lid_dist = float(p.get("eef_lid_dist", 0.0)) if approach_coef > 0.0 else None
     # --- post-success hold bookkeeping (operator decision B) ---
-    success_step = None                 # step at which the skill first succeeded
+    success_step = None                 # environment step at first success (diagnostics)
+    success_chunk = None                # elapsed action chunks at first success (Z-1 decay)
+    hold_window = ExactHoldWindow(hold_steps)
     held_steps = 0                      # steps stepped in the post-success hold window
     hold_stay = 0                       # of those, how many were "stopped" (<= stay_radius)
     hold_reward = 0.0                   # total hold shaping added
@@ -248,7 +242,7 @@ def _run_one_skill(sim, client, obs, args, skill, reward_mgr, *, eta, traj_id, s
         if skill is Skill.MOVE_HOLDING:
             return bool(pred.get("lid_grasped")) and bool(pred.get("in_preplace_region"))
         return bool(pred.get("official_check_success")) or official_success(pred)
-    while steps < horizon:
+    while steps < horizon or (hold_window.latched and hold_window.held_steps < hold_steps):
         if not action_plan:
             states = rollout.sample_history(state_queue, args.obs_history, args.obs_interval)
             images = {k: rollout.sample_history(q, args.obs_history, args.obs_interval)
@@ -266,8 +260,14 @@ def _run_one_skill(sim, client, obs, args, skill, reward_mgr, *, eta, traj_id, s
             image_queues[k].append(im)
         state_queue.append(rollout.observation_to_state(obs))
         p = sim.predicates()
-        rb = reward_mgr.step_reward(steps, p, done=bool(done), truncated=bool(trunc))
+        # Z-1 completion decay is indexed by elapsed action chunks, not 20 Hz env steps.
+        rb = reward_mgr.step_reward(chunk_idx, p, done=bool(done), truncated=bool(trunc))
         reward_sum += rb.primary
+        reward_components.official_terminal += rb.terminal
+        reward_components.milestone += rb.milestone
+        reward_components.drop += getattr(rb, "object_dropped", 0.0)
+        reward_components.collision += getattr(rb, "disallowed_collision", 0.0)
+        reward_components.timeout += getattr(rb, "timeout", 0.0)
         # --- post-success boundary hold shaping (training-only) ---
         if success_step is not None and hold_cfg is not None and hold_steps > 0:
             curr_eef = list(p.get("eef_pos", prev_eef))
@@ -280,36 +280,64 @@ def _run_one_skill(sim, client, obs, args, skill, reward_mgr, *, eta, traj_id, s
                 sum((a - b) ** 2 for a, b in zip(prev_eef, curr_eef)) ** 0.5
             if disp <= hold_cfg.stay_radius_m:
                 hold_stay += 1
+                reward_components.hold_stay += hold_cfg.stay_bonus
+            else:
+                reward_components.hold_drift += -hold_cfg.drift_penalty * (
+                    disp / max(hold_cfg.stay_radius_m, 1e-6) - 1.0)
+            if not _success_now(p):
+                reward_components.hold_lapse += -hold_cfg.drop_success_penalty
         prev_eef = list(p.get("eef_pos", prev_eef))
         # Approach shaping: reward getting closer to the lid (training-only)
         if approach_coef > 0.0 and prev_eef_lid_dist is not None:
             curr_dist = float(p.get("eef_lid_dist", prev_eef_lid_dist))
-            reward_sum += approach_coef * (prev_eef_lid_dist - curr_dist)
+            approach_reward = approach_coef * (prev_eef_lid_dist - curr_dist)
+            reward_sum += approach_reward
+            reward_components.approach += approach_reward
             prev_eef_lid_dist = curr_dist
         outcome = monitor.update(p, steps, horizon)
         if frames is not None and (steps % args.video_stride == 0 or outcome or done or trunc):
             frames.append(rollout.make_video_frame(obs))
-        # Boundary-hold: on the FIRST SUCCESS, latch the step and keep going for a hold
-        # window instead of breaking (so the post-success stay/drift shaping can score the
-        # policy's boundary behaviour). Without a hold window, break on any terminal outcome.
-        if outcome is SkillOutcome.SUCCESS and hold_cfg is not None and hold_steps > 0:
-            if success_step is None:
-                success_step = steps
-            if steps - success_step >= hold_steps:
+        # Latch the first success once, pay the decayed skill terminal once, then execute
+        # exactly hold_steps subsequent env steps even if the predicate lapses.
+        if outcome is SkillOutcome.SUCCESS and success_step is None:
+            success_step = steps
+            success_chunk = chunk_idx
+            terminal_reward = nonduplicated_skill_reward(
+                reward_components.official_terminal,
+                success_chunk,
+                getattr(args, "skill_success_reward", 1.0),
+                getattr(args, "skill_success_gamma", 0.998),
+                getattr(args, "skill_success_decay", True),
+            )
+            reward_sum += terminal_reward
+            reward_components.skill_terminal += terminal_reward
+            if hold_cfg is None or hold_window.observe(True, terminated=bool(done or trunc)):
                 break
-            # keep the success outcome latched; do not break yet
+            continue
+        if hold_window.latched:
+            outcome = SkillOutcome.SUCCESS
+            if hold_window.observe(_success_now(p), terminated=bool(done or trunc)):
+                break
             continue
         if outcome or done or trunc:
             break
     if outcome is None:
         outcome = SkillOutcome.TIMEOUT
-        reward_sum += (-timeout_penalty)   # flat cost for skill timeout (training-only)
+    timeout_reward = skill_timeout_reward(outcome.name, timeout_penalty)
+    reward_sum += timeout_reward
+    reward_components.timeout += timeout_reward
     if save_video is not None and frames is not None:
         import imageio.v2 as imageio
         imageio.mimsave(save_video, frames, fps=args.video_fps)
-    hold_stats = {"success_step": success_step, "held_steps": held_steps,
+    hold_stats = {"success_step": success_step, "success_chunk": success_chunk,
+                  "held_steps": held_steps,
                   "hold_stay": hold_stay, "hold_reward": round(hold_reward, 4),
-                  "hold_stay_frac": (round(hold_stay / held_steps, 3) if held_steps else None)}
+                  "hold_stay_frac": (round(hold_stay / held_steps, 3) if held_steps else None),
+                  "hold_lapse_steps": hold_window.lapse_steps,
+                  "reward_components": reward_components.as_dict()}
+    if abs(reward_components.total() - reward_sum) > 1e-5:
+        raise RuntimeError(
+            f"reward component mismatch: components={reward_components.total()} total={reward_sum}")
     return obs, outcome, reward_sum, steps, p, hold_stats
 
 
@@ -363,7 +391,7 @@ def _current_obs(sim):
 
 
 # throwaway reward cfg for the deterministic entry-setup grasp (its reward is unused)
-_ENTRY_REWARD_CFG = RewardConfig(mode="simulator", horizon=200, use_milestones=True)
+_ENTRY_REWARD_CFG = RewardConfig( horizon=200, use_milestones=True)
 
 
 def build_entry_seed_pool(factory, client, args, candidate_seeds, target_skill, need, tag=""):
@@ -689,7 +717,7 @@ def eval_episode(sim, client, args, reward_cfg, seed, out_dir=None, tag="", retu
     return res
 
 
-def train_iteration(client, args, reward_cfg, seed, it):
+def train_iteration(client, args, reward_cfg, seed, it, *, defer_update=False):
     """Group rollout from ONE shared initial state; returns metrics.
 
     Trains a single configured skill (default GRASP -- the measured bottleneck, and the
@@ -707,7 +735,8 @@ def train_iteration(client, args, reward_cfg, seed, it):
     # approach shaping disabled (operator 2026-09-16): reward only at final success,
     # no dense per-step distance shaping before success.
     train_approach_coef = 0.0
-    train_timeout_penalty = 0.5  # flat cost for timing out a skill
+    train_timeout_penalty = (0.0 if getattr(args, "reward_variant", "") ==
+                             "simulator_terminal_only" else 0.5)
     # Boundary-compliance hold (operator decision B): reward stopping after success. Config
     # from args (0 hold_steps disables it -> identical to the pre-B behaviour).
     hold_steps = int(getattr(args, "hold_steps", 0))
@@ -715,14 +744,15 @@ def train_iteration(client, args, reward_cfg, seed, it):
                           drift_penalty=getattr(args, "hold_drift_penalty", 0.10),
                           stay_radius_m=getattr(args, "hold_stay_radius", 0.02),
                           drop_success_penalty=getattr(args, "hold_drop_penalty", 0.5)) \
-        if hold_steps > 0 else None
-    vlm_weight = float(getattr(args, "vlm_weight", 0.0))
-    vlm_question = getattr(args, "vlm_question", "grasp")
+        if hold_enabled_for_variant(getattr(args, "reward_variant", "terminal_plus_hold"),
+                                    hold_steps) else None
     returns = []
     traj_ids = []
     successes = []          # per-member: did the trained skill succeed (for group composition)
-    vlm_scores = []
     hold_stats_all = []
+    reset_seconds = []
+    sample_rpc_start = float(getattr(client, "sample_rpc_seconds", 0.0))
+    sample_calls_start = int(getattr(client, "sample_rpc_calls", 0))
     entry_from_grasp = getattr(args, "entry_from_grasp", False) and skill in ENTRY_PREREQS
 
     if entry_from_grasp:
@@ -730,9 +760,11 @@ def train_iteration(client, args, reward_cfg, seed, it):
         # restore per group member so every member starts byte-identical from the SAME
         # real grasp-success state (skill guidance: group members start byte-identical,
         # diverge under eta>0). Avoids re-running the ~120-step grasp `group` times.
+        t_reset = time.perf_counter()
         genv, sim = _make_env(args.split, seed)
         try:
             reset_obs, _ = rollout.reset_env(genv, seed)
+            reset_seconds.append(time.perf_counter() - t_reset)
             sim.rest_lid_pos = sim.lid_pos()
             _obs, entry_ok, _p = _reach_entry_state(sim, client, args, seed, skill, reset_obs)
             if not entry_ok:
@@ -752,34 +784,35 @@ def train_iteration(client, args, reward_cfg, seed, it):
                 traj_id = f"iter{it}_m{m}"
                 final_obs, outcome, r, steps, p, hstats = _run_one_skill(
                     sim, client, obs, args, skill, reward_mgr, eta=args.eta,
-                    traj_id=traj_id, seed=args.seed_base + it * 100 + m,
+                    traj_id=traj_id,
+                    seed=(trajectory_action_seed(args.seed_base, it, m) if defer_update
+                          else args.seed_base + it * 100 + m),
                     approach_coef=train_approach_coef,
                     timeout_penalty=train_timeout_penalty,
                     hold_cfg=hold_cfg, hold_steps=hold_steps)
                 hold_stats_all.append(hstats)
                 is_succ = outcome is SkillOutcome.SUCCESS
                 successes.append(is_succ)
-                if is_succ:
-                    r += 1.0
-                if vlm_weight > 0.0:
-                    vscore = client.vlm_score(_scoring_image(final_obs), vlm_question)
-                    vlm_scores.append(vscore)
-                    r += vlm_weight * vscore
+                hstats["reward_components"]["total"] = r
                 returns.append(r)
                 traj_ids.append(traj_id)
         finally:
             genv.close()
     else:
         for m in range(args.group):
+            t_reset = time.perf_counter()
             genv, sim = _make_env(args.split, seed)
             try:
                 obs, _ = rollout.reset_env(genv, seed)   # identical start for all members
+                reset_seconds.append(time.perf_counter() - t_reset)
                 sim.rest_lid_pos = sim.lid_pos()
                 reward_mgr = RewardManager(reward_cfg)
                 traj_id = f"iter{it}_m{m}"
                 final_obs, outcome, r, steps, p, hstats = _run_one_skill(
                     sim, client, obs, args, skill, reward_mgr, eta=args.eta,
-                    traj_id=traj_id, seed=args.seed_base + it * 100 + m,
+                    traj_id=traj_id,
+                    seed=(trajectory_action_seed(args.seed_base, it, m) if defer_update
+                          else args.seed_base + it * 100 + m),
                     approach_coef=train_approach_coef,
                     timeout_penalty=train_timeout_penalty,
                     hold_cfg=hold_cfg, hold_steps=hold_steps)
@@ -787,16 +820,7 @@ def train_iteration(client, args, reward_cfg, seed, it):
                 # terminal shaping for the skill unit: bonus if the skill's predicate is met
                 is_succ = outcome is SkillOutcome.SUCCESS
                 successes.append(is_succ)
-                if is_succ:
-                    r += 1.0
-                # --- REAL VLM-auxiliary channel (sim+VLM ablation only; weight>0) ---
-                # A genuine Qwen3-VL VQA judgement of the FINAL frame: P(yes) that the grasp/
-                # closing progressed. Added to the GRPO return, never replacing the simulator
-                # reward. weight==0 => pure sim-only (identical to the executed baseline).
-                if vlm_weight > 0.0:
-                    vscore = client.vlm_score(_scoring_image(final_obs), vlm_question)
-                    vlm_scores.append(vscore)
-                    r += vlm_weight * vscore
+                hstats["reward_components"]["total"] = r
                 returns.append(r)
                 traj_ids.append(traj_id)
             finally:
@@ -812,10 +836,15 @@ def train_iteration(client, args, reward_cfg, seed, it):
     if adv_info["gated"]:
         metrics = {"loss": 0.0, "grad_norm": 0.0, "mean_ratio": 1.0, "n_chunks": 0,
                    "gated": adv_info["reason"], "reward_std": adv_info["reward_std"]}
+        reset_gated_store(client, defer_update)
+    elif defer_update:
+        metrics = {"loss": 0.0, "grad_norm": 0.0, "mean_ratio": 1.0,
+                   "n_chunks": 0, "deferred_update": True}
     else:
         metrics = client.update(advantages, clip=args.clip, kl_coef=args.kl_coef,
                                 ratio_max=args.ratio_max, adv_clip=args.adv_clip,
-                                update_epochs=getattr(args, "update_epochs", 1))
+                                update_epochs=getattr(args, "update_epochs", 1),
+                                target_kl=getattr(args, "target_kl", None))
     metrics["mean_return"] = float(arr.mean())
     metrics["max_return"] = float(arr.max())
     metrics["returns"] = [round(x, 4) for x in returns]
@@ -824,88 +853,139 @@ def train_iteration(client, args, reward_cfg, seed, it):
     metrics["group_composition"] = adv_info["composition"]      # all_success|mixed|all_failure|constant
     metrics["advantage_mode"] = adv_info["mode"]                # group_relative|nonneg_min_baseline|gated
     metrics["advantages"] = {tid: round(float(a), 4) for tid, a in zip(traj_ids, adv_arr)}
-    if vlm_scores:
-        metrics["vlm_mean"] = round(float(np.mean(vlm_scores)), 4)
-        metrics["vlm_scores"] = [round(x, 4) for x in vlm_scores]
+    metrics["_advantages"] = advantages
     # Boundary-hold diagnostics: how often did group members reach success, and of the
     # post-success hold steps, what fraction were "stopped" (eef displacement <= radius).
     succ_holds = [h for h in hold_stats_all if h.get("success_step") is not None]
     metrics["n_success_hold"] = len(succ_holds)
     stay_fracs = [h["hold_stay_frac"] for h in succ_holds if h.get("hold_stay_frac") is not None]
     metrics["mean_hold_stay_frac"] = round(float(np.mean(stay_fracs)), 4) if stay_fracs else None
+    metrics["reward_components"] = [h["reward_components"] for h in hold_stats_all]
+    metrics["skill_success_gamma"] = float(getattr(args, "skill_success_gamma", 0.998))
+    metrics["skill_success_decay"] = bool(getattr(args, "skill_success_decay", True))
+    metrics["reset_seconds"] = round(sum(reset_seconds), 3)
+    metrics["sample_store_rpc_seconds"] = round(
+        float(getattr(client, "sample_rpc_seconds", 0.0)) - sample_rpc_start, 3)
+    metrics["sample_store_rpc_calls"] = (
+        int(getattr(client, "sample_rpc_calls", 0)) - sample_calls_start)
     return metrics
 
 
-def vlm_gate(client, args, reward_cfg, seeds, out_dir, eval_split="target"):
-    """Verification GATE for the real VLM scorer (task standing gate, run BEFORE training).
+def train_batched_update(client, args, reward_cfg, seed_base, update_index):
+    """Clear the trainer store on every failed collection/update path."""
+    try:
+        return _train_batched_update_impl(client, args, reward_cfg, seed_base, update_index)
+    except Exception:
+        client.reset_store()
+        raise
 
-    Rolls out deterministic oracle-planner eval episodes, captures each FINAL frame plus
-    the simulator's official-success label, then scores every final frame with the real
-    Qwen3-VL VQA scorer under all three questions. A valid auxiliary scorer must assign a
-    HIGHER P(yes) to genuinely-successful episodes than to failed ones (positive/negative
-    separation). We report per-question mean P(yes | success) vs mean P(yes | fail), the
-    separation margin, and a threshold-free ROC-AUC. The gate PASSES if the primary
-    'success' question separates the two classes (AUC >= 0.65 and margin > 0).
+
+def _train_batched_update_impl(client, args, reward_cfg, seed_base, update_index):
+    """Collect multiple independent groups, then perform exactly one optimizer update.
+
+    Every group uses one shared env seed internally and a distinct env seed across groups.
+    Group-relative advantages are computed before aggregation. Collection continues in
+    whole groups until both floors are met: ``groups_per_update`` and
+    ``min_trainable_chunks``.
     """
-    out = Path(out_dir); out.mkdir(parents=True, exist_ok=True)
-    questions = ["success", "grasp", "progress"]
-    rows = []
-    for i, seed in enumerate(seeds):
-        genv, sim = _make_env(eval_split, seed)
-        try:
-            res, final_obs = eval_episode(sim, client, args, reward_cfg, seed,
-                                          return_final_obs=True)
-            img = _scoring_image(final_obs)
-            scores = {q: client.vlm_score(img, q) for q in questions}
-        finally:
-            genv.close()
-        row = {"seed": seed, "official_success": res["official_success"],
-               "grasp_success": res["grasp_success"], "vlm": scores}
-        rows.append(row)
-        print(f"[vlm-gate] {i+1}/{len(seeds)} seed={seed} succ={res['official_success']} "
-              f"grasp={res['grasp_success']} P(yes)={ {q: round(scores[q],3) for q in questions} }",
-              flush=True)
+    min_groups = int(getattr(args, "groups_per_update", 1))
+    min_chunks = int(getattr(args, "min_trainable_chunks", 0))
+    max_groups = int(getattr(args, "max_groups_per_update", max(min_groups, 64)))
+    validate_batch_config(min_groups, min_chunks, max_groups)
+    groups = []
+    advantages = {}
+    trainable_chunks = 0
+    progress_path = getattr(args, "group_progress_path", None)
+    t_collect = time.time()
+    store = client.metrics()
+    if int(store.get("n_chunks", 0)) != 0:
+        raise RuntimeError(f"trainer store not empty at update start: {store}")
 
-    def _auc(pos, neg):
-        if not pos or not neg:
-            return None
-        wins = sum((p > n) + 0.5 * (p == n) for p in pos for n in neg)
-        return wins / (len(pos) * len(neg))
+    while needs_more_groups(len(groups), trainable_chunks, min_groups, min_chunks):
+        if len(groups) >= max_groups:
+            client.reset_store()
+            raise RuntimeError(
+                f"chunk floor not reached after {max_groups} groups: "
+                f"{trainable_chunks} < {min_chunks}")
+        g = len(groups)
+        env_seed = group_env_seed(seed_base, update_index, g)
+        # The iteration token namespaces trajectory ids and action-noise seeds too.
+        iter_token = batch_iteration_token(update_index, g)
+        t_group = time.time()
+        gm = train_iteration(client, args, reward_cfg, env_seed, iter_token,
+                             defer_update=True)
+        gm["env_seed"] = env_seed
+        gm["group_index"] = g
+        gm["wall_seconds"] = round(time.time() - t_group, 3)
+        if "_advantages" not in gm:
+            client.reset_store()
+            raise RuntimeError(f"batched group did not produce advantages: {gm.get('skipped', gm)}")
+        group_advantages = gm.pop("_advantages")
+        advantages.update(group_advantages)
+        groups.append(gm)
+        store = client.metrics()
+        chunks_by_traj = store.get("chunks_by_traj", {})
+        group_trainable = sum(
+            int(chunks_by_traj.get(tid, 0))
+            for tid, advantage in group_advantages.items()
+            if float(advantage) != 0.0)
+        trainable_chunks += group_trainable
+        gm["stored_chunks"] = sum(int(chunks_by_traj.get(tid, 0)) for tid in group_advantages)
+        gm["trainable_chunks"] = group_trainable
+        if progress_path:
+            append_progress(progress_path, {
+                "update": update_index, "group": g, "env_seed": env_seed,
+                "trajectories": int(args.group),
+                "stored_chunks": gm["stored_chunks"],
+                "trainable_chunks": group_trainable,
+                "stored_chunks_cumulative": int(store.get("n_chunks", 0)),
+                "trainable_chunks_cumulative": trainable_chunks,
+                "n_success": int(gm.get("n_success_group") or 0),
+                "composition": gm.get("group_composition"),
+                "gate_reason": gm.get("gated"),
+                "reset_seconds": gm.get("reset_seconds"),
+                "sample_store_rpc_seconds": gm.get("sample_store_rpc_seconds"),
+                "rollout_seconds": gm["wall_seconds"],
+                "trainer_free_gb": store.get("free_gb"),
+            })
 
-    report = {"n": len(rows), "questions": {}}
-    for q in questions:
-        # success-vs-fail on the OFFICIAL predicate, and grasp-vs-nograsp for the grasp Q
-        succ = [r["vlm"][q] for r in rows if r["official_success"]]
-        fail = [r["vlm"][q] for r in rows if not r["official_success"]]
-        gyes = [r["vlm"][q] for r in rows if r["grasp_success"]]
-        gno = [r["vlm"][q] for r in rows if not r["grasp_success"]]
-        mean = lambda xs: (round(sum(xs) / len(xs), 4) if xs else None)
-        report["questions"][q] = {
-            "n_success": len(succ), "n_fail": len(fail),
-            "mean_P_success": mean(succ), "mean_P_fail": mean(fail),
-            "success_margin": (round(mean(succ) - mean(fail), 4) if succ and fail else None),
-            "auc_success_vs_fail": (round(_auc(succ, fail), 4) if _auc(succ, fail) is not None else None),
-            "n_grasp": len(gyes), "n_nograsp": len(gno),
-            "mean_P_grasp": mean(gyes), "mean_P_nograsp": mean(gno),
-            "grasp_margin": (round(mean(gyes) - mean(gno), 4) if gyes and gno else None),
-            "auc_grasp_vs_nograsp": (round(_auc(gyes, gno), 4) if _auc(gyes, gno) is not None else None),
-        }
-    # PASS criterion: the primary success question separates success from failure.
-    sq = report["questions"]["success"]
-    gq = report["questions"]["grasp"]
-    success_ok = (sq["auc_success_vs_fail"] is not None and sq["auc_success_vs_fail"] >= 0.65
-                  and sq["success_margin"] is not None and sq["success_margin"] > 0)
-    grasp_ok = (gq["auc_grasp_vs_nograsp"] is not None and gq["auc_grasp_vs_nograsp"] >= 0.65
-                and gq["grasp_margin"] is not None and gq["grasp_margin"] > 0)
-    report["gate_pass"] = bool(success_ok or grasp_ok)
-    report["gate_detail"] = {"success_question_separates": success_ok,
-                             "grasp_question_separates": grasp_ok}
-    report["rows"] = rows
-    (out / "vlm_gate.json").write_text(json.dumps(report, indent=2))
-    print("=== VLM GATE:", "PASS" if report["gate_pass"] else "FAIL",
-          "| success AUC", sq["auc_success_vs_fail"], "margin", sq["success_margin"],
-          "| grasp AUC", gq["auc_grasp_vs_nograsp"], "margin", gq["grasp_margin"], flush=True)
-    return report
+    collect_seconds = time.time() - t_collect
+    t_update = time.time()
+    update = client.update(
+        advantages, clip=args.clip, kl_coef=args.kl_coef,
+        ratio_max=args.ratio_max, adv_clip=args.adv_clip,
+        update_epochs=getattr(args, "update_epochs", 1),
+        target_kl=getattr(args, "target_kl", None))
+    update_seconds = time.time() - t_update
+    returns = [r for g in groups for r in g.get("returns", [])]
+    n_success = sum(int(g.get("n_success_group") or 0) for g in groups)
+    n_traj = len(groups) * int(args.group)
+    update.update({
+        "mean_return": float(np.mean(returns)) if returns else 0.0,
+        "max_return": float(np.max(returns)) if returns else 0.0,
+        "returns": returns,
+        "n_success_group": n_success,
+        "n_success_hold": sum(int(g.get("n_success_hold") or 0) for g in groups),
+        "groups_collected": len(groups),
+        "trajectories_collected": n_traj,
+        "stored_chunks_collected": int(store.get("n_chunks", 0)),
+        "trainable_chunks_collected": trainable_chunks,
+        "group_env_seeds": [g["env_seed"] for g in groups],
+        "group_summaries": groups,
+        "group_composition": [g.get("group_composition") for g in groups],
+        "advantage_mode": "per_group_then_aggregate",
+        "reward_std": float(np.std(returns)) if returns else 0.0,
+        "collect_seconds": round(collect_seconds, 3),
+        "optimizer_seconds": round(update_seconds, 3),
+        "trajectory_mean_seconds": round(collect_seconds / max(n_traj, 1), 3),
+        "reset_seconds": round(sum(float(g.get("reset_seconds", 0.0)) for g in groups), 3),
+        "sample_store_rpc_seconds": round(
+            sum(float(g.get("sample_store_rpc_seconds", 0.0)) for g in groups), 3),
+        "sample_store_rpc_calls": sum(int(g.get("sample_store_rpc_calls", 0)) for g in groups),
+    })
+    update["chunk_mean_seconds"] = round(
+        update["sample_store_rpc_seconds"] / max(update["stored_chunks_collected"], 1), 4)
+    return update
 
 
 def eval_pool(sim_factory, client, args, reward_cfg, seeds, out_dir, tag):
@@ -931,9 +1011,19 @@ def build_parser():
     ap.add_argument("--trainer-port", type=int, default=10088)
     ap.add_argument("--server-addr", default="127.0.0.1")
     ap.add_argument("--model-path", default="/checkpoint")
+    ap.add_argument("--train-source-manifest", default="/train/source_manifest.json")
+    ap.add_argument("--env-source-manifest", default="/rl_env/source_manifest.json")
     ap.add_argument("--split", default="target")
     ap.add_argument("--eval-split", default="target")
     ap.add_argument("--group", type=int, default=4)
+    ap.add_argument("--groups-per-update", type=int, default=1,
+                    help="Minimum number of independent env-seed groups collected before one "
+                         "optimizer update. Advantages remain normalized within each group.")
+    ap.add_argument("--min-trainable-chunks", type=int, default=0,
+                    help="Continue collecting whole groups until the trainer store contains at "
+                         "least this many action chunks before the optimizer update.")
+    ap.add_argument("--max-groups-per-update", type=int, default=64,
+                    help="Safety cap while satisfying --min-trainable-chunks.")
     ap.add_argument("--iters", type=int, default=30)
     ap.add_argument("--eval-n", type=int, default=50)
     ap.add_argument("--heldout-n", type=int, default=50)
@@ -957,24 +1047,17 @@ def build_parser():
                     help="Minimum within-group reward std for an optimizer update. Groups with a "
                          "smaller std (all-failure or effectively-constant reward) are gated: "
                          "advantage is zeroed and the step is skipped (advantage-handling fix).")
-    ap.add_argument("--vlm-weight", type=float, default=0.0,
-                    help="Weight of the REAL Qwen3-VL VQA auxiliary score added to the GRPO "
-                         "return during TRAINING. 0.0 = sim-only; >0 = sim+VLM ablation.")
     ap.add_argument("--update-epochs", type=int, default=1,
                     help="PPO/GRPO optimizer epochs per rollout batch (forwarded to trainer "
                          "op=update). 1 = single-step group-relative REINFORCE; pi-RL uses 4.")
-    ap.add_argument("--vlm-question", default="grasp",
-                    choices=("grasp", "progress", "success"),
-                    help="Which VQA question the auxiliary scorer asks each rollout.")
+    ap.add_argument("--target-kl", type=float, default=None,
+                    help="Stop before a later-epoch step when mean KL exceeds this.")
     ap.add_argument("--horizon-grasp", type=int, default=208)
     ap.add_argument("--horizon-move", type=int, default=150)
     ap.add_argument("--horizon-place", type=int, default=200)
     ap.add_argument("--max-skill-calls", type=int, default=3)
     ap.add_argument("--save-videos", type=int, default=6)
     ap.add_argument("--skip-eval", action="store_true")
-    ap.add_argument("--vlm-gate-n", type=int, default=0,
-                    help="If >0, run ONLY the VLM-scorer verification gate on this many "
-                         "eval seeds (no training), write vlm_gate.json, and exit.")
     ap.add_argument("--ckpt-name", default="grpo_trained.pt")
     ap.add_argument("--load-ckpt", default=None,
                     help="Load a saved LoRA checkpoint before AFTER-eval phase. "
@@ -988,6 +1071,11 @@ def build_parser():
     ap.add_argument("--hold-drift-penalty", type=float, default=0.10)
     ap.add_argument("--hold-stay-radius", type=float, default=0.02)
     ap.add_argument("--hold-drop-penalty", type=float, default=0.5)
+    ap.add_argument("--skill-success-reward", type=float, default=1.0)
+    ap.add_argument("--skill-success-gamma", type=float, default=0.998)
+    ap.add_argument("--no-skill-success-decay", dest="skill_success_decay",
+                    action="store_false", help="Disable gamma^completion_step decay.")
+    ap.set_defaults(skill_success_decay=True)
     # Operator MOVE-first: start the trained skill from its prerequisite skill's
     # SUCCESS entry-state (e.g. MOVE from a deterministic grasp-success) instead of
     # the fresh lid-on-counter reset. Default OFF (backward-compatible GRASP-from-reset).
@@ -1054,14 +1142,29 @@ def main():
     my, rest = build_parser().parse_known_args()
     args = rollout.parse_args(rest)
     rollout.validate_args(args)
-    for k in ("group", "eta", "clip", "kl_coef", "ratio_max", "adv_clip", "train_skill",
+    for k in ("group", "groups_per_update", "min_trainable_chunks", "max_groups_per_update",
+              "eta", "clip", "kl_coef", "ratio_max", "adv_clip", "train_skill",
+              "reward_variant",
               "horizon_grasp", "horizon_move", "horizon_place",
               "max_skill_calls", "seed_base", "save_videos", "split",
-              "vlm_weight", "vlm_question", "update_epochs", "reward_std_gate",
+              "update_epochs", "target_kl", "reward_std_gate",
               "hold_steps", "hold_stay_bonus", "hold_drift_penalty",
-              "hold_stay_radius", "hold_drop_penalty", "entry_from_grasp"):
+              "hold_stay_radius", "hold_drop_penalty", "skill_success_reward",
+              "skill_success_gamma", "skill_success_decay", "entry_from_grasp"):
         setattr(args, k, getattr(my, k))
+    validate_batch_config(my.groups_per_update, my.min_trainable_chunks,
+                          my.max_groups_per_update)
+    if my.hold_steps < 0:
+        raise ValueError("hold_steps must be non-negative")
+    if not (0.0 < my.skill_success_gamma <= 1.0):
+        raise ValueError("skill_success_gamma must be in (0, 1]")
+    if my.target_kl is not None and my.target_kl <= 0.0:
+        raise ValueError("target_kl must be positive when set")
     out = Path(my.out); out.mkdir(parents=True, exist_ok=True)
+    source_state = {
+        "train": verify_deployment_manifest("/train", my.train_source_manifest),
+        "env": verify_deployment_manifest("/rl_env", my.env_source_manifest),
+    }
 
     # simulator_terminal_only forces a PURE terminal-only ablation: zero the hold shaping
     # weights (the hold window is retained only as a verifier condition, not a reward).
@@ -1072,8 +1175,10 @@ def main():
         args.hold_drift_penalty = 0.0
         args.hold_drop_penalty = 0.0
 
-    reward_cfg = RewardConfig(mode="simulator", horizon=my.horizon_place,
+    reward_cfg = RewardConfig( horizon=my.horizon_place,
                               use_milestones=(my.reward_variant == "simulator_milestones"))
+    if my.reward_variant == "simulator_terminal_only":
+        reward_cfg.penalties = {name: 0.0 for name in reward_cfg.penalties}
 
     client = TrainerClient(my.model_path, my.server_addr, my.trainer_port,
                            args.robot_type, args.crop_ratio)
@@ -1087,9 +1192,12 @@ def main():
     def heldout_factory(seed):
         return _make_env(my.eval_split, seed)
 
-    log = {"config": {**vars(my), "reward_variant": my.reward_variant,
-                      "vlm_weight": my.vlm_weight, "vlm_question": my.vlm_question},
-           "phases": {}}
+    log = {"config": {**vars(my), "reward_variant": my.reward_variant},
+           "source": source_state, "phases": {}}
+    log["algorithm"] = (
+        "group-relative policy gradient (single on-policy epoch)"
+        if my.update_epochs == 1 else "PPO-clipped GRPO (multi-epoch)"
+    )
     # measurement fix: capture the full trainer-side config (optimizer/LR/grad-clip/LoRA
     # rank-alpha-targets/trainable count/sampler/eta/code rev) so the run summary is
     # self-describing. code_rev from env (set by the launcher) if available.
@@ -1098,7 +1206,14 @@ def main():
         log["trainer_config"] = client.config(code_rev=_os.environ.get("CODE_REV"))
     except Exception as _e:
         log["trainer_config"] = {"error": str(_e)}
+    trainer_cfg = log["trainer_config"]
+    server_args = trainer_cfg.get("config", {}) if isinstance(trainer_cfg, dict) else {}
+    adapter_skills = [s for s in str(server_args.get("adapter_skills", "")).split(",") if s]
+    if my.iters > 0 and adapter_skills and my.train_skill not in adapter_skills:
+        raise ValueError(f"trainer has adapters for {adapter_skills}, cannot train {my.train_skill!r}")
     (out / "train_log.jsonl").write_text("")
+    args.group_progress_path = str(out / "group_progress.jsonl")
+    Path(args.group_progress_path).write_text("")
 
     eval_seeds = [my.eval_seed_base + i for i in range(my.eval_n)]
     heldout_seeds = [my.heldout_seed_base + i for i in range(my.heldout_n)]
@@ -1197,15 +1312,6 @@ def main():
     else:
         train_seeds = None  # non-entry mode: train uses seed_base+it inline
 
-    # ---- VLM-scorer verification GATE (standing gate: run BEFORE any ablation train) ----
-    if my.vlm_gate_n > 0:
-        gate_seeds = [my.eval_seed_base + i for i in range(my.vlm_gate_n)]
-        rep = vlm_gate(client, args, reward_cfg, gate_seeds, out, eval_split=my.eval_split)
-        (out / "run_summary.json").write_text(json.dumps({"vlm_gate": rep}, indent=2, default=str))
-        client.close()
-        print("=== DONE (vlm-gate) ===", flush=True)
-        return
-
     # ---- EVAL(before) ----
     if not my.skip_eval:
         t0 = time.time()
@@ -1224,6 +1330,11 @@ def main():
     # Online adaptive curriculum (operator redesign t_2907de4f): NO upfront scan, seed
     # chosen per-iter from a moving band driven by the running per-seed difficulty EMA.
     adaptive_mode = (not entry_mode) and (my.adaptive_band is not None) and (not band_mode)
+    batch_mode = my.groups_per_update > 1 or my.min_trainable_chunks > 0
+    if batch_mode and (adaptive_mode or band_mode or entry_mode):
+        raise ValueError("multi-group update batching currently requires raw GRASP seed mode; "
+                         "adaptive-band, static difficulty-band, and entry-state modes need "
+                         "a per-group seed scheduler")
     curriculum = None
     if adaptive_mode:
         universe = my.adaptive_universe or (my.iters * 8)
@@ -1277,7 +1388,10 @@ def main():
                 seed = train_seeds[it % len(train_seeds)]
             else:
                 seed = my.seed_base + it
-            m = train_iteration(client, args, reward_cfg, seed, it)
+            if batch_mode:
+                m = train_batched_update(client, args, reward_cfg, my.seed_base, it)
+            else:
+                m = train_iteration(client, args, reward_cfg, seed, it)
             m["iter"] = it
             m["seed"] = seed
             if adaptive_mode:
@@ -1318,12 +1432,15 @@ def main():
                 def _f(x, d=3):
                     return f"{x:.{d}f}" if isinstance(x, (int, float)) else str(x)
                 print(f"[train] it={it} seed={seed}{_asrc} comp={m.get('group_composition')}({m.get('advantage_mode')}) "
-                      f"n_succ={m.get('n_success_group')}/{args.group} "
+                      f"n_succ={m.get('n_success_group')}/{m.get('trajectories_collected', args.group)} "
                       f"loss={m['loss']:.4f} return={m['mean_return']:.3f} "
                       f"grad_norm={m['grad_norm']:.1f} post_ratio={_f(m.get('post_step_mean_ratio'))} "
                       f"post_kl={_f(m.get('post_step_mean_kl'),5)} post_clip={_f(m.get('post_step_clip_fraction'))} "
                       f"adapter_dL2={_f(m.get('adapter_delta_l2'),5)} "
-                      f"n_succ_hold={m.get('n_success_hold')} mem={m.get('peak_mem_gb')}", flush=True)
+                      f"n_succ_hold={m.get('n_success_hold')} groups={m.get('groups_collected', 1)} "
+                      f"chunks={m.get('trainable_chunks_collected', m.get('n_chunks'))} "
+                      f"collect_s={m.get('collect_seconds')} opt_s={m.get('optimizer_seconds')} "
+                      f"mem={m.get('peak_mem_gb')}", flush=True)
     log["phases"]["train_curve"] = curve
     if adaptive_mode and curriculum is not None:
         log["adaptive_curriculum"]["final_band_stats"] = curriculum.band_stats()
@@ -1333,7 +1450,10 @@ def main():
     # Checkpoint path must be on the TRAINER SERVER's filesystem, which has /train mounted
     # (= /home/v4/rl-train-t_3ed65912 on the host). /out is only visible to the CLIENT.
     ckpt_server_path = f"/train/results/{Path(my.out).name}/{my.ckpt_name}"
-    save_res = client.save(ckpt_server_path)
+    save_res = client.save(
+        ckpt_server_path, update_index=my.iters,
+        train_meta={"skill": my.train_skill, "updates": my.iters,
+                    "reward_variant": my.reward_variant})
     log["checkpoint"] = save_res
 
     # ---- EVAL(after) ----

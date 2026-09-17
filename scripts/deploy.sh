@@ -34,6 +34,15 @@ AMP_BASE="/home/guest"
 
 # ---- 배포할 코드 디렉토리 ---------------------------------------------------
 DIRS=(rl-train-t_3ed65912 rl-env-t_4f3f2b20)
+TMP_ROOT="$(mktemp -d)"
+MANIFEST_DIR="$TMP_ROOT/manifests"
+STAGE_DIR="$TMP_ROOT/stage"
+mkdir -p "$MANIFEST_DIR" "$STAGE_DIR"
+trap 'rm -rf "$TMP_ROOT"' EXIT
+for d in "${DIRS[@]}"; do
+  python3 "$REPO_ROOT/scripts/build_source_manifest.py" "$d" "$MANIFEST_DIR/$d.json" --commit HEAD
+  git -C "$REPO_ROOT" archive HEAD "$d" | tar -x -C "$STAGE_DIR"
+done
 
 # ---- rsync 제외 패턴 (코드만, 대용량/생성물 제외) ---------------------------
 EXCLUDES=(
@@ -63,7 +72,9 @@ deploy_one() {
     echo "  -> $d/"
     rsync -az $DRY "${EXCLUDES[@]}" \
       -e "$sshcmd" \
-      "$REPO_ROOT/$d/" "$host:$base/$d/"
+      "$STAGE_DIR/$d/" "$host:$base/$d/"
+    rsync -az $DRY -e "$sshcmd" \
+      "$MANIFEST_DIR/$d.json" "$host:$base/$d/source_manifest.json"
   done
   echo "  [$name] 배포 완료"
 }
