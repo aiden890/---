@@ -66,13 +66,14 @@ def build_frame_annotations(recs):
     cur = None
     last_vlm = None   # last vlm record in this segment
 
-    def flush(verdict, steps, success_step, reason):
+    def flush(verdict, steps, success_step, reason, success_gate=None):
         if cur is None:
             return
         cur["verdict"] = verdict
         cur["steps"] = steps
         cur["success_step"] = success_step
         cur["reason"] = reason
+        cur["success_gate"] = success_gate   # strict, view-routed, episode-level
         segments.append(cur)
 
     for r in recs:
@@ -104,7 +105,7 @@ def build_frame_annotations(recs):
             cur["_verify_reason"] = r.get("reason")
         elif t == "skill_result" and cur is not None:
             flush(r["status"], r["steps"], r.get("success_step"),
-                  cur.get("_verify_reason"))
+                  cur.get("_verify_reason"), r.get("success_gate"))
             cur = None
 
     for seg in segments:
@@ -114,7 +115,7 @@ def build_frame_annotations(recs):
                 "skill": seg["skill"], "instr": seg["instr"], "plan_idx": seg["plan_idx"],
                 "verdict": seg["verdict"], "steps": seg["steps"],
                 "success_step": seg["success_step"], "reason": seg["reason"],
-                "max_prob": seg["max_prob"],
+                "max_prob": seg["max_prob"], "success_gate": seg.get("success_gate"),
                 "vlm": seg["vlm_by_frame"].get(fi),
                 "is_boundary": (i == len(frames) - 1),
             }
@@ -122,17 +123,34 @@ def build_frame_annotations(recs):
         s0 = segments[0]
         ann[0] = {"skill": s0["skill"], "instr": s0["instr"], "plan_idx": s0["plan_idx"],
                   "verdict": None, "steps": s0["steps"], "success_step": s0["success_step"],
-                  "reason": None, "max_prob": s0["max_prob"], "vlm": None, "is_boundary": False}
+                  "reason": None, "max_prob": s0["max_prob"], "success_gate": s0.get("success_gate"),
+                  "vlm": None, "is_boundary": False}
     return ann, segments
 
 
-def _place_note(skill, verdict):
-    if skill == "PLACE_OBJECT" and verdict != "SUCCESS":
-        return "  [single-frame PLACE VQA is weak -> possible false negative]"
-    return ""
+GREEN = (80, 220, 120)
+RED = (60, 60, 235)
+GREY = (170, 170, 170)
+AMBER = (40, 190, 235)
 
 
-def draw(frame, a, seed):
+def _gate_summary(sg):
+    """Compact one-line strict-gate read: PASS/FAIL + per-sub view scores."""
+    if not sg:
+        return None, None
+    ok = bool(sg.get("success"))
+    scores = sg.get("sub_scores") or []
+    views = sg.get("sub_views") or []
+    thr = sg.get("sub_thresholds") or []
+    parts = []
+    for s, v, t in zip(scores, views, thr):
+        s_s = f"{s:.2f}" if isinstance(s, (int, float)) else "n/a"
+        parts.append(f"{v}={s_s}/{t:.2f}")
+    detail = " ".join(parts) if parts else (sg.get("reason") or "")
+    return ok, detail
+
+
+def draw(frame, a, seed, sim_task_success=None):
     h, w = frame.shape[:2]
     pad = 6
     font = cv2.FONT_HERSHEY_SIMPLEX
@@ -153,7 +171,7 @@ def draw(frame, a, seed):
     cv2.putText(frame, "judge: obs VLM (Qwen3-VL)", (w - 210, 17), font, 0.40,
                 (140, 200, 250), 1, cv2.LINE_AA)
 
-    # bottom strip: live VLM P(yes) + latch + decision
+    # bottom strip: live VLM P(yes) + latch + decision (BOUNDARY judge)
     cv2.rectangle(frame, (0, h - 46), (w, h), (28, 28, 28), -1)
     vlm = a.get("vlm")
     if vlm and vlm.get("prob") is not None:
@@ -164,7 +182,7 @@ def draw(frame, a, seed):
         bar_w = int((w - 2 * pad) * max(0.0, min(1.0, p)))
         cv2.rectangle(frame, (pad, h - 40), (w - pad, h - 30), (60, 60, 60), -1)
         cv2.rectangle(frame, (pad, h - 40), (pad + bar_w, h - 30), dc, -1)
-        cv2.putText(frame, f"VLM P(yes)={p:.2f}  latch={vlm.get('consec')}"
+        cv2.putText(frame, f"BOUNDARY(latch) P(yes)={p:.2f}  latch={vlm.get('consec')}"
                     f"  decision={dec}",
                     (pad, h - 14), font, 0.44, dc, 1, cv2.LINE_AA)
     else:
@@ -172,17 +190,55 @@ def draw(frame, a, seed):
                     (pad, h - 14), font, 0.44, (170, 170, 170), 1, cv2.LINE_AA)
 
     if at_boundary:
-        vc = DECISION_COLOR.get("ADVANCE" if a["verdict"] == "SUCCESS" else "REPLAN",
-                                (200, 200, 200))
+        # ---- TWO SEPARATE JUDGMENTS at the skill boundary -----------------
+        #  (1) BOUNDARY judge (latch): did it ADVANCE / timeout?
+        #  (2) STRICT SuccessGate (view-routed, episode-level): PASS/FAIL.
+        # Showing them apart is the whole point: a PLACE that ADVANCEd on a
+        # transient single-frame flush now visibly FAILs the strict gate.
+        adv = a["verdict"] == "SUCCESS"
+        bc = GREEN if adv else RED
         mp = a.get("max_prob")
         mp_s = f"{mp:.2f}" if mp is not None else "n/a"
-        if a["verdict"] == "SUCCESS":
-            txt = f"VLM ADVANCE -> SUCCESS (max P(yes)={mp_s})"
+        boundary_txt = (f"[1] BOUNDARY: {'ADVANCE' if adv else 'REPLAN/timeout'}"
+                        f" (max P(yes)={mp_s})")
+
+        gate_ok, gate_detail = _gate_summary(a.get("success_gate"))
+        # panel geometry: draw an opaque box above the bottom strip
+        y0 = h - 46 - 62
+        cv2.rectangle(frame, (0, y0), (w, h - 46), (20, 20, 20), -1)
+        cv2.putText(frame, boundary_txt[:78], (pad, y0 + 16), font, 0.44, bc, 1, cv2.LINE_AA)
+
+        if gate_ok is None:
+            # skills without a strict gate (MOVE) -- say so, don't fake a verdict
+            cv2.putText(frame, "[2] SUCCESS GATE: n/a (waypoint skill, no strict gate)",
+                        (pad, y0 + 36), font, 0.42, GREY, 1, cv2.LINE_AA)
+            outer = bc
         else:
-            txt = (f"VLM REPLAN/timeout (max P(yes)={mp_s})"
-                   + _place_note(a["skill"], a["verdict"]))
-        cv2.putText(frame, txt[:88], (pad, h - 2), font, 0.40, vc, 1, cv2.LINE_AA)
-        cv2.rectangle(frame, (0, 0), (w - 1, h - 1), vc, 4)
+            gc = GREEN if gate_ok else RED
+            gtxt = f"[2] SUCCESS GATE(strict): {'PASS' if gate_ok else 'FAIL'}  {gate_detail}"
+            cv2.putText(frame, gtxt[:82], (pad, y0 + 36), font, 0.42, gc, 1, cv2.LINE_AA)
+            # highlight the caught false-positive: latch ADVANCE but strict FAIL
+            if adv and not gate_ok:
+                cv2.putText(frame,
+                            "  --> ADVANCE but STRICT=FAIL: PLACE false-positive CAUGHT",
+                            (pad, y0 + 54), font, 0.42, AMBER, 1, cv2.LINE_AA)
+            outer = gc  # the strict verdict drives the frame border
+
+        # ---- sim GT chip (offline label ONLY, never a verifier input) ------
+        if sim_task_success is not None and a["skill"] == "PLACE_OBJECT":
+            sg_c = GREEN if sim_task_success else RED
+            sim_txt = f"sim GT (offline): task_success={sim_task_success}"
+            (tw, _), _ = cv2.getTextSize(sim_txt, font, 0.42, 1)
+            cv2.putText(frame, sim_txt, (w - tw - pad, y0 + 16), font, 0.42, sg_c, 1, cv2.LINE_AA)
+            # agreement note between the strict obs gate and the sim label
+            if gate_ok is not None:
+                agree = (gate_ok == bool(sim_task_success))
+                atxt = "strict==sim (obs gate agrees w/ GT)" if agree else "strict!=sim (disagree)"
+                ac = GREEN if agree else AMBER
+                (aw, _), _ = cv2.getTextSize(atxt, font, 0.40, 1)
+                cv2.putText(frame, atxt, (w - aw - pad, y0 + 36), font, 0.40, ac, 1, cv2.LINE_AA)
+
+        cv2.rectangle(frame, (0, 0), (w - 1, h - 1), outer, 4)
     return frame
 
 
@@ -200,6 +256,16 @@ def main():
     seed_dir = os.path.join(root, f"seed{args.seed}")
     recs = [json.loads(l) for l in open(os.path.join(seed_dir, "trace.jsonl"))]
     ann, segments = build_frame_annotations(recs)
+
+    # sim GT (offline label ONLY -- never a verifier input). Read the seed
+    # summary's official predicate so the overlay can show VLM strict-success
+    # vs actual sim success side by side.
+    sim_task_success = None
+    try:
+        with open(os.path.join(seed_dir, "summary.json")) as f:
+            sim_task_success = bool(json.load(f).get("task_success"))
+    except Exception:
+        sim_task_success = None
 
     cap = cv2.VideoCapture(os.path.join(seed_dir, "episode.mp4"))
     w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -219,7 +285,7 @@ def main():
         a = ann.get(fi, last_ann)
         if a is not None:
             last_ann = a
-            frame = draw(frame, a, args.seed)
+            frame = draw(frame, a, args.seed, sim_task_success=sim_task_success)
             reps = args.hold_boundary if a.get("is_boundary") else 1
         else:
             reps = 1
@@ -232,8 +298,10 @@ def main():
     imageio.mimsave(args.out, out_frames, fps=args.fps, codec="libx264",
                     macro_block_size=None, pixelformat="yuv420p")
     print(json.dumps({"seed": args.seed, "video_frames_in": fi, "frames_written": written,
+                      "sim_task_success": sim_task_success,
                       "segments": [(s["skill"], s["verdict"],
-                                    round(s["max_prob"], 3) if s["max_prob"] is not None else None)
+                                    round(s["max_prob"], 3) if s["max_prob"] is not None else None,
+                                    (s.get("success_gate") or {}).get("success"))
                                    for s in segments],
                       "out": args.out}))
 

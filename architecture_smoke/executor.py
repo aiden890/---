@@ -135,6 +135,11 @@ class ExecutionManager:
                 res = self._result(SkillStatus.TIMEOUT, call, instruction, steps, None,
                                    "vlm_timeout", v.reason, self.env.predicates())
                 res.vlm_stats = verifier.stats()
+                # strict success verdict is meaningful even when the boundary
+                # latch never fired (timeout): the window mean of the accumulated
+                # frames says whether the end state actually looks successful.
+                if success_gate is not None:
+                    res.success_gate = success_gate.verdict()
                 return res
             if done or trunc:
                 self.trace.verify(call.name, "TERMINATED", f"env done={done} trunc={trunc}",
@@ -143,6 +148,8 @@ class ExecutionManager:
                                    "env_terminated", f"env done={done} trunc={trunc}",
                                    self.env.predicates())
                 res.vlm_stats = verifier.stats()
+                if success_gate is not None:
+                    res.success_gate = success_gate.verdict()
                 return res
 
         reason = last_v.reason if last_v else "budget exhausted"
@@ -151,6 +158,8 @@ class ExecutionManager:
         res = self._result(SkillStatus.TIMEOUT, call, instruction, steps, None,
                            "vlm_timeout", reason, self.env.predicates())
         res.vlm_stats = verifier.stats()
+        if success_gate is not None:
+            res.success_gate = success_gate.verdict()
         return res
 
     # ------------------------------------------------------------------ #
