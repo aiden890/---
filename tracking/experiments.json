@@ -2,6 +2,87 @@
   "schema_version": 1,
   "experiments": [
     {
+      "id": "EXP-20260917-Z1-EXPERT-SMOKE",
+      "date": "2026-09-17",
+      "title": "Z-1 expert adapter smoke test",
+      "status": "running",
+      "model": "Xiaomi-Robotics-1-RoboCasa365",
+      "task": "CloseBlenderLid / GRASP",
+      "question": "action-expert 전체 linear LoRA를 Z-1 규모의 group-relative update로 RTX 3090 24GB에서 안전하게 학습할 수 있는가?",
+      "summary": "2-update smoke가 실행 중이다. adapter 구조(189 target modules / 6.35M trainable params)는 실행 로그에서 확인된 provisional 값이며, update별 성능·시간·안정성 측정값과 gate 판정은 아직 수집 중이다.",
+      "page": "experiments/exp-20260917-z1-expert-smoke.html",
+      "data": "../rl-train-t_3ed65912/results/alllinear_grasp_smoke2/",
+      "tags": [
+        "GRPO",
+        "GRASP",
+        "Z-1",
+        "action-expert",
+        "all-linear-LoRA",
+        "smoke-test",
+        "running"
+      ],
+      "kanban": "t_4c421da6",
+      "configuration": {
+        "base_model": "Xiaomi-Robotics-1-RoboCasa365",
+        "task_skill": "CloseBlenderLid / GRASP",
+        "adapter": "action-expert all-linear LoRA",
+        "lora_rank": 8,
+        "lora_alpha": 32,
+        "target_modules": 189,
+        "trainable_params": "6.35M",
+        "adapter_count_status": "provisional — 실행 로그에서 확인, final artifact로 재검증 예정",
+        "sampler": "piRL Flow-SDE",
+        "denoise_steps": 5,
+        "eta": 0.1,
+        "control_hz": 20,
+        "horizon": 208,
+        "action_chunk": 16,
+        "group_size": 8,
+        "groups_per_update": "8 기본 / 24 최대",
+        "min_trainable_chunks": 1024,
+        "smoke_updates": 2,
+        "update_epoch": 1,
+        "optimizer": "AdamW",
+        "learning_rate": 0.00001,
+        "weight_decay": 0.01,
+        "ppo_clip": 0.2,
+        "grad_clip": 1.0,
+        "kl_coef": 0,
+        "reward": "terminal success + 20-step hold"
+      },
+      "progress": {
+        "source_status": "provisional",
+        "source": "parent task t_4c421da6 comment",
+        "observed_rollouts_started": 36,
+        "observed_trainable_chunks_upper_bound": 468,
+        "note": "첫 update rollout 수집 중이며 optimizer update 전 상태. 완료 artifact가 아니므로 최종 측정값으로 사용하지 않는다."
+      },
+      "measurements": {
+        "updates": null,
+        "rollout_wall_clock": null,
+        "reset_save_optimizer_time": null,
+        "peak_vram": null,
+        "oom": null,
+        "nan": null,
+        "success_official_hold": null,
+        "reward_distribution": null,
+        "ratio_kl_clip_grad_adapter_delta": null,
+        "recompute_ratio_one": null,
+        "logprob_match": null
+      },
+      "gate": {
+        "status": "collecting",
+        "continue_30_updates": null,
+        "eta": null
+      },
+      "artifacts": {
+        "result_dir": "rl-train-t_3ed65912/results/alllinear_grasp_smoke2/",
+        "checkpoint": null,
+        "summary_json": null,
+        "log": null
+      }
+    },
+    {
       "id": "EXP-20260917-ADAPTIVE",
       "date": "2026-09-17",
       "title": "Adaptive curriculum GRASP GRPO — 병목 진단 스윕 (exp1→3)",

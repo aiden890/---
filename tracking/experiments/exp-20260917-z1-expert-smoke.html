@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Z-1 expert adapter smoke test</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="../assets/theme.js"></script>
+  <style>
+    .notice{border-left:3px solid var(--run);padding:12px 15px;background:var(--surface);border-radius:0 9px 9px 0;margin:14px 0}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    .table-wrap{overflow-x:auto}
+    .state{font-weight:700;color:var(--run)}
+    .pending{color:var(--dim);font-style:italic}
+    .artifact-list{display:grid;gap:8px}
+    .artifact-row{display:grid;grid-template-columns:130px minmax(0,1fr);gap:10px;align-items:start}
+    @media(max-width:720px){.grid{grid-template-columns:1fr}.artifact-row{grid-template-columns:1fr;gap:2px}}
+  </style>
+</head>
+<body>
+<header><div class="bar"><a href="../index.html#attend">← 실험 목록</a><b>RoboCasa · Xiaomi VLA</b></div></header>
+<main id="app"><p class="dim">실험 정보를 불러오는 중…</p></main>
+<script>
+const EXP_ID='EXP-20260917-Z1-EXPERT-SMOKE';
+const pending='<span class="pending">수집 중</span>';
+const shown=v=>v===null||v===undefined||v===''?pending:String(v);
+const rows=items=>items.map(([k,v])=>`<tr><td>${k}</td><td>${shown(v)}</td></tr>`).join('');
+const linkOrPending=(label,path)=>path?`<a href="../${path}">${label}</a> <code>${path}</code>`:pending;
+
+fetch('../experiments.json').then(r=>{
+  if(!r.ok) throw new Error(`experiments.json HTTP ${r.status}`);
+  return r.json();
+}).then(db=>{
+  const e=db.experiments.find(x=>x.id===EXP_ID);
+  if(!e) throw new Error(`${EXP_ID} entry not found`);
+  const c=e.configuration, p=e.progress, m=e.measurements, g=e.gate, a=e.artifacts;
+  const status=e.status==='running'?'진행 중':e.status;
+  document.getElementById('app').innerHTML=`
+    <div class="dim">${e.id} · ${e.date}</div>
+    <h1>${e.title}</h1>
+    <div class="meta"><span class="chip state">${status}</span><span class="chip">${e.model}</span><span class="chip">${e.task}</span><span class="chip">card ${e.kanban}</span></div>
+    <div class="notice"><b>실행 중인 smoke입니다.</b><br>확정되지 않은 측정값은 모두 “수집 중”으로 표시한다. 189 modules / 6.35M은 실행 로그에서 확인된 <b>source/provisional</b> 값이며 final artifact로 재검증하기 전까지 최종값이 아니다.</div>
+    <div class="question"><b>검증 질문</b><br>${e.question}</div>
+
+    <div class="grid">
+      <div class="card"><h2>모델 · adapter</h2><div class="table-wrap"><table><tbody>${rows([
+        ['base model',c.base_model],['task / skill',c.task_skill],['adapter',c.adapter],['LoRA rank / alpha',`${c.lora_rank} / ${c.lora_alpha}`],
+        ['target modules',`${c.target_modules} (provisional)`],['trainable params',`${c.trainable_params} (provisional)`],['값 상태',c.adapter_count_status]
+      ])}</tbody></table></div></div>
+      <div class="card"><h2>rollout · update 규모</h2><div class="table-wrap"><table><tbody>${rows([
+        ['sampler',`${c.sampler}, ${c.denoise_steps} denoise steps, eta=${c.eta}`],['control / horizon / chunk',`${c.control_hz}Hz / ${c.horizon} / ${c.action_chunk}`],
+        ['group size',c.group_size],['groups / update',c.groups_per_update],['min trainable chunks',c.min_trainable_chunks],['smoke updates / epoch',`${c.smoke_updates} / ${c.update_epoch}`]
+      ])}</tbody></table></div></div>
+    </div>
+
+    <div class="card"><h2>optimizer · reward</h2><div class="table-wrap"><table><tbody>${rows([
+      ['optimizer',c.optimizer],['learning rate',c.learning_rate],['weight decay',c.weight_decay],['PPO clip',c.ppo_clip],['gradient clip',c.grad_clip],['KL coefficient',c.kl_coef],['reward',c.reward]
+    ])}</tbody></table></div></div>
+
+    <div class="card"><h2>현재 관측 snapshot — final 아님</h2>
+      <p class="dim">source: ${p.source} · status: <b>${p.source_status}</b></p>
+      <div class="table-wrap"><table><tbody>${rows([
+        ['rollouts started',p.observed_rollouts_started],['trainable chunks upper bound',`${p.observed_trainable_chunks_upper_bound} / ${c.min_trainable_chunks}`],['해석',p.note]
+      ])}</tbody></table></div>
+    </div>
+
+    <div class="card"><h2>update별 수집 결과</h2><div class="table-wrap"><table>
+      <thead><tr><th>update</th><th>rollouts</th><th>groups</th><th>trainable chunks</th><th>ratio / KL / clip</th><th>grad norm</th><th>adapter delta</th></tr></thead>
+      <tbody>${m.updates?m.updates.map(u=>`<tr><td>${shown(u.update)}</td><td>${shown(u.rollouts)}</td><td>${shown(u.groups)}</td><td>${shown(u.trainable_chunks)}</td><td>${shown(u.ratio_kl_clip)}</td><td>${shown(u.grad_norm)}</td><td>${shown(u.adapter_delta)}</td></tr>`).join(''):`<tr><td colspan="7">${pending}</td></tr>`}</tbody>
+    </table></div></div>
+
+    <div class="grid">
+      <div class="card"><h2>시간 · 자원 · 안정성</h2><div class="table-wrap"><table><tbody>${rows([
+        ['rollout 총/trajectory/chunk',m.rollout_wall_clock],['reset / save / optimizer',m.reset_save_optimizer_time],['peak VRAM',m.peak_vram],['OOM',m.oom],['NaN',m.nan]
+      ])}</tbody></table></div></div>
+      <div class="card"><h2>성공 · reward</h2><div class="table-wrap"><table><tbody>${rows([
+        ['success / official / hold',m.success_official_hold],['reward distribution',m.reward_distribution]
+      ])}</tbody></table></div></div>
+    </div>
+
+    <div class="card"><h2>학습 정합성 · gate</h2><div class="table-wrap"><table><tbody>${rows([
+      ['ratio / KL / clip / grad / delta',m.ratio_kl_clip_grad_adapter_delta],['first recompute ratio = 1',m.recompute_ratio_one],['rollout/recompute log-prob match',m.logprob_match],
+      ['smoke gate',g.status==='collecting'?'수집 중':g.status],['30-update 진행 여부',g.continue_30_updates],['30-update ETA',g.eta]
+    ])}</tbody></table></div></div>
+
+    <div class="card"><h2>artifact</h2><div class="artifact-list">
+      <div class="artifact-row"><b>result directory</b><code>${a.result_dir}</code></div>
+      <div class="artifact-row"><b>checkpoint</b><span>${linkOrPending('checkpoint',a.checkpoint)}</span></div>
+      <div class="artifact-row"><b>summary JSON</b><span>${linkOrPending('summary',a.summary_json)}</span></div>
+      <div class="artifact-row"><b>train log</b><span>${linkOrPending('log',a.log)}</span></div>
+    </div></div>`;
+}).catch(err=>{document.getElementById('app').innerHTML='<p class="no">실험 정보를 불러오지 못했습니다.</p>';console.error(err);});
+setTimeout(()=>location.reload(),60000);
+</script>
+</body>
+</html>
