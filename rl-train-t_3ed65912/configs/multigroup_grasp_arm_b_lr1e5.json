@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "status": "pending GPU gate",
+  "trainer": {
+    "sampler": "pirl",
+    "optimizer": "adamw",
+    "lr": 1e-5,
+    "weight_decay": 0.0,
+    "train_mode": "adapter_only",
+    "adapter_skills": "grasp",
+    "lora_targets": "all_linear",
+    "eta": 0.1,
+    "grad_clip": 1.0,
+    "update_epochs": 2,
+    "target_kl": 0.05,
+    "clip": 0.2,
+    "ratio_max": 10.0,
+    "adv_clip": 3.0
+  },
+  "client": {
+    "train_skill": "grasp",
+    "group": 8,
+    "groups_per_update": 8,
+    "min_trainable_chunks": 1024,
+    "max_groups_per_update": 24,
+    "iters": 2,
+    "adaptive_band": [1, 7],
+    "adaptive_universe": 256,
+    "adaptive_explore_frac": 0.25,
+    "adaptive_ema": 0.5,
+    "adaptive_avoid_recent": 3,
+    "eta": 0.1,
+    "reward_variant": "terminal_plus_hold",
+    "hold_steps": 20,
+    "eval_n": 0,
+    "heldout_n": 0,
+    "skip_eval": true,
+    "joint_logprob": false
+  }
+}
