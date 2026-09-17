@@ -189,6 +189,62 @@ def eval_point(rollouts, score_fn, *, tau, hysteresis_k, hold_steps):
     return confusion(recs), recs
 
 
+def episode_aggregate(frames, score_fn, aggregation):
+    """Aggregate an episode endpoint/window without consulting sim labels."""
+    values = [score_fn(fr["scores"]) for fr in frames]
+    values = [value for value in values if value is not None]
+    if not values:
+        return None
+    if aggregation == "mean":
+        selected = values
+    elif aggregation == "max":
+        return max(values)
+    elif aggregation.startswith("last"):
+        selected = values[-int(aggregation[4:]):]
+    else:
+        raise ValueError(f"unknown episode aggregation: {aggregation}")
+    return sum(selected) / len(selected)
+
+
+def sweep_episode_endpoints(rollouts, rules, target_precision,
+                            aggregations=("last1", "last3", "last5", "last10",
+                                          "mean", "max")):
+    """Tune an event-gated endpoint classifier separately from boundary timing.
+
+    This answers whether the same frozen VLM can judge a completion checkpoint
+    (single frame vs temporal window) even when it cannot safely identify the
+    earliest transition frame. Threshold candidates come only from observed
+    scores; sim GT is used solely for offline confusion labels.
+    """
+    sweep = []
+    for rule_name, score_fn in rules.items():
+        for aggregation in aggregations:
+            rows = [(bool(ro["gt_success"]),
+                     episode_aggregate(ro["frames"], score_fn, aggregation))
+                    for ro in rollouts]
+            rows = [(gt, score) for gt, score in rows if score is not None]
+            for tau in sorted({score for _, score in rows}):
+                tp = sum(gt and score >= tau for gt, score in rows)
+                fp = sum((not gt) and score >= tau for gt, score in rows)
+                fn = sum(gt and score < tau for gt, score in rows)
+                tn = sum((not gt) and score < tau for gt, score in rows)
+                precision = tp / (tp + fp) if (tp + fp) else None
+                recall = tp / (tp + fn) if (tp + fn) else None
+                f1 = (2 * precision * recall / (precision + recall)
+                      if precision and recall else None)
+                sweep.append({
+                    "rule": rule_name, "aggregation": aggregation, "tau": tau,
+                    "n": len(rows), "tp": tp, "fp": fp, "fn": fn, "tn": tn,
+                    "precision": precision, "recall": recall, "f1": f1,
+                })
+    measured = [row for row in sweep if row["precision"] is not None]
+    feasible = [row for row in measured if row["precision"] >= target_precision]
+    pool = feasible or measured
+    best = (max(pool, key=lambda row: (row["recall"] or 0,
+                                       row["precision"] or 0)) if pool else None)
+    return best, sweep
+
+
 # --------------------------------------------------------------------------- #
 #  candidate score-rules per skill                                              #
 # --------------------------------------------------------------------------- #
@@ -282,6 +338,8 @@ def main():
             single = (skill != "place" or s["rule"].startswith("place_combined@"))
             return single and s["hold_steps"] <= s["hysteresis_k"]
         runtime_best = pick_best(sweep, target, rule_filter=runtime_rule)
+        endpoint_best, endpoint_sweep = sweep_episode_endpoints(
+            rollouts, rules, target_precision=target)
         result["skills"][skill] = {
             "n_rollouts": len(rollouts),
             "n_pos": sum(1 for r in rollouts if r["gt_success"]),
@@ -289,6 +347,8 @@ def main():
             "target_precision": target,
             "best": best,
             "runtime_best": runtime_best,
+            "episode_endpoint_best": endpoint_best,
+            "episode_endpoint_sweep": endpoint_sweep,
             "roc_auc_by_rule": rule_auc,
             "sweep": sweep,
         }
@@ -298,6 +358,10 @@ def main():
               f"tau={b.get('tau')} k={b.get('hysteresis_k')} hold={b.get('hold_steps')} "
               f"prec={b.get('precision')} rec={b.get('recall')} "
               f"fp={b.get('fp')} offset={b.get('mean_timing_offset')}", flush=True)
+        e = endpoint_best or {}
+        print(f"  endpoint rule={e.get('rule')} agg={e.get('aggregation')} "
+              f"tau={e.get('tau')} prec={e.get('precision')} "
+              f"rec={e.get('recall')} fp={e.get('fp')}", flush=True)
 
     call_name = {"grasp": "GRASP_OBJECT", "move_holding": "MOVE_OBJECT",
                  "place": "PLACE_OBJECT"}

@@ -85,6 +85,22 @@ def test_success_gate_validation_ignores_boundary_only_move_rollouts():
     assert validate_success_gate.eval_baseline_before(cache) == {}
 
 
+def test_endpoint_sweep_selects_temporal_window_at_precision_target():
+    rules = {"q@eye": calibrate_obs_verifier.rule_single("q", view="eye")}
+    rollouts = [
+        {"gt_success": True, "frames": [
+            {"scores": {"q@eye": 0.2}}, {"scores": {"q@eye": 0.8}},
+            {"scores": {"q@eye": 0.8}}]},
+        {"gt_success": False, "frames": [
+            {"scores": {"q@eye": 0.9}}, {"scores": {"q@eye": 0.1}},
+            {"scores": {"q@eye": 0.1}}]},
+    ]
+    best, _ = calibrate_obs_verifier.sweep_episode_endpoints(
+        rollouts, rules, 0.9, aggregations=("max", "last3"))
+    assert best["aggregation"] == "last3"
+    assert best["precision"] == 1.0 and best["recall"] == 1.0
+
+
 if __name__ == "__main__":
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     for test in tests:
