@@ -6,6 +6,7 @@
 <title>RoboCasa · Xiaomi VLA</title>
 <link rel="stylesheet" href="assets/site.css">
 <link rel="stylesheet" href="assets/inference.css">
+<script src="assets/theme.js"></script>
 </head>
 <body>
 <header>
@@ -345,7 +346,7 @@ PLACE_OBJECT:
   <div class="card" id="infvid-card">
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px">
       <label class="dim" style="font-size:13px">버전</label>
-      <select id="infvid-select" style="padding:6px 10px;border-radius:8px;background:var(--bg2,#1a1d24);color:var(--tx,#e6e6e6);border:1px solid var(--bd,#333);min-width:280px"></select>
+      <select id="infvid-select" style="padding:6px 10px;border-radius:8px;background:var(--surface-deep);color:var(--tx);border:1px solid var(--bd);min-width:280px"></select>
       <span id="infvid-badge" class="dim" style="font-size:12px"></span>
     </div>
     <div id="infvid-player"></div>
@@ -389,7 +390,7 @@ PLACE_OBJECT:
   </div>
   <div class="card">
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
-      <input id="tsearch" placeholder="task 검색…" style="flex:1;min-width:160px;background:#0c0e13;border:1px solid var(--bd);border-radius:8px;color:var(--tx);padding:8px 12px;font:inherit;font-size:14px">
+      <input id="tsearch" placeholder="task 검색…" style="flex:1;min-width:160px;background:var(--surface-deep);border:1px solid var(--bd);border-radius:8px;color:var(--tx);padding:8px 12px;font:inherit;font-size:14px">
       <button class="filt active" data-f="all">전체</button>
       <button class="filt" data-f="atomic">atomic</button>
       <button class="filt" data-f="composite">composite</button>
