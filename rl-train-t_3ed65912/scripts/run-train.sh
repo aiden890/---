@@ -93,7 +93,7 @@ case "${1:-help}" in
       -v "$skilltools:/skill_eval_tools:ro" -v "$rlenv:/rl_env:ro" -v "$train:/train" -v "$out:/out" \
       -v "$parent/checkpoint:/checkpoint:ro" --network "container:$trainer" \
       --entrypoint python "$client_image" /train/src/grpo_train_loop.py \
-      --out /out --trainer-port $port "${@:3}" 2>&1 | tee "$out/train.log"
+      --out "/train/results/$run" --trainer-port $port "${@:3}" 2>&1 | tee "$out/train.log"
     ;;
   g5-sweep)
     # G5(success): pi-RL noise-level success sweep (sim rollout). Client image networked to
