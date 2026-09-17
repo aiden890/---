@@ -4,7 +4,9 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
-from checkpoint_schema import build_checkpoint_metadata, validate_checkpoint_metadata  # noqa: E402
+from checkpoint_schema import (  # noqa: E402
+    build_checkpoint_metadata, rng_state_for_restore, validate_checkpoint_metadata,
+)
 
 
 def valid():
@@ -40,7 +42,33 @@ def test_metadata_rejects_target_order_change_missing_shape_and_legacy():
             raise AssertionError(f"checkpoint metadata mutation escaped: {mutated}")
 
 
+def test_rng_restore_normalizes_all_tensor_states_to_cpu():
+    class FakeTensor:
+        def __init__(self, name):
+            self.name = name
+            self.cpu_calls = 0
+
+        def cpu(self):
+            self.cpu_calls += 1
+            return f"cpu:{self.name}"
+
+    torch_state = FakeTensor("torch")
+    cuda_state = FakeTensor("cuda:0")
+    original = {
+        "torch": torch_state,
+        "cuda": [cuda_state],
+        "python": (3, (1, 2), None),
+    }
+    normalized = rng_state_for_restore(original)
+    assert normalized["torch"] == "cpu:torch"
+    assert normalized["cuda"] == ["cpu:cuda:0"]
+    assert torch_state.cpu_calls == cuda_state.cpu_calls == 1
+    assert normalized["python"] is original["python"]
+    assert normalized is not original
+
+
 if __name__ == "__main__":
     test_metadata_roundtrip()
     test_metadata_rejects_target_order_change_missing_shape_and_legacy()
+    test_rng_restore_normalizes_all_tensor_states_to_cpu()
     print("checkpoint schema tests passed")

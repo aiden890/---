@@ -59,7 +59,7 @@ from training_correctness import (  # noqa: E402
     verify_deployment_manifest, should_stop_for_kl,
 )
 from checkpoint_schema import (  # noqa: E402
-    build_checkpoint_metadata, validate_checkpoint_metadata,
+    build_checkpoint_metadata, rng_state_for_restore, validate_checkpoint_metadata,
 )
 
 # Goal-3 SFT sends DATASET skill names; map them to the per-skill LoRA keys used by
@@ -543,7 +543,7 @@ class GRPOTrainerServer:
                         f"expected={tuple(named[name].shape)} actual={tuple(tensor.shape)}")
                 named[name].copy_(tensor.to(device=named[name].device, dtype=named[name].dtype))
         self.opt.load_state_dict(blob["optimizer"])
-        rng = blob["rng"]
+        rng = rng_state_for_restore(blob["rng"])
         torch.set_rng_state(rng["torch"])
         if torch.cuda.is_available() and rng.get("cuda") is not None:
             torch.cuda.set_rng_state_all(rng["cuda"])
