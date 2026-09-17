@@ -223,6 +223,18 @@ def candidate_rules(skill, views):
     return rules
 
 
+def pick_best(sweep, target, rule_filter=None):
+    candidates = [s for s in sweep if rule_filter is None or rule_filter(s)]
+    feasible = [s for s in candidates if s["precision"] is not None
+                and s["precision"] >= target and s["recall"] is not None]
+    if feasible:
+        return max(feasible, key=lambda s: (s["recall"], s["precision"],
+                                            -s["hold_steps"]))
+    measured = [s for s in candidates if s["precision"] is not None]
+    return (max(measured, key=lambda s: (s["precision"], s["recall"] or 0))
+            if measured else None)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--cache", required=True)
@@ -260,26 +272,23 @@ def main():
                         ("n", "tp", "fp", "fn", "tn", "early_fp",
                          "precision", "recall", "f1", "mean_timing_offset")},
                 })
-        # pick best operating point: max recall subject to precision >= target
+        # pick best operating point: max recall subject to precision >= target.
         target = args.place_precision_target if skill == "place" else 0.9
-        feasible = [s for s in sweep if s["precision"] is not None
-                    and s["precision"] >= target and s["recall"] is not None]
-        # prefer highest recall, then highest precision, then smallest hold
-        best = None
-        if feasible:
-            best = max(feasible, key=lambda s: (s["recall"], s["precision"],
-                                                -s["hold_steps"]))
-        else:
-            # no point hits target: report best precision achievable
-            cand = [s for s in sweep if s["precision"] is not None]
-            if cand:
-                best = max(cand, key=lambda s: (s["precision"], s["recall"] or 0))
+        best = pick_best(sweep, target)
+        # Runtime boundary verifier supports one question/view and K-query latch.
+        # PLACE decompositions belong to the separate strict SuccessGate; an
+        # extra offline hold longer than K is not a deployable boundary config.
+        def runtime_rule(s):
+            single = (skill != "place" or s["rule"].startswith("place_combined@"))
+            return single and s["hold_steps"] <= s["hysteresis_k"]
+        runtime_best = pick_best(sweep, target, rule_filter=runtime_rule)
         result["skills"][skill] = {
             "n_rollouts": len(rollouts),
             "n_pos": sum(1 for r in rollouts if r["gt_success"]),
             "n_neg": sum(1 for r in rollouts if not r["gt_success"]),
             "target_precision": target,
             "best": best,
+            "runtime_best": runtime_best,
             "roc_auc_by_rule": rule_auc,
             "sweep": sweep,
         }
@@ -289,6 +298,19 @@ def main():
               f"tau={b.get('tau')} k={b.get('hysteresis_k')} hold={b.get('hold_steps')} "
               f"prec={b.get('precision')} rec={b.get('recall')} "
               f"fp={b.get('fp')} offset={b.get('mean_timing_offset')}", flush=True)
+
+    call_name = {"grasp": "GRASP_OBJECT", "move_holding": "MOVE_OBJECT",
+                 "place": "PLACE_OBJECT"}
+    result["runtime_operating_points"] = {}
+    for skill, detail in result["skills"].items():
+        op = detail.get("runtime_best")
+        if not op:
+            continue
+        result["runtime_operating_points"][call_name[skill]] = {
+            "view": op["rule"].rsplit("@", 1)[-1],
+            "tau": op["tau"], "hysteresis_k": op["hysteresis_k"],
+            "vlm_min_interval": 16,
+        }
 
     Path(args.out).parent.mkdir(parents=True, exist_ok=True)
     Path(args.out).write_text(json.dumps(result, indent=2, default=str))

@@ -69,8 +69,11 @@ def main():
                     help="JSON mapping skill names to per-skill view/tau/hysteresis_k/interval")
     args = ap.parse_args()
 
-    operating_points = (json.loads(Path(args.verifier_config).read_text())
-                        if args.verifier_config else {})
+    if args.verifier_config:
+        config_payload = json.loads(Path(args.verifier_config).read_text())
+        operating_points = config_payload.get("runtime_operating_points", config_payload)
+    else:
+        operating_points = {}
 
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)

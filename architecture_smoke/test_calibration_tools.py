@@ -40,6 +40,16 @@ def test_temporal_auc_labels_frames_before_success_as_negative():
     assert calibrate_obs_verifier.rule_frame_auc([rollout], fn) == 1.0
 
 
+def test_pick_best_can_restrict_to_runtime_deployable_rules():
+    sweep = [
+        {"rule": "place_combo@right", "precision": 1.0, "recall": 1.0, "hold_steps": 2},
+        {"rule": "place_combined@eye", "precision": 0.9, "recall": 0.8, "hold_steps": 2},
+    ]
+    best = calibrate_obs_verifier.pick_best(
+        sweep, 0.9, rule_filter=lambda x: x["rule"].startswith("place_combined@"))
+    assert best["rule"] == "place_combined@eye"
+
+
 def test_move_question_is_cached_for_move_rollouts():
     assert cache_frame_scores.SKILL_QUESTIONS["move_holding"] == ["move"]
     assert cache_frame_scores.QUESTION_BANK["move"] == RUNTIME_SKILL_QUESTIONS["MOVE_OBJECT"]
