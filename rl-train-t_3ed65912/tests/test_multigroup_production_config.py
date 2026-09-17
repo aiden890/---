@@ -91,6 +91,19 @@ def test_arm_b_cap_covers_measured_chunk_floor_shortfall():
     assert client["adaptive_universe"] >= client["max_groups_per_update"]
 
 
+def test_arm_a_uses_selected_conservative_gpu_settings():
+    config = json.loads(CONFIG.read_text())
+    trainer = config["trainer"]
+    client = config["client"]
+    assert trainer["optimizer"] == "adamw"
+    assert trainer["lr"] == 3e-7
+    assert trainer["update_epochs"] == 2
+    assert trainer["clip"] == 0.2
+    assert trainer["target_kl"] == 0.05
+    assert client["max_groups_per_update"] >= 32
+    assert client["adaptive_universe"] >= client["max_groups_per_update"]
+
+
 def test_execute_failure_writes_failed_sentinel():
     with tempfile.TemporaryDirectory() as td:
         root = Path(td)
@@ -117,5 +130,6 @@ if __name__ == "__main__":
     test_canonical_runner_exposes_cpu_only_dry_run()
     test_gpu_gate_refuses_a_preexisting_trainer()
     test_arm_b_cap_covers_measured_chunk_floor_shortfall()
+    test_arm_a_uses_selected_conservative_gpu_settings()
     test_execute_failure_writes_failed_sentinel()
-    print("6 production dry-run/source-mutation tests passed")
+    print("7 production dry-run/source-mutation tests passed")
