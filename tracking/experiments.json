@@ -17,21 +17,32 @@
           "var": "optimizer",
           "v4": "SGD 2e-3",
           "amp": "AdamW 1e-5",
-          "verdict": "1차목표 달성(GATED 68%→33/36%). 2차 미달: SGD dL2~0.001(정지)·grasp 0.60→0.55 REGRESSED; AdamW dL2 0.0038(유일 이동)·grasp+0.05. 병목=업뎃강도로 가설."
+          "verdict": "1차목표 달성(GATED 68%→33/36%). 2차 미달: SGD dL2~0.001(정지)·grasp 0.60→0.55 REGRESSED; AdamW dL2 0.0038(유일 이동)·grasp+0.05. 병목=업뎃강도로 가설.",
+          "wandb_runs": [
+            "http://100.86.183.64:8080/aiden-lab-desktop/robocasa-grpo/runs/grpo-adaptive_sgd2e3"
+          ]
         },
         {
           "exp": "exp2",
           "var": "learning rate (AdamW 고정)",
           "v4": "AdamW 3e-5",
           "amp": "AdamW 5e-5",
-          "verdict": "가설 반증. dL2를 exp1 대비 4~12x 키웠으나 양쪽 eval grasp flat 0.55→0.55. 업뎃강도는 병목 아님."
+          "verdict": "가설 반증. dL2를 exp1 대비 4~12x 키웠으나 양쪽 eval grasp flat 0.55→0.55. 업뎃강도는 병목 아님.",
+          "wandb_runs": [
+            "http://100.86.183.64:8080/aiden-lab-desktop/robocasa-grpo/runs/grpo-adaptive_adamw3e5",
+            "http://100.86.183.64:8080/aiden-lab-desktop/robocasa-grpo/runs/grpo-adaptive_adamw5e5"
+          ]
         },
         {
           "exp": "exp3",
           "var": "PPO clip (AdamW 3e-5 고정)",
           "v4": "clip 0.2",
           "amp": "clip 0.3",
-          "verdict": "진행중. 진단: on-seed n_succ 무추세(seed 1092 10회 학습 5,4,5,2,3,4,4,5,4,3) + clip_fraction~0.90(clip=0.1 포화) → advantage gradient 억제가 진짜 병목으로 지목. clip 완화가 이를 푸는지 검증."
+          "verdict": "진행중. 진단: on-seed n_succ 무추세(seed 1092 10회 학습 5,4,5,2,3,4,4,5,4,3) + clip_fraction~0.90(clip=0.1 포화) → advantage gradient 억제가 진짜 병목으로 지목. clip 완화가 이를 푸는지 검증.",
+          "wandb_runs": [
+            "http://100.86.183.64:8080/aiden-lab-desktop/robocasa-grpo/runs/grpo-adaptive_adamw3e5_clip02",
+            "http://100.86.183.64:8080/aiden-lab-desktop/robocasa-grpo/runs/grpo-adaptive_adamw3e5_clip03"
+          ]
         }
       ],
       "summary": "온라인 adaptive band 커리큘럼(band 1~7, universe 240, explore 0.25). exp1 optimizer / exp2 LR / exp3 clip 페어드 단일변수 스윕. exp1이 GATED 비율은 절반으로 낮췄으나 고정 eval delta는 exp1·exp2 모두 0. 로그 실측 진단으로 병목을 clip 포화(learning-efficacy)로 지목, exp3에서 clip 완화 검증 중.",
@@ -46,7 +57,18 @@
         "2-GPU",
         "diagnosis"
       ],
-      "kanban": "t_2907de4f"
+      "kanban": "t_2907de4f",
+      "wandb": {
+        "project": "http://100.86.183.64:8080/aiden-lab-desktop/robocasa-grpo",
+        "workspace": "http://100.86.183.64:8080/aiden-lab-desktop/robocasa-grpo?nw=sp1frcpci1i",
+        "runs": {
+          "adaptive_sgd2e3": "http://100.86.183.64:8080/aiden-lab-desktop/robocasa-grpo/runs/grpo-adaptive_sgd2e3",
+          "adaptive_adamw3e5": "http://100.86.183.64:8080/aiden-lab-desktop/robocasa-grpo/runs/grpo-adaptive_adamw3e5",
+          "adaptive_adamw5e5": "http://100.86.183.64:8080/aiden-lab-desktop/robocasa-grpo/runs/grpo-adaptive_adamw5e5",
+          "adaptive_adamw3e5_clip02": "http://100.86.183.64:8080/aiden-lab-desktop/robocasa-grpo/runs/grpo-adaptive_adamw3e5_clip02",
+          "adaptive_adamw3e5_clip03": "http://100.86.183.64:8080/aiden-lab-desktop/robocasa-grpo/runs/grpo-adaptive_adamw3e5_clip03"
+        }
+      }
     },
     {
       "id": "EXP-20260916-STAGE1",

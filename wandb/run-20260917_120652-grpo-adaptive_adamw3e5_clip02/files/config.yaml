@@ -1,0 +1,40 @@
+_wandb:
+    value:
+        cli_version: 0.30.0
+        e:
+            3zbkisx966nj2zj716sleb4kjp3cmuze:
+                codePath: scripts/wandb_mirror.py
+                codePathLocal: scripts/wandb_mirror.py
+                cpu_count: 6
+                cpu_count_logical: 12
+                disk:
+                    /:
+                        total: "982820896768"
+                        used: "848653484032"
+                executable: /home/aiden/.hermes/hermes-agent/venv/bin/python
+                git:
+                    commit: cc5f6a1c9c7678a47a4fd1f8711c49b019ca279a
+                host: aiden-min
+                memory:
+                    total: "32682426368"
+                os: Linux-6.8.0-111-generic-x86_64-with-glibc2.35
+                program: /home/aiden/Desktop/lab/robot/robocasa-docker/scripts/wandb_mirror.py
+                python: CPython 3.11.14
+                root: /home/aiden/Desktop/lab/robot/robocasa-docker
+                startedAt: "2026-09-17T03:06:52.665898Z"
+                writerId: 3zbkisx966nj2zj716sleb4kjp3cmuze
+        m: []
+        python_version: 3.11.14
+        t:
+            "3":
+                - 2
+                - 13
+                - 14
+                - 61
+                - 62
+            "4": 3.11.14
+            "5": 0.30.0
+            "10":
+                - 20
+            "12": 0.30.0
+            "13": linux-x86_64
