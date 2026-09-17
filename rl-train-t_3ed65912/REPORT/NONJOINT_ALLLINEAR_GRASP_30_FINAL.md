@@ -1,10 +1,10 @@
-# Non-joint all-linear GRASP 30-iteration final report
+# Non-joint all-linear GRASP 30-update report (continuation active)
 
 Task: `t_80f3cba3`
 Run: `nonjoint_abbb8c8_alllinear30`
 Source commit: `abbb8c824456e75fb91274ff7abf5bbf9e9bcb01`
 Model/task: Xiaomi-Robotics-1-RoboCasa365 / CloseBlenderLid GRASP
-Verdict: update stability PASS; policy improvement NOT DEMONSTRATED.
+Interim verdict: update stability PASS; the first 30 rollout iterations produced only 20 actual optimizer updates because 10 groups were correctly gated. A strict-loaded continuation is active to reach the required minimum of 30 optimizer updates before the final policy-improvement verdict.
 
 ## Root cause and correction
 
