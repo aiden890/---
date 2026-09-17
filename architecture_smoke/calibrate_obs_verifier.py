@@ -98,6 +98,40 @@ def replay_rollout(frames, score_fn, *, tau, hysteresis_k, hold_steps):
     return None
 
 
+def roc_auc_binary(labels, scores):
+    """Tie-aware ROC AUC: probability a random positive outranks a negative."""
+    pos = [s for y, s in zip(labels, scores) if y]
+    neg = [s for y, s in zip(labels, scores) if not y]
+    if not pos or not neg:
+        return None
+    wins = 0.0
+    for p in pos:
+        for n in neg:
+            wins += 1.0 if p > n else (0.5 if p == n else 0.0)
+    return wins / (len(pos) * len(neg))
+
+
+def parse_views(text):
+    views = [v.strip() for v in text.split(",") if v.strip()]
+    allowed = {"full", "left", "right", "eye"}
+    bad = [v for v in views if v not in allowed]
+    if not views or bad:
+        raise ValueError(f"invalid views {bad or views}; allowed={sorted(allowed)}")
+    return views
+
+
+def rule_episode_auc(rollouts, score_fn):
+    """Episode ROC AUC using the strongest frame score seen by the online judge."""
+    labels, scores = [], []
+    for ro in rollouts:
+        vals = [score_fn(fr["scores"]) for fr in ro["frames"]]
+        vals = [v for v in vals if v is not None]
+        if vals:
+            labels.append(bool(ro["gt_success"]))
+            scores.append(max(vals))
+    return roc_auc_binary(labels, scores)
+
+
 def confusion(records):
     tp = fp = fn = tn = 0
     offsets = []
@@ -140,17 +174,33 @@ def eval_point(rollouts, score_fn, *, tau, hysteresis_k, hold_steps):
 #  candidate score-rules per skill                                              #
 # --------------------------------------------------------------------------- #
 def candidate_rules(skill, views):
-    if skill == "grasp":
-        return {"grasp_single": rule_single("grasp")}
-    # place: baseline single combined + decomposition variants
-    rules = {
-        "place_combined": rule_single("place_combined"),
-        "place_seated_and_clear_min": rule_and(["place_seated", "place_clear"], combine="min"),
-        "place_seated_and_released_min": rule_and(["place_seated", "place_released"], combine="min"),
-        "place_seated_released_clear_min": rule_and(
-            ["place_seated", "place_released", "place_clear"], combine="min"),
-        "place_seated_and_clear_prod": rule_and(["place_seated", "place_clear"], combine="product"),
-    }
+    """Build every question-rule x requested-view candidate.
+
+    The old implementation accepted ``views`` but silently hard-coded ``full``;
+    that made a per-view cache impossible to sweep. Keep rule construction in
+    this one calibration engine and make camera routing explicit in rule names.
+    """
+    rules = {}
+    for view in views:
+        if skill == "grasp":
+            rules[f"grasp@{view}"] = rule_single("grasp", view=view)
+        elif skill == "move_holding":
+            rules[f"move@{view}"] = rule_single("move", view=view)
+        elif skill == "place":
+            rules.update({
+                f"place_combined@{view}": rule_single("place_combined", view=view),
+                f"place_seated_and_clear_min@{view}": rule_and(
+                    ["place_seated", "place_clear"], view=view, combine="min"),
+                f"place_seated_and_released_min@{view}": rule_and(
+                    ["place_seated", "place_released"], view=view, combine="min"),
+                f"place_seated_released_clear_min@{view}": rule_and(
+                    ["place_seated", "place_released", "place_clear"],
+                    view=view, combine="min"),
+                f"place_seated_and_clear_prod@{view}": rule_and(
+                    ["place_seated", "place_clear"], view=view, combine="product"),
+            })
+        else:
+            raise ValueError(f"unsupported calibration skill: {skill}")
     return rules
 
 
@@ -175,8 +225,11 @@ def main():
     holds = [int(x) for x in args.hold_grid.split(",")]
 
     result = {"meta": cache["meta"], "skills": {}}
+    views = parse_views(args.views)
     for skill, rollouts in by_skill.items():
-        rules = candidate_rules(skill, args.views)
+        rules = candidate_rules(skill, views)
+        rule_auc = {name: rule_episode_auc(rollouts, fn)
+                    for name, fn in rules.items()}
         sweep = []
         for rname, rfn in rules.items():
             for tau, k, hold in itertools.product(taus, latches, holds):
@@ -208,6 +261,7 @@ def main():
             "n_neg": sum(1 for r in rollouts if not r["gt_success"]),
             "target_precision": target,
             "best": best,
+            "roc_auc_by_rule": rule_auc,
             "sweep": sweep,
         }
         b = best or {}

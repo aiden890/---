@@ -57,6 +57,12 @@ QUESTION_BANK = {
         "gripper firmly grasping and holding the blender lid, having lifted it "
         "clear off the counter? Answer yes or no."
     ),
+    # ---- move: grasped lid is held above the target, ready to place ----
+    "move": (
+        "These are camera views of a robot manipulation scene. Is the robot "
+        "still holding the blender lid above the blender base, positioned and "
+        "ready to place it down? Answer yes or no."
+    ),
     # ---- place: original single combined question (baseline for before/after) ----
     "place_combined": (
         "These are camera views of a robot manipulation scene showing a "
@@ -85,6 +91,7 @@ QUESTION_BANK = {
 # Which questions to score for each skill (avoid wasted forwards).
 SKILL_QUESTIONS = {
     "grasp": ["grasp"],
+    "move_holding": ["move"],
     "place": ["place_combined", "place_seated", "place_released", "place_clear"],
 }
 
