@@ -22,7 +22,7 @@
     "group": 8,
     "groups_per_update": 8,
     "min_trainable_chunks": 1024,
-    "max_groups_per_update": 24,
+    "max_groups_per_update": 32,
     "iters": 2,
     "adaptive_band": [1, 7],
     "adaptive_universe": 256,

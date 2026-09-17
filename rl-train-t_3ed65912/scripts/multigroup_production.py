@@ -119,6 +119,7 @@ def main():
     mode.add_argument("--execute", action="store_true")
     parser.add_argument("--runner")
     parser.add_argument("--out")
+    parser.add_argument("--results-root")
     args = parser.parse_args()
     config = json.loads(Path(args.config).read_text())
     plan = validate(config, args.run)
@@ -130,9 +131,22 @@ def main():
         if not args.runner:
             raise ValueError("--runner is required with --execute")
         runner = ["bash", args.runner]
-        subprocess.run(runner + ["trainer-start"] + plan["argv"]["trainer"], check=True)
+        results_root = (Path(args.results_root) if args.results_root else
+                        Path(__file__).resolve().parent.parent / "results")
+        run_dir = results_root / args.run
+        run_dir.mkdir(parents=True, exist_ok=True)
         try:
+            subprocess.run(runner + ["trainer-start"] + plan["argv"]["trainer"], check=True)
             subprocess.run(runner + ["train", args.run] + plan["argv"]["client"], check=True)
+            (run_dir / "DONE").write_text(json.dumps({
+                "status": "done", "run": args.run,
+            }, sort_keys=True) + "\n")
+        except Exception as exc:
+            (run_dir / "FAILED").write_text(json.dumps({
+                "status": "failed", "run": args.run,
+                "error": f"{type(exc).__name__}: {exc}",
+            }, sort_keys=True) + "\n")
+            raise
         finally:
             subprocess.run(runner + ["trainer-stop"], check=False)
 

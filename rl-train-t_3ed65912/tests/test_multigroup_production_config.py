@@ -9,6 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SCRIPT = ROOT / "scripts" / "multigroup_production.py"
 CONFIG = ROOT / "configs" / "multigroup_grasp_v1.json"
+ARM_B_CONFIG = ROOT / "configs" / "multigroup_grasp_arm_b_lr1e5.json"
 sys.path.insert(0, str(ROOT / "scripts"))
 from multigroup_production import audit_nonjoint_source  # noqa: E402
 
@@ -83,9 +84,38 @@ def test_gpu_gate_refuses_a_preexisting_trainer():
     assert "docker ps" in gate
 
 
+def test_arm_b_cap_covers_measured_chunk_floor_shortfall():
+    config = json.loads(ARM_B_CONFIG.read_text())
+    client = config["client"]
+    assert client["max_groups_per_update"] >= 32
+    assert client["adaptive_universe"] >= client["max_groups_per_update"]
+
+
+def test_execute_failure_writes_failed_sentinel():
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        runner = root / "fail-runner.sh"
+        runner.write_text("#!/usr/bin/env bash\nexit 23\n")
+        runner.chmod(0o755)
+        completed = subprocess.run([
+            sys.executable, str(SCRIPT), "--config", str(ARM_B_CONFIG),
+            "--run", "sentinel_failure_test", "--execute",
+            "--runner", str(runner), "--results-root", str(root / "results"),
+        ], text=True, capture_output=True)
+        run_dir = root / "results" / "sentinel_failure_test"
+        assert completed.returncode != 0
+        assert (run_dir / "FAILED").is_file()
+        assert not (run_dir / "DONE").exists()
+        failure = json.loads((run_dir / "FAILED").read_text())
+        assert failure["status"] == "failed"
+        assert "returned non-zero exit status 23" in failure["error"].lower()
+
+
 if __name__ == "__main__":
     test_production_config_dry_run_is_safe_and_complete()
     test_nonjoint_source_audit_catches_joint_ratio_and_mask_mutations()
     test_canonical_runner_exposes_cpu_only_dry_run()
     test_gpu_gate_refuses_a_preexisting_trainer()
-    print("4 production dry-run/source-mutation tests passed")
+    test_arm_b_cap_covers_measured_chunk_floor_shortfall()
+    test_execute_failure_writes_failed_sentinel()
+    print("6 production dry-run/source-mutation tests passed")
