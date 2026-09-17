@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RoboCasa · Xiaomi VLA</title>
-<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/site.css?v=20260917c">
 <link rel="stylesheet" href="assets/inference.css">
 <script src="assets/theme.js"></script>
 </head>
@@ -12,14 +12,15 @@
 <header>
   <nav class="nav">
     <div class="brand">Robo<span>Casa</span> · Xiaomi VLA</div>
-    <button data-tab="now" class="active">현재 작업</button>
-    <button data-tab="tasks">RoboCasa Task</button>
-    <button data-tab="rlenv">RL 환경</button>
-    <button data-tab="rltrain">RL 학습</button>
-    <button data-tab="inference">Inference</button>
-    <button data-tab="attend">실험 결과</button>
-
-    <a href="http://100.86.183.64:8898/" style="color:var(--dim);text-decoration:none;font-size:13px;padding:8px 10px">↩ Hub</a>
+    <div class="nav-tabs" aria-label="페이지 섹션">
+      <button data-tab="now" class="active">현재 작업</button>
+      <button data-tab="tasks">RoboCasa Task</button>
+      <button data-tab="rlenv">RL 환경</button>
+      <button data-tab="rltrain">RL 학습</button>
+      <button data-tab="inference">Inference</button>
+      <button data-tab="attend">실험 결과</button>
+      <a href="http://100.86.183.64:8898/">↩ Hub</a>
+    </div>
     <div class="live"><span class="dot"></span>v4 · RTX 3090</div>
   </nav>
 </header>
@@ -506,7 +507,7 @@ PLACE_OBJECT:
 
 <div class="foot">source: <code>tracking/</code> (git) · 초안 · 메뉴는 필요에 따라 추가 예정</div>
 
-<script src="assets/site.js?v=20260916b" defer></script>
+<script src="assets/site.js?v=20260917e" defer></script>
 <script src="assets/inference.js?v=20260916b" defer></script>
 <script src="assets/obs_verifier_calib.js?v=20260917a" defer></script>
 </body>

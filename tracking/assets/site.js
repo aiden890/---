@@ -3,7 +3,22 @@
 // tab switch
 function openHashTab(){
   const id=location.hash.slice(1), button=document.querySelector(`[data-tab="${id}"]`);
-  if(button) button.click();
+  if(button){
+    button.click();
+    // Hashes select in-page views; do not let native anchor scrolling hide
+    // the selected view's title beneath the sticky header. Keep the selected
+    // tab visible when the compact navigation becomes horizontally scrollable.
+    requestAnimationFrame(()=>{
+      const tabs=button.closest('.nav-tabs');
+      if(tabs){
+        const left=button.offsetLeft, right=left+button.offsetWidth;
+        if(left<tabs.scrollLeft)tabs.scrollLeft=left;
+        else if(right>tabs.scrollLeft+tabs.clientWidth)tabs.scrollLeft=right-tabs.clientWidth;
+      }
+      window.scrollTo(0,0);
+    });
+    setTimeout(()=>window.scrollTo(0,0),0);
+  }
 }
 window.addEventListener('DOMContentLoaded',openHashTab);
 window.addEventListener('hashchange',openHashTab);
