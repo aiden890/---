@@ -1,0 +1,202 @@
+{
+  "corpus": "/corpus",
+  "skills": {
+    "GRASP_OBJECT": {
+      "n_episodes": 10,
+      "n_pos": 4,
+      "n_neg": 6,
+      "point": {
+        "tp": 3,
+        "fp": 1,
+        "fn": 1,
+        "tn": 5,
+        "precision": 0.75,
+        "recall": 0.75
+      },
+      "bootstrap": {
+        "precision_ci95": [
+          0.4,
+          1.0
+        ],
+        "recall_ci95": [
+          0.25,
+          1.0
+        ],
+        "n_boot": 5000
+      },
+      "separation_margin": [
+        {
+          "question": "grasp",
+          "view": "eye",
+          "threshold": 0.5,
+          "pos_min": 0.427,
+          "pos_vals": [
+            0.427,
+            0.508,
+            0.519,
+            0.669
+          ],
+          "neg_max": 0.659,
+          "neg_vals": [
+            0.269,
+            0.424,
+            0.467,
+            0.474,
+            0.495,
+            0.659
+          ],
+          "margin_posmin_minus_negmax": -0.233,
+          "threshold_inside_gap": false
+        }
+      ],
+      "leave_one_positive_out": [
+        {
+          "dropped": "grasp/seed0",
+          "precision": 0.75,
+          "recall": 1.0,
+          "tp": 3,
+          "fp": 1,
+          "fn": 0
+        },
+        {
+          "dropped": "grasp/seed1",
+          "precision": 0.6666666666666666,
+          "recall": 0.6666666666666666,
+          "tp": 2,
+          "fp": 1,
+          "fn": 1
+        },
+        {
+          "dropped": "grasp/seed2",
+          "precision": 0.6666666666666666,
+          "recall": 0.6666666666666666,
+          "tp": 2,
+          "fp": 1,
+          "fn": 1
+        },
+        {
+          "dropped": "grasp/seed5",
+          "precision": 0.6666666666666666,
+          "recall": 0.6666666666666666,
+          "tp": 2,
+          "fp": 1,
+          "fn": 1
+        }
+      ],
+      "threshold_robustness": {
+        "shipped_primary_threshold": 0.5,
+        "base_confusion": [
+          3,
+          1,
+          1
+        ],
+        "unchanged_band_min": 0.5,
+        "unchanged_band_max": 0.5,
+        "band_width": 0.0
+      },
+      "criterion_note": "eye-view hold mean >=0.50 (best measured, precision 0.75)"
+    },
+    "PLACE_OBJECT": {
+      "n_episodes": 10,
+      "n_pos": 2,
+      "n_neg": 8,
+      "point": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "tn": 8,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      "bootstrap": {
+        "precision_ci95": [
+          1.0,
+          1.0
+        ],
+        "recall_ci95": [
+          1.0,
+          1.0
+        ],
+        "n_boot": 5000
+      },
+      "separation_margin": [
+        {
+          "question": "place_clear",
+          "view": "right",
+          "threshold": 0.75,
+          "pos_min": 0.781,
+          "pos_vals": [
+            0.781,
+            0.971
+          ],
+          "neg_max": 0.729,
+          "neg_vals": [
+            0.201,
+            0.543,
+            0.547,
+            0.581,
+            0.582,
+            0.594,
+            0.631,
+            0.729
+          ],
+          "margin_posmin_minus_negmax": 0.052,
+          "threshold_inside_gap": true
+        },
+        {
+          "question": "place_seated",
+          "view": "right",
+          "threshold": 0.5,
+          "pos_min": 0.522,
+          "pos_vals": [
+            0.522,
+            0.847
+          ],
+          "neg_max": 0.681,
+          "neg_vals": [
+            0.345,
+            0.359,
+            0.449,
+            0.511,
+            0.531,
+            0.532,
+            0.605,
+            0.681
+          ],
+          "margin_posmin_minus_negmax": -0.159,
+          "threshold_inside_gap": false
+        }
+      ],
+      "leave_one_positive_out": [
+        {
+          "dropped": "place/seed8",
+          "precision": 1.0,
+          "recall": 1.0,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        {
+          "dropped": "place/seed9",
+          "precision": 1.0,
+          "recall": 1.0,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        }
+      ],
+      "threshold_robustness": {
+        "shipped_primary_threshold": 0.75,
+        "base_confusion": [
+          2,
+          0,
+          0
+        ],
+        "unchanged_band_min": 0.73,
+        "unchanged_band_max": 0.78,
+        "band_width": 0.05
+      },
+      "criterion_note": "clear@right>=0.75 (AUC 1.0) AND seated@right>=0.50 guard; prec 1.0 rec 1.0"
+    }
+  }
+}

@@ -152,3 +152,69 @@ accumulate. The calibration engine (`cache_frame_scores.py` GPU pass ->
 `calibrate_obs_verifier.py` / `validate_success_gate.py` CPU replay) is built to
 re-run cheaply whenever the corpus grows — that is the "continuous improvement"
 loop the task asked for.
+
+## Iteration 3 — statistical CONFIDENCE analysis (task t_a309678b)
+
+Purpose (왜): operator said the [2-2] numbers are "전혀 정확하지 않다" because the
+corpus is tiny/biased (PLACE 2 succ / 8 fail, GRASP 4 / 6, MOVE 0). This iter
+does NOT re-pick an operating point — it quantifies *how much the shipped
+numbers can be trusted*, from the SAME per-view cache (`cache_perview.json`,
+obs-only + offline sim-GT label). Engine: `calib_stats.py` (CPU-only, no GPU,
+drives the shipped `success_gate.SUCCESS_CRITERIA` aggregation). Full JSON:
+`calib_out/calib_stats.json`. Every number is measured, none rounded up.
+
+### PLACE_OBJECT (n=10, pos=2, neg=8) — point precision 1.0 is FRAGILE
+- Separation margin, primary fact `place_clear@right` (episode-mean):
+  pos = [0.781, 0.971], neg max = 0.729 → margin = **+0.052** (threshold 0.75
+  sits inside a 0.052-wide gap on TWO positives).
+- Guard fact `place_seated@right`: pos = [0.522, 0.847], neg max = 0.681 →
+  margin = **-0.159**. The guard does NOT separate; a negative (0.681) outscores
+  a positive (0.522). It only "passes" because both positives happen to clear
+  its 0.50 cut while being ANDed with the clear fact. It is not an independent
+  discriminator on this corpus.
+- Threshold-robust band (primary, confusion unchanged): **[0.73, 0.78], width
+  0.05**. Move the shipped 0.75 by ±0.03 and the confusion breaks.
+- Stratified bootstrap CI collapses to [1.0, 1.0] — but that is an ARTIFACT of
+  having only 2 positives (resampling 2 points cannot express uncertainty), NOT
+  evidence of robustness. The margin + band are the honest signal.
+- Verdict: precision 1.0 is real on the corpus but rests on 2 positives, a
+  0.052 margin, and a 0.05-wide threshold band. NOT statistically trustworthy;
+  operator's diagnosis confirmed quantitatively.
+
+### GRASP_OBJECT (n=10, pos=4, neg=6) — weak separation
+- `grasp@eye` episode-mean: pos = [0.427, 0.508, 0.519, 0.669], neg =
+  [0.269, 0.424, 0.467, 0.474, 0.495, 0.659] → margin = **-0.233** (a failure
+  at 0.659 outscores 3 of 4 successes). Point precision 0.75 / recall 0.75.
+- Bootstrap95: precision **[0.4, 1.0]**, recall [0.25, 1.0] — could be as bad as
+  0.4. The eye-view grasp signal barely beats chance on this corpus.
+- Threshold-robust band width 0.0 at the shipped 0.5 (any move changes confusion).
+
+### Root blocker for the REAL fix (item #1: large balanced corpus)
+The only way to make these numbers trustworthy is more POSITIVES per skill
+(target ≥15 each). That requires the base/arm policy inference server
+(~10.7 GB, `xiaomi-server`-class) to roll out CloseBlenderLid. The single RTX3090
+on amp2 is occupied by the PROTECTED [1-1] exp4 GRPO trainer
+(`xiaomi-grpo-trainer-t_3ed65912`, 간섭 금지): ~10.4–11.7 GB free, no safe
+headroom for a second 10.7 GB server (logged: co-residence drops the trainer RPC
+with struct.error). The ~15 extra rollouts in `rl-env/results` are all
+not-even-grasped FAILURES — they add trivial negatives, zero new positives, so
+they do not fix the positive-scarcity that the whole complaint is about.
+Fresh collection (and the item-#4 end-to-end re-verification that depends on it)
+is GPU-blocked until the trainer finishes or a GPU window is granted.
+
+### Free (no-GPU, no-new-data) optimization space is EXHAUSTED
+Swept every cached question × view × {mean,last5} on the existing corpus
+(`calib_stats.py` companion sweep). Result: the shipped operating points are
+already the best achievable on this data — there is no un-tried question/view
+that widens the margin, so tuning cannot substitute for more positives.
+- PLACE: `place_clear@right` (mean) is the ONLY (question,view) with a positive
+  separation margin (+0.052, AUC 1.0). Every other combination has a NEGATIVE
+  margin (place_combined@right -0.010, place_released@eye -0.091, seated@right
+  -0.159, …). The shipped PLACE gate is already optimal for this corpus.
+- GRASP: NO (question,view,aggregation) yields a positive margin. Best is
+  grasp@eye mean (AUC 0.750, margin -0.233); grasp@left mean AUC 0.708 also
+  negative margin. GRASP success/failure are NOT linearly separable to this VLM
+  on the current 4-positive corpus regardless of view — a data problem.
+
+Conclusion: further accuracy requires MORE POSITIVES (GPU collection), not more
+tuning. Honest per operator's "성공 포장 금지".
