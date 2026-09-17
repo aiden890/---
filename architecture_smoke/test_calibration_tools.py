@@ -1,6 +1,7 @@
 """Tests for data-driven multi-skill calibration tooling."""
 import cache_frame_scores
 import calibrate_obs_verifier
+import validate_success_gate
 from obs_verifier import SKILL_QUESTIONS as RUNTIME_SKILL_QUESTIONS
 
 
@@ -75,6 +76,13 @@ def test_candidate_rules_cover_every_requested_view_for_existing_skills():
     assert set(grasp) == {"grasp@left", "grasp@right", "grasp@eye"}
     assert "place_combined@right" in place
     assert "place_seated_and_clear_min@eye" in place
+
+
+def test_success_gate_validation_ignores_boundary_only_move_rollouts():
+    cache = {"rollouts": [{"skill": "move_holding", "gt_success": False,
+                            "frames": []}]}
+    assert validate_success_gate.eval_success_gate(cache, backend=None) == ({}, [])
+    assert validate_success_gate.eval_baseline_before(cache) == {}
 
 
 if __name__ == "__main__":

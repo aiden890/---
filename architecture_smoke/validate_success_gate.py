@@ -83,6 +83,8 @@ def eval_success_gate(cache, backend):
     per_skill = {}
     details = []
     for ro in cache["rollouts"]:
+        if ro["skill"] not in skill_name:
+            continue
         sk = skill_name[ro["skill"]]
         if sk not in SUCCESS_CRITERIA:
             continue
@@ -106,6 +108,8 @@ def eval_baseline_before(cache, tau=0.6, k=2):
     skill_name = {"grasp": "GRASP_OBJECT", "place": "PLACE_OBJECT"}
     per_skill = {}
     for ro in cache["rollouts"]:
+        if ro["skill"] not in skill_q:
+            continue
         key = skill_q[ro["skill"]]
         run = 0
         fired = False
