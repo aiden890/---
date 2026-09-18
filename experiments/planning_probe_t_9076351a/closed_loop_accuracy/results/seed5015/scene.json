@@ -1,0 +1,426 @@
+{
+  "layout_id": 10,
+  "style_id": 10,
+  "lid_fixture_name": "blender_main_group_auxiliary_main_group",
+  "lid_xml": "/opt/robocasa/robocasa/models/assets/fixtures/blenders/Blender020/Blender020_Lid/model.xml",
+  "lid_size_wdh": [
+    0.15500000000000003,
+    0.14308454971744622,
+    0.03600428038956355
+  ],
+  "lid_scale": [
+    0.7454611037633763,
+    0.7454611037633763,
+    0.7454611037633763
+  ],
+  "blender_fixture_name": "blender_main_group",
+  "blender_xml": "/opt/robocasa/robocasa/models/assets/fixtures/blenders/Blender020/model.xml",
+  "blender_pos": [
+    1.2610222018893262,
+    -0.5321549515207571,
+    1.1530008539631018
+  ],
+  "blender_rot": 0.0,
+  "lid_closed_pos": [
+    1.2447288933362695,
+    -0.5197637590437116,
+    1.3638277512611923
+  ],
+  "lid_geoms": [
+    {
+      "name": "blender_main_group_auxiliary_main_group_g0",
+      "type": 7,
+      "size": [
+        0.01851669305073388,
+        0.07154547259869151,
+        0.0831054630892571
+      ],
+      "pos": [
+        0.0009844682652711454,
+        3.4008710849043488e-06,
+        -0.0025139990658097633
+      ],
+      "group": 1,
+      "contype": 0
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_handle_main",
+      "type": 5,
+      "size": [
+        0.02215371060804262,
+        0.0047950325579658734,
+        0.0
+      ],
+      "pos": [
+        0.0014727142762172585,
+        7.666273079753276e-05,
+        0.011082890582840916
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g2",
+      "type": 5,
+      "size": [
+        0.07206475926775678,
+        0.00539678306254656,
+        0.0
+      ],
+      "pos": [
+        0.0014727142762172585,
+        7.666273079753276e-05,
+        0.0027213888394238247
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g3",
+      "type": 5,
+      "size": [
+        0.06634609454122062,
+        0.008378627477600065,
+        0.0
+      ],
+      "pos": [
+        0.0014727142762172585,
+        7.666273079753276e-05,
+        -0.011145099311949977
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_reg_main",
+      "type": 6,
+      "size": [
+        0.0775,
+        0.0715422748587231,
+        0.018002140194781774
+      ],
+      "pos": [
+        -0.004621009017674643,
+        5.814596609397393e-07,
+        -0.002009442587471445
+      ],
+      "group": 1,
+      "contype": 0
+    }
+  ],
+  "init_robot_base_pos": [
+    1.396166569287208,
+    -0.8400923158020829,
+    0.0
+  ],
+  "init_robot_base_ori": [
+    0.0,
+    0.0,
+    1.5707963267948966
+  ],
+  "ep_meta_fixtures": {
+    "wall_room": {
+      "cls": "Wall"
+    },
+    "wall_backing_room": {
+      "cls": "Wall"
+    },
+    "wall_front_room": {
+      "cls": "Wall"
+    },
+    "wall_front_backing_room": {
+      "cls": "Wall"
+    },
+    "wall_left_room": {
+      "cls": "Wall"
+    },
+    "wall_left_backing_room": {
+      "cls": "Wall"
+    },
+    "wall_left_2_room": {
+      "cls": "Wall"
+    },
+    "wall_2_left_backing_room": {
+      "cls": "Wall"
+    },
+    "wall_right_room": {
+      "cls": "Wall"
+    },
+    "wall_right_backing_room": {
+      "cls": "Wall"
+    },
+    "utensil_rack_room": {
+      "cls": "WallAccessory"
+    },
+    "outlet_room": {
+      "cls": "WallAccessory"
+    },
+    "outlet_2_room": {
+      "cls": "WallAccessory"
+    },
+    "outlet_3_room": {
+      "cls": "WallAccessory"
+    },
+    "light_switch_room": {
+      "cls": "WallAccessory"
+    },
+    "light_switch_2_room": {
+      "cls": "WallAccessory"
+    },
+    "window_group_room": {
+      "cls": "Window"
+    },
+    "floor_room": {
+      "cls": "Floor"
+    },
+    "floor_backing_room": {
+      "cls": "Floor"
+    },
+    "floor_front_room": {
+      "cls": "Floor"
+    },
+    "floor_front_backing_room": {
+      "cls": "Floor"
+    },
+    "stool_1_room": {
+      "cls": "Stool"
+    },
+    "stool_2_room": {
+      "cls": "Stool"
+    },
+    "stool_3_room": {
+      "cls": "Stool"
+    },
+    "counter_corner_1_main_group": {
+      "cls": "Counter"
+    },
+    "counter_main_main_group": {
+      "cls": "Counter"
+    },
+    "stove_main_group": {
+      "cls": "Stove"
+    },
+    "counter_1_main_group": {
+      "cls": "Counter"
+    },
+    "counter_corner_2_main_group": {
+      "cls": "Counter"
+    },
+    "cab_corner_main_group": {
+      "cls": "Box"
+    },
+    "cab_main_main_group": {
+      "cls": "HingeCabinet"
+    },
+    "cab_1_main_group": {
+      "cls": "HingeCabinet"
+    },
+    "hood_main_group": {
+      "cls": "Hood"
+    },
+    "shelves_main_group": {
+      "cls": "OpenCabinet"
+    },
+    "cab_corner_3_main_group": {
+      "cls": "Box"
+    },
+    "cab_corner_4_main_group": {
+      "cls": "Box"
+    },
+    "stack_1_main_group_base": {
+      "cls": "Box"
+    },
+    "stack_1_main_group_1": {
+      "cls": "HingeCabinet"
+    },
+    "stack_1_main_group_2": {
+      "cls": "Drawer"
+    },
+    "stack_1_main_group_3": {
+      "cls": "Drawer"
+    },
+    "stack_2_main_group_base": {
+      "cls": "Box"
+    },
+    "stack_2_main_group_1": {
+      "cls": "HingeCabinet"
+    },
+    "stack_2_main_group_2": {
+      "cls": "Drawer"
+    },
+    "stack_2_main_group_3": {
+      "cls": "Drawer"
+    },
+    "right_corner_box_main_group": {
+      "cls": "Box"
+    },
+    "stack_3_main_group_base": {
+      "cls": "Box"
+    },
+    "stack_3_main_group_1": {
+      "cls": "HingeCabinet"
+    },
+    "stack_3_main_group_2": {
+      "cls": "Drawer"
+    },
+    "stack_3_main_group_3": {
+      "cls": "Drawer"
+    },
+    "stack_4_main_group_base": {
+      "cls": "Box"
+    },
+    "stack_4_main_group_1": {
+      "cls": "Drawer"
+    },
+    "stack_4_main_group_2": {
+      "cls": "Drawer"
+    },
+    "stack_4_main_group_3": {
+      "cls": "Drawer"
+    },
+    "stack_4_main_group_4": {
+      "cls": "Drawer"
+    },
+    "coffee_machine_main_group": {
+      "cls": "CoffeeMachine"
+    },
+    "knife_block_main_group": {
+      "cls": "Accessory"
+    },
+    "plant_main_group": {
+      "cls": "Accessory"
+    },
+    "toaster_main_group": {
+      "cls": "Toaster"
+    },
+    "toaster_oven_main_group": {
+      "cls": "ToasterOven"
+    },
+    "blender_main_group": {
+      "cls": "Blender"
+    },
+    "blender_main_group_auxiliary_main_group": {
+      "cls": "BlenderLid"
+    },
+    "fridge_left_group": {
+      "cls": "FridgeFrenchDoor"
+    },
+    "fridge_housing_left_group": {
+      "cls": "HousingCabinet"
+    },
+    "fridge_top_left_group": {
+      "cls": "HingeCabinet"
+    },
+    "stack_left_left_group_base": {
+      "cls": "Box"
+    },
+    "stack_left_left_group_1": {
+      "cls": "SingleCabinet"
+    },
+    "stack_left_left_group_2": {
+      "cls": "SingleCabinet"
+    },
+    "stack_right_left_group_base": {
+      "cls": "Box"
+    },
+    "stack_right_left_group_1": {
+      "cls": "SingleCabinet"
+    },
+    "stack_right_left_group_2": {
+      "cls": "SingleCabinet"
+    },
+    "box_left_top_left_group": {
+      "cls": "Box"
+    },
+    "box_left_bottom_left_group": {
+      "cls": "Box"
+    },
+    "box_right_top_left_group": {
+      "cls": "Box"
+    },
+    "box_right_bottom_left_group": {
+      "cls": "Box"
+    },
+    "sink_right_group": {
+      "cls": "Sink"
+    },
+    "counter_1_right_group": {
+      "cls": "Counter"
+    },
+    "counter_corner_right_group": {
+      "cls": "Counter"
+    },
+    "stack_1_right_group_base": {
+      "cls": "Box"
+    },
+    "stack_1_right_group_1": {
+      "cls": "HingeCabinet"
+    },
+    "stack_1_right_group_2": {
+      "cls": "PanelCabinet"
+    },
+    "dishwasher_right_group": {
+      "cls": "Dishwasher"
+    },
+    "stack_2_right_group_base": {
+      "cls": "Box"
+    },
+    "stack_2_right_group_1": {
+      "cls": "SingleCabinet"
+    },
+    "cab_1_right_group": {
+      "cls": "HingeCabinet"
+    },
+    "cab_2_right_group": {
+      "cls": "SingleCabinet"
+    },
+    "counter_corner_1_front_group": {
+      "cls": "Counter"
+    },
+    "counter_1_front_group": {
+      "cls": "Counter"
+    },
+    "stack_1_front_group_base": {
+      "cls": "Box"
+    },
+    "stack_1_front_group_1": {
+      "cls": "HingeCabinet"
+    },
+    "stack_1_front_group_2": {
+      "cls": "Drawer"
+    },
+    "shelves_front_group": {
+      "cls": "OpenCabinet"
+    },
+    "bottom_front_group_base": {
+      "cls": "Box"
+    },
+    "bottom_front_group_1": {
+      "cls": "Drawer"
+    },
+    "bottom_front_group_2": {
+      "cls": "Drawer"
+    },
+    "cab_middle_front_group": {
+      "cls": "HingeCabinet"
+    },
+    "microwave_front_group": {
+      "cls": "Microwave"
+    },
+    "micro_housing_front_group": {
+      "cls": "HousingCabinet"
+    },
+    "top_front_group": {
+      "cls": "HingeCabinet"
+    },
+    "utensil_set_front_group": {
+      "cls": "Accessory"
+    },
+    "counter_1_dining_area_group": {
+      "cls": "Counter"
+    },
+    "paper_towel_dining_area_group": {
+      "cls": "Accessory"
+    }
+  }
+}

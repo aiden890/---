@@ -1,0 +1,20 @@
+[
+  {
+    "path": "videos/execution_failure_grasp_seed5000.mp4",
+    "codec": "h264 (High) (avc1 / 0x31637661)",
+    "pixel_format": "yuv420p",
+    "decode_returncode": 0
+  },
+  {
+    "path": "videos/execution_failure_late_seed5002.mp4",
+    "codec": "h264 (High) (avc1 / 0x31637661)",
+    "pixel_format": "yuv420p",
+    "decode_returncode": 0
+  },
+  {
+    "path": "videos/success_seed5005.mp4",
+    "codec": "h264 (High) (avc1 / 0x31637661)",
+    "pixel_format": "yuv420p",
+    "decode_returncode": 0
+  }
+]

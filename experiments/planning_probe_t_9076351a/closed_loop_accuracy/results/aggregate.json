@@ -1,0 +1,137 @@
+{
+  "verdict": "TASK_ACCURACY_MEASURED",
+  "production_ready_claimed": false,
+  "source_commit": "45280448bd9f650c3cfd94f26939a8830374a05b",
+  "seeds": [
+    5000,
+    5001,
+    5002,
+    5003,
+    5004,
+    5005,
+    5006,
+    5007,
+    5008,
+    5009,
+    5010,
+    5011,
+    5012,
+    5013,
+    5014,
+    5015,
+    5016,
+    5017,
+    5018,
+    5019
+  ],
+  "rates": {
+    "planner_valid": {
+      "count": 20,
+      "denominator": 20,
+      "rate": 1.0
+    },
+    "boundary_reach": {
+      "GRASP_OBJECT": {
+        "count": 20,
+        "denominator": 20,
+        "rate": 1.0
+      },
+      "MOVE_OBJECT": {
+        "count": 20,
+        "denominator": 20,
+        "rate": 1.0
+      },
+      "PLACE_OBJECT": {
+        "count": 20,
+        "denominator": 20,
+        "rate": 1.0
+      }
+    },
+    "skill_success": {
+      "GRASP_OBJECT": {
+        "count": 6,
+        "denominator": 20,
+        "rate": 0.3
+      },
+      "MOVE_OBJECT": {
+        "count": 8,
+        "denominator": 20,
+        "rate": 0.4
+      },
+      "PLACE_OBJECT": {
+        "count": 0,
+        "denominator": 20,
+        "rate": 0.0
+      }
+    },
+    "official_full_task": {
+      "count": 3,
+      "denominator": 20,
+      "rate": 0.15
+    }
+  },
+  "baseline_comparison": {
+    "baseline": {
+      "count": 3,
+      "denominator": 20,
+      "rate": 0.15
+    },
+    "planned_runtime": {
+      "count": 3,
+      "denominator": 20,
+      "rate": 0.15
+    },
+    "delta_successes": 0,
+    "delta_percentage_points": 0.0,
+    "paired_same": 16,
+    "baseline_only": 2,
+    "planned_only": 2,
+    "mcnemar_exact_two_sided_p": 1.0,
+    "interpretation": "No aggregate improvement; n=20 does not support an improvement claim."
+  },
+  "latency_ms": {
+    "planner_min": 3248.7937286496162,
+    "planner_mean": 3324.6363025158644,
+    "planner_max": 4222.615960985422,
+    "policy_count": 657,
+    "policy_p50": 350.0943221151829,
+    "policy_p95": 400.9662639349699,
+    "policy_max": 449.62157495319843
+  },
+  "mechanics": {
+    "completed_scoring": 20,
+    "planner_calls_exactly_one": true,
+    "runtime_boundary_planner_calls": 0,
+    "fallback_calls": 0,
+    "repair_calls": 0,
+    "sequence_corrections": 0,
+    "action_before_plan": 0,
+    "nan_violations": 0,
+    "policy_deadline_misses": 0,
+    "rpc_or_control_errors": 0,
+    "queue_violations": 0,
+    "latest_only_superseded_drops": 4782
+  },
+  "async_event_counts": {
+    "cancel": 56,
+    "context": 60,
+    "drop": 4782,
+    "rpc_done": 5581,
+    "rpc_start": 5581,
+    "shutdown": 60,
+    "submit": 10419
+  },
+  "rpc_status_counts": {
+    "ok": 5581
+  },
+  "failure_stages": {
+    "GRASP_OBJECT": 13,
+    "PLACE_OBJECT": 4,
+    "none": 3
+  },
+  "official_success_seeds": [
+    5005,
+    5011,
+    5017
+  ]
+}

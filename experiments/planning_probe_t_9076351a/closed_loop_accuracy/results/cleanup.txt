@@ -1,0 +1,6 @@
+hostname=amp2
+experiment_containers=0
+ports_10086_10087=0
+compute_processes=0
+NVIDIA GeForce RTX 3090, 38 MiB, 0 %
+v4_processes=0

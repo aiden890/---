@@ -1,0 +1,54 @@
+{
+  "task": "CloseBlenderLid",
+  "seeds": [
+    5000,
+    5001,
+    5002,
+    5003,
+    5004,
+    5005,
+    5006,
+    5007,
+    5008,
+    5009,
+    5010,
+    5011,
+    5012,
+    5013,
+    5014,
+    5015,
+    5016,
+    5017,
+    5018,
+    5019
+  ],
+  "split": "target",
+  "source_commit": "45280448bd9f650c3cfd94f26939a8830374a05b",
+  "runtime_contract": {
+    "action_rate_hz": 20.0,
+    "policy_chunk_actions": 16,
+    "chunk_deadline_ms": 800.0,
+    "action_jitter_deadline_ms": 25.0,
+    "max_observation_age_ms": 1100.0,
+    "max_queue_chunks": 1
+  },
+  "planner": {
+    "kind": "generic_qwen_pre_episode_full_plan",
+    "calls_per_episode": 1,
+    "boundary_calls": 0,
+    "repair": false,
+    "fallback": false
+  },
+  "verifier": {
+    "kind": "obs_vlm",
+    "simulator_gt_input": false,
+    "config": "/pkg/calib_out/balanced_t_a309678b/sequence_boundary_calibration.json"
+  },
+  "policy": {
+    "model_path": "/checkpoint",
+    "adapter_mode": "disabled",
+    "adapter_checkpoint": null,
+    "replan_steps": 16
+  },
+  "baseline_official_success": "3/20"
+}

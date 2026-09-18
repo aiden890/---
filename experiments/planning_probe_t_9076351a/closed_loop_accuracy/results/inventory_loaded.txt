@@ -1,0 +1,6 @@
+2026-09-18T16:21:07+09:00
+amp2
+0, NVIDIA GeForce RTX 3090, 18708 MiB, 24576 MiB, 0 %
+243721, python3, 18662 MiB
+closed-loop-server-t_783b35bb|Up 15 seconds|xiaomi-cu121:t_9f03a613
+gpu-nccl|Up 4 weeks|nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04

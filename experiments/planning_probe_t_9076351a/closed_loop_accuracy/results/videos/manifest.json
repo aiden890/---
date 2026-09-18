@@ -1,0 +1,20 @@
+[
+  {
+    "seed": 5005,
+    "label": "success",
+    "path": "videos/success_seed5005.mp4",
+    "sha256": "e33a3891e9c9ffb8924fc1112dec54d963eac445517711c0852c1a3b07cfe451"
+  },
+  {
+    "seed": 5000,
+    "label": "execution_failure_grasp",
+    "path": "videos/execution_failure_grasp_seed5000.mp4",
+    "sha256": "de29b3bfbaf14a76fc889110b530e35bde725ccfd96ca76c63df48858b310229"
+  },
+  {
+    "seed": 5002,
+    "label": "execution_failure_late",
+    "path": "videos/execution_failure_late_seed5002.mp4",
+    "sha256": "6b4120920f94db0d12d50f57936a6b2b7e1e9a3ded97faf40a3632564e66bbdf"
+  }
+]

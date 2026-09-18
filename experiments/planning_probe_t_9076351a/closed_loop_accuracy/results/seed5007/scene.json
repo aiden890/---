@@ -1,0 +1,888 @@
+{
+  "layout_id": 6,
+  "style_id": 6,
+  "lid_fixture_name": "blender_left_group_auxiliary_left_group",
+  "lid_xml": "/opt/robocasa/robocasa/models/assets/fixtures/blenders/Blender026/Blender026_Lid/model.xml",
+  "lid_size_wdh": [
+    0.14,
+    0.14,
+    0.23333333333333336
+  ],
+  "lid_scale": [
+    1.1666666666666667,
+    1.1666666666666667,
+    1.1666666666666667
+  ],
+  "blender_fixture_name": "blender_left_group",
+  "blender_xml": "/opt/robocasa/robocasa/models/assets/fixtures/blenders/Blender026/model.xml",
+  "blender_pos": [
+    0.4604848725577847,
+    -2.1584512157883147,
+    1.1530068396194664
+  ],
+  "blender_rot": 1.5707999467849731,
+  "lid_closed_pos": [
+    0.4514058606566776,
+    -2.15802686891987,
+    1.3731182297161624
+  ],
+  "lid_geoms": [
+    {
+      "name": "blender_left_group_auxiliary_left_group_g0",
+      "type": 7,
+      "size": [
+        0.014350654537596631,
+        0.07808612437711279,
+        0.08186501738503583
+      ],
+      "pos": [
+        -0.0003816302061394624,
+        0.00037771799106505166,
+        0.0004645222714190251
+      ],
+      "group": 1,
+      "contype": 0
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_handle_main",
+      "type": 6,
+      "size": [
+        0.027496607042849067,
+        0.027496607042849067,
+        0.01169798600797852
+      ],
+      "pos": [
+        -0.0004874701844528318,
+        3.880371029178302e-05,
+        0.003029973207352062
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_g2",
+      "type": 6,
+      "size": [
+        0.04888675982753436,
+        0.05060115084052086,
+        0.002132913252959649
+      ],
+      "pos": [
+        -0.0006520557799376547,
+        0.0008339586978157362,
+        -0.00849169430633386
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_g3",
+      "type": 6,
+      "size": [
+        0.0017534500608841585,
+        0.009804404495904844,
+        0.009583025705069309
+      ],
+      "pos": [
+        -0.05612036772072316,
+        0.000678917703529199,
+        -0.00021752129153658947
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_g4",
+      "type": 6,
+      "size": [
+        0.04903400378922622,
+        0.008348504236588877,
+        0.0009283277419550966
+      ],
+      "pos": [
+        0.000440418016902792,
+        0.054350923746824265,
+        0.009557610377669334
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_g5",
+      "type": 6,
+      "size": [
+        0.04903402552008629,
+        0.007358798291534186,
+        0.0009283284210444739
+      ],
+      "pos": [
+        0.0004404178471304477,
+        -0.05508979472021262,
+        0.009557610377669334
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_g6",
+      "type": 6,
+      "size": [
+        0.0078963377357771,
+        0.0480349666128556,
+        0.0009283290322249135
+      ],
+      "pos": [
+        0.05443225366373857,
+        0.0006789176356202613,
+        0.009557610377669334
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_g7",
+      "type": 6,
+      "size": [
+        0.007349604507908226,
+        0.04803498834371567,
+        0.0009283296434053531
+      ],
+      "pos": [
+        -0.05483784278233846,
+        0.0006789178393470745,
+        0.009557610377669334
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_g8",
+      "type": 6,
+      "size": [
+        0.0017534499250662825,
+        0.009804404495904839,
+        0.009583025705069305
+      ],
+      "pos": [
+        -0.05538813769817353,
+        -0.019043554551899433,
+        -0.00021752129153658947
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_g9",
+      "type": 6,
+      "size": [
+        0.0017534444923512633,
+        0.004818278209616742,
+        0.0095830257050693
+      ],
+      "pos": [
+        -0.05406247700254123,
+        -0.03310197591781616,
+        -0.00021752129153658947
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_g10",
+      "type": 6,
+      "size": [
+        0.0017534443565333888,
+        0.004818278209616741,
+        0.009583025705069307
+      ],
+      "pos": [
+        -0.05270037800073624,
+        -0.04365719358126323,
+        -0.00021752129153658947
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_g11",
+      "type": 6,
+      "size": [
+        0.0017534500608841579,
+        0.009804404495904842,
+        0.009583025705069304
+      ],
+      "pos": [
+        -0.055179469287395484,
+        0.01987771751979987,
+        -0.00021752129153658947
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_g12",
+      "type": 6,
+      "size": [
+        0.0017534500608841575,
+        0.009804404495904846,
+        0.009583025705069304
+      ],
+      "pos": [
+        -0.053704834853609405,
+        0.03714696690440178,
+        -0.00021752129153658947
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_g13",
+      "type": 6,
+      "size": [
+        0.0017446191826214394,
+        0.0039593643353631105,
+        0.009582450923820336
+      ],
+      "pos": [
+        -0.05088857188820839,
+        0.049330895145734154,
+        -0.00021752129153658947
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_g14",
+      "type": 6,
+      "size": [
+        0.0017446191826214394,
+        0.003959364335363109,
+        0.009582450923820337
+      ],
+      "pos": [
+        -0.0426431621114413,
+        0.05309988247851531,
+        -0.00021752129153658947
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_g15",
+      "type": 6,
+      "size": [
+        0.0017446191826214394,
+        0.0039593643353631105,
+        0.009582450923820337
+      ],
+      "pos": [
+        -0.03360912203788757,
+        0.054149843752384186,
+        -0.00021752129153658947
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_g16",
+      "type": 6,
+      "size": [
+        0.0017446190468035638,
+        0.0039593643353631105,
+        0.009582450923820336
+      ],
+      "pos": [
+        -0.02505167666822672,
+        0.054916869228084884,
+        -0.00021752129153658947
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_g17",
+      "type": 6,
+      "size": [
+        0.0017904130315097664,
+        0.015118390787392856,
+        0.009624926062921682
+      ],
+      "pos": [
+        -0.00764976798867186,
+        0.05582266363004844,
+        -0.00021752129153658947
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_g18",
+      "type": 6,
+      "size": [
+        0.0017899747472256426,
+        0.008102019239837924,
+        0.009623158257454634
+      ],
+      "pos": [
+        0.01534361376737555,
+        0.05548937742908796,
+        -0.00021752129153658947
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_g19",
+      "type": 6,
+      "size": [
+        0.0017899744755898916,
+        0.008102020326380927,
+        0.00962315825745463
+      ],
+      "pos": [
+        0.0315743638202548,
+        0.05448941017190616,
+        -0.00021752129153658947
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_g20",
+      "type": 6,
+      "size": [
+        0.0017899744755898916,
+        0.004135197416568796,
+        0.00962315825745463
+      ],
+      "pos": [
+        0.043153676514824234,
+        0.05285504957040151,
+        -0.0002603571629151702
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_g21",
+      "type": 6,
+      "size": [
+        0.0017899744755898906,
+        0.004135197416568795,
+        0.009623158257454634
+      ],
+      "pos": [
+        0.04949890077114105,
+        0.049507979924480125,
+        -0.0001042078947648406
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_g22",
+      "type": 6,
+      "size": [
+        0.0017899743397720154,
+        0.004135197416568795,
+        0.009623158257454634
+      ],
+      "pos": [
+        0.053420886397361755,
+        0.04215646907687187,
+        0.00047538022045046097
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_g23",
+      "type": 6,
+      "size": [
+        0.0017899747472256422,
+        0.004135197416568797,
+        0.009623158257454634
+      ],
+      "pos": [
+        0.05402877678473791,
+        0.034564949572086334,
+        -0.0001909227188055714
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_g24",
+      "type": 6,
+      "size": [
+        0.0017899747472256426,
+        0.008670720194155972,
+        0.009623158257454635
+      ],
+      "pos": [
+        0.05528101325035096,
+        0.02191192594667276,
+        -0.00015005131717771292
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_g25",
+      "type": 6,
+      "size": [
+        0.001789974747225642,
+        0.008670720194155972,
+        0.009623158257454634
+      ],
+      "pos": [
+        0.05596819519996644,
+        0.004582115371401112,
+        2.5862439845999083e-06
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_g26",
+      "type": 6,
+      "size": [
+        0.001789974747225642,
+        0.008670720194155974,
+        0.009623158257454634
+      ],
+      "pos": [
+        0.055826775108774505,
+        -0.013666761728624504,
+        -0.000248187881273528
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_g27",
+      "type": 6,
+      "size": [
+        0.0017899747472256422,
+        0.008670720737427473,
+        0.009623158257454634
+      ],
+      "pos": [
+        0.05456787596146266,
+        -0.030802231592436634,
+        8.502443476269643e-05
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_g28",
+      "type": 6,
+      "size": [
+        0.0017899747472256429,
+        0.004125467967242003,
+        0.00962315608436863
+      ],
+      "pos": [
+        0.05316331051290035,
+        -0.042928562189141914,
+        0.00036914239171892405
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_g29",
+      "type": 6,
+      "size": [
+        0.0017899748830435193,
+        0.004125467967242001,
+        0.009623156084368627
+      ],
+      "pos": [
+        0.051080807422598205,
+        -0.04872459111114343,
+        0.0006376488987977307
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_g30",
+      "type": 6,
+      "size": [
+        0.001789974747225642,
+        0.004125467967242003,
+        0.009623156084368627
+      ],
+      "pos": [
+        0.04659681394696236,
+        -0.05193848100801309,
+        -6.889959331601858e-05
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_g31",
+      "type": 6,
+      "size": [
+        0.0017899747472256426,
+        0.004125467967242002,
+        0.009623156084368631
+      ],
+      "pos": [
+        0.038305873672167465,
+        -0.05369938910007477,
+        2.374340935299794e-05
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_g32",
+      "type": 6,
+      "size": [
+        0.0017899743397720162,
+        0.008718605774144333,
+        0.009623154997825623
+      ],
+      "pos": [
+        0.025308387664457165,
+        -0.05482142294446628,
+        0.00020798633340746164
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_g33",
+      "type": 6,
+      "size": [
+        0.001789974339772015,
+        0.008718606317415833,
+        0.009623154997825619
+      ],
+      "pos": [
+        0.007609388247753183,
+        -0.05596492253243924,
+        0.00048415948792050284
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_g34",
+      "type": 6,
+      "size": [
+        0.0017899743397720156,
+        0.008718605774144328,
+        0.009623154997825624
+      ],
+      "pos": [
+        -0.008845228236168623,
+        -0.055848040928443275,
+        0.00039367218657086295
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_g35",
+      "type": 6,
+      "size": [
+        0.001789974339772016,
+        0.00871860577414433,
+        0.009623154997825623
+      ],
+      "pos": [
+        -0.025640971958637238,
+        -0.05473815463483334,
+        -1.2016893985370796e-05
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_g36",
+      "type": 6,
+      "size": [
+        0.0017899743397720158,
+        0.004963180127864085,
+        0.009623156084368627
+      ],
+      "pos": [
+        -0.04103987663984299,
+        -0.053199357663591705,
+        0.00030928691073010367
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_left_group_auxiliary_left_group_reg_main",
+      "type": 6,
+      "size": [
+        0.07,
+        0.07,
+        0.11666666666666668
+      ],
+      "pos": [
+        0.000669363333333333,
+        -0.0005451600000000006,
+        0.00210504
+      ],
+      "group": 1,
+      "contype": 0
+    }
+  ],
+  "init_robot_base_pos": [
+    0.847176922872474,
+    -2.2459471279300316,
+    0.0
+  ],
+  "init_robot_base_ori": [
+    0.0,
+    0.0,
+    3.1415963267948968
+  ],
+  "ep_meta_fixtures": {
+    "wall_room": {
+      "cls": "Wall"
+    },
+    "wall_backing_room": {
+      "cls": "Wall"
+    },
+    "wall_left_room": {
+      "cls": "Wall"
+    },
+    "wall_left_backing_room": {
+      "cls": "Wall"
+    },
+    "wall_right_room": {
+      "cls": "Wall"
+    },
+    "wall_right_backing_room": {
+      "cls": "Wall"
+    },
+    "wall_front_room": {
+      "cls": "Wall"
+    },
+    "wall_front_backing_room": {
+      "cls": "Wall"
+    },
+    "outlet_room": {
+      "cls": "WallAccessory"
+    },
+    "outlet_2_room": {
+      "cls": "WallAccessory"
+    },
+    "outlet_3_room": {
+      "cls": "WallAccessory"
+    },
+    "light_switch_room": {
+      "cls": "WallAccessory"
+    },
+    "light_switch_2_room": {
+      "cls": "WallAccessory"
+    },
+    "utensil_rack_room": {
+      "cls": "WallAccessory"
+    },
+    "window_group_room": {
+      "cls": "Window"
+    },
+    "floor_room": {
+      "cls": "Floor"
+    },
+    "floor_backing_room": {
+      "cls": "Floor"
+    },
+    "cab_main_main_group": {
+      "cls": "HingeCabinet"
+    },
+    "cab_corner_main_group": {
+      "cls": "Box"
+    },
+    "cab_corner_2_main_group": {
+      "cls": "Box"
+    },
+    "counter_corner_left_main_group": {
+      "cls": "Counter"
+    },
+    "sink_main_group": {
+      "cls": "Sink"
+    },
+    "counter_main_main_group": {
+      "cls": "Counter"
+    },
+    "counter_corner_right_main_group": {
+      "cls": "Counter"
+    },
+    "stack_1_main_group_base": {
+      "cls": "Box"
+    },
+    "stack_1_main_group_1": {
+      "cls": "Drawer"
+    },
+    "stack_1_main_group_2": {
+      "cls": "Drawer"
+    },
+    "stack_1_main_group_3": {
+      "cls": "Drawer"
+    },
+    "stack_1_main_group_4": {
+      "cls": "Drawer"
+    },
+    "stack_2_main_group_base": {
+      "cls": "Box"
+    },
+    "stack_2_main_group_1": {
+      "cls": "HingeCabinet"
+    },
+    "stack_2_main_group_2": {
+      "cls": "PanelCabinet"
+    },
+    "dishwasher_main_group": {
+      "cls": "Dishwasher"
+    },
+    "stack_3_main_group_base": {
+      "cls": "Box"
+    },
+    "stack_3_main_group_1": {
+      "cls": "HingeCabinet"
+    },
+    "stack_3_main_group_2": {
+      "cls": "Drawer"
+    },
+    "stack_3_main_group_3": {
+      "cls": "Drawer"
+    },
+    "toaster_oven_main_group": {
+      "cls": "ToasterOven"
+    },
+    "knife_block_main_group": {
+      "cls": "Accessory"
+    },
+    "utensil_set_main_group": {
+      "cls": "Accessory"
+    },
+    "paper_towel_main_group": {
+      "cls": "Accessory"
+    },
+    "counter_1_right_group": {
+      "cls": "Counter"
+    },
+    "stove_right_group": {
+      "cls": "Stove"
+    },
+    "counter_2_right_group": {
+      "cls": "Counter"
+    },
+    "fridge_right_group": {
+      "cls": "FridgeFrenchDoor"
+    },
+    "fridge_housing_right_group": {
+      "cls": "HousingCabinet"
+    },
+    "counter_corner_right_group": {
+      "cls": "Counter"
+    },
+    "stack_1_right_group_base": {
+      "cls": "Box"
+    },
+    "stack_1_right_group_1": {
+      "cls": "SingleCabinet"
+    },
+    "stack_1_right_group_2": {
+      "cls": "Drawer"
+    },
+    "stack_2_right_group_base": {
+      "cls": "Box"
+    },
+    "stack_2_right_group_1": {
+      "cls": "SingleCabinet"
+    },
+    "stack_2_right_group_2": {
+      "cls": "Drawer"
+    },
+    "cab_1_right_group": {
+      "cls": "SingleCabinet"
+    },
+    "microwave_right_group": {
+      "cls": "Microwave"
+    },
+    "cab_micro_right_group": {
+      "cls": "HingeCabinet"
+    },
+    "cab_2_right_group": {
+      "cls": "SingleCabinet"
+    },
+    "cab_3_right_group": {
+      "cls": "HingeCabinet"
+    },
+    "toaster_right_group": {
+      "cls": "Toaster"
+    },
+    "counter_1_left_group": {
+      "cls": "Counter"
+    },
+    "counter_corner_left_group": {
+      "cls": "Counter"
+    },
+    "stack_1_left_group_base": {
+      "cls": "Box"
+    },
+    "stack_1_left_group_1": {
+      "cls": "Drawer"
+    },
+    "stack_1_left_group_2": {
+      "cls": "Drawer"
+    },
+    "stack_1_left_group_3": {
+      "cls": "Drawer"
+    },
+    "stack_1_left_group_4": {
+      "cls": "Drawer"
+    },
+    "stack_2_left_group_base": {
+      "cls": "Box"
+    },
+    "stack_2_left_group_1": {
+      "cls": "HingeCabinet"
+    },
+    "stack_2_left_group_2": {
+      "cls": "Drawer"
+    },
+    "stack_2_left_group_3": {
+      "cls": "Drawer"
+    },
+    "stack_3_left_group_base": {
+      "cls": "Box"
+    },
+    "stack_3_left_group_1": {
+      "cls": "HingeCabinet"
+    },
+    "stack_3_left_group_2": {
+      "cls": "Drawer"
+    },
+    "cab_1_left_group": {
+      "cls": "HingeCabinet"
+    },
+    "shelves_left_group": {
+      "cls": "OpenCabinet"
+    },
+    "coffee_machine_left_group": {
+      "cls": "CoffeeMachine"
+    },
+    "plant_left_group": {
+      "cls": "Accessory"
+    },
+    "blender_left_group": {
+      "cls": "Blender"
+    },
+    "blender_left_group_auxiliary_left_group": {
+      "cls": "BlenderLid"
+    }
+  }
+}

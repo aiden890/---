@@ -1,0 +1,4 @@
+2026-09-18T16:20:50+09:00
+amp2
+0, NVIDIA GeForce RTX 3090, 38 MiB, 24576 MiB, 0 %
+gpu-nccl|Up 4 weeks|nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04

@@ -1,0 +1,103 @@
+Client connected to server at 127.0.0.1:10086.
+[robosuite WARNING] No private macro file found! (macros.py:57)
+WARNING:robosuite_logs:No private macro file found!
+[robosuite WARNING] It is recommended to use a private macro file (macros.py:58)
+WARNING:robosuite_logs:It is recommended to use a private macro file
+[robosuite WARNING] To setup, run: python /opt/robosuite/robosuite/scripts/setup_macros.py (macros.py:59)
+WARNING:robosuite_logs:To setup, run: python /opt/robosuite/robosuite/scripts/setup_macros.py
+[robosuite WARNING] Could not import robosuite_models. Some robots may not be available. If you want to use these robots, please install robosuite_models from source (https://github.com/ARISE-Initiative/robosuite_models) or through pip install. (__init__.py:30)
+WARNING:robosuite_logs:Could not import robosuite_models. Some robots may not be available. If you want to use these robots, please install robosuite_models from source (https://github.com/ARISE-Initiative/robosuite_models) or through pip install.
+[robosuite WARNING] Could not load the mink-based whole-body IK. Make sure you install related import properly (e.g. pip install mink==0.0.5), otherwise you will not be able to use the default IK controller setting for GR1 robot. (__init__.py:40)
+WARNING:robosuite_logs:Could not load the mink-based whole-body IK. Make sure you install related import properly (e.g. pip install mink==0.0.5), otherwise you will not be able to use the default IK controller setting for GR1 robot.
+WARNING: mimicgen environments not imported since mimicgen is not installed!
+Creating CloseBlenderLid with split=target
+[robosuite INFO] Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json (composite_controller_factory.py:121)
+INFO:robosuite_logs:Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json
+/usr/local/lib/python3.11/site-packages/gymnasium/utils/passive_env_checker.py:158: UserWarning: [33mWARN: The obs returned by the `reset()` method is not within the observation space.[0m
+  logger.warn(f"{pre} is not within the observation space.")
+Asked to sample `fps` frames per second but no video metadata was provided which is required when sampling with `fps`. Defaulting to `fps=24`. Please provide `video_metadata` for more accurate results.
+/usr/local/lib/python3.11/site-packages/gymnasium/utils/passive_env_checker.py:158: UserWarning: [33mWARN: The obs returned by the `step()` method is not within the observation space.[0m
+  logger.warn(f"{pre} is not within the observation space.")
+{"seed": 5000, "planner_valid": true, "skills": ["GRASP_OBJECT:TIMEOUT", "MOVE_OBJECT:TIMEOUT", "PLACE_OBJECT:TIMEOUT"], "actions": 592, "official": false, "failure_stage": "GRASP_OBJECT"}
+Creating CloseBlenderLid with split=target
+[robosuite INFO] Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json (composite_controller_factory.py:121)
+INFO:robosuite_logs:Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json
+{"seed": 5001, "planner_valid": true, "skills": ["GRASP_OBJECT:TIMEOUT", "MOVE_OBJECT:SUCCESS", "PLACE_OBJECT:TIMEOUT"], "actions": 434, "official": false, "failure_stage": "GRASP_OBJECT"}
+Creating CloseBlenderLid with split=target
+[robosuite INFO] Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json (composite_controller_factory.py:121)
+INFO:robosuite_logs:Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json
+{"seed": 5002, "planner_valid": true, "skills": ["GRASP_OBJECT:SUCCESS", "MOVE_OBJECT:SUCCESS", "PLACE_OBJECT:TIMEOUT"], "actions": 383, "official": false, "failure_stage": "PLACE_OBJECT"}
+Creating CloseBlenderLid with split=target
+[robosuite INFO] Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json (composite_controller_factory.py:121)
+INFO:robosuite_logs:Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json
+{"seed": 5003, "planner_valid": true, "skills": ["GRASP_OBJECT:TIMEOUT", "MOVE_OBJECT:TIMEOUT", "PLACE_OBJECT:TIMEOUT"], "actions": 592, "official": false, "failure_stage": "GRASP_OBJECT"}
+Creating CloseBlenderLid with split=target
+[robosuite INFO] Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json (composite_controller_factory.py:121)
+INFO:robosuite_logs:Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json
+{"seed": 5004, "planner_valid": true, "skills": ["GRASP_OBJECT:TIMEOUT", "MOVE_OBJECT:TIMEOUT", "PLACE_OBJECT:TIMEOUT"], "actions": 592, "official": false, "failure_stage": "GRASP_OBJECT"}
+Creating CloseBlenderLid with split=target
+[robosuite INFO] Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json (composite_controller_factory.py:121)
+INFO:robosuite_logs:Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json
+{"seed": 5005, "planner_valid": true, "skills": ["GRASP_OBJECT:SUCCESS", "MOVE_OBJECT:TIMEOUT", "PLACE_OBJECT:TIMEOUT"], "actions": 584, "official": true, "failure_stage": null}
+Creating CloseBlenderLid with split=target
+[robosuite INFO] Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json (composite_controller_factory.py:121)
+INFO:robosuite_logs:Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json
+{"seed": 5006, "planner_valid": true, "skills": ["GRASP_OBJECT:TIMEOUT", "MOVE_OBJECT:TIMEOUT", "PLACE_OBJECT:TIMEOUT"], "actions": 592, "official": false, "failure_stage": "GRASP_OBJECT"}
+Creating CloseBlenderLid with split=target
+[robosuite INFO] Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json (composite_controller_factory.py:121)
+INFO:robosuite_logs:Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json
+{"seed": 5007, "planner_valid": true, "skills": ["GRASP_OBJECT:TIMEOUT", "MOVE_OBJECT:TIMEOUT", "PLACE_OBJECT:TIMEOUT"], "actions": 592, "official": false, "failure_stage": "GRASP_OBJECT"}
+Creating CloseBlenderLid with split=target
+[robosuite INFO] Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json (composite_controller_factory.py:121)
+INFO:robosuite_logs:Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json
+{"seed": 5008, "planner_valid": true, "skills": ["GRASP_OBJECT:SUCCESS", "MOVE_OBJECT:SUCCESS", "PLACE_OBJECT:TIMEOUT"], "actions": 527, "official": false, "failure_stage": "PLACE_OBJECT"}
+Creating CloseBlenderLid with split=target
+[robosuite INFO] Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json (composite_controller_factory.py:121)
+INFO:robosuite_logs:Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json
+{"seed": 5009, "planner_valid": true, "skills": ["GRASP_OBJECT:TIMEOUT", "MOVE_OBJECT:TIMEOUT", "PLACE_OBJECT:TIMEOUT"], "actions": 592, "official": false, "failure_stage": "GRASP_OBJECT"}
+Creating CloseBlenderLid with split=target
+[robosuite INFO] Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json (composite_controller_factory.py:121)
+INFO:robosuite_logs:Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json
+{"seed": 5010, "planner_valid": true, "skills": ["GRASP_OBJECT:TIMEOUT", "MOVE_OBJECT:SUCCESS", "PLACE_OBJECT:TIMEOUT"], "actions": 476, "official": false, "failure_stage": "GRASP_OBJECT"}
+Creating CloseBlenderLid with split=target
+[robosuite INFO] Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json (composite_controller_factory.py:121)
+INFO:robosuite_logs:Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json
+{"seed": 5011, "planner_valid": true, "skills": ["GRASP_OBJECT:SUCCESS", "MOVE_OBJECT:SUCCESS", "PLACE_OBJECT:TIMEOUT"], "actions": 380, "official": true, "failure_stage": null}
+Creating CloseBlenderLid with split=target
+[robosuite INFO] Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json (composite_controller_factory.py:121)
+INFO:robosuite_logs:Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json
+{"seed": 5012, "planner_valid": true, "skills": ["GRASP_OBJECT:SUCCESS", "MOVE_OBJECT:SUCCESS", "PLACE_OBJECT:TIMEOUT"], "actions": 373, "official": false, "failure_stage": "PLACE_OBJECT"}
+Creating CloseBlenderLid with split=target
+[robosuite INFO] Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json (composite_controller_factory.py:121)
+INFO:robosuite_logs:Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json
+{"seed": 5013, "planner_valid": true, "skills": ["GRASP_OBJECT:TIMEOUT", "MOVE_OBJECT:TIMEOUT", "PLACE_OBJECT:TIMEOUT"], "actions": 592, "official": false, "failure_stage": "GRASP_OBJECT"}
+Creating CloseBlenderLid with split=target
+[robosuite INFO] Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json (composite_controller_factory.py:121)
+INFO:robosuite_logs:Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json
+{"seed": 5014, "planner_valid": true, "skills": ["GRASP_OBJECT:TIMEOUT", "MOVE_OBJECT:TIMEOUT", "PLACE_OBJECT:TIMEOUT"], "actions": 592, "official": false, "failure_stage": "GRASP_OBJECT"}
+Creating CloseBlenderLid with split=target
+[robosuite INFO] Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json (composite_controller_factory.py:121)
+INFO:robosuite_logs:Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json
+{"seed": 5015, "planner_valid": true, "skills": ["GRASP_OBJECT:TIMEOUT", "MOVE_OBJECT:SUCCESS", "PLACE_OBJECT:TIMEOUT"], "actions": 359, "official": false, "failure_stage": "GRASP_OBJECT"}
+Creating CloseBlenderLid with split=target
+[robosuite INFO] Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json (composite_controller_factory.py:121)
+INFO:robosuite_logs:Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json
+{"seed": 5016, "planner_valid": true, "skills": ["GRASP_OBJECT:SUCCESS", "MOVE_OBJECT:SUCCESS", "PLACE_OBJECT:TIMEOUT"], "actions": 377, "official": false, "failure_stage": "PLACE_OBJECT"}
+Creating CloseBlenderLid with split=target
+[robosuite INFO] Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json (composite_controller_factory.py:121)
+INFO:robosuite_logs:Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json
+{"seed": 5017, "planner_valid": true, "skills": ["GRASP_OBJECT:TIMEOUT", "MOVE_OBJECT:TIMEOUT", "PLACE_OBJECT:TIMEOUT"], "actions": 592, "official": true, "failure_stage": null}
+Creating CloseBlenderLid with split=target
+[robosuite INFO] Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json (composite_controller_factory.py:121)
+INFO:robosuite_logs:Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json
+{"seed": 5018, "planner_valid": true, "skills": ["GRASP_OBJECT:TIMEOUT", "MOVE_OBJECT:TIMEOUT", "PLACE_OBJECT:TIMEOUT"], "actions": 592, "official": false, "failure_stage": "GRASP_OBJECT"}
+Creating CloseBlenderLid with split=target
+[robosuite INFO] Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json (composite_controller_factory.py:121)
+INFO:robosuite_logs:Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json
+{"seed": 5019, "planner_valid": true, "skills": ["GRASP_OBJECT:TIMEOUT", "MOVE_OBJECT:TIMEOUT", "PLACE_OBJECT:TIMEOUT"], "actions": 592, "official": false, "failure_stage": "GRASP_OBJECT"}
+Client connection closed.
+{
+  "completed": 20,
+  "planner_valid": 20,
+  "official_success": 3
+}

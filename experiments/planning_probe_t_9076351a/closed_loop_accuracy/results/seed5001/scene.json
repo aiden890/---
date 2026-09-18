@@ -1,0 +1,1644 @@
+{
+  "layout_id": 2,
+  "style_id": 2,
+  "lid_fixture_name": "blender_main_group_auxiliary_main_group",
+  "lid_xml": "/opt/robocasa/robocasa/models/assets/fixtures/blenders/Blender010/Blender010_Lid/model.xml",
+  "lid_size_wdh": [
+    0.18,
+    0.18,
+    0.05267176166902404
+  ],
+  "lid_scale": [
+    0.6364922206506365,
+    0.6364922206506365,
+    0.6364922206506365
+  ],
+  "blender_fixture_name": "blender_main_group",
+  "blender_xml": "/opt/robocasa/robocasa/models/assets/fixtures/blenders/Blender010/model.xml",
+  "blender_pos": [
+    1.8822065778794366,
+    -0.5119625238528688,
+    1.1031517456956625
+  ],
+  "blender_rot": 0.0,
+  "lid_closed_pos": [
+    1.860039321676292,
+    -0.4775338727223669,
+    1.2849853744702406
+  ],
+  "lid_geoms": [
+    {
+      "name": "blender_main_group_auxiliary_main_group_g0",
+      "type": 7,
+      "size": [
+        0.03159957839930846,
+        0.07515405792433529,
+        0.08073122467305148
+      ],
+      "pos": [
+        0.00405121096918461,
+        -1.086711548379516e-05,
+        -0.005822797738846226
+      ],
+      "group": 1,
+      "contype": 0
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g1",
+      "type": 6,
+      "size": [
+        0.004802167493338885,
+        0.011316626800337471,
+        0.011377207687206283
+      ],
+      "pos": [
+        -0.03300763355749837,
+        0.03769656503638925,
+        -0.013702208916571049
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g2",
+      "type": 6,
+      "size": [
+        0.01826985058133639,
+        0.03289946314089706,
+        0.010352782625836733
+      ],
+      "pos": [
+        0.028553587427992463,
+        0.022892189202922405,
+        -0.015681039916069537
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g3",
+      "type": 6,
+      "size": [
+        0.01826984702465895,
+        0.03289945365642388,
+        0.01035278262583673
+      ],
+      "pos": [
+        0.0301598232697901,
+        -0.025265446246260464,
+        -0.015681039916069537
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g4",
+      "type": 6,
+      "size": [
+        0.011816750184397044,
+        0.06000760737200606,
+        0.01035276602800867
+      ],
+      "pos": [
+        0.007584828638393943,
+        -0.0004567268435926278,
+        -0.015681039916069537
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g5",
+      "type": 6,
+      "size": [
+        0.004802167196949098,
+        0.011316626800337471,
+        0.011377207687206285
+      ],
+      "pos": [
+        -0.04842860210565732,
+        0.021726651778484166,
+        -0.01333118581029954
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g6",
+      "type": 6,
+      "size": [
+        0.004802167196949097,
+        0.005115428676004117,
+        0.011377206501647131
+      ],
+      "pos": [
+        -0.05720940325013987,
+        0.008413567678025454,
+        -0.013488068481145856
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g7",
+      "type": 6,
+      "size": [
+        0.00480216749333889,
+        0.011316626800337477,
+        0.01137720768720628
+      ],
+      "pos": [
+        -0.01552631970510793,
+        0.050920955678698365,
+        -0.013196781340886376
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g8",
+      "type": 6,
+      "size": [
+        0.004802167789728672,
+        0.00500553742030048,
+        0.01137720887276543
+      ],
+      "pos": [
+        -0.00250893776717331,
+        0.05779660121133338,
+        -0.013099802602635751
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g9",
+      "type": 6,
+      "size": [
+        0.004802167789728673,
+        0.00511542867600412,
+        0.011377206501647138
+      ],
+      "pos": [
+        -0.058389470887487645,
+        -0.0012971413067556507,
+        -0.013510821732301186
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g10",
+      "type": 6,
+      "size": [
+        0.0048021674933388875,
+        0.005115428676004123,
+        0.011377206501647136
+      ],
+      "pos": [
+        -0.05622503823235821,
+        -0.011080940012968919,
+        -0.013556157514094632
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g11",
+      "type": 6,
+      "size": [
+        0.004802167493338885,
+        0.005115428676004119,
+        0.011377206501647134
+      ],
+      "pos": [
+        -0.05108836137253628,
+        -0.020162161845381898,
+        -0.013334941661678245
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g12",
+      "type": 6,
+      "size": [
+        0.004802166900559311,
+        0.005115428676004119,
+        0.011377207687206282
+      ],
+      "pos": [
+        -0.04484226671607356,
+        -0.027420501128534617,
+        -0.013407943651733506
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g13",
+      "type": 6,
+      "size": [
+        0.004802167493338885,
+        0.00511542867600412,
+        0.011377207687206287
+      ],
+      "pos": [
+        -0.037521514857169425,
+        -0.035033882180652995,
+        -0.013107693684320302
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g14",
+      "type": 6,
+      "size": [
+        0.004802166900559312,
+        0.00511542867600412,
+        0.011377207687206285
+      ],
+      "pos": [
+        -0.029510988088527527,
+        -0.041894753275194124,
+        -0.013243378557612569
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g15",
+      "type": 6,
+      "size": [
+        0.004802167493338885,
+        0.005115428083224546,
+        0.011377206501647134
+      ],
+      "pos": [
+        -0.02148160381608839,
+        -0.04822249976125094,
+        -0.013283308189694244
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g16",
+      "type": 6,
+      "size": [
+        0.004802167196949098,
+        0.00511542867600412,
+        0.011377206501647133
+      ],
+      "pos": [
+        -0.01366042032774638,
+        -0.05354147768003768,
+        -0.013389458413508522
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g17",
+      "type": 6,
+      "size": [
+        0.004802167493338885,
+        0.005115428676004119,
+        0.011377206501647133
+      ],
+      "pos": [
+        -0.004327953022495018,
+        -0.058328661187703405,
+        -0.013315896839535725
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g18",
+      "type": 6,
+      "size": [
+        0.004802167493338885,
+        0.005115428083224545,
+        0.011377206501647133
+      ],
+      "pos": [
+        0.0047507506822890575,
+        -0.061209702698311004,
+        -0.013412771248581385
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g19",
+      "type": 6,
+      "size": [
+        0.004802167789728673,
+        0.005115428676004121,
+        0.011377207687206285
+      ],
+      "pos": [
+        0.012481486084943445,
+        -0.061150761439742934,
+        -0.013480699045486126
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g20",
+      "type": 6,
+      "size": [
+        0.004802167493338885,
+        0.005115428676004122,
+        0.011377206501647131
+      ],
+      "pos": [
+        0.021531354620146447,
+        -0.05809912745230943,
+        -0.013351311862384413
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g21",
+      "type": 6,
+      "size": [
+        0.004802166900559311,
+        0.005115428083224548,
+        0.011377206501647136
+      ],
+      "pos": [
+        0.029700357451128655,
+        -0.05289816009104673,
+        -0.013916178631479028
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g22",
+      "type": 6,
+      "size": [
+        0.0048021666041695235,
+        0.00511542867600412,
+        0.011377206501647134
+      ],
+      "pos": [
+        0.03678766797168926,
+        -0.04619275610973002,
+        -0.013469241801886444
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g23",
+      "type": 6,
+      "size": [
+        0.004802167196949099,
+        0.00511542867600412,
+        0.011377206501647134
+      ],
+      "pos": [
+        0.04363831717526221,
+        -0.038599645747912484,
+        -0.013608483352620666
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g24",
+      "type": 6,
+      "size": [
+        0.004802167196949099,
+        0.00511542867600412,
+        0.011377206501647136
+      ],
+      "pos": [
+        0.05007099987256645,
+        -0.031068736932318146,
+        -0.01358647937484644
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g25",
+      "type": 6,
+      "size": [
+        0.004802167493338888,
+        0.005115428676004121,
+        0.011377207687206285
+      ],
+      "pos": [
+        0.056129984842162826,
+        -0.023150698003876834,
+        -0.013442495587522946
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g26",
+      "type": 6,
+      "size": [
+        0.004802167196949097,
+        0.005115428676004122,
+        0.011377207687206278
+      ],
+      "pos": [
+        0.061408264886540435,
+        -0.015272717933464252,
+        -0.013178106413197822
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g27",
+      "type": 6,
+      "size": [
+        0.0048021666041695235,
+        0.00511542867600412,
+        0.011377206501647134
+      ],
+      "pos": [
+        0.06503002478344605,
+        -0.005981624271335999,
+        -0.013531478914884057
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g28",
+      "type": 6,
+      "size": [
+        0.004802166900559311,
+        0.005115428676004119,
+        0.011377206501647131
+      ],
+      "pos": [
+        0.06552849075581768,
+        0.003037279533667561,
+        -0.01358713380349576
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g29",
+      "type": 6,
+      "size": [
+        0.004802166900559312,
+        0.005115428676004121,
+        0.011377206501647133
+      ],
+      "pos": [
+        0.0624180482924406,
+        0.011824472916682673,
+        -0.013802915052780841
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g30",
+      "type": 6,
+      "size": [
+        0.004802167196949098,
+        0.00511542867600412,
+        0.011377206501647134
+      ],
+      "pos": [
+        0.05755024676275725,
+        0.019871711709880426,
+        -0.013764019228275628
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g31",
+      "type": 6,
+      "size": [
+        0.004802166604169525,
+        0.005115428083224546,
+        0.01137720887276543
+      ],
+      "pos": [
+        0.05162685182172136,
+        0.02767014906042199,
+        -0.013616393403251572
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g32",
+      "type": 6,
+      "size": [
+        0.004802166900559309,
+        0.00511542867600412,
+        0.011377206501647134
+      ],
+      "pos": [
+        0.04525959302040273,
+        0.03550204763233746,
+        -0.013766333439731193
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g33",
+      "type": 6,
+      "size": [
+        0.004802167196949097,
+        0.00511542867600412,
+        0.011377207687206282
+      ],
+      "pos": [
+        0.03831127508315541,
+        0.04307176691217841,
+        -0.013553094029257962
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g34",
+      "type": 6,
+      "size": [
+        0.004802167493338885,
+        0.00511542867600412,
+        0.01137720887276543
+      ],
+      "pos": [
+        0.030949211230203826,
+        0.05020230766148682,
+        -0.01370344189808426
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g35",
+      "type": 6,
+      "size": [
+        0.004802167196949098,
+        0.00511542867600412,
+        0.011377208872765424
+      ],
+      "pos": [
+        0.023465620451297246,
+        0.05577509008253143,
+        -0.01354756458139487
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g36",
+      "type": 6,
+      "size": [
+        0.004802167196949097,
+        0.00511542867600412,
+        0.011377206501647133
+      ],
+      "pos": [
+        0.015486553680188584,
+        0.0591790675063113,
+        -0.01374770593440853
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g37",
+      "type": 6,
+      "size": [
+        0.004802167493338884,
+        0.005115428676004118,
+        0.011377206501647134
+      ],
+      "pos": [
+        0.006272948163929046,
+        0.06003047917907612,
+        -0.01385918643214915
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g38",
+      "type": 6,
+      "size": [
+        0.01826984702465895,
+        0.03289945365642388,
+        0.01035278262583673
+      ],
+      "pos": [
+        -0.01887914025168102,
+        0.019302501052070035,
+        -0.015681039916069537
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g39",
+      "type": 6,
+      "size": [
+        0.01826984702465895,
+        0.03289945365642388,
+        0.01035278262583673
+      ],
+      "pos": [
+        -0.008893655112495348,
+        -0.014208974988533045,
+        -0.015681039916069537
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g40",
+      "type": 6,
+      "size": [
+        0.06757820396561602,
+        0.015683695568559523,
+        0.00410858338206079
+      ],
+      "pos": [
+        -0.01029169906188946,
+        -0.011765370422070568,
+        -0.0037454943339929217
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g41",
+      "type": 6,
+      "size": [
+        0.00579308065068098,
+        0.00924154677424353,
+        0.004108583382060791
+      ],
+      "pos": [
+        -0.038763715278309845,
+        0.04681998803221016,
+        -0.0037454943339929217
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g42",
+      "type": 6,
+      "size": [
+        0.005793080057901403,
+        0.00924154677424353,
+        0.00410858338206079
+      ],
+      "pos": [
+        -0.026343121882290956,
+        0.05640879515795593,
+        -0.0037454943339929217
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g43",
+      "type": 6,
+      "size": [
+        0.005793080057901404,
+        0.009241547367023109,
+        0.004108583382060791
+      ],
+      "pos": [
+        -0.012827313688216149,
+        0.06389568653352865,
+        -0.0037454943339929217
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g44",
+      "type": 6,
+      "size": [
+        0.005793080650680981,
+        0.009241546774243535,
+        0.004108583382060791
+      ],
+      "pos": [
+        0.0034415448292605105,
+        0.06784101871739351,
+        -0.0037454943339929217
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g45",
+      "type": 6,
+      "size": [
+        0.00579308065068098,
+        0.009241546774243537,
+        0.004108583382060791
+      ],
+      "pos": [
+        0.018519730882816637,
+        0.06549693117131607,
+        -0.0037454943339929217
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g46",
+      "type": 6,
+      "size": [
+        0.00579308065068098,
+        0.009241546774243534,
+        0.004108583382060791
+      ],
+      "pos": [
+        0.032066823611670875,
+        0.05647948293655563,
+        -0.0037454943339929217
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g47",
+      "type": 6,
+      "size": [
+        0.005793080650680979,
+        0.009241546774243532,
+        0.004108583382060791
+      ],
+      "pos": [
+        0.04519956578965571,
+        0.04337580118438985,
+        -0.0037454943339929217
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g48",
+      "type": 6,
+      "size": [
+        0.005793081243460555,
+        0.009241547367023107,
+        0.004108583382060791
+      ],
+      "pos": [
+        0.05640237416961406,
+        0.029387972100283502,
+        -0.0037454943339929217
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g49",
+      "type": 6,
+      "size": [
+        0.005793081243460552,
+        0.009241546774243534,
+        0.00410858338206079
+      ],
+      "pos": [
+        0.06539751018122197,
+        0.015538753849445003,
+        -0.0037454943339929217
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g50",
+      "type": 6,
+      "size": [
+        0.005846139757539629,
+        0.009274712791389758,
+        0.0041085839748403645
+      ],
+      "pos": [
+        0.06893424177608193,
+        6.766493621254616e-05,
+        -0.0037454943339929217
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g51",
+      "type": 6,
+      "size": [
+        0.005793080650680979,
+        0.009241546774243532,
+        0.00410858338206079
+      ],
+      "pos": [
+        0.0662080722280068,
+        -0.014964753532679448,
+        -0.0037454943339929217
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g52",
+      "type": 6,
+      "size": [
+        0.0057930806506809795,
+        0.009241547367023107,
+        0.00410858338206079
+      ],
+      "pos": [
+        0.05808244426398837,
+        -0.028325943473879317,
+        -0.0037454943339929217
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g53",
+      "type": 6,
+      "size": [
+        0.005793080057901404,
+        0.00924154677424353,
+        0.00410858338206079
+      ],
+      "pos": [
+        0.04702789716875705,
+        -0.04195947057792793,
+        -0.0037454943339929217
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g54",
+      "type": 6,
+      "size": [
+        0.005793080650680979,
+        0.009241546774243534,
+        0.004108583382060791
+      ],
+      "pos": [
+        0.017881229035082092,
+        -0.06652614352052248,
+        -0.0037454943339929217
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g55",
+      "type": 6,
+      "size": [
+        0.005793080650680981,
+        0.009241546774243534,
+        0.00410858338206079
+      ],
+      "pos": [
+        0.0024274246479994506,
+        -0.06866105101064712,
+        -0.0037454943339929217
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g56",
+      "type": 6,
+      "size": [
+        0.0057930812434605515,
+        0.009241546774243528,
+        0.00410858338206079
+      ],
+      "pos": [
+        -0.012529264118580366,
+        -0.06554207726364594,
+        -0.0037454943339929217
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g57",
+      "type": 6,
+      "size": [
+        0.005793081243460555,
+        0.009241546774243534,
+        0.004108583382060789
+      ],
+      "pos": [
+        -0.02726284073088766,
+        -0.05726839193107384,
+        -0.0037454943339929217
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g58",
+      "type": 6,
+      "size": [
+        0.005793081243460555,
+        0.009241546774243534,
+        0.004108583382060789
+      ],
+      "pos": [
+        -0.04101883846597253,
+        -0.04609919178182367,
+        -0.0037454943339929217
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g59",
+      "type": 6,
+      "size": [
+        0.005793080650680982,
+        0.00924154677424353,
+        0.00410858338206079
+      ],
+      "pos": [
+        -0.05313554697023254,
+        -0.03456908845918351,
+        -0.0037454943339929217
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g60",
+      "type": 6,
+      "size": [
+        0.005793080650680977,
+        0.009241546774243532,
+        0.004108583382060791
+      ],
+      "pos": [
+        -0.06387142050890134,
+        -0.021387382688414426,
+        -0.0037454943339929217
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g61",
+      "type": 6,
+      "size": [
+        0.005793080057901408,
+        0.009241546774243534,
+        0.004108583382060791
+      ],
+      "pos": [
+        -0.06987300544682115,
+        -0.006289580373206772,
+        -0.0037454943339929217
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g62",
+      "type": 6,
+      "size": [
+        0.005793080650680977,
+        0.009241546774243534,
+        0.004108583382060789
+      ],
+      "pos": [
+        -0.06881939429036293,
+        0.01138939167856327,
+        -0.0037454943339929217
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g63",
+      "type": 6,
+      "size": [
+        0.044994203234157266,
+        0.05168195186865211,
+        0.00878209399673271
+      ],
+      "pos": [
+        0.001699339579975251,
+        0.0006002157340695636,
+        -0.00020247208819984124
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g64",
+      "type": 6,
+      "size": [
+        0.030431854558378837,
+        0.030087999725527264,
+        0.0027620816165963356
+      ],
+      "pos": [
+        0.014505773793268405,
+        -0.0008970364346004274,
+        0.010087192480095373
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g65",
+      "type": 6,
+      "size": [
+        0.022278126471450686,
+        0.020946195820686336,
+        0.0029546837026024125
+      ],
+      "pos": [
+        0.014397555954301205,
+        -0.0010041540746789166,
+        0.016454688393243468
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_handle_main",
+      "type": 6,
+      "size": [
+        0.024428664373373554,
+        0.025435362954372397,
+        0.0026275004988702217
+      ],
+      "pos": [
+        0.014495001802855872,
+        -0.0003574362650047329,
+        0.022977672759680632
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g67",
+      "type": 6,
+      "size": [
+        0.026940126788751063,
+        0.00864021516967527,
+        0.0009338484166118894
+      ],
+      "pos": [
+        -0.036857777197425064,
+        -0.044364239783401704,
+        0.004081934976326947
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g68",
+      "type": 6,
+      "size": [
+        0.010915093329409733,
+        0.00864021576245485,
+        0.0009338484166118902
+      ],
+      "pos": [
+        -0.06280423707132461,
+        -0.017841568524926858,
+        0.0036439511930251222
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g69",
+      "type": 6,
+      "size": [
+        0.010915093329409731,
+        0.008640215762454852,
+        0.0009338484907093362
+      ],
+      "pos": [
+        -0.06624071778468735,
+        0.004597863345769204,
+        0.004605167872065618
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g70",
+      "type": 6,
+      "size": [
+        0.010915092143850579,
+        0.008640215762454852,
+        0.0009338484166118883
+      ],
+      "pos": [
+        -0.05864242652939604,
+        0.02141128356082436,
+        0.00454183174573844
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g71",
+      "type": 6,
+      "size": [
+        0.010915092143850582,
+        0.008640215762454854,
+        0.0009338484166118892
+      ],
+      "pos": [
+        -0.04415708466247251,
+        0.038519784112630844,
+        0.004040930931268015
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g72",
+      "type": 6,
+      "size": [
+        0.010915093329409728,
+        0.008640215762454854,
+        0.00093384841661189
+      ],
+      "pos": [
+        -0.028018715305324998,
+        0.0522081504405978,
+        0.004204175016109053
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g73",
+      "type": 6,
+      "size": [
+        0.010915093329409731,
+        0.00864021576245485,
+        0.000933848490709335
+      ],
+      "pos": [
+        -0.01037570541195013,
+        0.06171143607169263,
+        0.004190958402734751
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g74",
+      "type": 6,
+      "size": [
+        0.010915093329409728,
+        0.008640215169675279,
+        0.0009338484907093371
+      ],
+      "pos": [
+        0.06746757707046147,
+        0.00032049501999748984,
+        0.004605167872065618
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g75",
+      "type": 6,
+      "size": [
+        0.01091509332940973,
+        0.008640215762454854,
+        0.0009338484166118901
+      ],
+      "pos": [
+        0.06164242704484554,
+        -0.01718644158126947,
+        0.00454183174573844
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g76",
+      "type": 6,
+      "size": [
+        0.010915093329409731,
+        0.00864021635523443,
+        0.0009338484166118906
+      ],
+      "pos": [
+        0.048997300601916066,
+        -0.035696621599595316,
+        0.004040930931268015
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g77",
+      "type": 6,
+      "size": [
+        0.010915092143850584,
+        0.008640215762454854,
+        0.0009338484166118897
+      ],
+      "pos": [
+        0.03435550049432096,
+        -0.05097523057646259,
+        0.004204175016109053
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g78",
+      "type": 6,
+      "size": [
+        0.010915094514968873,
+        0.00864021576245485,
+        0.000933848490709336
+      ],
+      "pos": [
+        0.01778577492589492,
+        -0.06224609953595017,
+        0.004190958402734751
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g79",
+      "type": 6,
+      "size": [
+        0.01091509332940973,
+        0.008640215762454852,
+        0.0009338484166118893
+      ],
+      "pos": [
+        -0.0024952611568498477,
+        -0.06404274803239858,
+        0.0047646584766462465
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g80",
+      "type": 6,
+      "size": [
+        0.010915093329409726,
+        0.00864021576245485,
+        0.0009338484907093358
+      ],
+      "pos": [
+        0.01791924043246341,
+        0.06271327148906918,
+        0.004169713775594383
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g81",
+      "type": 6,
+      "size": [
+        0.010915092143850584,
+        0.008640215762454854,
+        0.0009338484166118885
+      ],
+      "pos": [
+        0.034977568121155385,
+        0.05087418299921837,
+        0.004106377649267206
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g82",
+      "type": 6,
+      "size": [
+        0.010915093329409733,
+        0.008640215762454852,
+        0.0009338484166118899
+      ],
+      "pos": [
+        0.049911485260413085,
+        0.034155807282664985,
+        0.0036054765384069933
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g83",
+      "type": 6,
+      "size": [
+        0.010915093329409731,
+        0.00864021576245485,
+        0.0009338484166118903
+      ],
+      "pos": [
+        0.061229051023595236,
+        0.01627478809155197,
+        0.004397502960703076
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_g84",
+      "type": 6,
+      "size": [
+        0.010915094514968875,
+        0.008640215762454856,
+        0.0009338484907093357
+      ],
+      "pos": [
+        0.0037818589897186112,
+        0.06518019244728196,
+        0.004169713479204596
+      ],
+      "group": 0,
+      "contype": 1
+    },
+    {
+      "name": "blender_main_group_auxiliary_main_group_reg_main",
+      "type": 6,
+      "size": [
+        0.09,
+        0.09,
+        0.026335880834512024
+      ],
+      "pos": [
+        -6.364922206689393e-08,
+        1.941301272978433e-07,
+        -5.410183875553487e-08
+      ],
+      "group": 1,
+      "contype": 0
+    }
+  ],
+  "init_robot_base_pos": [
+    1.8029447579630031,
+    -0.8377430816161683,
+    0.0
+  ],
+  "init_robot_base_ori": [
+    0.0,
+    0.0,
+    1.5707963267948966
+  ],
+  "ep_meta_fixtures": {
+    "wall_room": {
+      "cls": "Wall"
+    },
+    "wall_backing_room": {
+      "cls": "Wall"
+    },
+    "wall_left_room": {
+      "cls": "Wall"
+    },
+    "wall_left_backing_room": {
+      "cls": "Wall"
+    },
+    "wall_right_room": {
+      "cls": "Wall"
+    },
+    "wall_right_backing_room": {
+      "cls": "Wall"
+    },
+    "wall_front_room": {
+      "cls": "Wall"
+    },
+    "wall_front_backing_room": {
+      "cls": "Wall"
+    },
+    "floor_room": {
+      "cls": "Floor"
+    },
+    "floor_backing_room": {
+      "cls": "Floor"
+    },
+    "outlet_room": {
+      "cls": "WallAccessory"
+    },
+    "outlet_2_room": {
+      "cls": "WallAccessory"
+    },
+    "light_switch_room": {
+      "cls": "WallAccessory"
+    },
+    "light_switch_2_room": {
+      "cls": "WallAccessory"
+    },
+    "utensil_rack_room": {
+      "cls": "WallAccessory"
+    },
+    "stool_1_room": {
+      "cls": "Stool"
+    },
+    "stool_2_room": {
+      "cls": "Stool"
+    },
+    "stool_3_room": {
+      "cls": "Stool"
+    },
+    "stovetop_main_group": {
+      "cls": "Stovetop"
+    },
+    "counter_main_main_group": {
+      "cls": "Counter"
+    },
+    "bottom_main_group_base": {
+      "cls": "Box"
+    },
+    "bottom_main_group_1": {
+      "cls": "Drawer"
+    },
+    "bottom_main_group_2": {
+      "cls": "Drawer"
+    },
+    "oven_main_group": {
+      "cls": "Oven"
+    },
+    "oven_housing_main_group": {
+      "cls": "HousingCabinet"
+    },
+    "microwave_main_group": {
+      "cls": "Microwave"
+    },
+    "micro_housing_main_group": {
+      "cls": "HousingCabinet"
+    },
+    "top_main_group": {
+      "cls": "HingeCabinet"
+    },
+    "fridge_main_group": {
+      "cls": "FridgeSideBySide"
+    },
+    "fridge_housing_main_group": {
+      "cls": "HousingCabinet"
+    },
+    "fridge_top_main_group": {
+      "cls": "HingeCabinet"
+    },
+    "cab_main_main_group": {
+      "cls": "HingeCabinet"
+    },
+    "hood_main_group": {
+      "cls": "Hood"
+    },
+    "shelves_main_group": {
+      "cls": "OpenCabinet"
+    },
+    "cab_2_main_group": {
+      "cls": "HingeCabinet"
+    },
+    "stack_3_main_group_base": {
+      "cls": "Box"
+    },
+    "stack_3_main_group_1": {
+      "cls": "HingeCabinet"
+    },
+    "stack_3_main_group_2": {
+      "cls": "Drawer"
+    },
+    "stack_3_main_group_3": {
+      "cls": "Drawer"
+    },
+    "stack_4_main_group_base": {
+      "cls": "Box"
+    },
+    "stack_4_main_group_1": {
+      "cls": "HingeCabinet"
+    },
+    "stack_4_main_group_2": {
+      "cls": "Drawer"
+    },
+    "stack_4_main_group_3": {
+      "cls": "Drawer"
+    },
+    "stack_5_main_group_base": {
+      "cls": "Box"
+    },
+    "stack_5_main_group_1": {
+      "cls": "HingeCabinet"
+    },
+    "stack_5_main_group_2": {
+      "cls": "Drawer"
+    },
+    "stack_5_main_group_3": {
+      "cls": "Drawer"
+    },
+    "stack_6_main_group_base": {
+      "cls": "Box"
+    },
+    "stack_6_main_group_1": {
+      "cls": "Drawer"
+    },
+    "stack_6_main_group_2": {
+      "cls": "Drawer"
+    },
+    "stack_6_main_group_3": {
+      "cls": "Drawer"
+    },
+    "stack_6_main_group_4": {
+      "cls": "Drawer"
+    },
+    "toaster_main_group": {
+      "cls": "Toaster"
+    },
+    "knife_block_main_group": {
+      "cls": "Accessory"
+    },
+    "paper_towel_main_group": {
+      "cls": "Accessory"
+    },
+    "coffee_machine_main_group": {
+      "cls": "CoffeeMachine"
+    },
+    "blender_main_group": {
+      "cls": "Blender"
+    },
+    "blender_main_group_auxiliary_main_group": {
+      "cls": "BlenderLid"
+    },
+    "sink_island_group": {
+      "cls": "Sink"
+    },
+    "island_island_group": {
+      "cls": "Counter"
+    },
+    "island_stack_1_island_group_base": {
+      "cls": "Box"
+    },
+    "island_stack_1_island_group_1": {
+      "cls": "HingeCabinet"
+    },
+    "island_stack_1_island_group_2": {
+      "cls": "PanelCabinet"
+    },
+    "dishwasher_island_group": {
+      "cls": "Dishwasher"
+    },
+    "island_panel_cab_right_island_group_base": {
+      "cls": "Box"
+    },
+    "island_panel_cab_right_island_group_1": {
+      "cls": "PanelCabinet"
+    },
+    "island_cab_left_island_group_base": {
+      "cls": "Box"
+    },
+    "island_cab_left_island_group_1": {
+      "cls": "Drawer"
+    },
+    "island_cab_left_island_group_2": {
+      "cls": "Drawer"
+    },
+    "island_cab_left_island_group_3": {
+      "cls": "Drawer"
+    },
+    "island_cab_left_island_group_4": {
+      "cls": "Drawer"
+    },
+    "island_panel_cab_left_island_group_base": {
+      "cls": "Box"
+    },
+    "island_panel_cab_left_island_group_1": {
+      "cls": "PanelCabinet"
+    },
+    "island_base_box_island_group": {
+      "cls": "Box"
+    },
+    "plant_island_group": {
+      "cls": "Accessory"
+    }
+  }
+}

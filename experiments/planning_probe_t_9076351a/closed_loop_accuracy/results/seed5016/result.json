@@ -1,0 +1,247 @@
+{
+  "seed": 5016,
+  "goal": "Close the blender lid securely.",
+  "terminal": "plan_consumed",
+  "planner_calls": 1,
+  "runtime_boundary_planner_calls": 0,
+  "steps_used": 377,
+  "task_success": false,
+  "skills": [
+    {
+      "status": "SUCCESS",
+      "skill": "GRASP_OBJECT",
+      "args": {
+        "grasp_region": "lid_handle",
+        "object": "blender_lid"
+      },
+      "instruction": "Grasp the blender lid securely at its handle and lift it clear.",
+      "steps": 167,
+      "success_step": 167,
+      "terminated_by": "async_endpoint_success",
+      "reason": "strict_success_gate",
+      "vlm_stats": {
+        "skill": "GRASP_OBJECT",
+        "view": "left",
+        "tau": 0.6,
+        "hysteresis_k": 2,
+        "vlm_min_interval": 4,
+        "elapsed": 98,
+        "n_vlm_calls": 28,
+        "vlm_seconds": 2.6221,
+        "sequence_model": true,
+        "sequence_probability": 0.9944397265218635,
+        "succeeded_step": 97,
+        "mean_vlm_latency_ms": 93.64
+      },
+      "success_gate": {
+        "success": true,
+        "reason": "strict_success_gate",
+        "n_frames": 98,
+        "sub_scores": [
+          0.8737448394298554
+        ],
+        "sub_thresholds": [
+          0.453265318274498
+        ],
+        "sub_pass": [
+          true
+        ],
+        "sub_views": [
+          "eye"
+        ],
+        "aggregate": "last_k_mean",
+        "criterion": "balanced n=30 best-F1: final10 grasp@eye>=0.45327; precision .667 recall .933"
+      }
+    },
+    {
+      "status": "SUCCESS",
+      "skill": "MOVE_OBJECT",
+      "args": {
+        "destination": "closed_preplace_region",
+        "object": "blender_lid"
+      },
+      "instruction": "Move the held blender lid to the pre-place region above the blender while maintaining a stable grasp and avoiding disallowed contact.",
+      "steps": 114,
+      "success_step": 114,
+      "terminated_by": "async_endpoint_success",
+      "reason": "no_strict_gate",
+      "vlm_stats": {
+        "skill": "MOVE_OBJECT",
+        "view": "right",
+        "tau": 0.6,
+        "hysteresis_k": 2,
+        "vlm_min_interval": 4,
+        "elapsed": 98,
+        "n_vlm_calls": 64,
+        "vlm_seconds": 6.3522,
+        "sequence_model": true,
+        "sequence_probability": 0.6735134657009655,
+        "succeeded_step": 98,
+        "mean_vlm_latency_ms": 99.25
+      },
+      "success_gate": {
+        "success": true,
+        "reason": "no_strict_gate"
+      }
+    },
+    {
+      "status": "TIMEOUT",
+      "skill": "PLACE_OBJECT",
+      "args": {
+        "destination": "blender",
+        "object": "blender_lid"
+      },
+      "instruction": "Place the blender lid on the blender, release it after it is stably supported, then move the gripper clear.",
+      "steps": 96,
+      "success_step": null,
+      "terminated_by": "async_budget_exhausted",
+      "reason": "skill not yet recognised as complete",
+      "vlm_stats": {
+        "skill": "PLACE_OBJECT",
+        "view": "eye",
+        "tau": 0.6,
+        "hysteresis_k": 2,
+        "vlm_min_interval": 4,
+        "elapsed": 40,
+        "n_vlm_calls": 34,
+        "vlm_seconds": 3.8327,
+        "sequence_model": true,
+        "sequence_probability": 0.018005952380952383,
+        "succeeded_step": null,
+        "mean_vlm_latency_ms": 112.73
+      },
+      "success_gate": null
+    }
+  ],
+  "official_predicate": false,
+  "final_predicates": {
+    "gripper_lid_contact": true,
+    "lid_on_counter": false,
+    "lid_lifted": true,
+    "lid_grasped": true,
+    "lid_dz_from_rest": 0.4180198243474261,
+    "lid_xy_to_closed_pos": 0.003796794255627017,
+    "lid_dz_to_closed_pos": 0.011745819890829123,
+    "lid_dist_to_closed_pos": 0.012344226647601679,
+    "in_preplace_region": false,
+    "lid_on_blender": false,
+    "lid_upright_7deg": false,
+    "gripper_lid_far_0.15": false,
+    "eef_lid_dist": 0.03682799179660185,
+    "official_check_success": false,
+    "finger_qpos": [
+      0.0337168815513685,
+      -0.0185326215794767
+    ],
+    "gripper_ramp_action": [
+      -1.0,
+      1.0
+    ],
+    "lid_other_contacts": [
+      "blender_main_group_g42",
+      "blender_main_group_g44"
+    ],
+    "lid_pos": [
+      4.57178285175983,
+      -0.491356452515468,
+      1.3832585942130613
+    ],
+    "eef_pos": [
+      4.563096513100368,
+      -0.49377135002246547,
+      1.4189659711888967
+    ],
+    "base_pos": [
+      4.766617160321349,
+      -0.8816909400908236,
+      0.7011553337719153
+    ]
+  },
+  "reset_snapshot_sha256": "53c4f6dd18862dfaa8ca77024ffee2c638d00746b41ae3b930b24d783c59f64a",
+  "canonical_plan": [
+    {
+      "name": "GRASP_OBJECT",
+      "args": {
+        "grasp_region": "lid_handle",
+        "object": "blender_lid"
+      },
+      "instruction": "Grasp the blender lid securely at its handle and lift it clear.",
+      "contract": "held AND lifted>=0.05m AND stable_for(20) AND no_disallowed_contact",
+      "budget": 208
+    },
+    {
+      "name": "MOVE_OBJECT",
+      "args": {
+        "destination": "closed_preplace_region",
+        "object": "blender_lid"
+      },
+      "instruction": "Move the held blender lid to the pre-place region above the blender while maintaining a stable grasp and avoiding disallowed contact.",
+      "contract": "held AND at_target(xy<=0.06m,z 0.015-0.25m) AND stable_for(3) AND no_disallowed_contact",
+      "budget": 288
+    },
+    {
+      "name": "PLACE_OBJECT",
+      "args": {
+        "destination": "blender",
+        "object": "blender_lid"
+      },
+      "instruction": "Place the blender lid on the blender, release it after it is stably supported, then move the gripper clear.",
+      "contract": "supported_by AND released AND upright_error<=7deg AND gripper_clear>=0.15m",
+      "budget": 96
+    }
+  ],
+  "video_frames": 189,
+  "video": "episode.mp4",
+  "failure_stage": "PLACE_OBJECT",
+  "failure_reason": "skill not yet recognised as complete",
+  "planner": {
+    "calls": 1,
+    "latency_ms": 3309.6604365855455,
+    "raw_json": "{\"plan\": [{\"name\": \"GRASP_OBJECT\", \"args\": {\"grasp_region\": \"lid_handle\", \"object\": \"blender_lid\"}}, {\"name\": \"MOVE_OBJECT\", \"args\": {\"destination\": \"closed_preplace_region\", \"object\": \"blender_lid\"}}, {\"name\": \"PLACE_OBJECT\", \"args\": {\"destination\": \"blender\", \"object\": \"blender_lid\"}}]}",
+    "valid": true
+  },
+  "mechanics": {
+    "runtime_boundary_planner_calls": 0,
+    "fallback_calls": 0,
+    "repair_calls": 0,
+    "sequence_corrections": 0,
+    "action_before_plan": 0,
+    "nan_violations": 0
+  },
+  "policy": {
+    "calls": 25,
+    "actions": 377,
+    "latencies_ms": [
+      336.78740821778774,
+      337.97281607985497,
+      368.1834302842617,
+      446.07746601104736,
+      393.19916255772114,
+      389.54056054353714,
+      340.90040624141693,
+      371.1966294795275,
+      332.34409615397453,
+      323.6967418342829,
+      312.72651068866253,
+      330.17327822744846,
+      383.4249246865511,
+      323.9774629473686,
+      335.87755635380745,
+      419.6250829845667,
+      365.9976962953806,
+      332.79898576438427,
+      316.7893923819065,
+      316.07905961573124,
+      367.1962842345238,
+      393.23084242641926,
+      342.8448084741831,
+      424.2475349456072,
+      391.8489646166563
+    ],
+    "p50_ms": 342.8448084741831,
+    "p95_ms": 423.3230445533991,
+    "max_ms": 446.07746601104736,
+    "deadline_misses": 0
+  },
+  "elapsed_s": 53.617854757234454
+}

@@ -1,0 +1,43 @@
+{
+  "task_id": "t_783b35bb",
+  "execution_source_commit": "45280448bd9f650c3cfd94f26939a8830374a05b",
+  "host": "amp_csi (hostname amp2)",
+  "gpu": "NVIDIA GeForce RTX 3090 24576 MiB",
+  "remote_bundle": "/home/guest/closed-loop-t_783b35bb-run140",
+  "container_images": {
+    "server": "xiaomi-cu121:t_9f03a613",
+    "client": "xiaomi-client:t_9f03a613"
+  },
+  "models": {
+    "policy": {
+      "id": "XiaomiRobotics/Xiaomi-Robotics-1-RoboCasa365",
+      "revision": "3a6d0293bfa90759d34a7fc48c2c62413cd7bcf4"
+    },
+    "planner": {
+      "id": "Qwen/Qwen3-VL-4B-Instruct",
+      "revision": "ebb281ec70b05090aa6165b016eac8ec08e71b17"
+    }
+  },
+  "protocol": {
+    "task": "CloseBlenderLid",
+    "split": "target",
+    "fixed_seeds": "5000..5019",
+    "planner_calls_per_episode": 1,
+    "runtime_boundary_planner_calls": 0,
+    "runtime_simulator_gt_input": false,
+    "official_predicate_use": "offline final scoring only",
+    "fallback": false,
+    "repair": false,
+    "sequence_correction": false
+  },
+  "inputs": {
+    "paired_baseline_sha256": "80887a458d1db6ada52e0cb188660405d96216f74d95f4cbfcc1d6d4d1ff68f6",
+    "verifier_calibration_sha256": "a1676719c9e96a4053b4eda993165542874b3e0498e62e627c4c5b1d76492354"
+  },
+  "harness_hashes": {
+    "run_closed_loop_accuracy.py": "df559c6ff69d2e4643a6193ce09d02f18e583acc2433eb82e1abe874ee4e8f0b",
+    "run_remote.sh": "eecb623e9d046daf57d0e5df40b9f8bd32ed16e98eeb71c4d54e4c0e11e01c3d",
+    "finalize.py": "3c5db23c9985ed9cac28af1a636c799e37bc97c406f0133265f544f7e80fd245",
+    "verify_videos.py": "3850b35d6fdb23f7e15a63971170a097543327d9961ef04822aa4bff09dd8590"
+  }
+}
