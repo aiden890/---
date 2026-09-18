@@ -21,9 +21,12 @@ def main() -> None:
     args = ap.parse_args()
 
     repo = Path(run("git", "rev-parse", "--show-toplevel").strip())
+    def git(*git_args: str, text: bool = True):
+        return run("git", "-C", str(repo), *git_args, text=text)
+
     project = args.project.rstrip("/")
-    commit = run("git", "rev-parse", args.commit).strip()
-    names = run("git", "ls-tree", "-r", "--name-only", commit, "--", project).splitlines()
+    commit = git("rev-parse", args.commit).strip()
+    names = git("ls-tree", "-r", "--name-only", commit, "--", project).splitlines()
     selected: list[str] = []
     for name in names:
         rel = name[len(project) + 1:]
@@ -39,12 +42,12 @@ def main() -> None:
     manifest: dict[str, object] = {
         "commit": commit,
         "dirty": False,
-        "build_worktree_dirty": bool(run("git", "status", "--porcelain").strip()),
+        "build_worktree_dirty": bool(git("status", "--porcelain").strip()),
         "project": project,
         "files": file_hashes,
     }
     for rel in sorted(selected):
-        blob = run("git", "show", f"{commit}:{project}/{rel}", text=False)
+        blob = git("show", f"{commit}:{project}/{rel}", text=False)
         file_hashes[rel] = hashlib.sha256(blob).hexdigest()
     Path(args.output).write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
 

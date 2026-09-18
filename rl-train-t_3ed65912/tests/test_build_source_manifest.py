@@ -28,6 +28,14 @@ def test_manifest_reads_exact_commit_not_dirty_worktree():
         assert data["dirty"] is False
         assert data["files"]["src/x.py"] == hashlib.sha256(b"one\n").hexdigest()
 
+        nested = root / "nested" / "launcher"
+        nested.mkdir(parents=True)
+        nested_out = root / "nested-manifest.json"
+        subprocess.run(["python3", str(SCRIPT), "project", str(nested_out),
+                        "--commit", "HEAD"], cwd=nested, check=True)
+        nested_data = json.loads(nested_out.read_text())
+        assert nested_data["files"] == data["files"]
+
 
 if __name__ == "__main__":
     test_manifest_reads_exact_commit_not_dirty_worktree()
