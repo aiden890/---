@@ -88,6 +88,7 @@ def main() -> int:
             "pass": bool(
                 traces and health.get("model_load_count") == 1
                 and scheduler.get("max_active_forwards") == 1
+                and scheduler.get("policy_priority_dequeues", 0) > 0
                 and scheduler.get("errors") == 0
                 and not runtime_gt_leaks
                 and request_kinds["boundary"] > 0

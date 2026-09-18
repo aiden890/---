@@ -61,6 +61,7 @@ class PriorityDispatcher:
             "completed": {self.POLICY: 0, self.BACKGROUND: 0},
             "errors": 0, "dropped": 0, "superseded": 0, "stale": 0, "timeouts": 0,
             "active_forwards": 0, "max_active_forwards": 0,
+            "policy_priority_dequeues": 0,
             "queue_wait_ms": {}, "model_latency_ms": {},
             "background_by_kind": {kind: 0 for kind in sorted(self.BACKGROUND_KINDS)},
             "policy_blocked_by_background_ms": 0.0,
@@ -159,6 +160,8 @@ class PriorityDispatcher:
                                       (not self._policy and self._background is None)):
                     return
                 if self._policy:
+                    if self._background is not None:
+                        self._metrics["policy_priority_dequeues"] += 1
                     job = self._policy.popleft()
                 else:
                     job, self._background = self._background, None

@@ -57,6 +57,7 @@ class PriorityDispatcherTest(unittest.TestCase):
         dispatcher.close(timeout=1)
         self.assertEqual(order, ["p0", "p1", "bg"])
         self.assertEqual(peak, 1)
+        self.assertEqual(dispatcher.snapshot()["policy_priority_dequeues"], 1)
 
     def test_latest_background_supersedes_pending_without_preempting_running(self):
         dispatcher = PriorityDispatcher()
