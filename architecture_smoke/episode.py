@@ -11,6 +11,72 @@ from __future__ import annotations
 from schemas import PlannerContext, SkillStatus
 
 
+def run_preplanned_episode(planner, manager, env, trace, registry, goal, episode_budget):
+    """Plan once from the reset snapshot, then consume the canonical plan.
+
+    Planning and strict validation finish before ``manager.execute`` can issue an
+    action. Any planner, snapshot, or budget error returns with zero actions and
+    no scripted replacement. Skill results never trigger another planner call.
+    """
+    from pre_episode_planner import PlanRejected
+
+    env.reset()
+    reset_observation = env.obs_for_verifier()
+    context = PlannerContext(
+        goal=goal, predicates={}, skill_catalog=registry.names,
+        step_budget_remaining=episode_budget, planner_calls=0,
+        observation=reset_observation,
+    )
+    try:
+        plan = planner.plan_episode(context)
+        # Re-read immediately before handing the first call to the executor. The
+        # simulator must still be at the exact reset snapshot while planning.
+        planner.validate_execution_snapshot(plan, env.obs_for_verifier())
+        if sum(call.budget or 0 for call in plan.calls) > episode_budget:
+            raise PlanRejected("canonical full plan exceeds episode budget")
+    except PlanRejected as exc:
+        summary = {
+            "seed": env.seed, "goal": goal, "terminal": "plan_rejected",
+            "planner_calls": planner.calls, "runtime_boundary_planner_calls": 0,
+            "steps_used": 0, "task_success": False, "obs_task_success": None,
+            "skills": [], "final_predicates": {}, "plan_error": str(exc),
+        }
+        trace.episode_end(terminal=summary["terminal"], planner_calls=planner.calls,
+                          steps_used=0, task_success=False)
+        return summary
+
+    steps_used = 0
+    skill_log = []
+    terminal = "plan_consumed"
+    for boundary_index, call in enumerate(plan.calls):
+        trace.plan(
+            boundary_index, env.observation_ref(), {}, call.as_dict(),
+            registry.render(call), "canonical pre-episode plan", planner.kind)
+        result = manager.execute(call)
+        steps_used += result.steps
+        skill_log.append(result.as_dict())
+        trace.skill_result(result.as_dict(), next_skill=(
+            "advance_preplanned" if boundary_index + 1 < len(plan.calls) else None))
+
+    final_pred = env.predicates()
+    obs_task_success = None
+    for result in reversed(skill_log):
+        if result.get("skill") == "PLACE_OBJECT" and result.get("success_gate") is not None:
+            obs_task_success = bool(result["success_gate"].get("success"))
+            break
+    summary = {
+        "seed": env.seed, "goal": goal, "terminal": terminal,
+        "planner_calls": planner.calls, "runtime_boundary_planner_calls": 0,
+        "steps_used": steps_used,
+        "task_success": bool(final_pred.get("official_check_success")),
+        "obs_task_success": obs_task_success, "skills": skill_log,
+        "final_predicates": final_pred,
+    }
+    trace.episode_end(terminal=terminal, planner_calls=planner.calls,
+                      steps_used=steps_used, task_success=summary["task_success"])
+    return summary
+
+
 def run_episode(planner, manager, env, trace, registry, goal, episode_budget,
                 max_planner_calls=12, obs_only=False):
     """Drive one end-to-end episode. Returns a machine-readable summary dict.

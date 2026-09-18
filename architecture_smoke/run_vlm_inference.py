@@ -3,7 +3,7 @@
 Task t_fc5e73d5. Runs the full skill-conditioned architecture for CloseBlenderLid
 with the skill-termination judge REPLACED by the obs-only Qwen3-VL verifier:
 
-    SequentialPlanner (obs-only) -> SkillCall -> ExecutionManager
+    generic Qwen full-plan (once, pre-episode) -> SkillCall -> ExecutionManager
         -> base Xiaomi RoboCasa365 VLA (adapter DISABLED) -> RoboCasa env
         -> ObsVLMVerifier (policy's own frozen Qwen3-VL VQA, P(yes) latch)
         -> SkillResult -> planner,   for N randomized seeds.
@@ -29,11 +29,12 @@ from pathlib import Path
 from schemas import AdapterMode
 import bindings
 from skills import SkillRegistry
-from planner import SequentialPlanner, VLMPlanner
+from pre_episode_planner import PreEpisodePlanner
+from runtime_contract import POLICY_CHUNK_ACTIONS, as_dict as runtime_contract_dict
 from environment import RoboCasaEnvironment
 from executor import ExecutionManager
 from trace import Trace
-from episode import run_episode
+from episode import run_preplanned_episode
 
 
 def build_registry() -> SkillRegistry:
@@ -49,14 +50,14 @@ def main():
     ap.add_argument("--server-port", type=int, default=10086)
     ap.add_argument("--model-path", default="/checkpoint")
     ap.add_argument("--robot-type", default="robocasa365")
-    ap.add_argument("--replan-steps", type=int, default=16)
+    ap.add_argument("--replan-steps", type=int, default=POLICY_CHUNK_ACTIONS)
     ap.add_argument("--obs-history", type=int, default=4)
     ap.add_argument("--obs-interval", type=int, default=2)
     ap.add_argument("--crop-ratio", type=float, default=0.95)
     ap.add_argument("--video-stride", type=int, default=2)
     ap.add_argument("--video-fps", type=int, default=20)
     ap.add_argument("--episode-budget", type=int, default=600)
-    ap.add_argument("--max-planner-calls", type=int, default=8)
+
     # obs-only VLM verifier knobs
     ap.add_argument("--vlm-min-interval", type=int, default=16,
                     help="min steps between VLM queries (realistic replan cadence)")
@@ -69,11 +70,7 @@ def main():
                     help="JSON mapping skill names to per-skill view/tau/hysteresis_k/interval")
     ap.add_argument("--sync-verifier", action="store_true",
                     help="compatibility only: block the control loop on verifier RPCs")
-    ap.add_argument("--planner-mode", choices=("vlm", "sequential"), default="vlm",
-                    help="target obs-only VLM planner or scripted rollout compatibility")
-    ap.add_argument("--planner-timeout", type=float, default=5.0)
-    ap.add_argument("--planner-retries", type=int, default=1)
-    ap.add_argument("--max-plan-length", type=int, default=8)
+    ap.add_argument("--planner-timeout", type=float, default=10.0)
     args = ap.parse_args()
 
     if args.verifier_config:
@@ -89,8 +86,10 @@ def main():
     from policy import BasePolicyClient
     from vlm_backends import RemoteVLMScorerBackend
 
+    if args.replan_steps != POLICY_CHUNK_ACTIONS:
+        ap.error(f"production runtime requires --replan-steps={POLICY_CHUNK_ACTIONS}")
     registry = build_registry()
-    planner_kind = "vlm_obs_typed" if args.planner_mode == "vlm" else "sequential_obs_stub"
+    planner_kind = PreEpisodePlanner.kind
     policy = BasePolicyClient(
         model_path=args.model_path, server_addr=args.server_addr, server_port=args.server_port,
         robot_type=args.robot_type, crop_ratio=args.crop_ratio, replan_steps=args.replan_steps,
@@ -109,12 +108,10 @@ def main():
     config = {
         "task": "CloseBlenderLid", "goal": bindings.GOAL, "seeds": seeds, "split": args.split,
         "planner": {
-            "mode": args.planner_mode, "kind": planner_kind,
-            "target_default": "vlm",
-            "compatibility": "--planner-mode sequential preserves deterministic legacy rollouts",
-            "timeout_s": args.planner_timeout, "retries": args.planner_retries,
-            "max_plan_length": args.max_plan_length,
-            "fallback": "SequentialPlanner on timeout/error/invalid output",
+            "mode": "pre_episode_full_plan", "kind": planner_kind,
+            "calls_per_episode": 1, "boundary_calls": 0,
+            "timeout_s": args.planner_timeout, "fallback": None,
+            "json_repair": False, "sequence_substitution": False,
         },
         "verifier": {"kind": "obs_vlm", "backbone": "policy's own frozen Qwen3-VL VQA P(yes)",
                      "input": "3-cam images + 14D proprio ONLY (no sim predicate)",
@@ -129,6 +126,7 @@ def main():
         "obs_interval": args.obs_interval, "crop_ratio": args.crop_ratio,
         "video_stride": args.video_stride, "video_fps": args.video_fps,
         "episode_budget": args.episode_budget, "skill_catalog": registry.catalog(),
+        "runtime_contract": runtime_contract_dict(),
     }
     (out / "config.json").write_text(json.dumps(config, indent=2, default=str))
 
@@ -148,15 +146,9 @@ def main():
                 "adapter_checkpoint": None, "planner_kind": planner_kind,
                 "verifier_kind": "obs_vlm", "policy_provenance": provenance,
             })
-            # Fresh planner and cycle/retry state per episode. Both modes consume
-            # exactly the same obs-only episode context.
-            if args.planner_mode == "vlm":
-                planner = VLMPlanner(
-                    registry, vlm_backend, episode_id=f"seed{seed}",
-                    timeout_s=args.planner_timeout, max_retries=args.planner_retries,
-                    max_plan_length=args.max_plan_length)
-            else:
-                planner = SequentialPlanner(registry, max_retries=1)
+            planner = PreEpisodePlanner(
+                registry, vlm_backend, episode_id=f"seed{seed}",
+                timeout_s=args.planner_timeout)
             try:
                 env.reset()
                 scene = env.scene_meta()
@@ -169,9 +161,9 @@ def main():
                     synchronous_verifier=args.sync_verifier,
                     episode_id=f"seed{seed}",
                     verifier_operating_points=operating_points)
-                summary = run_episode(planner, manager, env, trace, registry,
-                                      bindings.GOAL, args.episode_budget,
-                                      args.max_planner_calls, obs_only=True)
+                summary = run_preplanned_episode(
+                    planner, manager, env, trace, registry,
+                    bindings.GOAL, args.episode_budget)
                 nframes = env.save_video(seed_dir / "episode.mp4")
                 summary["video"] = "episode.mp4"
                 summary["video_frames"] = nframes

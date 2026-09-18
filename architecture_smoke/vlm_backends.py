@@ -280,9 +280,6 @@ class RemoteVLMScorerBackend(VLMBackend):
         observation = request.payload["observation"]
         prompt = request.payload["prompt"]
         image = self.compose(observation.images)
-        inputs = self._vs.build_vqa_inputs(
-            self.processor, image, prompt, robot_type=self.robot_type,
-            state_dim=self.state_dim, state_length=self.state_length)
         self.set_timeout(timeout_s)
         resp = self._rpc({
             "op": "background_vlm",
@@ -291,7 +288,8 @@ class RemoteVLMScorerBackend(VLMBackend):
             "observation_step": request.observation_step,
             "request_id": request.request_id,
             "request_kind": request.request_kind.value,
-            "payload": {"inputs": inputs, "operation": "planner", "max_new_tokens": 384},
+            "payload": {"image": image, "prompt": prompt,
+                        "operation": "planner", "max_new_tokens": 384},
             "timeout_s": timeout_s,
         })
         response_identity = (

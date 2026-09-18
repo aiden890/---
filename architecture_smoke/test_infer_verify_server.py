@@ -14,6 +14,10 @@ class FakeModel:
         return self
 
 
+class FakeProcessor:
+    pass
+
+
 class InferVerifyServerTest(unittest.TestCase):
     def setUp(self):
         self.loads = 0
@@ -56,6 +60,21 @@ class InferVerifyServerTest(unittest.TestCase):
             ("raw-policy-response", "robocasa365"),
         )
         self.assertEqual(self.loads, 1)
+
+    def test_optional_generic_planner_is_a_second_preloaded_model(self):
+        planner = FakeModel()
+        server = InferVerifyServer(
+            "unused", "127.0.0.1", 0, model_loader=lambda: FakeModel(),
+            planner_model_path="generic-qwen",
+            planner_loader=lambda: (planner, FakeProcessor()))
+        try:
+            health = server.handle({"op": "health"})
+            self.assertEqual(health["model_load_count"], 2)
+            self.assertTrue(health["generic_planner_loaded"])
+            self.assertEqual(health["planner_model_path"], "generic-qwen")
+            self.assertEqual(planner.eval_calls, 1)
+        finally:
+            server.close()
 
     def test_canonical_background_envelope_round_trips_identity(self):
         response = self.server.handle(self.background(request_kind="planner"))

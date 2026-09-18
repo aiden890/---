@@ -14,6 +14,7 @@ the offline end-to-end control-loop check.
 from __future__ import annotations
 
 from schemas import AdapterMode, PolicyInput, PolicyOutput
+from runtime_contract import POLICY_CHUNK_ACTIONS
 
 
 def _assert_adapter_disabled(pin: PolicyInput) -> None:
@@ -49,9 +50,13 @@ class BasePolicyClient:
         np = self._np
         chunk = self._client.infer(pin.state_history, pin.image_history, pin.instruction)
         chunk = np.asarray(chunk, dtype=np.float32)
-        if len(chunk) < self.replan_steps:
-            raise RuntimeError(f"policy returned {len(chunk)} actions < replan {self.replan_steps}")
-        return PolicyOutput(action_chunk=chunk[: self.replan_steps], chunk_len=int(len(chunk)),
+        if self.replan_steps != POLICY_CHUNK_ACTIONS:
+            raise RuntimeError(
+                f"runtime replan must equal canonical chunk {POLICY_CHUNK_ACTIONS}")
+        if len(chunk) != POLICY_CHUNK_ACTIONS:
+            raise RuntimeError(
+                f"policy returned {len(chunk)} actions; contract requires {POLICY_CHUNK_ACTIONS}")
+        return PolicyOutput(action_chunk=chunk, chunk_len=int(len(chunk)),
                             adapter_mode=self.adapter_mode, adapter_checkpoint=None)
 
     def provenance(self) -> dict:

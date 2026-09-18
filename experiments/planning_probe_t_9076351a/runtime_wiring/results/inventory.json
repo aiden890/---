@@ -1,0 +1,29 @@
+{
+  "startup": {
+    "container_pid": 1,
+    "returncode": 0,
+    "compute_processes": []
+  },
+  "dual_loaded": {
+    "container_pid": 1,
+    "returncode": 0,
+    "compute_processes": [
+      {
+        "pid": 241184,
+        "process_name": "[Not Found]",
+        "used_memory_mib": 18662
+      }
+    ]
+  },
+  "complete": {
+    "container_pid": 1,
+    "returncode": 0,
+    "compute_processes": [
+      {
+        "pid": 241184,
+        "process_name": "[Not Found]",
+        "used_memory_mib": 19312
+      }
+    ]
+  }
+}

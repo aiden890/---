@@ -41,6 +41,9 @@ from priority_dispatcher import PriorityDispatcher, SupersededError  # noqa: E40
 
 
 class InferVerifyServer:
+    DEFAULT_PLANNER_MODEL = "Qwen/Qwen3-VL-4B-Instruct"
+    DEFAULT_PLANNER_REVISION = "ebb281ec70b05090aa6165b016eac8ec08e71b17"
+
     @staticmethod
     def _load_model(model_path):
         torch = importlib.import_module("torch")
@@ -50,7 +53,18 @@ class InferVerifyServer:
             attn_implementation="flash_attention_2", dtype=torch.bfloat16,
         ).cuda().to(torch.bfloat16)
 
-    def __init__(self, model_path, host, port, *, model_loader=None):
+    @classmethod
+    def _load_planner(cls, model_path, revision):
+        torch = importlib.import_module("torch")
+        transformers = importlib.import_module("transformers")
+        processor = transformers.AutoProcessor.from_pretrained(model_path, revision=revision)
+        model = transformers.Qwen3VLForConditionalGeneration.from_pretrained(
+            model_path, revision=revision, dtype=torch.bfloat16,
+            attn_implementation="flash_attention_2").cuda().eval()
+        return model, processor
+
+    def __init__(self, model_path, host, port, *, model_loader=None,
+                 planner_model_path=None, planner_revision=None, planner_loader=None):
         self.host, self.port = host, port
         self.model_path = model_path
         self._yn_ids = None
@@ -63,6 +77,18 @@ class InferVerifyServer:
             raise RuntimeError("model loader returned None")
         self.model_load_count = 1
         self.model.eval()
+        self.planner_model = None
+        self.planner_processor = None
+        self.planner_model_path = planner_model_path
+        if planner_model_path is not None:
+            if planner_loader is None:
+                planner_loader = lambda: self._load_planner(
+                    planner_model_path, planner_revision or self.DEFAULT_PLANNER_REVISION)
+            self.planner_model, self.planner_processor = planner_loader()
+            if self.planner_model is None or self.planner_processor is None:
+                raise RuntimeError("planner loader returned an incomplete model/processor pair")
+            self.planner_model.eval()
+            self.model_load_count += 1
         self.dispatcher = PriorityDispatcher()
         self._ready = True
         print("Model loaded.", flush=True)
@@ -114,15 +140,30 @@ class InferVerifyServer:
         return {"prob": float(prob), "question": req.get("question")}
 
     def _op_planner(self, req):
-        """Deterministic JSON generation on the already-loaded VLM backbone."""
+        """Deterministic JSON generation on the dedicated generic Qwen planner."""
+        if self.planner_model is None or self.planner_processor is None:
+            raise RuntimeError("generic Qwen planner is not loaded")
         torch = importlib.import_module("torch")
-        data = {k: self._to_dev(v) for k, v in req["inputs"].items()}
+        messages = [{"role": "user", "content": [
+            {"type": "image", "image": req["image"]},
+            {"type": "text", "text": req["prompt"]},
+        ]}]
+        inputs = self.planner_processor.apply_chat_template(
+            messages, tokenize=True, add_generation_prompt=True,
+            return_dict=True, return_tensors="pt")
+        data = {}
+        for key, value in dict(inputs).items():
+            if isinstance(value, torch.Tensor):
+                value = value.to(
+                    device=self.planner_model.device,
+                    dtype=(self.planner_model.dtype if value.is_floating_point() else None))
+            data[key] = value
         input_len = int(data["input_ids"].shape[-1])
-        with torch.no_grad():
-            generated = self.model.vlm.generate(
+        with torch.inference_mode():
+            generated = self.planner_model.generate(
                 **data, max_new_tokens=int(req.get("max_new_tokens", 384)),
                 do_sample=False)
-        text = self._get_tokenizer().decode(
+        text = self.planner_processor.tokenizer.decode(
             generated[0, input_len:], skip_special_tokens=True).strip()
         return {"text": text}
 
@@ -185,6 +226,8 @@ class InferVerifyServer:
         if req.get("op") == "health":
             return {"healthy": self.dispatcher.is_alive, "ready": self._ready,
                     "model_load_count": self.model_load_count,
+                    "generic_planner_loaded": self.planner_model is not None,
+                    "planner_model_path": self.planner_model_path,
                     "scheduler": self.dispatcher.snapshot()}
         raise ValueError(f"unknown structured operation: {req.get('op')!r}")
 
@@ -228,8 +271,12 @@ def main():
     ap.add_argument("--model", default="/checkpoint")
     ap.add_argument("--host", default="127.0.0.1")
     ap.add_argument("--port", type=int, default=10086)
+    ap.add_argument("--planner-model", default=InferVerifyServer.DEFAULT_PLANNER_MODEL)
+    ap.add_argument("--planner-revision", default=InferVerifyServer.DEFAULT_PLANNER_REVISION)
     a = ap.parse_args()
-    InferVerifyServer(a.model, a.host, a.port).serve()
+    InferVerifyServer(
+        a.model, a.host, a.port,
+        planner_model_path=a.planner_model, planner_revision=a.planner_revision).serve()
 
 
 if __name__ == "__main__":

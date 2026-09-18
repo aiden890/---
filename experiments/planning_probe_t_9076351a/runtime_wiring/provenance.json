@@ -1,0 +1,28 @@
+{
+  "task_id": "t_f3ce8e97",
+  "execution_base_commit": "d1af9c407dab6c11528abafc3d467138d12ffc66",
+  "host": "amp_csi (hostname amp2)",
+  "gpu": "NVIDIA GeForce RTX 3090",
+  "container_image": "xiaomi-cu121:t_9f03a613",
+  "models": {
+    "policy": "XiaomiRobotics/Xiaomi-Robotics-1-RoboCasa365",
+    "planner": "Qwen/Qwen3-VL-4B-Instruct",
+    "planner_revision": "ebb281ec70b05090aa6165b016eac8ec08e71b17"
+  },
+  "execution": {
+    "one_python_process": true,
+    "one_visible_gpu": true,
+    "planner_calls_pre_episode": 1,
+    "planner_calls_runtime": 0,
+    "actions": 48,
+    "skill_boundaries": 3,
+    "fallbacks": 0
+  },
+  "cleanup": {
+    "experiment_containers": 0,
+    "ports_10086_10087": 0,
+    "compute_processes": 0,
+    "gpu_memory_used_mib": 38,
+    "gpu_utilization_percent": 0
+  }
+}
