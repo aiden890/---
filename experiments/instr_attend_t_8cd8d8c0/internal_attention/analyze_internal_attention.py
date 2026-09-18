@@ -22,6 +22,9 @@ LABEL_DISPLAY = {
 ATTENTION_CAVEAT = (
     "Attention is routing evidence, not causal importance, performance, or accuracy."
 )
+SCATTER_CAUSAL_CAVEAT = (
+    "Attention–ES association does not establish causal importance of attention."
+)
 HEATMAP_AGGREGATION = {
     "layer_timestep": (
         "1 attention forward/condition; 16 action queries averaged by recorder, "
@@ -370,6 +373,7 @@ def plot_joint(records: list[dict], out: Path) -> None:
             )
             draw.text((x + dx, y + dy), LABEL_DISPLAY[record["label"]], fill="black", font=font(15), anchor=anchor)
     draw.text((width // 2, 735), f"Mean post-softmax DiT action-query -> instruction mass; actual x range [{min(xs):.6f}, {max(xs):.6f}]", fill="black", font=font(19), anchor="ma")
+    draw.text((width // 2, 710), SCATTER_CAUSAL_CAVEAT, fill="#333333", font=font(16), anchor="ma")
     draw.text((20, 110), f"ES range [{min(ys):.3f}, {max(ys):.3f}]", fill="black", font=font(16))
     draw.text((20, 680), "y: action ES = d_means / (noise_floor / sqrt(N)); dimensionless, not attention", fill="black", font=font(18))
     legend_x = 450

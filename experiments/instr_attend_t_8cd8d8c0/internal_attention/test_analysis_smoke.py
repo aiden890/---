@@ -14,6 +14,7 @@ from PIL import Image
 from analyze_internal_attention import (
     ATTENTION_CAVEAT,
     HEATMAP_AGGREGATION,
+    SCATTER_CAUSAL_CAVEAT,
     SCATTER_LABEL_LAYOUT,
 )
 
@@ -109,6 +110,9 @@ def main() -> None:
         assert guide["token_boundaries"]["skill_place"]["action_query_index_range"] == [0, 15]
         assert "attention != causal importance" in guide["caveat"]
         assert "routing evidence" in ATTENTION_CAVEAT
+        assert SCATTER_CAUSAL_CAVEAT == (
+            "Attention–ES association does not establish causal importance of attention."
+        )
         assert "1 attention forward/condition" in HEATMAP_AGGREGATION["layer_timestep"]
         assert "16 action queries" in HEATMAP_AGGREGATION["layer_head"]
         assert "instruction-query positions averaged" in HEATMAP_AGGREGATION["vlm_layer_head"]
