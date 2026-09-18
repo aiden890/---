@@ -1,0 +1,81 @@
+
+==========
+== CUDA ==
+==========
+
+CUDA Version 12.1.1
+
+Container image Copyright (c) 2016-2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+
+This container image and its contents are governed by the NVIDIA Deep Learning Container License.
+By pulling and using the container, you accept the terms and conditions of this license:
+https://developer.nvidia.com/ngc/nvidia-deep-learning-container-license
+
+A copy of this license is made available in this container at /NGC-DL-CONTAINER-LICENSE for your convenience.
+
+2026-09-18 12:26:50,820	WARNING services.py:2152 -- WARNING: The object store is using /tmp instead of /dev/shm because /dev/shm has only 8589934592 bytes available. This will harm performance! You may be able to free up space by deleting files in /dev/shm. If you are inside a Docker container, you can increase /dev/shm size by passing '--shm-size=10.24gb' to 'docker run' (or add it to the run_options list in a Ray cluster config). Make sure to set this to more than 30% of available RAM.
+2026-09-18 12:26:50,978	INFO worker.py:1908 -- Started a local Ray instance. View the dashboard at [1m[32m127.0.0.1:8265 [39m[22m
+[INFO 12:26:53 RLinf] RLinf is running on a cluster with 1 node and 1 accelerator. The nodes' details are: 
+node_labels: []
+node_rank: 0
+ray_id: e4d7b3b2ed03a9b3d7d721e30bcfbd34ea0521bb44ae24cf9ef1ce04
+node_ip: 192.168.0.51
+num_cpus: 28
+python_interpreter_path: /usr/bin/python3
+hardware_resources:
+- type: Accelerator
+  infos:
+  - type: Accelerator
+    model: NV_GPU:RTX 3090
+profiler_backends: []
+
+Node groups' details are: 
+label: cluster
+nodes: '0'
+hardware_type: Accelerator
+ignore_hardware: false
+env_configs: null
+
+label: node
+nodes: '0'
+hardware_type: null
+ignore_hardware: true
+env_configs: null
+
+[INFO 12:26:53 NodePlacementStrategy] 
+[INFO 12:26:53 NodePlacementStrategy] Using node placement with node ranks: [0], node groups: ['node'].
+[INFO 12:26:53 NodePlacementStrategy] Generated 1 placements: [Placement(rank=0, cluster_node_rank=0, placement_node_rank=0, local_accelerator_rank='0', accelerator_type='NV_GPU', local_rank=0, local_world_size=1, visible_accelerators=['0'], isolate_accelerator=False, local_hardware_ranks=[], node_group_label='cluster')].
+[36m(MiBoTGrid-t43-resume-test(rank=0) pid=2475)[0m [robosuite WARNING] No private macro file found! (macros.py:57)
+[36m(MiBoTGrid-t43-resume-test(rank=0) pid=2475)[0m WARNING:robosuite_logs:No private macro file found!
+[36m(MiBoTGrid-t43-resume-test(rank=0) pid=2475)[0m [robosuite WARNING] It is recommended to use a private macro file (macros.py:58)
+[36m(MiBoTGrid-t43-resume-test(rank=0) pid=2475)[0m WARNING:robosuite_logs:It is recommended to use a private macro file
+[36m(MiBoTGrid-t43-resume-test(rank=0) pid=2475)[0m [robosuite WARNING] To setup, run: python /opt/robosuite/robosuite/scripts/setup_macros.py (macros.py:59)
+[36m(MiBoTGrid-t43-resume-test(rank=0) pid=2475)[0m WARNING:robosuite_logs:To setup, run: python /opt/robosuite/robosuite/scripts/setup_macros.py
+[36m(MiBoTGrid-t43-resume-test(rank=0) pid=2475)[0m [robosuite WARNING] Could not import robosuite_models. Some robots may not be available. If you want to use these robots, please install robosuite_models from source (https://github.com/ARISE-Initiative/robosuite_models) or through pip install. (__init__.py:30)
+[36m(MiBoTGrid-t43-resume-test(rank=0) pid=2475)[0m WARNING:robosuite_logs:Could not import robosuite_models. Some robots may not be available. If you want to use these robots, please install robosuite_models from source (https://github.com/ARISE-Initiative/robosuite_models) or through pip install.
+[36m(MiBoTGrid-t43-resume-test(rank=0) pid=2475)[0m [robosuite WARNING] Could not load the mink-based whole-body IK. Make sure you install related import properly (e.g. pip install mink==0.0.5), otherwise you will not be able to use the default IK controller setting for GR1 robot. (__init__.py:40)
+[36m(MiBoTGrid-t43-resume-test(rank=0) pid=2475)[0m WARNING:robosuite_logs:Could not load the mink-based whole-body IK. Make sure you install related import properly (e.g. pip install mink==0.0.5), otherwise you will not be able to use the default IK controller setting for GR1 robot.
+[36m(MiBoTGrid-t43-resume-test(rank=0) pid=2475)[0m [robosuite WARNING] No private macro file found! (macros.py:28)
+[36m(MiBoTGrid-t43-resume-test(rank=0) pid=2475)[0m WARNING:robosuite_logs:No private macro file found!
+[36m(MiBoTGrid-t43-resume-test(rank=0) pid=2475)[0m [robosuite WARNING] It is recommended to use a private macro file (macros.py:29)
+[36m(MiBoTGrid-t43-resume-test(rank=0) pid=2475)[0m WARNING:robosuite_logs:It is recommended to use a private macro file
+[36m(MiBoTGrid-t43-resume-test(rank=0) pid=2475)[0m [robosuite WARNING] To setup, run: python /opt/robocasa/robocasa/scripts/setup_macros.py (macros.py:30)
+[36m(MiBoTGrid-t43-resume-test(rank=0) pid=2475)[0m WARNING:robosuite_logs:To setup, run: python /opt/robocasa/robocasa/scripts/setup_macros.py
+[36m(MiBoTGrid-t43-resume-test(rank=0) pid=2475)[0m WARNING: mimicgen environments not imported since mimicgen is not installed!
+[36m(MiBoTGrid-t43-resume-test(rank=0) pid=2475)[0m [robosuite INFO] Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json (composite_controller_factory.py:121)
+[36m(MiBoTGrid-t43-resume-test(rank=0) pid=2475)[0m INFO:robosuite_logs:Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json
+[36m(MiBoTGrid-t43-resume-test(rank=0) pid=2475)[0m Creating CloseBlenderLid with split=pretrain
+[36m(MiBoTGrid-t43-resume-test(rank=0) pid=2475)[0m /usr/local/lib/python3.10/dist-packages/gymnasium/utils/passive_env_checker.py:158: UserWarning: [33mWARN: The obs returned by the `reset()` method is not within the observation space.[0m
+[36m(MiBoTGrid-t43-resume-test(rank=0) pid=2475)[0m   logger.warn(f"{pre} is not within the observation space.")
+[36m(MiBoTGrid-t43-resume-test(rank=0) pid=2475)[0m Asked to sample `fps` frames per second but no video metadata was provided which is required when sampling with `fps`. Defaulting to `fps=24`. Please provide `video_metadata` for more accurate results.
+[36m(MiBoTGrid-t43-resume-test(rank=0) pid=2475)[0m /usr/local/lib/python3.10/dist-packages/gymnasium/utils/passive_env_checker.py:158: UserWarning: [33mWARN: The obs returned by the `step()` method is not within the observation space.[0m
+[36m(MiBoTGrid-t43-resume-test(rank=0) pid=2475)[0m   logger.warn(f"{pre} is not within the observation space.")
+[36m(MiBoTGrid-t43-resume-test(rank=0) pid=2475)[0m [robosuite INFO] Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json (composite_controller_factory.py:121)
+[36m(MiBoTGrid-t43-resume-test(rank=0) pid=2475)[0m INFO:robosuite_logs:Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json
+[36m(MiBoTGrid-t43-resume-test(rank=0) pid=2475)[0m Creating CloseBlenderLid with split=pretrain
+*** SIGTERM received at time=1789734459 on cpu 6 ***
+PC: @     0x7bea9eaec117  (unknown)  (unknown)
+    @     0x7bea9ea9d520  (unknown)  (unknown)
+[2026-09-18 12:27:39,294 E 1 1] logging.cc:496: *** SIGTERM received at time=1789734459 on cpu 6 ***
+[2026-09-18 12:27:39,294 E 1 1] logging.cc:496: PC: @     0x7bea9eaec117  (unknown)  (unknown)
+[2026-09-18 12:27:39,294 E 1 1] logging.cc:496:     @     0x7bea9ea9d520  (unknown)  (unknown)

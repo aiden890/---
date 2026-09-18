@@ -1,0 +1,29 @@
+source_commit=471dd203639bd6b125fc5548423c54e5329ecaed
+image_id="sha256:e8c0b248afb6fe759616049cfaa45c147d6ac56cfdf79788063577d735dc073c"
+host=amp2 arch=x86_64
+NVIDIA GeForce RTX 3090, 580.95.05, 24576 MiB, 38 MiB, 24085 MiB, 0 %
+compute_processes:
+containers:
+gpu-nccl|Up 4 weeks|nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04
+ports_10086_10090:
+checkpoint_sha256:
+checkpoint/LICENSE: OK
+checkpoint/README.md: OK
+checkpoint/added_tokens.json: OK
+checkpoint/chat_template.jinja: OK
+checkpoint/config.json: OK
+checkpoint/configuration_mibot.py: OK
+checkpoint/merges.txt: OK
+checkpoint/model-00001-of-00003.safetensors: OK
+checkpoint/model-00002-of-00003.safetensors: OK
+checkpoint/model-00003-of-00003.safetensors: OK
+checkpoint/model.safetensors.index.json: OK
+checkpoint/modeling_mibot.py: OK
+checkpoint/preprocessor_config.json: OK
+checkpoint/processing_mibot.py: OK
+checkpoint/processor_config.json: OK
+checkpoint/special_tokens_map.json: OK
+checkpoint/tokenizer.json: OK
+checkpoint/tokenizer_config.json: OK
+checkpoint/video_preprocessor_config.json: OK
+checkpoint/vocab.json: OK
