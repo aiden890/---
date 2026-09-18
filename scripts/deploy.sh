@@ -7,7 +7,7 @@
 #   scripts/deploy.sh amp_csi      # amp_csi에만
 #   scripts/deploy.sh --dry-run    # 실제 전송 없이 변경분만 표시
 #
-# 배포 대상: rl-train-t_3ed65912, rl-env-t_4f3f2b20 의 소스/스크립트만.
+# 배포 대상: RL 소스와 canonical Skill VLA runtime 소스/스크립트.
 # 제외: 체크포인트(*.pt), 영상(*.mp4), results/, vendor/, __pycache__ 등 (아래 EXCLUDES).
 # 원칙: 코드는 중앙(이 저장소)에서만 고치고, 서버로는 배포만 한다. 서버에서 직접 코드 수정 금지.
 set -euo pipefail
@@ -33,7 +33,7 @@ AMP_HOST="amp_csi"
 AMP_BASE="/home/guest"
 
 # ---- 배포할 코드 디렉토리 ---------------------------------------------------
-DIRS=(rl-train-t_3ed65912 rl-env-t_4f3f2b20)
+DIRS=(rl-train-t_3ed65912 rl-env-t_4f3f2b20 architecture_smoke)
 TMP_ROOT="$(mktemp -d)"
 MANIFEST_DIR="$TMP_ROOT/manifests"
 STAGE_DIR="$TMP_ROOT/stage"
@@ -48,6 +48,7 @@ done
 EXCLUDES=(
   --exclude='__pycache__/' --exclude='*.pyc'
   --exclude='results/' --exclude='REPORT/'
+  --exclude='out*/' --exclude='calib_out/' --exclude='runtime_runs/'
   --exclude='vendor/' --exclude='pylibs/' --exclude='*.pt' --exclude='*.pth'
   --exclude='*.mp4' --exclude='*.tar.gz' --exclude='*.pkl' --exclude='*.bak_*'
   --exclude='.git/' --exclude='data/' --exclude='checkpoint*/'

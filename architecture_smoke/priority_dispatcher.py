@@ -60,6 +60,7 @@ class PriorityDispatcher:
             "submitted": {self.POLICY: 0, self.BACKGROUND: 0},
             "completed": {self.POLICY: 0, self.BACKGROUND: 0},
             "errors": 0, "dropped": 0, "superseded": 0, "stale": 0, "timeouts": 0,
+            "active_forwards": 0, "max_active_forwards": 0,
             "queue_wait_ms": {}, "model_latency_ms": {},
             "background_by_kind": {kind: 0 for kind in sorted(self.BACKGROUND_KINDS)},
             "policy_blocked_by_background_ms": 0.0,
@@ -181,6 +182,11 @@ class PriorityDispatcher:
             self._emit("start", lane=job.lane, request_kind=job.request_kind,
                        queue_wait_ms=queue_wait_ms)
             try:
+                with self._condition:
+                    self._metrics["active_forwards"] += 1
+                    self._metrics["max_active_forwards"] = max(
+                        self._metrics["max_active_forwards"],
+                        self._metrics["active_forwards"])
                 result = job.function()
             except BaseException as exc:  # keep the dispatcher alive after model faults
                 elapsed_ms = (self._clock() - started) * 1000.0
@@ -200,6 +206,7 @@ class PriorityDispatcher:
                            model_latency_ms=elapsed_ms)
             finally:
                 with self._condition:
+                    self._metrics["active_forwards"] -= 1
                     self._active = None
                     self._condition.notify_all()
 
