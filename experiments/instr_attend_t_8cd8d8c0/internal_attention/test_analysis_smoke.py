@@ -33,7 +33,7 @@ def main() -> None:
                     "dit_action_to_instruction": np.full((5, 36, 8), value, np.float32),
                     "dit_action_to_image": np.full((5, 36, 8), value * 2, np.float32),
                     "dit_action_to_text_total": np.full((5, 36, 8), value * 3, np.float32),
-                    "dit_query_to_instruction": np.full((5, 36, 8, 30), value, np.float32),
+                    "dit_query_to_instruction": np.full((5, 36, 8, 16), value, np.float32),
                     "dit_action_to_grasp_tokens": np.full((5, 36, 8), value, np.float32),
                     "dit_action_to_move_tokens": np.full((5, 36, 8), value, np.float32),
                     "dit_action_to_place_tokens": np.full((5, 36, 8), value, np.float32),

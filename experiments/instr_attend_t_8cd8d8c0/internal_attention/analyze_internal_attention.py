@@ -46,7 +46,7 @@ def load_records(input_dir: Path, attendance_path: Path) -> tuple[list[dict], di
                 "vlm_image_to_instruction": (36, 32),
                 "dit_action_to_instruction": (5, 36, 8),
                 "dit_action_to_image": (5, 36, 8),
-                "dit_query_to_instruction": (5, 36, 8, 30),
+                "dit_query_to_instruction": (5, 36, 8, 16),
             }
             for key, shape in expected.items():
                 if arrays[key].shape != shape:
@@ -208,7 +208,7 @@ def main() -> None:
             "expected_case_count": 12,
             "vlm_shape": [36, 32],
             "dit_shape": [5, 36, 8],
-            "dit_query_shape": [5, 36, 8, 30],
+            "dit_query_shape": [5, 36, 8, 16],
             "all_finite": True,
             "dtype": "float32",
         },
@@ -239,7 +239,7 @@ def main() -> None:
 - 실제 Xiaomi-Robotics-1-RoboCasa365 checkpoint forward의 Q/K projection과 RoPE를 그대로 사용했다.
 - 정책 실행은 원래 FlashAttention/SDPA 경로를 유지했고, hook은 선택 query/key 확률만 read-only로 재구성했다.
 - 12개 조건(reset/move/place × correct/grasp/move/place), VLM 36층×32헤드 및 DiT 5 flow timestep×36층×8헤드를 모두 기록했다.
-- 원 tensor summary shape: VLM `(36, 32)`, DiT `(5, 36, 8)`, action-query 상세 `(5, 36, 8, 30)`; 저장 dtype float32.
+- RoboCasa365 processor의 실제 action chunk는 16 query다. 원 tensor summary shape: VLM `(36, 32)`, DiT `(5, 36, 8)`, action-query 상세 `(5, 36, 8, 16)`; 저장 dtype float32.
 
 ## 상태별 요약
 
