@@ -10,7 +10,7 @@ accelerate==1.10.1
 einops==0.8.1
 pillow==11.3.0
 scipy==1.15.3
-numpy==2.2.6
+numpy==2.2.5
 imageio==2.37.0
 imageio-ffmpeg==0.6.0
 safetensors==0.8.0

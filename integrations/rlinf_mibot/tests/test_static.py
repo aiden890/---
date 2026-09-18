@@ -88,6 +88,7 @@ def test_pins():
     lk = (ROOT / "configs" / "requirements-rlinf.lock").read_text()
     check("lock has torch cu121", "torch==2.5.1+cu121" in lk)
     requirements = (ROOT / "configs" / "requirements-rlinf.txt").read_text()
+    check("RoboCasa exact numpy runtime", "numpy==2.2.5" in requirements)
     for package in ("termcolor", "h5py", "pygame", "pynput", "hidapi"):
         check(f"RoboCasa runtime dependency {package}", f"{package}==" in requirements)
 
