@@ -153,8 +153,11 @@ case "${1:-help}" in
     serial_id="${2:?Usage: bash run.sh grid-compare SERIAL_RUN PARALLEL_RUN}"
     parallel_id="${3:?Usage: bash run.sh grid-compare SERIAL_RUN PARALLEL_RUN}"
     validate_run_id "$serial_id"; validate_run_id "$parallel_id"
-    python3 src/compare_grid_runs.py "$RLINF_RESULTS/$serial_id" "$RLINF_RESULTS/$parallel_id" \
-      --output "$RLINF_RESULTS/$parallel_id/serial_vs_parallel.json"
+    # Result directories are created by root inside the rollout container, so run the
+    # comparison through the same mounted image instead of writing as the host user.
+    docker run --rm --network none "${common_args[@]}" "$IMAGE" \
+      python3 /integration/src/compare_grid_runs.py "/results/$serial_id" "/results/$parallel_id" \
+      --output "/results/$parallel_id/serial_vs_parallel.json"
     ;;
   grid-smoke)
     run_id="${2:?Usage: bash run.sh grid-smoke RUN_ID [OmegaConf overrides...]}"; shift 2
