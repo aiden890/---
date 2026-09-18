@@ -90,7 +90,7 @@ def colorize(values: np.ndarray, low: float, high: float) -> Image.Image:
     green = np.clip(2.0 * normalized, 0.0, 1.0)
     blue = np.clip(1.5 - 2.0 * normalized, 0.0, 1.0)
     rgb = np.stack([red, green, blue], axis=-1)
-    return Image.fromarray(np.uint8(np.round(rgb * 255.0)), mode="RGB")
+    return Image.fromarray(np.uint8(np.round(rgb * 255.0)))
 
 
 def panel_heatmaps(records: list[dict], array_key: str, reducer, path: Path, caption: str) -> None:
@@ -172,7 +172,7 @@ def plot_joint(records: list[dict], out: Path) -> None:
 def write_csv(records: list[dict], out: Path) -> None:
     keys = [key for key in records[0] if key != "arrays"]
     with (out / "combined_summary.csv").open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=keys)
+        writer = csv.DictWriter(handle, fieldnames=keys, lineterminator="\n")
         writer.writeheader()
         for record in records:
             writer.writerow({key: record[key] for key in keys})

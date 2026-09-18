@@ -37,9 +37,14 @@ def main() -> None:
                     "dit_action_to_grasp_tokens": np.full((5, 36, 8), value, np.float32),
                     "dit_action_to_move_tokens": np.full((5, 36, 8), value, np.float32),
                     "dit_action_to_place_tokens": np.full((5, 36, 8), value, np.float32),
-                    "actions": np.zeros((1, 30, 60), np.float32),
+                    "actions": np.zeros((1, 16, 60), np.float32),
                 }
                 np.savez_compressed(raw / f"{state}__{label}.npz", **arrays)
+                instruction_token_count = (12, 7, 16, 23)[label_index]
+                (raw / f"{state}__{label}.tokens.json").write_text(
+                    json.dumps({"instruction_indices": list(range(instruction_token_count))}),
+                    encoding="utf-8",
+                )
                 rows.append({
                     "label": label,
                     "effect_size_vs_null": float(label_index),
