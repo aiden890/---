@@ -32,6 +32,7 @@ def main() -> int:
     control_counts: Counter[str] = Counter()
     stale_drops = 0
     superseded = 0
+    request_kinds: Counter[str] = Counter()
     runtime_gt_leaks: list[dict] = []
     queried: list[dict] = []
     windows = 0
@@ -47,6 +48,8 @@ def main() -> int:
                 reason = str(record.get("reason", ""))
                 stale_drops += int(event == "drop" and reason.startswith("stale_"))
                 superseded += int(event == "drop" and reason == "superseded")
+                if event == "submit":
+                    request_kinds[str(record.get("request_kind"))] += 1
             if kind == "window":
                 windows += 1
                 policy_chunks.append(int(record.get("chunk_len", 0)))
@@ -57,9 +60,12 @@ def main() -> int:
                     "step": record.get("step"),
                     "candidate_stop": bool(record.get("proprio_candidate")),
                 })
-            # final simulator labels are written to summary.json only. Trace is the
-            # runtime audit stream and must never contain one of these fields.
-            leaked = sorted(FORBIDDEN_RUNTIME_KEYS.intersection(record))
+            # Final simulator labels in episode_end/summary are evaluation-only.
+            # Only the control envelope and planner input digest are runtime payloads.
+            leaked = sorted(FORBIDDEN_RUNTIME_KEYS.intersection(record)) \
+                if kind == "async_control" else []
+            if kind == "plan" and record.get("predicates_digest"):
+                leaked.append("predicates_digest")
             if leaked:
                 runtime_gt_leaks.append({"trace": str(trace_path), "type": kind, "keys": leaked})
 
@@ -84,11 +90,15 @@ def main() -> int:
                 and scheduler.get("max_active_forwards") == 1
                 and scheduler.get("errors") == 0
                 and not runtime_gt_leaks
+                and request_kinds["boundary"] > 0
+                and request_kinds["endpoint"] > 0
+                and scheduler.get("background_by_kind", {}).get("planner", 0) > 0
             ),
         },
         "scheduler": scheduler,
         "trace_events": dict(event_counts),
         "async_control_events": dict(control_counts),
+        "requests_by_kind": dict(request_kinds),
         "client_superseded_count": superseded,
         "stale_response_rejection_count": stale_drops,
         "windows": windows,

@@ -74,7 +74,9 @@ assert_idle() {
 
 strict_health() {
   local output="${1:-}"
+  local require_quiescent="${2:-0}"
   local args=(--host 127.0.0.1 --port "$port" --timeout 5 --strict)
+  [ "$require_quiescent" = 0 ] || args+=(--quiescent)
   if [ -n "$output" ]; then
     local tmp="${output}.tmp.$$"
     docker exec "$server" python3 /pkg/runtime_probe.py "${args[@]}" > "$tmp"
@@ -82,6 +84,18 @@ strict_health() {
   else
     docker exec "$server" python3 /pkg/runtime_probe.py "${args[@]}"
   fi
+}
+
+wait_quiescent() {
+  local output="$1"
+  for _ in $(seq 1 60); do
+    if strict_health "$output" 1 >/dev/null 2>&1; then
+      return 0
+    fi
+    sleep 2
+  done
+  echo "dispatcher did not become quiescent" >&2
+  return 1
 }
 
 wait_ready() {
@@ -202,7 +216,7 @@ PREVIOUS=$previous"
       --replan-steps 16 --vlm-min-interval 16 \
       2>&1 | tee "$out/run.log"
 
-  strict_health "$out/health_final.json" >/dev/null
+  wait_quiescent "$out/health_final.json"
   docker logs "$server" > "$out/server.log" 2>&1
   python3 "$pkg/runtime_metrics.py" --run-dir "$out" \
     --health "$out/health_final.json" --output "$out/metrics.json" > "$out/metrics.log"

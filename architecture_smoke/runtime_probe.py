@@ -32,7 +32,7 @@ def health(host: str, port: int, timeout: float) -> dict:
     return response
 
 
-def validate(response: dict) -> None:
+def validate(response: dict, *, quiescent: bool = False) -> None:
     scheduler = response.get("scheduler")
     if response.get("healthy") is not True or response.get("ready") is not True:
         raise RuntimeError(f"server is not healthy and ready: {response!r}")
@@ -42,6 +42,10 @@ def validate(response: dict) -> None:
         raise RuntimeError(f"dispatcher is not ready: {response!r}")
     if scheduler.get("max_active_forwards", 0) > 1:
         raise RuntimeError(f"concurrent CUDA forwards detected: {response!r}")
+    if quiescent and (scheduler.get("active_forwards") != 0
+                      or scheduler.get("background_pending")
+                      or scheduler.get("policy_queue_depth") != 0):
+        raise RuntimeError(f"dispatcher is not quiescent: {response!r}")
 
 
 def main() -> int:
@@ -51,11 +55,12 @@ def main() -> int:
     parser.add_argument("--timeout", type=float, default=5.0)
     parser.add_argument("--output")
     parser.add_argument("--strict", action="store_true")
+    parser.add_argument("--quiescent", action="store_true")
     args = parser.parse_args()
 
     response = health(args.host, args.port, args.timeout)
     if args.strict:
-        validate(response)
+        validate(response, quiescent=args.quiescent)
     payload = json.dumps(response, indent=2, sort_keys=True)
     if args.output:
         target = Path(args.output)
