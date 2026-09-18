@@ -19,6 +19,28 @@ LABEL_DISPLAY = {
     "skill_move": "MOVE",
     "skill_place": "PLACE",
 }
+ATTENTION_CAVEAT = (
+    "Attention is routing evidence, not causal importance, performance, or accuracy."
+)
+HEATMAP_AGGREGATION = {
+    "layer_timestep": (
+        "1 attention forward/condition; 16 action queries averaged by recorder, "
+        "then 8 heads averaged per cell."
+    ),
+    "layer_head": (
+        "1 attention forward/condition; 16 action queries averaged by recorder, "
+        "then 5 flow timesteps averaged per cell."
+    ),
+    "vlm_layer_head": (
+        "1 attention forward/condition; image-key mass summed, then instruction-query "
+        "positions averaged per cell."
+    ),
+}
+SCATTER_LABEL_LAYOUT = {
+    ("place", "correct_full"): (-12, -4, "rm"),
+    ("place", "skill_move"): (12, -18, "lm"),
+    ("place", "skill_place"): (-12, -4, "rm"),
+}
 FONT_PATHS = (
     "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
     "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
@@ -184,14 +206,15 @@ def panel_heatmaps(
     path: Path,
     title: str,
     x_label: str,
-    y_label: str,
+    shared_y_caption: str,
+    aggregation_caption: str,
 ) -> None:
     panels = [reducer(record["arrays"][array_key]) for record in records]
     low = min(float(panel.min()) for panel in panels)
     high = max(float(panel.max()) for panel in panels)
-    width, height = 2240, 1460
-    grid_left, grid_top = 90, 150
-    panel_w, panel_h = 490, 405
+    width, height = 2240, 1550
+    grid_left, grid_top = 90, 180
+    panel_w, panel_h = 490, 390
     canvas = Image.new("RGB", (width, height), "white")
     draw = ImageDraw.Draw(canvas)
     draw.text((width // 2, 35), title, fill="black", font=font(32), anchor="ma")
@@ -202,12 +225,19 @@ def panel_heatmaps(
         font=font(21),
         anchor="ma",
     )
+    draw.text(
+        (width // 2, 122),
+        f"Shared y-axis: {shared_y_caption}",
+        fill="#222222",
+        font=font(19),
+        anchor="ma",
+    )
     for record, values in zip(records, panels):
         row = STATES.index(record["state"])
         col = LABELS.index(record["label"])
         x = grid_left + col * panel_w
         y = grid_top + row * panel_h
-        box = (x + 58, y + 58, x + 448, y + 310)
+        box = (x + 58, y + 52, x + 448, y + 285)
         heatmap = colorize(values, low, high).resize(
             (box[2] - box[0], box[3] - box[1]), Image.Resampling.NEAREST
         )
@@ -225,8 +255,7 @@ def panel_heatmaps(
         x_ticks = sorted(set([0, x_max // 2, x_max]))
         y_ticks = list(range(values.shape[0])) if values.shape[0] <= 8 else [0, y_max // 2, y_max]
         draw_ticks(draw, box, x_ticks, x_max, y_ticks, y_max)
-        draw.text((box[0] + (box[2] - box[0]) // 2, y + 354), x_label, fill="black", font=font(16), anchor="ma")
-        draw.text((x + 3, y + 326), y_label, fill="black", font=font(16))
+        draw.text((box[0] + (box[2] - box[0]) // 2, y + 330), x_label, fill="black", font=font(16), anchor="ma")
 
     color_left, color_top, color_right, color_bottom = 2070, grid_top + 58, 2110, grid_top + 3 * panel_h - 95
     gradient = np.linspace(high, low, color_bottom - color_top, dtype=np.float32)[:, None]
@@ -238,10 +267,24 @@ def panel_heatmaps(
     draw.text((color_right + 12, color_bottom), f"{low:.5f}", fill="black", font=font(17), anchor="lm")
     draw.text((2070, color_bottom + 18), "attention mass\n(low -> high)", fill="black", font=font(17), spacing=4)
     draw.text(
-        (width // 2, 1395),
+        (width // 2, 1390),
         f"Actual global range [{low:.6f}, {high:.6f}]. Color increases blue -> cyan -> yellow; scale is shared across every panel.",
         fill="#222222",
-        font=font(19),
+        font=font(18),
+        anchor="ma",
+    )
+    draw.text(
+        (width // 2, 1435),
+        f"Aggregation: {aggregation_caption}",
+        fill="#222222",
+        font=font(18),
+        anchor="ma",
+    )
+    draw.text(
+        (width // 2, 1480),
+        ATTENTION_CAVEAT,
+        fill="#222222",
+        font=font(18),
         anchor="ma",
     )
     canvas.save(path)
@@ -255,7 +298,8 @@ def plot_layer_timestep(records: list[dict], out: Path) -> None:
         out / "action_instruction_layer_timestep.png",
         "DiT action-query -> instruction attention by flow timestep and layer",
         "DiT layer (0-35)",
-        "flow timestep (0-4); heads averaged",
+        "flow timestep 0-4 (top -> bottom)",
+        HEATMAP_AGGREGATION["layer_timestep"],
     )
 
 
@@ -267,7 +311,8 @@ def plot_layer_head(records: list[dict], out: Path) -> None:
         out / "action_instruction_layer_head.png",
         "DiT action-query -> instruction attention by head and layer",
         "DiT layer (0-35)",
-        "attention head (0-7); timesteps averaged",
+        "attention head 0-7 (top -> bottom)",
+        HEATMAP_AGGREGATION["layer_head"],
     )
 
 
@@ -279,12 +324,13 @@ def plot_vlm(records: list[dict], out: Path) -> None:
         out / "vlm_instruction_image_layer_head.png",
         "Causal VLM instruction-query -> image-key attention by head and layer",
         "VLM layer (0-35)",
-        "attention head (0-31); instruction queries averaged",
+        "attention head 0-31 (top -> bottom)",
+        HEATMAP_AGGREGATION["vlm_layer_head"],
     )
 
 
 def plot_joint(records: list[dict], out: Path) -> None:
-    width, height = 1900, 820
+    width, height = 2020, 820
     canvas = Image.new("RGB", (width, height), "white")
     draw = ImageDraw.Draw(canvas)
     colors = {"correct_full": "#555555", "skill_grasp": "#0072B2", "skill_move": "#E69F00", "skill_place": "#009E73"}
@@ -293,14 +339,14 @@ def plot_joint(records: list[dict], out: Path) -> None:
     xmin, xmax = min(xs), max(xs)
     ymin, ymax = min(ys), max(ys)
     xmin -= 0.002
-    xmax += 0.002
+    xmax += 0.004
     ymax += 0.6
     plot_ymin = -0.5
     draw.text((width // 2, 28), "Attention routing versus counterfactual action sensitivity", fill="black", font=font(32), anchor="ma")
     draw.text((width // 2, 75), "Panels are observation states; point color is instruction condition; axes and scales are shared", fill="#333333", font=font(20), anchor="ma")
     panel_w, panel_top, panel_bottom = 535, 150, 650
     for state_index, state in enumerate(STATES):
-        left = 95 + state_index * 595
+        left = 95 + state_index * 620
         right = left + panel_w
         draw.rectangle((left, panel_top, right, panel_bottom), outline="black", width=2)
         draw.text(((left + right) // 2, panel_top - 35), f"observation state = {state}", fill="black", font=font(22), anchor="ma")
@@ -319,7 +365,10 @@ def plot_joint(records: list[dict], out: Path) -> None:
             y = panel_bottom - (record["action_effect_size"] - plot_ymin) / (ymax - plot_ymin) * (panel_bottom - panel_top)
             color = colors[record["label"]]
             draw.ellipse((x - 9, y - 9, x + 9, y + 9), fill=color, outline="black", width=1)
-            draw.text((x + 12, y - 4), LABEL_DISPLAY[record["label"]], fill="black", font=font(15), anchor="lm")
+            dx, dy, anchor = SCATTER_LABEL_LAYOUT.get(
+                (state, record["label"]), (12, -4, "lm")
+            )
+            draw.text((x + dx, y + dy), LABEL_DISPLAY[record["label"]], fill="black", font=font(15), anchor=anchor)
     draw.text((width // 2, 735), f"Mean post-softmax DiT action-query -> instruction mass; actual x range [{min(xs):.6f}, {max(xs):.6f}]", fill="black", font=font(19), anchor="ma")
     draw.text((20, 110), f"ES range [{min(ys):.3f}, {max(ys):.3f}]", fill="black", font=font(16))
     draw.text((20, 680), "y: action ES = d_means / (noise_floor / sqrt(N)); dimensionless, not attention", fill="black", font=font(18))

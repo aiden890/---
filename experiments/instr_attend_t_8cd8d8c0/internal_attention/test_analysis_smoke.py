@@ -11,6 +11,12 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
+from analyze_internal_attention import (
+    ATTENTION_CAVEAT,
+    HEATMAP_AGGREGATION,
+    SCATTER_LABEL_LAYOUT,
+)
+
 STATES = ("reset", "move", "place")
 LABELS = ("correct_full", "skill_grasp", "skill_move", "skill_place")
 
@@ -102,6 +108,12 @@ def main() -> None:
         assert guide["aggregation"]["attention_samples_per_condition"] == 1
         assert guide["token_boundaries"]["skill_place"]["action_query_index_range"] == [0, 15]
         assert "attention != causal importance" in guide["caveat"]
+        assert "routing evidence" in ATTENTION_CAVEAT
+        assert "1 attention forward/condition" in HEATMAP_AGGREGATION["layer_timestep"]
+        assert "16 action queries" in HEATMAP_AGGREGATION["layer_head"]
+        assert "instruction-query positions averaged" in HEATMAP_AGGREGATION["vlm_layer_head"]
+        assert SCATTER_LABEL_LAYOUT[("place", "correct_full")] != SCATTER_LABEL_LAYOUT[("place", "skill_move")]
+        assert SCATTER_LABEL_LAYOUT[("place", "skill_place")][2] == "rm"
         expected = {
             "combined_summary.csv",
             "REPORT.ko.md",
@@ -116,6 +128,8 @@ def main() -> None:
             if name.endswith(".png"):
                 with Image.open(out / name) as image:
                     assert image.width >= 1800 and image.height >= 800, (name, image.size)
+                    if "layer_" in name:
+                        assert image.height >= 1500, (name, image.size)
         report = (out / "REPORT.ko.md").read_text(encoding="utf-8")
         for required in ("## 먼저 읽는 법", "## 축과 tensor 의미", "## 집계와 정규화", "## token 경계", "## 한계"):
             assert required in report, required
