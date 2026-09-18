@@ -56,11 +56,16 @@ def load_records(input_dir: Path, attendance_path: Path) -> tuple[list[dict], di
             action_instruction = arrays["dit_action_to_instruction"]
             action_image = arrays["dit_action_to_image"]
             sens = sensitivity[(state, label)]
+            token_mapping = json.loads(
+                (input_dir / f"{state}__{label}.tokens.json").read_text(encoding="utf-8")
+            )
+            instruction_token_count = len(token_mapping["instruction_indices"])
             records.append({
                 "state": state,
                 "label": label,
                 "npz": path.name,
                 "action_to_instruction_mean": float(action_instruction.mean()),
+                "action_to_instruction_per_token": float(action_instruction.mean() / instruction_token_count),
                 "action_to_instruction_std": float(action_instruction.std()),
                 "action_to_image_mean": float(action_image.mean()),
                 "instruction_to_image_mean": float(arrays["vlm_instruction_to_image"].mean()),
@@ -71,6 +76,7 @@ def load_records(input_dir: Path, attendance_path: Path) -> tuple[list[dict], di
                 "action_effect_size": float(sens["effect_size_vs_null"]),
                 "action_cosine": float(sens["cosine"]),
                 "action_d_means": float(sens["d_means"]),
+                "instruction_token_count": instruction_token_count,
                 "arrays": arrays,
             })
     return records, sensitivity
@@ -191,6 +197,10 @@ def main() -> None:
         [record["action_to_instruction_mean"] for record in non_reference],
         [record["action_effect_size"] for record in non_reference],
     )
+    all_corr_per_token = pearson(
+        [record["action_to_instruction_per_token"] for record in non_reference],
+        [record["action_effect_size"] for record in non_reference],
+    )
     by_state = {
         state: pearson(
             [r["action_to_instruction_mean"] for r in non_reference if r["state"] == state],
@@ -214,6 +224,7 @@ def main() -> None:
         },
         "joint_analysis": {
             "pearson_attention_vs_effect_nonreference": all_corr,
+            "pearson_per_token_attention_vs_effect_nonreference": all_corr_per_token,
             "pearson_by_state": by_state,
             "interpretation_rule": "correlation is descriptive cross-validation, not a causal estimate",
         },
@@ -226,10 +237,12 @@ def main() -> None:
     state_lines = []
     for state in STATES:
         rows = [record for record in records if record["state"] == state]
+        skill_rows = [record for record in rows if record["label"] != "correct_full"]
         state_lines.append(
             f"| {state} | {np.mean([r['action_to_instruction_mean'] for r in rows]):.6f} | "
             f"{np.mean([r['action_to_image_mean'] for r in rows]):.6f} | "
             f"{np.mean([r['instruction_to_image_mean'] for r in rows]):.6f} | "
+            f"{np.mean([r['action_effect_size'] for r in skill_rows]):.3f} | "
             f"{by_state[state] if by_state[state] is not None else 'N/A'} |"
         )
     report = f"""# 스킬별 내부 attention × 행동 민감도 결합 분석
@@ -243,19 +256,21 @@ def main() -> None:
 
 ## 상태별 요약
 
-| state | action→instruction | action→image | instruction→image | attention↔행동 ES Pearson |
-|---|---:|---:|---:|---:|
+| state | action→instruction | action→image | instruction→image | skill 행동 ES 평균 | attention↔행동 ES Pearson |
+|---|---:|---:|---:|---:|---:|
 {chr(10).join(state_lines)}
 
-비정답 skill 9개 조건 전체의 attention mass와 기존 action effect size 간 Pearson 상관은 `{all_corr}`이다. 이 값은 attention이 행동 민감도와 함께 움직이는지 보는 교차검증일 뿐 인과 추정치가 아니다.
+비정답 skill 9개 조건 전체에서 total attention mass와 기존 action effect size 간 Pearson은 `{all_corr}`, instruction token 수로 나눈 mass와 ES 간 Pearson은 `{all_corr_per_token}`이다. 이 값들은 attention이 행동 민감도와 함께 움직이는지 보는 기술적 교차검증일 뿐 인과 추정치가 아니다.
 
 ## 해석
 
 1. `action→instruction`은 DiT action query가 VLM KV cache의 instruction span에 둔 정규화 attention mass다. `action→image`와 동일 분모에서 측정했다.
 2. `instruction→image`는 causal VLM에서 instruction query가 앞선 visual token에 둔 attention이다. 반대 방향 `image→instruction`은 image token이 instruction보다 먼저 오므로 causal mask상 정확히 0이다.
 3. GRASP/MOVE/PLACE 열은 각 instruction 안에서 명시적으로 발견된 관련 lexeme token에 대한 mass다. 해당 lexeme가 없는 지시는 0으로 기록하며, token index는 각 `*.tokens.json`에 보존했다.
-4. 높은 attention weight는 routing의 관찰값이지 causal importance가 아니다. 기존 고정-observation counterfactual action ES/cosine과 일치·불일치를 함께 봐야 한다.
-5. token masking은 checkpoint forward를 바꾸므로 이번 read-only 측정에는 포함하지 않았다. 기존 instruction 교체 실험이 행동 수준의 독립적 intervention 역할을 한다.
+4. **불일치가 핵심이다.** state 평균 action→instruction mass는 reset `0.0325`에서 place `0.0420`으로 증가하지만 skill 행동 ES 평균은 reset `9.154`에서 place `0.500`으로 급감한다. place에서 move/place 지시는 attention mass `0.0454/0.0530`을 받으면서도 행동 ES는 `0.284/0.358`, cosine은 `0.9998/0.9997`이다. 즉 내부 routing이 존재해도 출력 행동은 observation에 의해 거의 고정될 수 있다.
+5. reset에서도 place 지시가 네 지시 중 가장 높은 total mass(`0.0421`)를 받지만 skill 행동 ES(`6.765`)는 grasp/move(`10.476/10.221`)보다 낮다. total mass의 instruction 길이 의존성 때문에 크기 순위를 causal importance 순위로 읽을 수 없다.
+6. 높은 attention weight는 routing의 관찰값이지 causal importance가 아니다. 기존 고정-observation counterfactual action ES/cosine과 일치·불일치를 함께 봐야 한다.
+7. token masking은 checkpoint forward를 바꾸므로 이번 read-only 측정에는 포함하지 않았다. 기존 instruction 교체 실험이 행동 수준의 독립적 intervention 역할을 한다.
 
 ## 산출물
 
