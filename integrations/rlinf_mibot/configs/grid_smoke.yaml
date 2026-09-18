@@ -1,0 +1,60 @@
+run:
+  id: dgx-spark-grid-smoke
+  source_commit: auto
+  checkpoint_hash: from-preflight
+
+results_root: /results
+
+# Canonical grid: every dotted key accepts a scalar or a list. Lists form a Cartesian
+# product; each expanded config gets a stable SHA-256 ID, seed band, directory and manifest.
+grid:
+  sampler.noise_level: [0.1, 0.3]
+  sampler.name: pirl_flow_sde
+  env.skill: GRASP_OBJECT
+  env.split: pretrain
+  env.horizon: 250
+  rollout.episodes: 1
+  rollout.replan_steps: 16
+  rollout.obs_history: 4
+  rollout.obs_interval: 2
+  reward.variant: simulator_terminal_only
+  reward.use_milestones: false
+
+seed:
+  base: 710000
+  stride: 10000
+
+runtime:
+  backend: rlinf
+  workers: 2
+  max_in_flight: 2
+  retries: 1
+  fail_fast: per_config
+  node_ranks: [0, 0]
+  # Future 2-Spark hook: set workers/node_ranks to e.g. 4/[0,0,1,1] after Ray is
+  # configured across both hosts. The external fabric is ConnectX-7/RoCE, not NVLink.
+  cluster:
+    num_nodes: 1
+    interconnect: local
+    network_interface: auto
+    roce_gids: []
+
+validation:
+  # DGX acceptance may override this with a planned seed. Exactly its first attempt raises;
+  # the persistent marker makes the configured bounded retry deterministic.
+  inject_fail_once_seed: null
+
+model_server:
+  host: 127.0.0.1
+  port: 10088
+  model_path: /checkpoint
+  robot_type: robocasa365
+  crop_ratio: 0.95
+
+consume_smoke:
+  update_epochs: 2
+  clip: 0.1
+  kl_coef: 0.005
+  ratio_max: 10.0
+  adv_clip: 3.0
+  target_kl: 0.02

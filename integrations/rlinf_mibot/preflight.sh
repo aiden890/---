@@ -18,6 +18,27 @@ fail() { echo "  [FAIL] $1: $2  -> $3"; rec "$1" FAIL "$2 :: fix: $3"; FAIL=$((F
 
 echo "== RLinf-MiBoT host preflight =="
 
+# 0. Architecture / image profile. The pinned CUDA 12.1 digest is the verified x86_64
+# default; DGX Spark is normally aarch64 and needs an operator-validated NGC base whose
+# torch/flash-attn already support that machine.
+arch=$(uname -m 2>/dev/null || true)
+if [[ -n "$arch" ]]; then pass "host_arch" "$arch"; else fail "host_arch" "uname failed" "repair host userland"; fi
+if [[ -n "${RLINF_EXPECT_ARCH:-}" && "$arch" != "$RLINF_EXPECT_ARCH" ]]; then
+  fail "host_arch_match" "expected=$RLINF_EXPECT_ARCH actual=$arch" "run on the intended DGX Spark host"
+else
+  pass "host_arch_match" "expected=${RLINF_EXPECT_ARCH:-any} actual=$arch"
+fi
+if [[ "$arch" == "aarch64" ]]; then
+  if [[ -z "${RLINF_BASE_IMAGE:-}" || "${RLINF_INSTALL_TORCH:-1}" != "0" ]]; then
+    fail "spark_image_profile" "aarch64 cannot use the default x86 CUDA12.1 torch-wheel path" \
+      "set RLINF_BASE_IMAGE to the validated DGX Spark NGC PyTorch image and RLINF_INSTALL_TORCH=0"
+  else
+    pass "spark_image_profile" "base=${RLINF_BASE_IMAGE}; using base-image torch"
+  fi
+else
+  pass "spark_image_profile" "x86-compatible default profile"
+fi
+
 # 1. NVIDIA driver + GPU
 if command -v nvidia-smi >/dev/null 2>&1; then
   drv=$(nvidia-smi --query-gpu=driver_version --format=csv,noheader 2>/dev/null | head -1)
@@ -62,6 +83,14 @@ elif command -v nvidia-ctk >/dev/null 2>&1; then
   warn "nvidia_container_toolkit" "nvidia-ctk present but runtime not shown in docker info; verify with a --gpus run"
 else
   fail "nvidia_container_toolkit" "not detected" "install nvidia-container-toolkit and restart docker"
+fi
+
+# Runtime-level device visibility is the actual toolkit gate.
+if command -v docker >/dev/null 2>&1 && docker run --rm --gpus all \
+    "${RLINF_GPU_PROBE_IMAGE:-nvidia/cuda:12.1.1-base-ubuntu22.04}" nvidia-smi -L >/dev/null 2>&1; then
+  pass "container_gpu" "docker --gpus all sees the NVIDIA device"
+else
+  fail "container_gpu" "GPU probe container failed" "fix nvidia-container-toolkit/runtime before image build"
 fi
 
 # 4. Disk / RAM

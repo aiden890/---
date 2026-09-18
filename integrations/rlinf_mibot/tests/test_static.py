@@ -51,6 +51,17 @@ def test_configs():
     check("ppo_smoke adapter_only", ppo["model"]["train_mode"] == "adapter_only")
     ode = yaml.safe_load((ROOT / "configs" / "ode_eval.yaml").read_text())
     check("ode_eval noise=0", float(ode["sampler"]["noise_level"]) == 0.0)
+    grid = yaml.safe_load((ROOT / "configs" / "grid_smoke.yaml").read_text())
+    check("grid config parses", isinstance(grid, dict))
+    check("grid has >=2 parameter configs", len(grid["grid"]["sampler.noise_level"]) >= 2)
+    check("grid uses >=2 RLinf workers", int(grid["runtime"]["workers"]) >= 2)
+    check("grid collection is optimizer-free", "optimizer" not in grid["grid"])
+    worker_source = (ROOT / "src" / "rlinf_grid_worker.py").read_text()
+    check("retry attempts use isolated trajectory IDs",
+          "__attempt{attempt}" in worker_source and "discard_store([traj_id])" in worker_source)
+    deployment_doc = " ".join((ROOT / "deploy" / "README.md").read_text().split())
+    check("two-Spark fabric named RoCE not NVLink",
+          "ConnectX-7/RoCE" in deployment_doc and "not NVLink" in deployment_doc)
 
 
 def test_guard():

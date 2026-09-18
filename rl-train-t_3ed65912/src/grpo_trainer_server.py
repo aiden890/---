@@ -32,7 +32,9 @@ import random
 import socket
 import struct
 import sys
+import threading
 import traceback
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import torch
@@ -62,6 +64,10 @@ from checkpoint_schema import (  # noqa: E402
     build_checkpoint_metadata, rng_state_for_restore, validate_checkpoint_metadata,
 )
 from update_batch import IdempotentUpdateCache  # noqa: E402
+try:
+    from rollout_store import export_rollout_store, import_rollout_store  # noqa: E402
+except ImportError:  # Optional unless the RLinf collector integration is mounted.
+    export_rollout_store = import_rollout_store = None
 
 # Goal-3 SFT sends DATASET skill names; map them to the per-skill LoRA keys used by
 # inject_per_skill_lora (grasp/move_holding/place) -- same roles the GRPO loop's
@@ -156,6 +162,9 @@ class GRPOTrainerServer:
             raise ValueError(a.optimizer)
         self.store: dict = {}
         self.update_cache = IdempotentUpdateCache()
+        # One resident model serves multiple simulator clients. Connections may overlap,
+        # while model/store mutations remain serialized through this actor lock.
+        self.request_lock = threading.RLock()
         print("Model loaded.", flush=True)
 
     # ---- wire helpers ----
@@ -251,6 +260,9 @@ class GRPOTrainerServer:
             "exec_mask_cpu": exec_mask.cpu(),
             "old_logp": old_logp,
             "skill": skill,
+            # Per-trajectory sampler value: one resident actor serves a parameter grid, so
+            # recompute must not silently substitute the server's default --eta.
+            "eta": eta,
             "derived_seed": derived_seed,
             "chunk_index": chunk_index,
         }
@@ -281,9 +293,10 @@ class GRPOTrainerServer:
         exec_mask = chunk["exec_mask_cpu"].to(self.model.device)
         vfield, shape, dev, dt = build_velocity_field(self.model, state, action_mask, **vlm)
         sampler = getattr(self.a, "sampler", "fixed_noise")
+        chunk_eta = float(chunk.get("eta", self.a.eta))
         if sampler == "pirl":
             ts = openpi_timesteps(self.a.num_steps)
-            sig = openpi_sigmas(self.a.num_steps, self.a.eta)
+            sig = openpi_sigmas(self.a.num_steps, chunk_eta)
             means = []
             selected = int(chunk["denoise_index"])
             for k in range(self.a.num_steps):
@@ -311,7 +324,7 @@ class GRPOTrainerServer:
                 else:
                     v = vfield(xs[k], t_k)
                 means.append(xs[k] + v * dtc)
-            new_logp = transition_logprob(xs, means, eta=self.a.eta,
+            new_logp = transition_logprob(xs, means, eta=chunk_eta,
                                           num_steps=self.a.num_steps, executed_mask=exec_mask)[0]
             return new_logp.reshape(1)
 
@@ -614,7 +627,38 @@ class GRPOTrainerServer:
     def op_metrics(self, req):
         return {"n_trajs": len(self.store), "n_chunks": sum(len(v) for v in self.store.values()),
                 "chunks_by_traj": {str(k): len(v) for k, v in self.store.items()},
-                "free_gb": round(torch.cuda.mem_get_info()[0] / 1e9, 2)}
+                "free_gb": round(torch.cuda.mem_get_info()[0] / 1e9, 2),
+                "allocated_gb": round(torch.cuda.memory_allocated() / 1e9, 2),
+                "peak_allocated_gb": round(torch.cuda.max_memory_allocated() / 1e9, 2)}
+
+    def op_export_store(self, req):
+        """Persist selected collector trajectories without performing an update."""
+        if export_rollout_store is None:
+            raise RuntimeError("rollout_store integration is not mounted")
+        ids = list(map(str, req["trajectory_ids"]))
+        result = export_rollout_store(self.store, ids, Path(req["path"]),
+                                      allowed_root=Path("/results"))
+        if req.get("drop_after_export", False):
+            for trajectory_id in ids:
+                self.store.pop(trajectory_id, None)
+            result["dropped_from_live_store"] = True
+        return result
+
+    def op_import_store(self, req):
+        """Restore a collector payload so the existing op_update path can consume it."""
+        if import_rollout_store is None:
+            raise RuntimeError("rollout_store integration is not mounted")
+        return import_rollout_store(
+            self.store, Path(req["path"]), expected_sha256=req["expected_sha256"],
+            allowed_root=Path("/results"))
+
+    def op_discard_store(self, req):
+        ids = list(map(str, req.get("trajectory_ids", [])))
+        removed = []
+        for trajectory_id in ids:
+            if self.store.pop(trajectory_id, None) is not None:
+                removed.append(trajectory_id)
+        return {"discarded_trajectory_ids": removed, "optimizer_update_requested": False}
 
     def op_sft_update(self, req):
         """Goal-3: per-skill conditional flow-matching (CFM) SFT step.
@@ -722,40 +766,59 @@ class GRPOTrainerServer:
     def handle(self, req):
         fn = {"sample": self.op_sample, "update": self.op_update, "save": self.op_save,
               "load": self.op_load, "metrics": self.op_metrics, "config": self.op_config,
-              "reset": self.op_reset,
+              "reset": self.op_reset, "export_store": self.op_export_store,
+              "import_store": self.op_import_store, "discard_store": self.op_discard_store,
               "sft_update": self.op_sft_update, "sft_val": self.op_sft_val}.get(req.get("op"))
         return fn(req) if fn else {"error": f"unknown op {req.get('op')}"}
+
+    def _serve_connection(self, conn):
+        conn.settimeout(300.0)
+        try:
+            while True:
+                ln = self._recv_all(conn, 4)
+                if not ln:
+                    break
+                n = struct.unpack(">I", ln)[0]
+                if n > 512 * 1024 * 1024:
+                    raise ValueError(f"RPC request exceeds 512 MiB limit: {n}")
+                payload = self._recv_all(conn, n)
+                if not payload:
+                    break
+                with self.request_lock:
+                    resp = self.handle(pickle.loads(payload))
+                out = pickle.dumps(resp)
+                conn.sendall(struct.pack(">I", len(out)) + out)
+        except Exception as e:
+            print(f"Error: {e}", flush=True)
+            traceback.print_exc()
+            try:
+                out = pickle.dumps({"error": str(e)})
+                conn.sendall(struct.pack(">I", len(out)) + out)
+            except Exception:
+                pass
+        finally:
+            conn.close()
+
+    def _serve_limited(self, conn, slots):
+        try:
+            self._serve_connection(conn)
+        finally:
+            slots.release()
 
     def serve(self):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             s.bind((self.a.host, self.a.port))
-            s.listen(1)
+            s.listen(128)
             print(f"GRPO trainer server on {self.a.host}:{self.a.port}...", flush=True)
-            while True:
-                conn, _ = s.accept()
-                try:
-                    while True:
-                        ln = self._recv_all(conn, 4)
-                        if not ln:
-                            break
-                        n = struct.unpack(">I", ln)[0]
-                        payload = self._recv_all(conn, n)
-                        if not payload:
-                            break
-                        resp = self.handle(pickle.loads(payload))
-                        out = pickle.dumps(resp)
-                        conn.sendall(struct.pack(">I", len(out)) + out)
-                except Exception as e:
-                    print(f"Error: {e}", flush=True)
-                    traceback.print_exc()
-                    try:
-                        out = pickle.dumps({"error": str(e)})
-                        conn.sendall(struct.pack(">I", len(out)) + out)
-                    except Exception:
-                        pass
-                finally:
-                    conn.close()
+            slots = threading.BoundedSemaphore(16)
+            with ThreadPoolExecutor(max_workers=16, thread_name_prefix="grpo-rpc") as executor:
+                while True:
+                    conn, _ = s.accept()
+                    if not slots.acquire(blocking=False):
+                        conn.close()
+                        continue
+                    executor.submit(self._serve_limited, conn, slots)
 
 
 def main():

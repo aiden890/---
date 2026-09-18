@@ -11,7 +11,7 @@
   },
   "gates": [
     {"id": "deliverable_dockerfile",   "status": "READY",        "detail": "docker/Dockerfile (CUDA 12.1.1 base + digest, torch/flash-attn pinned, RLinf cloned at pinned commit). `docker build --check` clean."},
-    {"id": "deliverable_run_wrapper",  "status": "READY",        "detail": "run.sh + docker-compose.yml (server/client style, build/smoke/ppo-smoke/ode-eval/shell)."},
+    {"id": "deliverable_run_wrapper",  "status": "READY",        "detail": "run.sh + docker-compose.yml include one-command grid launch/stop/resume/consume and serial-vs-parallel comparison."},
     {"id": "deliverable_lockfiles",    "status": "READY",        "detail": "configs/requirements-rlinf.{txt,lock}; build args TORCH_CUDA_ARCH_LIST/MAX_JOBS/RLINF_COMMIT."},
     {"id": "deliverable_env_example",  "status": "READY",        "detail": ".env.example: only path/host/GPU/port/revision placeholders, no secrets."},
     {"id": "deliverable_bootstrap",    "status": "READY",        "detail": "bootstrap.sh: preflight -> pin RLinf -> build -> validate mounts -> smoke; stops before training."},
@@ -19,7 +19,8 @@
     {"id": "deliverable_smoke",        "status": "READY",        "detail": "src/smoke.py: imports/cuda/egl/robocasa/checkpoint/volume gates -> smoke_report.json."},
     {"id": "deliverable_skeleton",     "status": "READY",        "detail": "src/mibot_adapter.py + src/rlinf_env.py: model/obs/12-D decode/velocity/pi-RL sampler/reward/RLinf-reg interfaces; reuse verified pirl_flow_sde.py + flow_policy.py + reward.py by import."},
     {"id": "deliverable_hydra",        "status": "READY",        "detail": "configs/ppo_smoke.yaml (adapter-only, 1 iter, epochs>=2) + configs/ode_eval.yaml (noise=0). Long training disabled by guards."},
-    {"id": "deliverable_readme",       "status": "READY",        "detail": "deploy/README.md with required inputs, deploy/smoke/ppo/resume/rollback commands and expected outputs."},
+    {"id": "deliverable_grid",         "status": "READY",        "detail": "Deterministic Hydra/OmegaConf parameter grid, stable config hashes, disjoint seed bands, RLinf WorkerGroup scheduler, portable trainer-store export/import, retries, resume, fail-closed artifact audit."},
+    {"id": "deliverable_readme",       "status": "READY",        "detail": "deploy/README.md includes DGX Spark/aarch64 gates, collection/consume commands, acceptance evidence, rollback, and future ConnectX-7/RoCE two-Spark hooks (not NVLink)."},
 
     {"id": "static_tests",             "status": "READY",        "detail": "tests/test_static.py: 31 checks PASS (imports, config parse, guard, pins, secret scan, env-placeholder scan)."},
     {"id": "shell_syntax",             "status": "READY",        "detail": "bash -n clean on bootstrap.sh/preflight.sh/run.sh."},
@@ -35,10 +36,16 @@
     {"id": "logprob_ratio_one",        "status": "NEEDS_SERVER", "detail": "stored-vs-recomputed log-prob ratio==1 before update; GPU gate."},
     {"id": "rlinf_registration",       "status": "NEEDS_SERVER", "detail": "register MiBoT against the pinned RLinf API (explicit NotImplementedError seam) — wire on server."},
     {"id": "ppo_update",               "status": "NEEDS_SERVER", "detail": "one short adapter-only PPO update + checkpoint resume; GPU gate."},
-    {"id": "ode_before_after_eval",    "status": "NEEDS_SERVER", "detail": "deterministic ODE eval on fixed seeds, base vs trained; sim + GPU gate."}
+    {"id": "ode_before_after_eval",    "status": "NEEDS_SERVER", "detail": "deterministic ODE eval on fixed seeds, base vs trained; sim + GPU gate."},
+    {"id": "dgx_spark_preflight",      "status": "NEEDS_SERVER", "detail": "SSH-accessible DGX Spark must pass architecture/image, container GPU, EGL, checkpoint, assets, and writable-results preflight."},
+    {"id": "dgx_real_grid_parallel",   "status": "NEEDS_SERVER", "detail": "Real Xiaomi checkpoint with >=2 parameter configs and >=2 RLinf rollout workers must show cross-config wall-clock overlap, disjoint seeds, and non-mixed artifacts."},
+    {"id": "dgx_retry_resume",         "status": "NEEDS_SERVER", "detail": "Bounded injected worker failure and interrupted-collector resume must be demonstrated without duplicate completed jobs."},
+    {"id": "dgx_consume_update",       "status": "NEEDS_SERVER", "detail": "Collector payloads must be imported by the existing trainer for one bounded optimizer update and a reloadable checkpoint."},
+    {"id": "dgx_serial_parallel",      "status": "NEEDS_SERVER", "detail": "Measured serial-vs-parallel elapsed time, throughput, trainer memory, and failure counts are required; no speedup claim before evidence."}
   ],
   "required_server_inputs": [
-    "SSH host/alias for the new server",
+    "SSH host/alias for the DGX Spark",
+    "validated DGX Spark NGC PyTorch base-image tag for aarch64",
     "GPU model + count + NVIDIA driver version",
     "storage path + quota for results/caches",
     "confirmation Docker + nvidia-container-toolkit are installed",

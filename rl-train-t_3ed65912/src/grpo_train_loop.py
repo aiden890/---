@@ -168,6 +168,20 @@ class TrainerClient:
     def metrics(self):
         return self._rpc({"op": "metrics"})
 
+    def export_store(self, trajectory_ids, path, *, drop_after_export=False):
+        """Persist selected sampled chunks without asking the optimizer to update."""
+        return self._rpc({"op": "export_store", "trajectory_ids": list(trajectory_ids),
+                          "path": str(path), "drop_after_export": bool(drop_after_export)})
+
+    def import_store(self, path, expected_sha256):
+        """Restore a collector payload for the existing update path to consume later."""
+        return self._rpc({"op": "import_store", "path": str(path),
+                          "expected_sha256": expected_sha256})
+
+    def discard_store(self, trajectory_ids):
+        """Drop failed-attempt chunks without performing an optimizer update."""
+        return self._rpc({"op": "discard_store", "trajectory_ids": list(trajectory_ids)})
+
     def config(self, code_rev=None):
         """Fetch the full trainer configuration (optimizer/LR/grad-clip/LoRA/trainable count/
         sampler/eta) for the run summary. Measurement fix: every run summary is self-describing."""

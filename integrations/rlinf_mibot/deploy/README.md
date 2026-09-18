@@ -111,7 +111,66 @@ All under the mounted `RLINF_RESULTS`:
 - `ode_eval/ode_eval_report.json` — deterministic eval, per-seed + before/after.
 - training runs (when enabled): per-run dir with logs, adapter checkpoint, rollout MP4s.
 
-## 7. Rollback / removal command
+## 7. RLinf parameter-grid collector (DGX Spark acceptance)
+
+The grid collector is optimizer-free: RLinf `WorkerGroup` actors own independent RoboCasa
+simulators while one resident Xiaomi trainer/model server serializes GPU inference and stores
+the canonical GRPO rollout chunks. Every expanded config has a stable SHA-256 identity,
+disjoint seed band and separate result subtree. Collection exports each trajectory from the
+trainer store without updating; `grid-consume` later imports two exported stores and exercises
+the existing `op=update -> op=save -> op=load` path exactly once.
+
+This code is not production-ready merely because CPU/fake tests pass. Acceptance requires an
+SSH-accessible DGX Spark and saved evidence for all commands below.
+
+```bash
+# DGX Spark is aarch64: use the Spark administrator's validated NGC PyTorch image.
+# Do not guess this tag and do not use the x86 CUDA 12.1 wheel path.
+export RLINF_BASE_IMAGE=<validated-dgx-spark-ngc-pytorch-image>
+export RLINF_INSTALL_TORCH=0
+export RLINF_INSTALL_FLASH_ATTN=0
+
+bash preflight.sh
+bash run.sh build
+
+# Serial baseline and 2-worker parallel run use identical configs/seeds under separate IDs.
+bash run.sh model-start dgx-grid-serial
+bash run.sh grid-serial dgx-grid-serial
+bash run.sh model-stop dgx-grid-serial
+
+bash run.sh model-start dgx-grid-parallel
+bash run.sh grid-parallel dgx-grid-parallel validation.inject_fail_once_seed=710000
+bash run.sh grid-consume dgx-grid-parallel
+bash run.sh model-stop dgx-grid-parallel
+
+bash run.sh grid-compare dgx-grid-serial dgx-grid-parallel
+```
+
+`grid-smoke RUN_ID` is the one-command model-start -> parallel collect -> one-update consume ->
+cleanup path. `grid-stop RUN_ID` stops both named containers. After an interrupted collector,
+first verify no collector container is live, then run `grid-resume RUN_ID`; it preserves a prior
+FAILED sentinel as `FAILED.pre-resume.<timestamp>`, clears only the stale lock, and skips job IDs
+already present in `episodes.jsonl`.
+
+Required acceptance evidence:
+
+- preflight PASS for hardware, container GPU, EGL, checkpoint, assets and writable results;
+- trainer log reaches `GRPO trainer server on ...` after loading the real Xiaomi checkpoint;
+- at least two config IDs and two distinct RLinf workers, with
+  `audit.cross_config_overlap_seconds > 0`, no mixed config hashes and no duplicate seeds;
+- planned injected failure appears once in `failures.jsonl`, then succeeds on bounded retry;
+- an interrupted run resumes without duplicating a completed job;
+- `consume_smoke/consume_smoke.json` has one real update, adapter delta > 0, no non-finite or
+  dropped ratios, and save/load success for the produced checkpoint;
+- `serial_vs_parallel.json` reports measured elapsed time, throughput, trainer peak allocation
+  and failure attempts. No speedup is claimed until this file exists from real Spark runs.
+
+Future two-Spark placement is configured by `runtime.node_ranks` (for example `[0,0,1,1]`) and
+the `runtime.cluster`/`.env` network hooks. The inter-host fabric is **ConnectX-7/RoCE**, not
+NVLink. Validate Ray membership, the RoCE interface/GID and shared result/checkpoint mounts on
+both nodes before changing `num_nodes`; the single-Spark acceptance does not prove this mode.
+
+## 8. Rollback / removal command
 
 Remove the image and (optionally) the pinned RLinf clone; host mounts (checkpoint, assets,
 results) are untouched:
@@ -124,8 +183,8 @@ rm -rf vendor/rlinf
 # results/caches are host-mounted and preserved; delete them yourself if desired.
 ```
 
-To fully undo the integration, delete `integrations/rlinf_mibot/` — it is self-contained
-and nothing else in the repo imports it.
+To fully undo the integration, delete `integrations/rlinf_mibot/` and revert the collector
+store RPC additions in `rl-train-t_3ed65912/src/{grpo_train_loop,grpo_trainer_server}.py`.
 
 ---
 
@@ -147,9 +206,16 @@ integrations/rlinf_mibot/
                                    pi-RL sampler (reuses verified rl-env code by import)
     rlinf_env.py                   reward/env adapter + skill contracts + RLinf registration
     train_entry.py / eval_entry.py Hydra PPO-smoke / ODE-eval entry points (guarded)
+    grid_collection.py              deterministic grid/seed/artifact contract + audit
+    rlinf_grid_runtime.py           production RLinf WorkerGroup scheduler
+    rlinf_grid_worker.py            independent RoboCasa simulator worker
+    rollout_store.py                portable canonical trainer-store serialization
+    consume_collector.py            bounded existing-trainer update/save/load smoke
+    compare_grid_runs.py            measured serial-vs-parallel report
   configs/ppo_smoke.yaml           adapter-only PPO smoke (1 iter, long training disabled)
   configs/ode_eval.yaml            deterministic ODE eval (noise=0)
-  tests/test_static.py             no-GPU static validation (31 checks)
+  configs/grid_smoke.yaml          2-config/2-worker collection acceptance config
+  tests/test_*.py                  no-GPU unit/static/mutation validation
   readiness_report.json            READY / NEEDS_SERVER per gate
   deploy/README.md                 this file
 ```

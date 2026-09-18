@@ -3,8 +3,8 @@
 # flash-attn are installed separately in the Dockerfile (CUDA index / --no-build-isolation).
 #
 # These mirror the VERIFIED xiaomi-cu121 inference image, plus Hydra for configs. RLinf's
-# own runtime deps are resolved by its pinned `pip install -e /opt/rlinf` in the Dockerfile;
-# the exact resolved set is frozen to /app/requirements.resolved.txt at build time.
+# scheduler/runtime deps are listed explicitly because RLinf is installed with --no-deps;
+# the exact resolved environment is also frozen to /app/requirements.resolved.txt at build time.
 transformers==4.57.1
 accelerate==1.10.1
 einops==0.8.1
@@ -18,3 +18,15 @@ huggingface_hub==0.36.2
 # --- config / experiment management (Hydra configs in configs/) ---
 hydra-core==1.3.2
 omegaconf==2.3.0
+# RLinf scheduler/runtime (installed explicitly because RLinf itself is --no-deps).
+ray[default]==2.47.0
+# Pinned RoboCasa runtime dependencies used by the RLinf simulator workers.
+gymnasium==1.2.0
+mujoco==3.3.1
+PyOpenGL==3.1.10
+glfw==2.10.2
+opencv-python-headless==4.12.0.88
+numba==0.61.2
+lxml==6.0.1
+qpsolvers==4.8.0
+quadprog==0.1.13
