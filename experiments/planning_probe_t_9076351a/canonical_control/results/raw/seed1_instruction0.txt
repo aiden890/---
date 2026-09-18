@@ -1,0 +1,1 @@
+{"plan": [{"name": "GRASP_OBJECT", "args": {"grasp_region": "lid_handle", "object": "blender_lid"}}, {"name": "MOVE_OBJECT", "args": {"destination": "closed_preplace_region", "object": "blender_lid"}}, {"name": "PLACE_OBJECT", "args": {"destination": "blender", "object": "blender_lid"}}]}

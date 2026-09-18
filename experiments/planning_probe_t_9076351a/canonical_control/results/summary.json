@@ -1,0 +1,26 @@
+{
+  "verdict": "PASS",
+  "cases": 12,
+  "direct_semantic_json": 12,
+  "exact_three_skill_sequence": 12,
+  "model_emitted_name_args_valid": 12,
+  "deterministic_canonicalization_success": 12,
+  "canonicalized_strict_five_field_plan": 12,
+  "first_skill_correct": 12,
+  "latency_ms": {
+    "min": 3208.436045795679,
+    "mean": 3296.96798697114,
+    "max": 4132.40709155798
+  },
+  "peak_vram_mib": 8672.99267578125,
+  "hard_gate": "direct semantic JSON, exact sequence, and canonical strict plan must each be 12/12",
+  "constraints": {
+    "fallback_used": false,
+    "parser_repair_used": false,
+    "constrained_decoding_used": false,
+    "production_runtime_modified": false
+  },
+  "model": "Qwen/Qwen3-VL-4B-Instruct",
+  "revision": "ebb281ec70b05090aa6165b016eac8ec08e71b17",
+  "source_commit": "61e517f233c1eee91e9154130d4fd0ef172743e0"
+}

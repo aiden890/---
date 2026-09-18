@@ -65,6 +65,10 @@ class GeneratedArtifactTest(unittest.TestCase):
     def test_no_hidden_repair_and_separate_outputs(self):
         data = json.loads((RESULTS / "cases.json").read_text())
         self.assertEqual(len(data["cases"]), 12)
+        self.assertEqual({case["seed"] for case in data["cases"]}, {0, 1, 2})
+        self.assertEqual({case["instruction_index"] for case in data["cases"]}, {0, 1, 2, 3})
+        self.assertEqual(len({case["image_sha256"] for case in data["cases"]}), 3)
+        self.assertEqual(len({case["instruction"] for case in data["cases"]}), 4)
         self.assertEqual(data["constraints"], {
             "fallback_used": False,
             "parser_repair_used": False,
