@@ -1,0 +1,554 @@
+{
+  "verdict": "INCONCLUSIVE",
+  "production_integration_gate": "FAIL/NOT READY",
+  "process": {
+    "pid": 1,
+    "cuda_visible_devices": "0",
+    "cuda_device_count": 1
+  },
+  "gpu": {
+    "name": "NVIDIA GeForce RTX 3090",
+    "total_mib": 24122.1875
+  },
+  "models": {
+    "policy": {
+      "id": "XiaomiRobotics/Xiaomi-Robotics-1-RoboCasa365",
+      "revision": "3a6d0293bfa90759d34a7fc48c2c62413cd7bcf4",
+      "path": "/checkpoint",
+      "load_ms": 3324.1527788341045
+    },
+    "planner": {
+      "id": "Qwen/Qwen3-VL-4B-Instruct",
+      "revision": "ebb281ec70b05090aa6165b016eac8ec08e71b17",
+      "load_ms": 4957.542043179274
+    }
+  },
+  "policy_input": {
+    "seed": 0,
+    "history": 4,
+    "state": "zeros(1,4,60)",
+    "instruction": "Close the lid blender by securely placing the lid on top.",
+    "camera_files": [
+      "seed0_video.robot0_agentview_left.png",
+      "seed0_video.robot0_agentview_right.png",
+      "seed0_video.robot0_eye_in_hand.png"
+    ]
+  },
+  "latency": {
+    "baseline_warmup_ms": [
+      1140.5265014618635,
+      255.05479983985424
+    ],
+    "baseline": {
+      "count": 12,
+      "p50_ms": 253.76963429152966,
+      "p95_ms": 256.2616689130664,
+      "max_ms": 256.4194779843092,
+      "mean_ms": 254.10486105829477,
+      "throughput_hz": 3.9353831950919966
+    },
+    "dual_warmup_ms": [
+      268.5724217444658,
+      254.25099022686481
+    ],
+    "dual_planner_idle": {
+      "count": 12,
+      "p50_ms": 253.26636899262667,
+      "p95_ms": 254.66795675456524,
+      "max_ms": 255.33294677734375,
+      "mean_ms": 253.44932125881314,
+      "throughput_hz": 3.9455619570542733
+    },
+    "throughput_degradation_pct": -0.25864728941698,
+    "post_planner_policy_ms": 255.33652119338512
+  },
+  "memory": {
+    "peak_reserved_mib": 18700.0,
+    "headroom_mib": 5422.1875
+  },
+  "planner_case": {
+    "seed": 0,
+    "instruction_index": 0,
+    "instruction": "Close the lid blender by securely placing the lid on top.",
+    "rendered_chat_length": 1247,
+    "raw_output": "{\"plan\": [{\"name\": \"GRASP_OBJECT\", \"args\": {\"grasp_region\": \"lid_handle\", \"object\": \"blender_lid\"}}, {\"name\": \"MOVE_OBJECT\", \"args\": {\"destination\": \"closed_preplace_region\", \"object\": \"blender_lid\"}}, {\"name\": \"PLACE_OBJECT\", \"args\": {\"destination\": \"blender\", \"object\": \"blender_lid\"}}]}",
+    "generated_token_count": 90,
+    "latency_ms": 3299.5749171823263,
+    "parse_error": null,
+    "direct_semantic_json": true,
+    "validation": {
+      "semantic_schema_valid": true,
+      "name_args_valid": true,
+      "sequence": [
+        "GRASP_OBJECT",
+        "MOVE_OBJECT",
+        "PLACE_OBJECT"
+      ],
+      "exact_sequence": true,
+      "first_skill_correct": true,
+      "unknown_skill": false,
+      "missing_step": false,
+      "extra_step": false,
+      "duplicate_step": false,
+      "errors": []
+    },
+    "canonicalization_errors": [],
+    "canonical_strict_plan": {
+      "plan": [
+        {
+          "name": "GRASP_OBJECT",
+          "args": {
+            "grasp_region": "lid_handle",
+            "object": "blender_lid"
+          },
+          "instruction": "Grasp the blender lid securely at its handle and lift it clear.",
+          "contract": "held AND lifted>=0.05m AND stable_for(20) AND no_disallowed_contact",
+          "budget": 208
+        },
+        {
+          "name": "MOVE_OBJECT",
+          "args": {
+            "destination": "closed_preplace_region",
+            "object": "blender_lid"
+          },
+          "instruction": "Move the held blender lid to the pre-place region above the blender while maintaining a stable grasp and avoiding disallowed contact.",
+          "contract": "held AND at_target(xy<=0.06m,z 0.015-0.25m) AND stable_for(3) AND no_disallowed_contact",
+          "budget": 288
+        },
+        {
+          "name": "PLACE_OBJECT",
+          "args": {
+            "destination": "blender",
+            "object": "blender_lid"
+          },
+          "instruction": "Place the blender lid on the blender, release it after it is stably supported, then move the gripper clear.",
+          "contract": "supported_by AND released AND upright_error<=7deg AND gripper_clear>=0.15m",
+          "budget": 96
+        }
+      ]
+    },
+    "canonical_strict_plan_valid": true
+  },
+  "gate": {
+    "single_process_single_gpu_serialized": true,
+    "process_attribution": "host idle before launch; exactly one nvidia-smi compute row throughout; container PID namespace prevents numeric PID equality",
+    "zero_oom_nan_rpc_failures": true,
+    "reserved_headroom_at_least_2_gib": true,
+    "policy_throughput_degradation_at_most_10pct": true,
+    "policy_p95_meets_existing_budget": null,
+    "policy_budget_evidence": "No explicit policy-forward/control-loop deadline exists in the inspected production server or rollout scheduler; inference is synchronous and blocks action execution.",
+    "planner_boundary_max_latency_ms": 3299.5749171823263,
+    "action_loop_during_planner": "blocked: one process, serialized CUDA, synchronous call; no queue is created",
+    "unbounded_queue_or_backpressure": false
+  },
+  "errors": [],
+  "process_inventory": {
+    "startup": {
+      "container_pid": 1,
+      "namespace_pids_host_to_container": [
+        1
+      ],
+      "host_pid": 1,
+      "returncode": 0,
+      "compute_processes": [
+        {
+          "pid": 233688,
+          "process_name": "[Not Found]",
+          "used_memory_mib": 256
+        }
+      ]
+    },
+    "dual_loaded": {
+      "container_pid": 1,
+      "namespace_pids_host_to_container": [
+        1
+      ],
+      "host_pid": 1,
+      "returncode": 0,
+      "compute_processes": [
+        {
+          "pid": 233688,
+          "process_name": "[Not Found]",
+          "used_memory_mib": 18764
+        }
+      ]
+    },
+    "complete": {
+      "container_pid": 1,
+      "namespace_pids_host_to_container": [
+        1
+      ],
+      "host_pid": 1,
+      "returncode": 0,
+      "compute_processes": [
+        {
+          "pid": 233688,
+          "process_name": "[Not Found]",
+          "used_memory_mib": 19018
+        }
+      ]
+    }
+  },
+  "timeline": [
+    {
+      "stage": "startup",
+      "monotonic_s": 9065637.07945963,
+      "allocated_mib": 0.0,
+      "reserved_mib": 0.0,
+      "peak_allocated_mib": 0.0,
+      "peak_reserved_mib": 0.0,
+      "driver_free_mib": 23820.4375,
+      "total_mib": 24122.1875
+    },
+    {
+      "stage": "policy_loaded",
+      "monotonic_s": 9065640.422178691,
+      "allocated_mib": 9693.27978515625,
+      "reserved_mib": 9830.0,
+      "peak_allocated_mib": 9693.2802734375,
+      "peak_reserved_mib": 9830.0,
+      "driver_free_mib": 13948.4375,
+      "total_mib": 24122.1875
+    },
+    {
+      "stage": "baseline_warmup_0",
+      "monotonic_s": 9065641.605375296,
+      "allocated_mib": 9705.91796875,
+      "reserved_mib": 10132.0,
+      "peak_allocated_mib": 9916.279296875,
+      "peak_reserved_mib": 10132.0,
+      "driver_free_mib": 13626.4375,
+      "total_mib": 24122.1875,
+      "latency_ms": 1140.5265014618635
+    },
+    {
+      "stage": "baseline_warmup_1",
+      "monotonic_s": 9065641.860910755,
+      "allocated_mib": 9705.919921875,
+      "reserved_mib": 10132.0,
+      "peak_allocated_mib": 9916.28125,
+      "peak_reserved_mib": 10132.0,
+      "driver_free_mib": 13626.4375,
+      "total_mib": 24122.1875,
+      "latency_ms": 255.05479983985424
+    },
+    {
+      "stage": "baseline_0",
+      "monotonic_s": 9065642.117799584,
+      "allocated_mib": 9705.919921875,
+      "reserved_mib": 10132.0,
+      "peak_allocated_mib": 9916.28125,
+      "peak_reserved_mib": 10132.0,
+      "driver_free_mib": 13626.4375,
+      "total_mib": 24122.1875,
+      "latency_ms": 256.4194779843092
+    },
+    {
+      "stage": "baseline_1",
+      "monotonic_s": 9065642.372508178,
+      "allocated_mib": 9705.919921875,
+      "reserved_mib": 10132.0,
+      "peak_allocated_mib": 9916.28125,
+      "peak_reserved_mib": 10132.0,
+      "driver_free_mib": 13626.4375,
+      "total_mib": 24122.1875,
+      "latency_ms": 254.24020178616047
+    },
+    {
+      "stage": "baseline_2",
+      "monotonic_s": 9065642.626787355,
+      "allocated_mib": 9705.919921875,
+      "reserved_mib": 10132.0,
+      "peak_allocated_mib": 9916.28125,
+      "peak_reserved_mib": 10132.0,
+      "driver_free_mib": 13626.4375,
+      "total_mib": 24122.1875,
+      "latency_ms": 253.8523729890585
+    },
+    {
+      "stage": "baseline_3",
+      "monotonic_s": 9065642.880819524,
+      "allocated_mib": 9705.919921875,
+      "reserved_mib": 10132.0,
+      "peak_allocated_mib": 9916.28125,
+      "peak_reserved_mib": 10132.0,
+      "driver_free_mib": 13626.4375,
+      "total_mib": 24122.1875,
+      "latency_ms": 253.6009345203638
+    },
+    {
+      "stage": "baseline_4",
+      "monotonic_s": 9065643.135139609,
+      "allocated_mib": 9705.919921875,
+      "reserved_mib": 10132.0,
+      "peak_allocated_mib": 9916.28125,
+      "peak_reserved_mib": 10132.0,
+      "driver_free_mib": 13626.4375,
+      "total_mib": 24122.1875,
+      "latency_ms": 253.89375537633896
+    },
+    {
+      "stage": "baseline_5",
+      "monotonic_s": 9065643.389388323,
+      "allocated_mib": 9705.919921875,
+      "reserved_mib": 10132.0,
+      "peak_allocated_mib": 9916.28125,
+      "peak_reserved_mib": 10132.0,
+      "driver_free_mib": 13626.4375,
+      "total_mib": 24122.1875,
+      "latency_ms": 253.8196910172701
+    },
+    {
+      "stage": "baseline_6",
+      "monotonic_s": 9065643.643439295,
+      "allocated_mib": 9705.919921875,
+      "reserved_mib": 10132.0,
+      "peak_allocated_mib": 9916.28125,
+      "peak_reserved_mib": 10132.0,
+      "driver_free_mib": 13626.4375,
+      "total_mib": 24122.1875,
+      "latency_ms": 253.63154336810112
+    },
+    {
+      "stage": "baseline_7",
+      "monotonic_s": 9065643.897208055,
+      "allocated_mib": 9705.919921875,
+      "reserved_mib": 10132.0,
+      "peak_allocated_mib": 9916.28125,
+      "peak_reserved_mib": 10132.0,
+      "driver_free_mib": 13626.4375,
+      "total_mib": 24122.1875,
+      "latency_ms": 253.34773398935795
+    },
+    {
+      "stage": "baseline_8",
+      "monotonic_s": 9065644.153950648,
+      "allocated_mib": 9705.919921875,
+      "reserved_mib": 10132.0,
+      "peak_allocated_mib": 9916.28125,
+      "peak_reserved_mib": 10132.0,
+      "driver_free_mib": 13626.4375,
+      "total_mib": 24122.1875,
+      "latency_ms": 256.13255240023136
+    },
+    {
+      "stage": "baseline_9",
+      "monotonic_s": 9065644.408039413,
+      "allocated_mib": 9705.919921875,
+      "reserved_mib": 10132.0,
+      "peak_allocated_mib": 9916.28125,
+      "peak_reserved_mib": 10132.0,
+      "driver_free_mib": 13626.4375,
+      "total_mib": 24122.1875,
+      "latency_ms": 253.6204196512699
+    },
+    {
+      "stage": "baseline_10",
+      "monotonic_s": 9065644.662201473,
+      "allocated_mib": 9705.919921875,
+      "reserved_mib": 10132.0,
+      "peak_allocated_mib": 9916.28125,
+      "peak_reserved_mib": 10132.0,
+      "driver_free_mib": 13626.4375,
+      "total_mib": 24122.1875,
+      "latency_ms": 253.71957756578922
+    },
+    {
+      "stage": "baseline_11",
+      "monotonic_s": 9065644.915608363,
+      "allocated_mib": 9705.919921875,
+      "reserved_mib": 10132.0,
+      "peak_allocated_mib": 9916.28125,
+      "peak_reserved_mib": 10132.0,
+      "driver_free_mib": 13626.4375,
+      "total_mib": 24122.1875,
+      "latency_ms": 252.9800720512867
+    },
+    {
+      "stage": "dual_loaded",
+      "monotonic_s": 9065649.873607444,
+      "allocated_mib": 18226.8984375,
+      "reserved_mib": 18446.0,
+      "peak_allocated_mib": 18226.8984375,
+      "peak_reserved_mib": 18446.0,
+      "driver_free_mib": 5312.4375,
+      "total_mib": 24122.1875
+    },
+    {
+      "stage": "dual_warmup_0",
+      "monotonic_s": 9065650.172658132,
+      "allocated_mib": 18226.900390625,
+      "reserved_mib": 18654.0,
+      "peak_allocated_mib": 18437.26171875,
+      "peak_reserved_mib": 18654.0,
+      "driver_free_mib": 5104.4375,
+      "total_mib": 24122.1875,
+      "latency_ms": 268.5724217444658
+    },
+    {
+      "stage": "dual_warmup_1",
+      "monotonic_s": 9065650.427531948,
+      "allocated_mib": 18226.900390625,
+      "reserved_mib": 18654.0,
+      "peak_allocated_mib": 18437.26171875,
+      "peak_reserved_mib": 18654.0,
+      "driver_free_mib": 5104.4375,
+      "total_mib": 24122.1875,
+      "latency_ms": 254.25099022686481
+    },
+    {
+      "stage": "dual_idle_0",
+      "monotonic_s": 9065650.682106843,
+      "allocated_mib": 18226.900390625,
+      "reserved_mib": 18654.0,
+      "peak_allocated_mib": 18437.26171875,
+      "peak_reserved_mib": 18654.0,
+      "driver_free_mib": 5104.4375,
+      "total_mib": 24122.1875,
+      "latency_ms": 254.02252562344074
+    },
+    {
+      "stage": "dual_idle_1",
+      "monotonic_s": 9065650.935994646,
+      "allocated_mib": 18226.900390625,
+      "reserved_mib": 18654.0,
+      "peak_allocated_mib": 18437.26171875,
+      "peak_reserved_mib": 18654.0,
+      "driver_free_mib": 5104.4375,
+      "total_mib": 24122.1875,
+      "latency_ms": 253.3703427761793
+    },
+    {
+      "stage": "dual_idle_2",
+      "monotonic_s": 9065651.189784428,
+      "allocated_mib": 18226.900390625,
+      "reserved_mib": 18654.0,
+      "peak_allocated_mib": 18437.26171875,
+      "peak_reserved_mib": 18654.0,
+      "driver_free_mib": 5104.4375,
+      "total_mib": 24122.1875,
+      "latency_ms": 252.8199553489685
+    },
+    {
+      "stage": "dual_idle_3",
+      "monotonic_s": 9065651.44335111,
+      "allocated_mib": 18226.900390625,
+      "reserved_mib": 18654.0,
+      "peak_allocated_mib": 18437.26171875,
+      "peak_reserved_mib": 18654.0,
+      "driver_free_mib": 5104.4375,
+      "total_mib": 24122.1875,
+      "latency_ms": 253.05894017219543
+    },
+    {
+      "stage": "dual_idle_4",
+      "monotonic_s": 9065651.697883464,
+      "allocated_mib": 18226.900390625,
+      "reserved_mib": 18654.0,
+      "peak_allocated_mib": 18437.26171875,
+      "peak_reserved_mib": 18654.0,
+      "driver_free_mib": 5104.4375,
+      "total_mib": 24122.1875,
+      "latency_ms": 254.03081066906452
+    },
+    {
+      "stage": "dual_idle_5",
+      "monotonic_s": 9065651.951588996,
+      "allocated_mib": 18226.900390625,
+      "reserved_mib": 18654.0,
+      "peak_allocated_mib": 18437.26171875,
+      "peak_reserved_mib": 18654.0,
+      "driver_free_mib": 5104.4375,
+      "total_mib": 24122.1875,
+      "latency_ms": 253.16239520907402
+    },
+    {
+      "stage": "dual_idle_6",
+      "monotonic_s": 9065652.20747407,
+      "allocated_mib": 18226.900390625,
+      "reserved_mib": 18654.0,
+      "peak_allocated_mib": 18437.26171875,
+      "peak_reserved_mib": 18654.0,
+      "driver_free_mib": 5104.4375,
+      "total_mib": 24122.1875,
+      "latency_ms": 255.33294677734375
+    },
+    {
+      "stage": "dual_idle_7",
+      "monotonic_s": 9065652.462221112,
+      "allocated_mib": 18226.900390625,
+      "reserved_mib": 18654.0,
+      "peak_allocated_mib": 18437.26171875,
+      "peak_reserved_mib": 18654.0,
+      "driver_free_mib": 5104.4375,
+      "total_mib": 24122.1875,
+      "latency_ms": 254.12387400865555
+    },
+    {
+      "stage": "dual_idle_8",
+      "monotonic_s": 9065652.71636299,
+      "allocated_mib": 18226.900390625,
+      "reserved_mib": 18654.0,
+      "peak_allocated_mib": 18437.26171875,
+      "peak_reserved_mib": 18654.0,
+      "driver_free_mib": 5104.4375,
+      "total_mib": 24122.1875,
+      "latency_ms": 253.58151458203793
+    },
+    {
+      "stage": "dual_idle_9",
+      "monotonic_s": 9065652.969451366,
+      "allocated_mib": 18226.900390625,
+      "reserved_mib": 18654.0,
+      "peak_allocated_mib": 18437.26171875,
+      "peak_reserved_mib": 18654.0,
+      "driver_free_mib": 5104.4375,
+      "total_mib": 24122.1875,
+      "latency_ms": 252.5531891733408
+    },
+    {
+      "stage": "dual_idle_10",
+      "monotonic_s": 9065653.22255532,
+      "allocated_mib": 18226.900390625,
+      "reserved_mib": 18654.0,
+      "peak_allocated_mib": 18437.26171875,
+      "peak_reserved_mib": 18654.0,
+      "driver_free_mib": 5104.4375,
+      "total_mib": 24122.1875,
+      "latency_ms": 252.58748419582844
+    },
+    {
+      "stage": "dual_idle_11",
+      "monotonic_s": 9065653.476106888,
+      "allocated_mib": 18226.900390625,
+      "reserved_mib": 18654.0,
+      "peak_allocated_mib": 18437.26171875,
+      "peak_reserved_mib": 18654.0,
+      "driver_free_mib": 5104.4375,
+      "total_mib": 24122.1875,
+      "latency_ms": 252.74787656962872
+    },
+    {
+      "stage": "planner_generate",
+      "monotonic_s": 9065656.788371747,
+      "allocated_mib": 18226.89892578125,
+      "reserved_mib": 18700.0,
+      "peak_allocated_mib": 18380.35986328125,
+      "peak_reserved_mib": 18700.0,
+      "driver_free_mib": 5058.4375,
+      "total_mib": 24122.1875,
+      "latency_ms": 3299.5749171823263
+    },
+    {
+      "stage": "post_planner_policy",
+      "monotonic_s": 9065657.04423809,
+      "allocated_mib": 18226.90087890625,
+      "reserved_mib": 18700.0,
+      "peak_allocated_mib": 18437.26220703125,
+      "peak_reserved_mib": 18700.0,
+      "driver_free_mib": 5058.4375,
+      "total_mib": 24122.1875,
+      "latency_ms": 255.33652119338512
+    }
+  ]
+}

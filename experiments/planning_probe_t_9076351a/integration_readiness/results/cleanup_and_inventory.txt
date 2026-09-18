@@ -1,0 +1,30 @@
+GPU
+0, NVIDIA GeForce RTX 3090, GPU-30f75d7a-ba83-2323-4f1f-492dac313edc, 580.95.05, 24576 MiB, 38 MiB, 0 %
+COMPUTE
+EXPERIMENT_CONTAINERS
+PORTS
+IMAGE
+sha256:aac5e8e597636dc80df55a3150da68f2fb5897e28bfb02836319578fba477c87 []
+VERSIONS
+
+==========
+== CUDA ==
+==========
+
+CUDA Version 12.1.1
+
+Container image Copyright (c) 2016-2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+
+This container image and its contents are governed by the NVIDIA Deep Learning Container License.
+By pulling and using the container, you accept the terms and conditions of this license:
+https://developer.nvidia.com/ngc/nvidia-deep-learning-container-license
+
+A copy of this license is made available in this container at /NGC-DL-CONTAINER-LICENSE for your convenience.
+
+WARNING: The NVIDIA Driver was not detected.  GPU functionality will not be available.
+   Use the NVIDIA Container Toolkit to start this container with GPU support; see
+   https://docs.nvidia.com/datacenter/cloud-native/ .
+
+2.5.1+cu121
+4.57.1
+2.8.3

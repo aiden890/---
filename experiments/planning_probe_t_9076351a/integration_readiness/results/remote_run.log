@@ -1,0 +1,67 @@
+
+==========
+== CUDA ==
+==========
+
+CUDA Version 12.1.1
+
+Container image Copyright (c) 2016-2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+
+This container image and its contents are governed by the NVIDIA Deep Learning Container License.
+By pulling and using the container, you accept the terms and conditions of this license:
+https://developer.nvidia.com/ngc/nvidia-deep-learning-container-license
+
+A copy of this license is made available in this container at /NGC-DL-CONTAINER-LICENSE for your convenience.
+
+You are attempting to use Flash Attention 2 without specifying a torch dtype. This might lead to unexpected behaviour
+Loading checkpoint shards:   0%|          | 0/3 [00:00<?, ?it/s]Loading checkpoint shards:  67%|██████▋   | 2/3 [00:00<00:00, 19.41it/s]Loading checkpoint shards: 100%|██████████| 3/3 [00:00<00:00, 28.01it/s]
+Asked to sample `fps` frames per second but no video metadata was provided which is required when sampling with `fps`. Defaulting to `fps=24`. Please provide `video_metadata` for more accurate results.
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00, 30.41it/s]
+The following generation flags are not valid and may be ignored: ['temperature', 'top_p', 'top_k']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+{
+  "verdict": "INCONCLUSIVE",
+  "gate": {
+    "single_process_single_gpu_serialized": true,
+    "process_attribution": "host idle before launch; exactly one nvidia-smi compute row throughout; container PID namespace prevents numeric PID equality",
+    "zero_oom_nan_rpc_failures": true,
+    "reserved_headroom_at_least_2_gib": true,
+    "policy_throughput_degradation_at_most_10pct": true,
+    "policy_p95_meets_existing_budget": null,
+    "policy_budget_evidence": "No explicit policy-forward/control-loop deadline exists in the inspected production server or rollout scheduler; inference is synchronous and blocks action execution.",
+    "planner_boundary_max_latency_ms": 3299.5749171823263,
+    "action_loop_during_planner": "blocked: one process, serialized CUDA, synchronous call; no queue is created",
+    "unbounded_queue_or_backpressure": false
+  },
+  "latency": {
+    "baseline_warmup_ms": [
+      1140.5265014618635,
+      255.05479983985424
+    ],
+    "baseline": {
+      "count": 12,
+      "p50_ms": 253.76963429152966,
+      "p95_ms": 256.2616689130664,
+      "max_ms": 256.4194779843092,
+      "mean_ms": 254.10486105829477,
+      "throughput_hz": 3.9353831950919966
+    },
+    "dual_warmup_ms": [
+      268.5724217444658,
+      254.25099022686481
+    ],
+    "dual_planner_idle": {
+      "count": 12,
+      "p50_ms": 253.26636899262667,
+      "p95_ms": 254.66795675456524,
+      "max_ms": 255.33294677734375,
+      "mean_ms": 253.44932125881314,
+      "throughput_hz": 3.9455619570542733
+    },
+    "throughput_degradation_pct": -0.25864728941698,
+    "post_planner_policy_ms": 255.33652119338512
+  },
+  "memory": {
+    "peak_reserved_mib": 18700.0,
+    "headroom_mib": 5422.1875
+  }
+}
