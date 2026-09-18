@@ -59,6 +59,8 @@ def test_configs():
     worker_source = (ROOT / "src" / "rlinf_grid_worker.py").read_text()
     check("retry attempts use isolated trajectory IDs",
           "__attempt{attempt}" in worker_source and "discard_store([traj_id])" in worker_source)
+    check("grid snapshot uses canonical Sim signature",
+          'sim.snapshot("grid_initial", 0)' in worker_source)
     deployment_doc = " ".join((ROOT / "deploy" / "README.md").read_text().split())
     check("two-Spark fabric named RoCE not NVLink",
           "ConnectX-7/RoCE" in deployment_doc and "not NVLink" in deployment_doc)

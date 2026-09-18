@@ -97,7 +97,8 @@ class RoboCasaGridWorker(Worker):
         try:
             obs, _ = rollout.reset_env(genv, int(job["seed"]))
             sim.rest_lid_pos = sim.lid_pos()
-            snapshot_blob = pickle.dumps(sim.snapshot(), protocol=pickle.HIGHEST_PROTOCOL)
+            snapshot_blob = pickle.dumps(
+                sim.snapshot("grid_initial", 0), protocol=pickle.HIGHEST_PROTOCOL)
             randomization = {
                 "env_seed": int(job["seed"]),
                 "split": args.split,
