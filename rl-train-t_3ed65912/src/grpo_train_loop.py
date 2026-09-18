@@ -303,6 +303,11 @@ def _run_one_skill(sim, client, obs, args, skill, reward_mgr, *, eta, traj_id, s
             reward_components.approach += approach_reward
             prev_eef_lid_dist = curr_dist
         outcome = monitor.update(p, steps, horizon)
+        # Binary task reward ends PLACE as soon as stable lid closure has been debounced.
+        # Robot/gripper motion is intentionally not part of this success condition.
+        if (getattr(args, "reward_variant", "simulator_terminal_only") == "simulator_terminal_only"
+                and skill is Skill.PLACE and rb.success):
+            outcome = SkillOutcome.SUCCESS
         if frames is not None and (steps % args.video_stride == 0 or outcome or done or trunc):
             frames.append(rollout.make_video_frame(obs))
         # Latch the first success once, pay the decayed skill terminal once, then execute

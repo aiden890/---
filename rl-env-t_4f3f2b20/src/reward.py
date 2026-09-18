@@ -67,6 +67,8 @@ class RewardConfig:
     terminal_success: float = 1.0
     persistent_success: bool = False         # if enabled, every frame in the official
                                             # success state receives 1 (not a one-frame pulse)
+    success_stability_steps: int = 1         # consecutive closed-state env steps before success
+    success_ignores_gripper_motion: bool = False
     terminal_decay_gamma: float = 0.998     # Z-1 success-aware decay
     horizon: int = 400                      # steps; used for the decay reference
     use_milestones: bool = False            # operator decision (2026-09-16): pay reward ONCE at the
@@ -96,6 +98,9 @@ class RewardConfig:
         return cls(
             terminal_success=1.0,
             persistent_success=True,
+            success_stability_steps=10,      # 5 rendered frames at stride=2 (0.25 s at 20 fps)
+            success_ignores_gripper_motion=True,
+            settle_terminal=False,
             terminal_decay_gamma=1.0,
             horizon=horizon,
             use_milestones=False,
@@ -135,6 +140,8 @@ class RewardManager:
     def reset(self) -> None:
         self._fired: set[str] = set()
         self._terminal_paid = False
+        self._success_streak = 0
+        self._success_latched = False
         self._prev_grasped = False
 
     def step_reward(
@@ -180,7 +187,17 @@ class RewardManager:
         # upright still becomes True here and is paid; one that ends tilted or off-position
         # never does. At episode end (done/truncated) we RE-EVALUATE on the final predicates
         # so a success that only stabilises on the very last step is not missed.
-        success = official_success(p)
+        if self.cfg.success_ignores_gripper_motion:
+            # CloseBlenderLid success is the stable closed/upright lid state. Gripper or
+            # robot motion is deliberately irrelevant. Debounce it, then latch for the
+            # rest of the episode so the displayed current reward remains 1.
+            closed = bool(p.get("lid_on_blender")) and bool(p.get("lid_upright_7deg", True))
+            self._success_streak = self._success_streak + 1 if closed else 0
+            if self._success_streak >= max(1, int(self.cfg.success_stability_steps)):
+                self._success_latched = True
+            success = self._success_latched
+        else:
+            success = official_success(p)
         at_end = bool(truncated or done)
         pay_now = success and (self.cfg.persistent_success or not self._terminal_paid)
         if self.cfg.settle_terminal:
