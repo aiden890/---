@@ -46,14 +46,20 @@ def output_path(cfg: dict, mode: str, explicit: str | None) -> Path:
     return Path(cfg.get("results_root", "/results")) / run_id
 
 
-def main():
+def parse_cli(argv: list[str] | None = None):
     parser = argparse.ArgumentParser()
     parser.add_argument("command", choices=("collect", "resume", "audit", "fake-smoke", "consume-smoke"))
     parser.add_argument("--config", default=str(Path(__file__).resolve().parents[1] / "configs" / "grid_smoke.yaml"))
     parser.add_argument("--output")
     parser.add_argument("--mode", choices=("parallel", "serial"), default="parallel")
     parser.add_argument("overrides", nargs="*")
-    args = parser.parse_args()
+    # Launcher options precede Hydra-style positional overrides. parse_args() rejects this
+    # supported intermixing when the final positional uses nargs="*".
+    return parser.parse_intermixed_args(argv)
+
+
+def main():
+    args = parse_cli()
 
     overrides = [item for item in args.overrides if item != "--"]
     cfg = resolve_provenance(load_config(Path(args.config), overrides))
