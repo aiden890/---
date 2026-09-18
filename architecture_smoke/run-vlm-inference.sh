@@ -75,8 +75,13 @@ assert_idle() {
 strict_health() {
   local output="${1:-}"
   local args=(--host 127.0.0.1 --port "$port" --timeout 5 --strict)
-  [ -z "$output" ] || args+=(--output "$output")
-  docker exec "$server" python3 /pkg/runtime_probe.py "${args[@]}"
+  if [ -n "$output" ]; then
+    local tmp="${output}.tmp.$$"
+    docker exec "$server" python3 /pkg/runtime_probe.py "${args[@]}" > "$tmp"
+    mv -f "$tmp" "$output"
+  else
+    docker exec "$server" python3 /pkg/runtime_probe.py "${args[@]}"
+  fi
 }
 
 wait_ready() {
