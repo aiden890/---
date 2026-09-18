@@ -1,0 +1,25 @@
+{
+  "parallel": {
+    "done": true,
+    "elapsed_seconds": 39.558,
+    "episodes": 2,
+    "episodes_per_hour": 182.009,
+    "failed": false,
+    "failure_attempts": 0,
+    "mean_episode_wall_seconds": 38.671,
+    "run": "/results/t43-parallel-pass",
+    "trainer_peak_allocated_gb": 10.41
+  },
+  "parallel_speedup": 1.709,
+  "serial": {
+    "done": true,
+    "elapsed_seconds": 67.593,
+    "episodes": 2,
+    "episodes_per_hour": 106.519,
+    "failed": false,
+    "failure_attempts": 0,
+    "mean_episode_wall_seconds": 33.622,
+    "run": "/results/t43-serial-v2",
+    "trainer_peak_allocated_gb": 10.4
+  }
+}

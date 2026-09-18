@@ -1,0 +1,35 @@
+{
+  "audit": {
+    "checks": {
+      "cross_config_overlap_observed": true,
+      "episodes_present": true,
+      "exact_expected_job_coverage": true,
+      "has_multiple_configs": true,
+      "no_config_mixing": true,
+      "no_duplicate_job_ids": true,
+      "no_duplicate_seeds": true,
+      "no_optimizer_updates": true,
+      "parallel_workers_observed": true,
+      "production_artifacts_present": true,
+      "rows_match_planned_jobs": true,
+      "trainer_payload_hashes_valid": true
+    },
+    "config_count": 2,
+    "config_mixing_count": 0,
+    "cross_config_overlap_seconds": 37.783069372177124,
+    "duplicate_seed_count": 0,
+    "episode_count": 2,
+    "job_mismatch_count": 0,
+    "max_concurrency": 2,
+    "optimizer_update_requests": 0,
+    "pass": true
+  },
+  "completed_episodes": 2,
+  "fatal_failures": [],
+  "optimizer_update_requests": 0,
+  "pid": 1,
+  "planned_episodes": 2,
+  "retry_count": 0,
+  "schema": "mibot-grpo-rollout-v1",
+  "status": "done"
+}

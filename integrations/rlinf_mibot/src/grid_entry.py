@@ -10,11 +10,23 @@ import subprocess
 from pathlib import Path
 
 
+def partition_grid_overrides(grid_keys: set[str], overrides: list[str]):
+    grid, regular = [], []
+    for item in overrides:
+        key = item.split("=", 1)[0]
+        (grid if key in grid_keys else regular).append(item)
+    return grid, regular
+
+
 def load_config(path: Path, overrides: list[str]) -> dict:
     from omegaconf import OmegaConf
     config = OmegaConf.load(path)
-    if overrides:
-        config = OmegaConf.merge(config, OmegaConf.from_dotlist(overrides))
+    grid_overrides, regular_overrides = partition_grid_overrides(set(config.grid), overrides)
+    if regular_overrides:
+        config = OmegaConf.merge(config, OmegaConf.from_dotlist(regular_overrides))
+    for item in grid_overrides:
+        key, value = item.split("=", 1)
+        config.grid[key] = OmegaConf.from_dotlist([f"value={value}"]).value
     return OmegaConf.to_container(config, resolve=True)
 
 
