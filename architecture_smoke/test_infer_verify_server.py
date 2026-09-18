@@ -27,6 +27,7 @@ class InferVerifyServerTest(unittest.TestCase):
             "raw-policy-response", input_data["task_id"])
         self.server._op_vlm_score = lambda req: {
             "prob": 0.75, "question": req.get("question")}
+        self.server._op_planner = lambda req: {"text": "{\"name\":\"GRASP_OBJECT\"}"}
 
     def tearDown(self):
         self.server.close()
@@ -62,6 +63,16 @@ class InferVerifyServerTest(unittest.TestCase):
         self.assertEqual(response["request_id"], "req-4")
         self.assertEqual(response["request_kind"], "planner")
         self.assertEqual(response["result"]["prob"], 0.75)
+
+    def test_planner_operation_uses_planner_background_kind(self):
+        request = self.background(
+            request_kind="planner",
+            payload={"inputs": {"pixels": [1]}, "operation": "planner"})
+        response = self.server.handle(request)
+        self.assertEqual(response["status"], "ok")
+        self.assertIn("GRASP_OBJECT", response["result"]["text"])
+        health = self.server.handle({"op": "health"})
+        self.assertEqual(health["scheduler"]["background_by_kind"]["planner"], 1)
 
     def test_background_rejects_missing_identity_and_simulator_ground_truth(self):
         request = self.background()

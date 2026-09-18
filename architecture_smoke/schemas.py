@@ -52,6 +52,10 @@ class PlannerContext:
     last_result: Optional["SkillResult"] = None
     step_budget_remaining: int = 0
     planner_calls: int = 0
+    # Robot-observable input for the planner.  The legacy predicate planner may
+    # ignore it; obs-only planners must ignore ``predicates`` instead.
+    observation: Any = None
+    plan_history: Sequence[Mapping[str, Any]] = field(default_factory=tuple)
 
 
 @dataclass
@@ -60,9 +64,18 @@ class SkillCall:
 
     name: str
     args: Mapping[str, str]
+    instruction: Optional[str] = None
+    contract: Optional[str] = None
+    budget: Optional[int] = None
 
     def as_dict(self) -> dict:
-        return {"name": self.name, "args": dict(self.args)}
+        return {
+            "name": self.name,
+            "args": dict(self.args),
+            "instruction": self.instruction,
+            "contract": self.contract,
+            "budget": self.budget,
+        }
 
 
 # --------------------------------------------------------------------------- #

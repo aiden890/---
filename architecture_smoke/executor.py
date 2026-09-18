@@ -63,6 +63,12 @@ class ExecutionManager:
             return self._execute_vlm(call)
         return self._execute_predicate(call)
 
+    def _validated_runtime_call(self, call: SkillCall):
+        contract = self.registry.validate_call(call)
+        instruction = call.instruction or contract.render_instruction(call.args)
+        max_steps = call.budget if call.budget is not None else contract.max_steps
+        return contract, instruction, max_steps
+
     def _execute_vlm_async(self, call: SkillCall) -> SkillResult:
         """Execute actions while verifier/endpoint VLM work runs in the background."""
         from async_control import (AsyncVerifierClient, ControlRequest, ControlResponse,
@@ -70,12 +76,11 @@ class ExecutionManager:
         from obs_verifier import ObsVLMVerifier, SKILL_QUESTIONS
         from success_gate import make_success_gate
 
-        contract = self.registry.validate_call(call)
-        instruction = contract.render_instruction(call.args)
+        contract, instruction, max_steps = self._validated_runtime_call(call)
         qkey = _SKILL_QUESTION_KEY.get(call.name, call.name)
         op = self.verifier_operating_points.get(call.name, {})
         verifier = ObsVLMVerifier(
-            qkey, self.vlm_backend, max_steps=contract.max_steps,
+            qkey, self.vlm_backend, max_steps=max_steps,
             question_text=SKILL_QUESTIONS[qkey],
             vlm_min_interval=op.get("vlm_min_interval", self.vlm_min_interval),
             hysteresis_k=op.get("hysteresis_k", self.hysteresis_k),
@@ -132,7 +137,7 @@ class ExecutionManager:
         client = AsyncVerifierClient(
             transport, timeout_s=self.verifier_timeout_s, telemetry=telemetry)
         client.set_context(self.episode_id, call.name)
-        self.trace.route(call.name, self.adapter_mode.value, None, contract.max_steps, True)
+        self.trace.route(call.name, self.adapter_mode.value, None, max_steps, True)
 
         action_plan = []
         steps = 0
@@ -185,7 +190,7 @@ class ExecutionManager:
             return Decision.CONTINUE
 
         try:
-            while steps < contract.max_steps:
+            while steps < max_steps:
                 transition = consume()
                 if transition is Decision.ADVANCE:
                     result = self._result(SkillStatus.SUCCESS, call, instruction, steps, steps,
@@ -261,12 +266,11 @@ class ExecutionManager:
         from obs_verifier import ObsVLMVerifier, SKILL_QUESTIONS
         from success_gate import make_success_gate
 
-        contract = self.registry.validate_call(call)
-        instruction = contract.render_instruction(call.args)
+        contract, instruction, max_steps = self._validated_runtime_call(call)
         qkey = _SKILL_QUESTION_KEY.get(call.name, call.name)
         op = self.verifier_operating_points.get(call.name, {})
         verifier = ObsVLMVerifier(
-            qkey, self.vlm_backend, max_steps=contract.max_steps,
+            qkey, self.vlm_backend, max_steps=max_steps,
             question_text=SKILL_QUESTIONS[qkey],
             vlm_min_interval=op.get("vlm_min_interval", self.vlm_min_interval),
             hysteresis_k=op.get("hysteresis_k", self.hysteresis_k),
@@ -281,12 +285,12 @@ class ExecutionManager:
 
         # can_start stays obs-agnostic here: the sequential planner only issues a
         # skill when it is its turn, so we always start (no privileged precondition).
-        self.trace.route(call.name, self.adapter_mode.value, None, contract.max_steps, True)
+        self.trace.route(call.name, self.adapter_mode.value, None, max_steps, True)
 
         action_plan = []
         last_v: VerificationResult | None = None
         steps = 0
-        while steps < contract.max_steps:
+        while steps < max_steps:
             if not action_plan:
                 pin = self.env.build_policy_input(instruction, self.adapter_mode, None)
                 out = self.policy.infer(pin)
@@ -373,13 +377,12 @@ class ExecutionManager:
     #  privileged-predicate path (original behaviour)                     #
     # ------------------------------------------------------------------ #
     def _execute_predicate(self, call: SkillCall) -> SkillResult:
-        contract = self.registry.validate_call(call)          # schema validation
-        instruction = contract.render_instruction(call.args)  # fixed NL render
+        contract, instruction, max_steps = self._validated_runtime_call(call)
         verifier = PredicateVerifier(contract)
 
         pred = self.env.predicates()
         can_start = verifier.check_can_start(pred)
-        self.trace.route(call.name, self.adapter_mode.value, None, contract.max_steps, can_start)
+        self.trace.route(call.name, self.adapter_mode.value, None, max_steps, can_start)
         if not can_start:
             # precondition unmet -> FAILED, planner may RETRY/REPLAN.
             return self._result(SkillStatus.FAILED, call, instruction, 0, None,
@@ -388,7 +391,7 @@ class ExecutionManager:
         action_plan = []
         last_v: VerificationResult | None = None
         steps = 0
-        while steps < contract.max_steps:
+        while steps < max_steps:
             if not action_plan:
                 pin = self.env.build_policy_input(instruction, self.adapter_mode, None)
                 out = self.policy.infer(pin)

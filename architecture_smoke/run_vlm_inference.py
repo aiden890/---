@@ -29,7 +29,7 @@ from pathlib import Path
 from schemas import AdapterMode
 import bindings
 from skills import SkillRegistry
-from planner import SequentialPlanner
+from planner import SequentialPlanner, VLMPlanner
 from environment import RoboCasaEnvironment
 from executor import ExecutionManager
 from trace import Trace
@@ -69,6 +69,11 @@ def main():
                     help="JSON mapping skill names to per-skill view/tau/hysteresis_k/interval")
     ap.add_argument("--sync-verifier", action="store_true",
                     help="compatibility only: block the control loop on verifier RPCs")
+    ap.add_argument("--planner-mode", choices=("vlm", "sequential"), default="vlm",
+                    help="target obs-only VLM planner or scripted rollout compatibility")
+    ap.add_argument("--planner-timeout", type=float, default=5.0)
+    ap.add_argument("--planner-retries", type=int, default=1)
+    ap.add_argument("--max-plan-length", type=int, default=8)
     args = ap.parse_args()
 
     if args.verifier_config:
@@ -85,7 +90,7 @@ def main():
     from vlm_backends import RemoteVLMScorerBackend
 
     registry = build_registry()
-    planner = SequentialPlanner(registry, max_retries=1)
+    planner_kind = "vlm_obs_typed" if args.planner_mode == "vlm" else "sequential_obs_stub"
     policy = BasePolicyClient(
         model_path=args.model_path, server_addr=args.server_addr, server_port=args.server_port,
         robot_type=args.robot_type, crop_ratio=args.crop_ratio, replan_steps=args.replan_steps,
@@ -103,7 +108,14 @@ def main():
 
     config = {
         "task": "CloseBlenderLid", "goal": bindings.GOAL, "seeds": seeds, "split": args.split,
-        "planner": {"kind": planner.kind, "note": "scripted sequential obs-only stub, NOT a learned planner"},
+        "planner": {
+            "mode": args.planner_mode, "kind": planner_kind,
+            "target_default": "vlm",
+            "compatibility": "--planner-mode sequential preserves deterministic legacy rollouts",
+            "timeout_s": args.planner_timeout, "retries": args.planner_retries,
+            "max_plan_length": args.max_plan_length,
+            "fallback": "SequentialPlanner on timeout/error/invalid output",
+        },
         "verifier": {"kind": "obs_vlm", "backbone": "policy's own frozen Qwen3-VL VQA P(yes)",
                      "input": "3-cam images + 14D proprio ONLY (no sim predicate)",
                      "control_plane": ("synchronous_compatibility" if args.sync_verifier
@@ -133,11 +145,18 @@ def main():
             )
             trace = Trace(seed_dir / "trace.jsonl", {
                 "seed": seed, "task": "CloseBlenderLid", "adapter_mode": AdapterMode.DISABLED.value,
-                "adapter_checkpoint": None, "planner_kind": planner.kind,
+                "adapter_checkpoint": None, "planner_kind": planner_kind,
                 "verifier_kind": "obs_vlm", "policy_provenance": provenance,
             })
-            # fresh planner state per episode
-            planner = SequentialPlanner(registry, max_retries=1)
+            # Fresh planner and cycle/retry state per episode. Both modes consume
+            # exactly the same obs-only episode context.
+            if args.planner_mode == "vlm":
+                planner = VLMPlanner(
+                    registry, vlm_backend, episode_id=f"seed{seed}",
+                    timeout_s=args.planner_timeout, max_retries=args.planner_retries,
+                    max_plan_length=args.max_plan_length)
+            else:
+                planner = SequentialPlanner(registry, max_retries=1)
             try:
                 env.reset()
                 scene = env.scene_meta()

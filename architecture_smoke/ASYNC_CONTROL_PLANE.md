@@ -54,3 +54,24 @@ before pending background work. Replacing an unstarted background request return
 `dropped`; expired work returns `timeout`. `op=health` reports readiness, queue
 depths, drop/supersede/stale/timeout counters, per-kind queue wait and model
 latency, and policy delay caused by a running background forward.
+
+## Observation-only planner
+
+`run_vlm_inference.py` now has one planner selector: `--planner-mode vlm` is the
+target and default path; `--planner-mode sequential` preserves deterministic
+legacy-rollout behavior. The VLM path submits `request_kind=planner` through the
+same background slot and the same model instance. It never creates a planner
+process or a second GPU model.
+
+The planner receives only goal text, the current three-camera observation,
+proprio14, and plan/result history. Result history deliberately excludes the
+simulator predicate dictionary. Its output must be exactly the five-field JSON
+object `SkillCall{name,args,instruction,contract,budget}`. Name, exact argument
+keys, rendered instruction, done contract, and positive bounded budget are all
+checked against `tracking/inference.json`'s bindings in `bindings.CONTRACTS`.
+Unknown skills, missing or extra arguments, malformed JSON, stale identities,
+timeouts, model errors, over-budget calls, repeated cycles, and plan-length
+overflow cannot reach robot control. They either use the bounded deterministic
+`SequentialPlanner` fallback (with the reason in the plan trace) or terminate
+safely at the maximum plan length. Planner quality remains unclaimed until the
+separate GPU evaluation gate; the local smoke establishes wiring and safety only.

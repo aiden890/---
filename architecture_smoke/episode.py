@@ -27,14 +27,18 @@ def run_episode(planner, manager, env, trace, registry, goal, episode_budget,
     steps_used = 0
     last_result = None
     skill_log = []
+    plan_history = []
     terminal = "budget_exhausted"
 
     while planner_calls < max_planner_calls and steps_used < episode_budget:
         pred = {} if obs_only else env.predicates()
+        planner_observation = env.obs_for_verifier() if obs_only else None
         ctx = PlannerContext(goal=goal, predicates=pred, skill_catalog=registry.names,
                              last_result=last_result,
                              step_budget_remaining=episode_budget - steps_used,
-                             planner_calls=planner_calls)
+                             planner_calls=planner_calls,
+                             observation=planner_observation,
+                             plan_history=tuple(plan_history))
         call = planner.plan(ctx)
         rationale = planner.rationale(call, last_result)
         trace.plan(planner_calls, env.observation_ref(), (env.predicates() if not obs_only else {}),
@@ -47,10 +51,16 @@ def run_episode(planner, manager, env, trace, registry, goal, episode_budget,
             terminal = "planner_done" if obs_only else "task_success"
             break
 
+        plan_history.append({"call": call.as_dict()})
         result = manager.execute(call)
         steps_used += result.steps
         last_result = result
         skill_log.append(result.as_dict())
+        plan_history[-1]["result"] = {
+            "status": result.status.value, "skill": result.skill,
+            "steps": result.steps, "terminated_by": result.terminated_by,
+            "reason": result.reason,
+        }
 
         # planner sees the result and decides next on the next loop turn.
         next_hint = None

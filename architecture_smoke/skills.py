@@ -41,7 +41,31 @@ class SkillRegistry:
     def validate_call(self, call: SkillCall) -> SkillContract:
         contract = self.get(call.name)
         contract.validate_args(call.args)
+        expected_instruction = contract.render_instruction(call.args)
+        if call.instruction is not None and call.instruction != expected_instruction:
+            raise ValueError(f"SkillCall({call.name}) instruction does not match registry")
+        if call.contract is not None and call.contract != contract.done_description:
+            raise ValueError(f"SkillCall({call.name}) contract does not match registry")
+        if call.budget is not None:
+            if isinstance(call.budget, bool) or not isinstance(call.budget, int) or call.budget <= 0:
+                raise ValueError(f"SkillCall({call.name}) budget must be a positive integer")
+            if call.budget > contract.max_steps:
+                raise ValueError(
+                    f"SkillCall({call.name}) budget {call.budget} exceeds {contract.max_steps}")
         return contract
+
+    def typed_call(self, name: str, args=None, *, budget=None) -> SkillCall:
+        """Build the canonical five-field call from this registry only."""
+        contract = self.get(name)
+        bound = dict(contract.default_args if args is None else args)
+        contract.validate_args(bound)
+        selected_budget = contract.max_steps if budget is None else budget
+        call = SkillCall(
+            name=name, args=bound,
+            instruction=contract.render_instruction(bound),
+            contract=contract.done_description, budget=selected_budget)
+        self.validate_call(call)
+        return call
 
     def render(self, call: SkillCall) -> str:
         contract = self.validate_call(call)

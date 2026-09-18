@@ -54,6 +54,7 @@ class InferVerifyServer:
         self.host, self.port = host, port
         self.model_path = model_path
         self._yn_ids = None
+        self._tokenizer = None
         print("Loading model (combined infer+verify server)...", flush=True)
         if model_loader is None:
             model_loader = lambda: self._load_model(model_path)
@@ -86,10 +87,15 @@ class InferVerifyServer:
     # ---- request handlers ------------------------------------------------- #
     def _yes_no_ids(self):
         if self._yn_ids is None:
-            from transformers import AutoTokenizer
-            tok = AutoTokenizer.from_pretrained(self.model_path, trust_remote_code=True)
-            self._yn_ids = vlm_scorer.resolve_yes_no_ids(tok)
+            self._yn_ids = vlm_scorer.resolve_yes_no_ids(self._get_tokenizer())
         return self._yn_ids
+
+    def _get_tokenizer(self):
+        if self._tokenizer is None:
+            from transformers import AutoTokenizer
+            self._tokenizer = AutoTokenizer.from_pretrained(
+                self.model_path, trust_remote_code=True)
+        return self._tokenizer
 
     def _op_vlm_score(self, req):
         """P(yes) from one VQA forward on the frozen backbone (obs-only verifier)."""
@@ -106,6 +112,19 @@ class InferVerifyServer:
             logits_last = out.logits[0, -1, :]
             prob = vlm_scorer.answer_probability(logits_last, yes_ids, no_ids)
         return {"prob": float(prob), "question": req.get("question")}
+
+    def _op_planner(self, req):
+        """Deterministic JSON generation on the already-loaded VLM backbone."""
+        torch = importlib.import_module("torch")
+        data = {k: self._to_dev(v) for k, v in req["inputs"].items()}
+        input_len = int(data["input_ids"].shape[-1])
+        with torch.no_grad():
+            generated = self.model.vlm.generate(
+                **data, max_new_tokens=int(req.get("max_new_tokens", 384)),
+                do_sample=False)
+        text = self._get_tokenizer().decode(
+            generated[0, input_len:], skip_special_tokens=True).strip()
+        return {"text": text}
 
     def _base_actions(self, input_data):
         """Stock action path: identical to upstream/deploy/server.py."""
@@ -131,9 +150,14 @@ class InferVerifyServer:
         control = self._control_request(req)
         started = time.monotonic()
         try:
+            operation = control.payload.get("operation", "score")
+            if control.request_kind.value != "planner" and operation == "planner":
+                raise ValueError("planner operation requires request_kind=planner")
+            function = (lambda: self._op_planner(control.payload)) if operation == "planner" \
+                else (lambda: self._op_vlm_score(control.payload))
             result = self.dispatcher.submit_background(
                 control.request_kind.value,
-                lambda: self._op_vlm_score(control.payload),
+                function,
                 timeout_s=req.get("timeout_s"),
             )
             status, error = "ok", None

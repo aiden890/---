@@ -271,6 +271,46 @@ class RemoteVLMScorerBackend(VLMBackend):
             raise RuntimeError(resp.get("error") or f"background VLM status={resp.get('status')}")
         return float(resp["result"]["prob"])
 
+    def complete(self, request, timeout_s: float):
+        """Run a typed planner request on the same low-priority model lane."""
+        from async_control import ControlResponse, RequestKind, ResponseStatus
+
+        if request.request_kind is not RequestKind.PLANNER:
+            raise ValueError("planner service requires request_kind=planner")
+        observation = request.payload["observation"]
+        prompt = request.payload["prompt"]
+        image = self.compose(observation.images)
+        inputs = self._vs.build_vqa_inputs(
+            self.processor, image, prompt, robot_type=self.robot_type,
+            state_dim=self.state_dim, state_length=self.state_length)
+        self.set_timeout(timeout_s)
+        resp = self._rpc({
+            "op": "background_vlm",
+            "episode_id": request.episode_id,
+            "skill_id": request.skill_id,
+            "observation_step": request.observation_step,
+            "request_id": request.request_id,
+            "request_kind": request.request_kind.value,
+            "payload": {"inputs": inputs, "operation": "planner", "max_new_tokens": 384},
+            "timeout_s": timeout_s,
+        })
+        response_identity = (
+            resp.get("episode_id"), resp.get("skill_id"), resp.get("observation_step"),
+            resp.get("request_id"), resp.get("request_kind"))
+        expected_identity = (
+            request.episode_id, request.skill_id, request.observation_step,
+            request.request_id, request.request_kind.value)
+        if response_identity != expected_identity:
+            raise ValueError("planner response identity does not match request")
+        try:
+            status = ResponseStatus(resp.get("status", "error"))
+        except ValueError:
+            status = ResponseStatus.ERROR
+        return ControlResponse.from_request(
+            request, status=status,
+            payload={"text": (resp.get("result") or {}).get("text")},
+            error=resp.get("error"))
+
     def close(self):
         if self._sock is not None:
             try:
