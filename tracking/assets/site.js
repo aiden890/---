@@ -147,7 +147,7 @@ fetch('rlenv.json').then(r=>r.json()).then(RL=>{
   function load(i){
     cur=i; const clip=clips[i];
     [...tabs.children].forEach((b,j)=>b.classList.toggle('active',j===i));
-    vid.src=clip.mp4; vid.load();
+    vid.src=clip.overlay_mp4||clip.mp4; vid.load();
     const maxf=clip.timeline[clip.timeline.length-1].f;
     seek.max=maxf; seek.value=0;
     document.getElementById('rl-meta').innerHTML=`<b>${clip.case||''}</b> · 목표: ${clip.goal} · 판정 <b>${clip.outcome}</b> · 학습 리워드 합계 <b>${clip.total}</b>`;

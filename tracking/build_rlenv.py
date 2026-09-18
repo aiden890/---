@@ -152,7 +152,7 @@ def replay(skill_key, steps, frames, *, hold_steps=0):
     approach_coef = 0.0  # approach shaping disabled (operator 2026-09-16): success + hold only
     timeout_penalty = 0.5
 
-    cfg = RewardConfig(mode="simulator", horizon=horizon, use_milestones=False)
+    cfg = RewardConfig(horizon=horizon, use_milestones=False)
     rm = RewardManager(cfg)
     hold_cfg = HoldConfig()
     fm = frame_map(steps, frames)
@@ -287,6 +287,8 @@ def main():
             "goal": spec["goal"],
             "instr": spec["instr"],
             "mp4": spec["mp4"],
+            "overlay_mp4": str(Path(str(spec["mp4"])).with_name(
+                Path(str(spec["mp4"])).stem + "_reward_overlay.mp4")),
             "fps": 20,
             "stride": 2,
             "outcome": outcome.name if hasattr(outcome, "name") else str(outcome),
