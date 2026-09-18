@@ -82,6 +82,12 @@ def test_binary_reward_is_exactly_zero_for_failure_and_one_for_success():
     )
     check(rb_success.primary == 1.0 and rb_success.terminal == 1.0,
           "binary reward pays exactly 1 for official success without decay")
+    rb_success_next = succeeded.step_reward(
+        100,
+        _p(lid_on_blender=True, gripper_far=True, official_check_success=True),
+    )
+    check(rb_success_next.primary == 1.0 and rb_success_next.terminal == 1.0,
+          "binary reward remains 1 on every later frame while task success persists")
 
 
 def test_terminal_negative_no_reward_on_partial():

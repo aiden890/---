@@ -65,6 +65,8 @@ def official_success(p: dict[str, Any]) -> bool:
 @dataclass
 class RewardConfig:
     terminal_success: float = 1.0
+    persistent_success: bool = False         # if enabled, every frame in the official
+                                            # success state receives 1 (not a one-frame pulse)
     terminal_decay_gamma: float = 0.998     # Z-1 success-aware decay
     horizon: int = 400                      # steps; used for the decay reference
     use_milestones: bool = False            # operator decision (2026-09-16): pay reward ONCE at the
@@ -93,6 +95,7 @@ class RewardConfig:
         """Exact outcome reward: failed trajectory=0, successful trajectory=1."""
         return cls(
             terminal_success=1.0,
+            persistent_success=True,
             terminal_decay_gamma=1.0,
             horizon=horizon,
             use_milestones=False,
@@ -179,14 +182,14 @@ class RewardManager:
         # so a success that only stabilises on the very last step is not missed.
         success = official_success(p)
         at_end = bool(truncated or done)
-        pay_now = success and not self._terminal_paid
+        pay_now = success and (self.cfg.persistent_success or not self._terminal_paid)
         if self.cfg.settle_terminal:
             # only pay while the hand is clear of the lid (settled), or at episode end
             pay_now = pay_now and (bool(p.get("gripper_lid_far_0.15")) or at_end)
         rb.success = success
         if pay_now:
             self._terminal_paid = True
-            decay = self.cfg.terminal_decay_gamma ** step_index
+            decay = 1.0 if self.cfg.persistent_success else self.cfg.terminal_decay_gamma ** step_index
             rb.terminal += self.cfg.terminal_success * decay
 
         # timeout penalty at the end of a failed episode
