@@ -136,6 +136,8 @@ def test_assets_mount_contract():
           'RLINF_ASSETS_MODE:-ro' in run and 'assets_mount' in run)
     check("grid compare writes through result volume",
           'python3 /integration/src/compare_grid_runs.py' in run)
+    check("grid resume clears root-owned lock through result volume",
+          '".collector.lock").unlink(missing_ok=True)' in run)
     check("preflight recognizes Docker asset volumes",
           'docker volume inspect "$RLINF_ASSETS"' in preflight)
     check("assets mount defaults read-only",

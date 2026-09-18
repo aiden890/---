@@ -118,11 +118,11 @@ case "${1:-help}" in
       if docker ps --format '{{.Names}}' | grep -qx "$name"; then
         echo "collector is still live; refusing concurrent resume" >&2; exit 1
       fi
-      if [[ -e "$RLINF_RESULTS/$run_id/FAILED" ]]; then
-        mv "$RLINF_RESULTS/$run_id/FAILED" \
-          "$RLINF_RESULTS/$run_id/FAILED.pre-resume.$(date +%s)"
-      fi
-      rm -f "$RLINF_RESULTS/$run_id/.collector.lock"
+      # Collector artifacts are root-owned inside the result mount. Archive the failure
+      # sentinel and clear only the verified-stale lock through that same mount.
+      docker run --rm --network none "${common_args[@]}" "$IMAGE" python3 -c \
+        'import pathlib,sys,time; r=pathlib.Path("/results")/sys.argv[1]; f=r/"FAILED"; f.rename(r/f"FAILED.pre-resume.{int(time.time())}") if f.exists() else None; (r/".collector.lock").unlink(missing_ok=True)' \
+        "$run_id"
     else
       [[ ! -e "$RLINF_RESULTS/$run_id/FAILED" ]] || { echo "FAILED exists; use grid-resume after inspection" >&2; exit 1; }
       [[ ! -e "$RLINF_RESULTS/$run_id/.collector.lock" ]] || { echo "collector lock exists; use grid-resume after verifying no live container" >&2; exit 1; }
