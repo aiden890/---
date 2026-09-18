@@ -1,0 +1,33 @@
+{
+  "verdict": "checkpoint limitation",
+  "rationale": "The official instruct control produced direct non-empty parseable JSON for all three observations, while the Xiaomi action-policy checkpoint emitted only an empty CoT followed by EOS for every general-QA and planning prompt.",
+  "xiaomi": {
+    "model": "XiaomiRobotics/Xiaomi-Robotics-1-RoboCasa365",
+    "revision": "3a6d0293bfa90759d34a7fc48c2c62413cd7bcf4",
+    "general_qa_semantic_nonempty": 0,
+    "general_qa_cases": 3,
+    "planning_semantic_nonempty": 0,
+    "planning_cases": 1,
+    "all_exact_empty_cot": true,
+    "all_stop_eos": true
+  },
+  "official": {
+    "model": "Qwen/Qwen3-VL-4B-Instruct",
+    "revision": "ebb281ec70b05090aa6165b016eac8ec08e71b17",
+    "semantic_nonempty": 3,
+    "cases": 3,
+    "direct_valid_json": 3,
+    "direct_strict_plan": 0,
+    "exact_skill_sequence": 3,
+    "all_stop_eos": true,
+    "note": "Strict plan validity is diagnostic only; direct non-empty JSON establishes that the image/chat/generation harness works."
+  },
+  "constraints": {
+    "fallback_used": false,
+    "parser_repair_used": false,
+    "constrained_decoding_used": false,
+    "production_runtime_modified": false
+  },
+  "source_commit": "1d8d20d3f0871567df6e961601d1da3e0547b8d8",
+  "parent_artifact_commit": "aa0807dc80aa0958a39ec315cb6bee9ea889c568"
+}

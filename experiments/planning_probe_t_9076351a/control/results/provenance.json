@@ -1,0 +1,86 @@
+{
+  "gpu_host": "amp_csi",
+  "gpu": "NVIDIA GeForce RTX 3090 24576 MiB",
+  "container_image": "xiaomi-cu121:t_9f03a613",
+  "transformers": "4.57.1",
+  "torch": "2.5.1+cu121",
+  "xiaomi": {
+    "model": "XiaomiRobotics/Xiaomi-Robotics-1-RoboCasa365",
+    "revision": "3a6d0293bfa90759d34a7fc48c2c62413cd7bcf4",
+    "processor_class": "MiBotProcessor",
+    "tokenizer_class": "Qwen2TokenizerFast",
+    "preprocessing": "MiBotProcessor callable with canonical minimal Qwen3-VL image chat prompt, zero state (1,4,60), robot_type=robocasa365",
+    "chat_template": "explicit <|im_start|>user + vision tokens + text + <|im_end|> + <|im_start|>assistant",
+    "special_tokens": {
+      "eos_token_id": 151645,
+      "pad_token_id": 151643,
+      "cot_token_ids": [
+        63889,
+        354,
+        1472,
+        64498,
+        29
+      ],
+      "cot_open_token_ids": [
+        63889,
+        354,
+        29
+      ],
+      "cot_close_token_ids": [
+        522,
+        64498,
+        29
+      ],
+      "assistant_prefix_token_ids": [
+        151644,
+        77091,
+        198
+      ]
+    },
+    "decoding": {
+      "do_sample": false,
+      "max_new_tokens": 512
+    },
+    "source_commit": "1d8d20d3f0871567df6e961601d1da3e0547b8d8"
+  },
+  "official": {
+    "model": "Qwen/Qwen3-VL-4B-Instruct",
+    "revision": "ebb281ec70b05090aa6165b016eac8ec08e71b17",
+    "processor_class": "Qwen3VLProcessor",
+    "tokenizer_class": "Qwen2TokenizerFast",
+    "preprocessing": "official AutoProcessor.apply_chat_template with one image and text, add_generation_prompt=True",
+    "chat_template": "{%- if tools %}\n    {{- '<|im_start|>system\\n' }}\n    {%- if messages[0].role == 'system' %}\n        {%- if messages[0].content is string %}\n            {{- messages[0].content }}\n        {%- else %}\n            {%- for content in messages[0].content %}\n                {%- if 'text' in content %}\n                    {{- content.text }}\n                {%- endif %}\n            {%- endfor %}\n        {%- endif %}\n        {{- '\\n\\n' }}\n    {%- endif %}\n    {{- \"# Tools\\n\\nYou may call one or more functions to assist with the user query.\\n\\nYou are provided with function signatures within <tools></tools> XML tags:\\n<tools>\" }}\n    {%- for tool in tools %}\n        {{- \"\\n\" }}\n        {{- tool | tojson }}\n    {%- endfor %}\n    {{- \"\\n</tools>\\n\\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\\n<tool_call>\\n{\\\"name\\\": <function-name>, \\\"arguments\\\": <args-json-object>}\\n</tool_call><|im_end|>\\n\" }}\n{%- else %}\n    {%- if messages[0].role == 'system' %}\n        {{- '<|im_start|>system\\n' }}\n        {%- if messages[0].content is string %}\n            {{- messages[0].content }}\n        {%- else %}\n            {%- for content in messages[0].content %}\n                {%- if 'text' in content %}\n                    {{- content.text }}\n                {%- endif %}\n            {%- endfor %}\n        {%- endif %}\n        {{- '<|im_end|>\\n' }}\n    {%- endif %}\n{%- endif %}\n{%- set image_count = namespace(value=0) %}\n{%- set video_count = namespace(value=0) %}\n{%- for message in messages %}\n    {%- if message.role == \"user\" %}\n        {{- '<|im_start|>' + message.role + '\\n' }}\n        {%- if message.content is string %}\n            {{- message.content }}\n        {%- else %}\n            {%- for content in message.content %}\n                {%- if content.type == 'image' or 'image' in content or 'image_url' in content %}\n                    {%- set image_count.value = image_count.value + 1 %}\n                    {%- if add_vision_id %}Picture {{ image_count.value }}: {% endif -%}\n                    <|vision_start|><|image_pad|><|vision_end|>\n                {%- elif content.type == 'video' or 'video' in content %}\n                    {%- set video_count.value = video_count.value + 1 %}\n                    {%- if add_vision_id %}Video {{ video_count.value }}: {% endif -%}\n                    <|vision_start|><|video_pad|><|vision_end|>\n                {%- elif 'text' in content %}\n                    {{- content.text }}\n                {%- endif %}\n            {%- endfor %}\n        {%- endif %}\n        {{- '<|im_end|>\\n' }}\n    {%- elif message.role == \"assistant\" %}\n        {{- '<|im_start|>' + message.role + '\\n' }}\n        {%- if message.content is string %}\n            {{- message.content }}\n        {%- else %}\n            {%- for content_item in message.content %}\n                {%- if 'text' in content_item %}\n                    {{- content_item.text }}\n                {%- endif %}\n            {%- endfor %}\n        {%- endif %}\n        {%- if message.tool_calls %}\n            {%- for tool_call in message.tool_calls %}\n                {%- if (loop.first and message.content) or (not loop.first) %}\n                    {{- '\\n' }}\n                {%- endif %}\n                {%- if tool_call.function %}\n                    {%- set tool_call = tool_call.function %}\n                {%- endif %}\n                {{- '<tool_call>\\n{\"name\": \"' }}\n                {{- tool_call.name }}\n                {{- '\", \"arguments\": ' }}\n                {%- if tool_call.arguments is string %}\n                    {{- tool_call.arguments }}\n                {%- else %}\n                    {{- tool_call.arguments | tojson }}\n                {%- endif %}\n                {{- '}\\n</tool_call>' }}\n            {%- endfor %}\n        {%- endif %}\n        {{- '<|im_end|>\\n' }}\n    {%- elif message.role == \"tool\" %}\n        {%- if loop.first or (messages[loop.index0 - 1].role != \"tool\") %}\n            {{- '<|im_start|>user' }}\n        {%- endif %}\n        {{- '\\n<tool_response>\\n' }}\n        {%- if message.content is string %}\n            {{- message.content }}\n        {%- else %}\n            {%- for content in message.content %}\n                {%- if content.type == 'image' or 'image' in content or 'image_url' in content %}\n                    {%- set image_count.value = image_count.value + 1 %}\n                    {%- if add_vision_id %}Picture {{ image_count.value }}: {% endif -%}\n                    <|vision_start|><|image_pad|><|vision_end|>\n                {%- elif content.type == 'video' or 'video' in content %}\n                    {%- set video_count.value = video_count.value + 1 %}\n                    {%- if add_vision_id %}Video {{ video_count.value }}: {% endif -%}\n                    <|vision_start|><|video_pad|><|vision_end|>\n                {%- elif 'text' in content %}\n                    {{- content.text }}\n                {%- endif %}\n            {%- endfor %}\n        {%- endif %}\n        {{- '\\n</tool_response>' }}\n        {%- if loop.last or (messages[loop.index0 + 1].role != \"tool\") %}\n            {{- '<|im_end|>\\n' }}\n        {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- if add_generation_prompt %}\n    {{- '<|im_start|>assistant\\n' }}\n{%- endif %}\n",
+    "special_tokens": {
+      "eos_token_id": 151645,
+      "pad_token_id": 151643,
+      "assistant_prefix_token_ids": [
+        151644,
+        77091,
+        198
+      ]
+    },
+    "decoding": {
+      "do_sample": false,
+      "max_new_tokens": 512
+    },
+    "source_commit": "1d8d20d3f0871567df6e961601d1da3e0547b8d8"
+  },
+  "input_image_hashes": [
+    "1f7046a25f9ee0c92a2b0d641e8dfc89a98f58d1be68f5849dfa30232d2411e3",
+    "9b5f2837ab78183ba92ec3f2e4cfd5682e6557a723efc883ac32f6d8f0fadf1c",
+    "bcd5112880c6d26d690547e0b4a37c20730c5b8e7eb84280b0520016899d977d"
+  ],
+  "prompt_hashes": [
+    "242811883eb366fb0f7c383eb6d9d4f2e0525e9710093c124081965bfe944229",
+    "2e21cca6fe16548b2d841dedbcafbf8123f5c4de66359b64ff5e007d55c06f0c",
+    "aed161462ad31511db3b30b4216dcc626a144b461249fe59439c980a5bd15985",
+    "d871838f28ce18f05ccc8d3bb98eb86968061c477f8854ab1fa07550a5f26827"
+  ],
+  "cleanup": {
+    "experiment_containers_absent": true,
+    "port_10087_listener_absent": true,
+    "gpu_compute_processes_absent": true,
+    "gpu_memory_mib": 38,
+    "gpu_utilization_percent": 0
+  }
+}

@@ -69,6 +69,7 @@ def main() -> None:
     official_nonempty = sum(semantic_nonempty(case["raw_output"]) for case in ocases)
     official_json = sum(bool(case["direct_valid_json"]) for case in ocases)
     official_strict = sum(bool(case["direct_valid_plan"]) for case in ocases)
+    official_exact_sequence = sum(bool(case["exact_sequence"]) for case in ocases)
     if official_nonempty == len(ocases) and official_json == len(ocases) and x_nonempty == 0:
         verdict = "checkpoint limitation"
         rationale = (
@@ -106,6 +107,7 @@ def main() -> None:
             "cases": len(ocases),
             "direct_valid_json": official_json,
             "direct_strict_plan": official_strict,
+            "exact_skill_sequence": official_exact_sequence,
             "all_stop_eos": all(case["stop_reason"] == "eos_token" for case in ocases),
             "note": "Strict plan validity is diagnostic only; direct non-empty JSON establishes that the image/chat/generation harness works.",
         },
@@ -152,7 +154,7 @@ def main() -> None:
 
 - Xiaomi `{xiaomi['model']}` revision `{xiaomi['revision']}`: 일반 image-QA 3/3과 planning 1/1이 모두 정확히 `<cot></cot>` 뒤 EOS로 종료했다. 첫 생성 token/top-k, 전체 token IDs, EOS IDs와 latency는 `xiaomi_checkpoint_sanity.json`에 있다.
 - 공식 `{official['model']}` revision `{official['revision']}`: 동일한 세 reset contact sheet와 동일한 full-plan payload에서 semantic non-empty 3/3, direct parseable JSON 3/3이었다. 따라서 image 입력, chat template, generation 자체가 전부 빈 출력을 만드는 harness 결함이라는 가설은 지지되지 않는다.
-- 공식 모델의 strict registry plan은 {official_strict}/3이다. 일부 argument/contract 문자열이 registry의 정확한 값과 달라 strict score는 실패했지만, 이 control의 원인 분리 기준은 direct raw language/JSON 생성 가능 여부다.
+- 공식 모델은 세 case 모두 `GRASP_OBJECT → MOVE_OBJECT → PLACE_OBJECT` 순서를 생성했지만 strict registry plan은 {official_strict}/3이다. 일부 argument/contract 문자열이 registry의 정확한 값과 달라 strict score는 실패했으며, 이 control의 원인 분리 기준은 direct raw language/JSON 생성 가능 여부다.
 
 ## 해석 범위
 

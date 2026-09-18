@@ -1,0 +1,635 @@
+{
+  "control": "xiaomi_checkpoint_sanity",
+  "model": "XiaomiRobotics/Xiaomi-Robotics-1-RoboCasa365",
+  "revision": "3a6d0293bfa90759d34a7fc48c2c62413cd7bcf4",
+  "model_path": "/checkpoint",
+  "processor_class": "MiBotProcessor",
+  "tokenizer_class": "Qwen2TokenizerFast",
+  "preprocessing": "MiBotProcessor callable with canonical minimal Qwen3-VL image chat prompt, zero state (1,4,60), robot_type=robocasa365",
+  "chat_template": "explicit <|im_start|>user + vision tokens + text + <|im_end|> + <|im_start|>assistant",
+  "special_tokens": {
+    "eos_token_id": 151645,
+    "pad_token_id": 151643,
+    "cot_token_ids": [
+      63889,
+      354,
+      1472,
+      64498,
+      29
+    ],
+    "cot_open_token_ids": [
+      63889,
+      354,
+      29
+    ],
+    "cot_close_token_ids": [
+      522,
+      64498,
+      29
+    ],
+    "assistant_prefix_token_ids": [
+      151644,
+      77091,
+      198
+    ]
+  },
+  "decoding": {
+    "do_sample": false,
+    "max_new_tokens": 512
+  },
+  "source_commit": "1d8d20d3f0871567df6e961601d1da3e0547b8d8",
+  "cases": [
+    {
+      "raw_output": "<cot></cot>",
+      "raw_output_with_special_tokens": "<cot></cot><|im_end|>",
+      "generated_token_ids": [
+        63889,
+        354,
+        1472,
+        64498,
+        29,
+        151645
+      ],
+      "generated_token_count": 6,
+      "first_generated_token_id": 63889,
+      "first_token_topk": [
+        {
+          "token_id": 63889,
+          "logit": 60.75,
+          "decoded": "<c"
+        },
+        {
+          "token_id": 1472,
+          "logit": 27.75,
+          "decoded": "></"
+        },
+        {
+          "token_id": 44047,
+          "logit": 27.0,
+          "decoded": "<s"
+        },
+        {
+          "token_id": 354,
+          "logit": 26.25,
+          "decoded": "ot"
+        },
+        {
+          "token_id": 62752,
+          "logit": 24.5,
+          "decoded": "<t"
+        },
+        {
+          "token_id": 63895,
+          "logit": 24.5,
+          "decoded": "<f"
+        },
+        {
+          "token_id": 21897,
+          "logit": 24.375,
+          "decoded": "<i"
+        },
+        {
+          "token_id": 9312,
+          "logit": 24.25,
+          "decoded": "<a"
+        },
+        {
+          "token_id": 33177,
+          "logit": 23.75,
+          "decoded": "<b"
+        },
+        {
+          "token_id": 20373,
+          "logit": 23.625,
+          "decoded": "<C"
+        }
+      ],
+      "eos_token_ids": [
+        151645
+      ],
+      "stop_reason": "eos_token",
+      "latency_ms": 1195.4551432281733,
+      "input_token_count": 214,
+      "input_suffix_token_ids": [
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151653,
+        3838,
+        55354,
+        374,
+        9434,
+        304,
+        1493,
+        6249,
+        6194,
+        30,
+        21806,
+        26753,
+        13,
+        151645,
+        198,
+        151644,
+        77091,
+        198
+      ],
+      "input_suffix_text": "<|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|vision_end|>What appliance is visible in these camera views? Answer briefly.<|im_end|>\n<|im_start|>assistant\n",
+      "case_id": "qa_object",
+      "control": "xiaomi_checkpoint_sanity",
+      "prompt": "What appliance is visible in these camera views? Answer briefly.",
+      "prompt_sha256": "2e21cca6fe16548b2d841dedbcafbf8123f5c4de66359b64ff5e007d55c06f0c",
+      "chat_prompt_sha256": "19a5f7e0f0e93836f7e6de61914992293514277dab4adc6664346728632a0226",
+      "image_path": "/parent_results/images/seed0_contact_sheet.png",
+      "image_sha256": "bcd5112880c6d26d690547e0b4a37c20730c5b8e7eb84280b0520016899d977d",
+      "direct_nonempty": true,
+      "direct_valid_json": false
+    },
+    {
+      "raw_output": "<cot></cot>",
+      "raw_output_with_special_tokens": "<cot></cot><|im_end|>",
+      "generated_token_ids": [
+        63889,
+        354,
+        1472,
+        64498,
+        29,
+        151645
+      ],
+      "generated_token_count": 6,
+      "first_generated_token_id": 63889,
+      "first_token_topk": [
+        {
+          "token_id": 63889,
+          "logit": 55.5,
+          "decoded": "<c"
+        },
+        {
+          "token_id": 33177,
+          "logit": 25.0,
+          "decoded": "<b"
+        },
+        {
+          "token_id": 44047,
+          "logit": 24.75,
+          "decoded": "<s"
+        },
+        {
+          "token_id": 21897,
+          "logit": 24.625,
+          "decoded": "<i"
+        },
+        {
+          "token_id": 9312,
+          "logit": 23.375,
+          "decoded": "<a"
+        },
+        {
+          "token_id": 86086,
+          "logit": 23.25,
+          "decoded": "<k"
+        },
+        {
+          "token_id": 94407,
+          "logit": 23.125,
+          "decoded": "<g"
+        },
+        {
+          "token_id": 90707,
+          "logit": 23.125,
+          "decoded": "<d"
+        },
+        {
+          "token_id": 39297,
+          "logit": 22.5,
+          "decoded": "<v"
+        },
+        {
+          "token_id": 1472,
+          "logit": 22.375,
+          "decoded": "></"
+        }
+      ],
+      "eos_token_ids": [
+        151645
+      ],
+      "stop_reason": "eos_token",
+      "latency_ms": 250.09601935744286,
+      "input_token_count": 220,
+      "input_suffix_token_ids": [
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151653,
+        3872,
+        279,
+        61795,
+        26334,
+        2669,
+        51023,
+        9099,
+        389,
+        1909,
+        315,
+        279,
+        61795,
+        30,
+        21806,
+        9834,
+        476,
+        902,
+        13,
+        151645,
+        198,
+        151644,
+        77091,
+        198
+      ],
+      "input_suffix_text": "<|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|vision_end|>Is the blender lid already securely placed on top of the blender? Answer yes or no.<|im_end|>\n<|im_start|>assistant\n",
+      "case_id": "qa_lid_state",
+      "control": "xiaomi_checkpoint_sanity",
+      "prompt": "Is the blender lid already securely placed on top of the blender? Answer yes or no.",
+      "prompt_sha256": "242811883eb366fb0f7c383eb6d9d4f2e0525e9710093c124081965bfe944229",
+      "chat_prompt_sha256": "d301cfe66b7f10a6f0cbd7f14a36d95dc13602cfb7eba2f6df4ec8f84f09b1a5",
+      "image_path": "/parent_results/images/seed0_contact_sheet.png",
+      "image_sha256": "bcd5112880c6d26d690547e0b4a37c20730c5b8e7eb84280b0520016899d977d",
+      "direct_nonempty": true,
+      "direct_valid_json": false
+    },
+    {
+      "raw_output": "<cot></cot>",
+      "raw_output_with_special_tokens": "<cot></cot><|im_end|>",
+      "generated_token_ids": [
+        63889,
+        354,
+        1472,
+        64498,
+        29,
+        151645
+      ],
+      "generated_token_count": 6,
+      "first_generated_token_id": 63889,
+      "first_token_topk": [
+        {
+          "token_id": 63889,
+          "logit": 61.0,
+          "decoded": "<c"
+        },
+        {
+          "token_id": 1472,
+          "logit": 26.875,
+          "decoded": "></"
+        },
+        {
+          "token_id": 44047,
+          "logit": 26.375,
+          "decoded": "<s"
+        },
+        {
+          "token_id": 354,
+          "logit": 25.875,
+          "decoded": "ot"
+        },
+        {
+          "token_id": 63895,
+          "logit": 24.125,
+          "decoded": "<f"
+        },
+        {
+          "token_id": 79546,
+          "logit": 24.125,
+          "decoded": "<y"
+        },
+        {
+          "token_id": 33177,
+          "logit": 24.0,
+          "decoded": "<b"
+        },
+        {
+          "token_id": 21897,
+          "logit": 24.0,
+          "decoded": "<i"
+        },
+        {
+          "token_id": 13748,
+          "logit": 23.75,
+          "decoded": "<m"
+        },
+        {
+          "token_id": 9312,
+          "logit": 23.75,
+          "decoded": "<a"
+        }
+      ],
+      "eos_token_ids": [
+        151645
+      ],
+      "stop_reason": "eos_token",
+      "latency_ms": 246.76776118576527,
+      "input_token_count": 213,
+      "input_suffix_token_ids": [
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151655,
+        151653,
+        85984,
+        398,
+        7512,
+        279,
+        12305,
+        33686,
+        6109,
+        304,
+        825,
+        11652,
+        13,
+        151645,
+        198,
+        151644,
+        77091,
+        198
+      ],
+      "input_suffix_text": "<|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|image_pad|><|vision_end|>Briefly describe the robot manipulation scene in one sentence.<|im_end|>\n<|im_start|>assistant\n",
+      "case_id": "qa_scene",
+      "control": "xiaomi_checkpoint_sanity",
+      "prompt": "Briefly describe the robot manipulation scene in one sentence.",
+      "prompt_sha256": "d871838f28ce18f05ccc8d3bb98eb86968061c477f8854ab1fa07550a5f26827",
+      "chat_prompt_sha256": "4993d90ddf8005dbbb35b4f16fca79161db3343bbb93311c94db22fcff3bfa78",
+      "image_path": "/parent_results/images/seed0_contact_sheet.png",
+      "image_sha256": "bcd5112880c6d26d690547e0b4a37c20730c5b8e7eb84280b0520016899d977d",
+      "direct_nonempty": true,
+      "direct_valid_json": false
+    },
+    {
+      "raw_output": "<cot></cot>",
+      "raw_output_with_special_tokens": "<cot></cot><|im_end|>",
+      "generated_token_ids": [
+        63889,
+        354,
+        1472,
+        64498,
+        29,
+        151645
+      ],
+      "generated_token_count": 6,
+      "first_generated_token_id": 63889,
+      "first_token_topk": [
+        {
+          "token_id": 63889,
+          "logit": 54.5,
+          "decoded": "<c"
+        },
+        {
+          "token_id": 9312,
+          "logit": 24.125,
+          "decoded": "<a"
+        },
+        {
+          "token_id": 33177,
+          "logit": 23.75,
+          "decoded": "<b"
+        },
+        {
+          "token_id": 44047,
+          "logit": 22.875,
+          "decoded": "<s"
+        },
+        {
+          "token_id": 21897,
+          "logit": 22.125,
+          "decoded": "<i"
+        },
+        {
+          "token_id": 13748,
+          "logit": 21.625,
+          "decoded": "<m"
+        },
+        {
+          "token_id": 86086,
+          "logit": 21.25,
+          "decoded": "<k"
+        },
+        {
+          "token_id": 96946,
+          "logit": 21.125,
+          "decoded": "\"c"
+        },
+        {
+          "token_id": 94407,
+          "logit": 20.75,
+          "decoded": "<g"
+        },
+        {
+          "token_id": 90707,
+          "logit": 20.625,
+          "decoded": "<d"
+        }
+      ],
+      "eos_token_ids": [
+        151645
+      ],
+      "stop_reason": "eos_token",
+      "latency_ms": 309.5324095338583,
+      "input_token_count": 639,
+      "input_suffix_token_ids": [
+        330,
+        17371,
+        279,
+        61795,
+        26334,
+        389,
+        279,
+        61795,
+        11,
+        4879,
+        432,
+        1283,
+        432,
+        374,
+        357,
+        2845,
+        7248,
+        11,
+        1221,
+        3271,
+        279,
+        22993,
+        6922,
+        2797,
+        10465,
+        330,
+        2810,
+        22731,
+        788,
+        220,
+        24,
+        21,
+        11,
+        330,
+        606,
+        788,
+        330,
+        35875,
+        13442,
+        9207,
+        1125,
+        330,
+        8202,
+        54923,
+        788,
+        330,
+        7925,
+        279,
+        26334,
+        61795,
+        553,
+        51023,
+        24047,
+        279,
+        26334,
+        389,
+        1909,
+        1189,
+        92,
+        151645,
+        198,
+        151644,
+        77091,
+        198
+      ],
+      "input_suffix_text": " \"Place the blender lid on the blender, release it after it is stably supported, then move the gripper clear.\", \"max_steps\": 96, \"name\": \"PLACE_OBJECT\"}], \"task_instruction\": \"Close the lid blender by securely placing the lid on top.\"}<|im_end|>\n<|im_start|>assistant\n",
+      "case_id": "planning",
+      "control": "xiaomi_checkpoint_sanity",
+      "prompt": "Create the complete robot skill plan needed to accomplish the task visible in the initial camera observation. Use only the task instruction, the three supplied skill specifications, and the image. Do not use simulator predicates, ground-truth state, or unstated skills. Return exactly one JSON object matching the schema and no prose.\n{\"output_schema\": {\"plan\": [{\"args\": {\"required_arg\": \"string\"}, \"budget\": \"positive integer no greater than registry max_steps\", \"contract\": \"exact registry done_when string\", \"instruction\": \"exact registry-rendered string\", \"name\": \"string\"}]}, \"skill_registry\": [{\"args\": [\"object\", \"grasp_region\"], \"description\": \"Grasp an object at a named grasp region and lift it clear.\", \"done_when\": \"held AND lifted>=0.05m AND stable_for(20) AND no_disallowed_contact\", \"instruction\": \"Grasp the blender lid securely at its handle and lift it clear.\", \"max_steps\": 208, \"name\": \"GRASP_OBJECT\"}, {\"args\": [\"object\", \"destination\"], \"description\": \"Move a held object to a named destination region.\", \"done_when\": \"held AND at_target(xy<=0.06m,z 0.015-0.25m) AND stable_for(3) AND no_disallowed_contact\", \"instruction\": \"Move the held blender lid to the pre-place region above the blender while maintaining a stable grasp and avoiding disallowed contact.\", \"max_steps\": 288, \"name\": \"MOVE_OBJECT\"}, {\"args\": [\"object\", \"destination\"], \"description\": \"Place a held object on a support, release, and retreat.\", \"done_when\": \"supported_by AND released AND upright_error<=7deg AND gripper_clear>=0.15m\", \"instruction\": \"Place the blender lid on the blender, release it after it is stably supported, then move the gripper clear.\", \"max_steps\": 96, \"name\": \"PLACE_OBJECT\"}], \"task_instruction\": \"Close the lid blender by securely placing the lid on top.\"}",
+      "prompt_sha256": "aed161462ad31511db3b30b4216dcc626a144b461249fe59439c980a5bd15985",
+      "chat_prompt_sha256": "c0dcbef264adf2abd8d87b9eb1ad4ed266f74d9387be1243f4d4d3d2f0f9b4fa",
+      "image_path": "/parent_results/images/seed0_contact_sheet.png",
+      "image_sha256": "bcd5112880c6d26d690547e0b4a37c20730c5b8e7eb84280b0520016899d977d",
+      "direct_nonempty": true,
+      "direct_valid_json": false
+    }
+  ]
+}

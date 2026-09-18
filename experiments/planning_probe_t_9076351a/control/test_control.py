@@ -17,6 +17,7 @@ class ControlArtifactTest(unittest.TestCase):
         self.assertEqual(summary["xiaomi"]["planning_semantic_nonempty"], 0)
         self.assertEqual(summary["official"]["semantic_nonempty"], 3)
         self.assertEqual(summary["official"]["direct_valid_json"], 3)
+        self.assertEqual(summary["official"]["exact_skill_sequence"], 3)
 
     def test_direct_generation_and_provenance(self) -> None:
         xiaomi = json.loads((RESULTS / "xiaomi_checkpoint_sanity.json").read_text())

@@ -1,0 +1,107 @@
+control,case_id,image_sha256,prompt_sha256,raw_output,generated_token_ids,generated_token_count,first_generated_token_id,semantic_nonempty,direct_valid_json,direct_valid_plan,stop_reason,eos_token_ids,latency_ms,raw_path
+xiaomi_checkpoint_sanity,qa_object,bcd5112880c6d26d690547e0b4a37c20730c5b8e7eb84280b0520016899d977d,2e21cca6fe16548b2d841dedbcafbf8123f5c4de66359b64ff5e007d55c06f0c,<cot></cot>,"[63889, 354, 1472, 64498, 29, 151645]",6,63889,False,False,False,eos_token,[151645],1195.4551432281733,raw/xiaomi_checkpoint_sanity__qa_object.txt
+xiaomi_checkpoint_sanity,qa_lid_state,bcd5112880c6d26d690547e0b4a37c20730c5b8e7eb84280b0520016899d977d,242811883eb366fb0f7c383eb6d9d4f2e0525e9710093c124081965bfe944229,<cot></cot>,"[63889, 354, 1472, 64498, 29, 151645]",6,63889,False,False,False,eos_token,[151645],250.09601935744286,raw/xiaomi_checkpoint_sanity__qa_lid_state.txt
+xiaomi_checkpoint_sanity,qa_scene,bcd5112880c6d26d690547e0b4a37c20730c5b8e7eb84280b0520016899d977d,d871838f28ce18f05ccc8d3bb98eb86968061c477f8854ab1fa07550a5f26827,<cot></cot>,"[63889, 354, 1472, 64498, 29, 151645]",6,63889,False,False,False,eos_token,[151645],246.76776118576527,raw/xiaomi_checkpoint_sanity__qa_scene.txt
+xiaomi_checkpoint_sanity,planning,bcd5112880c6d26d690547e0b4a37c20730c5b8e7eb84280b0520016899d977d,aed161462ad31511db3b30b4216dcc626a144b461249fe59439c980a5bd15985,<cot></cot>,"[63889, 354, 1472, 64498, 29, 151645]",6,63889,False,False,False,eos_token,[151645],309.5324095338583,raw/xiaomi_checkpoint_sanity__planning.txt
+official_instruct,seed0_full_plan,bcd5112880c6d26d690547e0b4a37c20730c5b8e7eb84280b0520016899d977d,aed161462ad31511db3b30b4216dcc626a144b461249fe59439c980a5bd15985,"{
+  ""plan"": [
+    {
+      ""args"": {
+        ""object"": ""blender_lid"",
+        ""grasp_region"": ""handle""
+      },
+      ""budget"": 208,
+      ""contract"": ""held AND lifted>=0.05m AND stable_for(20) AND no_disallowed_contact"",
+      ""instruction"": ""Grasp the blender lid securely at its handle and lift it clear."",
+      ""name"": ""GRASP_OBJECT""
+    },
+    {
+      ""args"": {
+        ""object"": ""blender_lid"",
+        ""destination"": ""blender""
+      },
+      ""budget"": 288,
+      ""contract"": ""held AND at_target(xy<=0.06m,z 0.015-0.25m) AND stable_for(3) AND no_disallowed_contact"",
+      ""instruction"": ""Move the held blender lid to the pre-place region above the blender while maintaining a stable grasp and avoiding disallowed contact."",
+      ""name"": ""MOVE_OBJECT""
+    },
+    {
+      ""args"": {
+        ""object"": ""blender_lid"",
+        ""destination"": ""blender""
+      },
+      ""budget"": 96,
+      ""contract"": ""supported_by AND released AND upright_error<=7deg AND gripper_clear>=0.15m"",
+      ""instruction"": ""Place the blender lid on the blender, release it after it is stably supported, then move the gripper clear."",
+      ""name"": ""PLACE_OBJECT""
+    }
+  ]
+}","[515, 220, 330, 10393, 788, 2278, 262, 341, 414, 330, 2116, 788, 341, 286, 330, 1700, 788, 330, 2024, 1659, 907, 307, 756, 286, 330, 901, 13367, 20627, 788, 330, 8192, 698, 414, 1153, 414, 330, 48406, 788, 220, 17, 15, 23, 345, 414, 330, 20257, 788, 330, 27608, 3567, 29731, 9922, 15, 13, 15, 20, 76, 3567, 15175, 5478, 7, 17, 15, 8, 3567, 902, 9932, 20967, 20597, 756, 414, 330, 54974, 788, 330, 6464, 13367, 279, 61795, 26334, 51023, 518, 1181, 3705, 323, 11893, 432, 2797, 10346, 414, 330, 606, 788, 330, 8626, 65104, 13442, 698, 262, 1153, 262, 341, 414, 330, 2116, 788, 341, 286, 330, 1700, 788, 330, 2024, 1659, 907, 307, 756, 286, 330, 17997, 788, 330, 2024, 1659, 698, 414, 1153, 414, 330, 48406, 788, 220, 17, 23, 23, 345, 414, 330, 20257, 788, 330, 27608, 3567, 518, 11123, 93219, 8203, 15, 13, 15, 21, 76, 22669, 220, 15, 13, 15, 16, 20, 12, 15, 13, 17, 20, 76, 8, 3567, 15175, 5478, 7, 18, 8, 3567, 902, 9932, 20967, 20597, 756, 414, 330, 54974, 788, 330, 9860, 279, 5644, 61795, 26334, 311, 279, 855, 41661, 5537, 3403, 279, 61795, 1393, 20337, 264, 15175, 33377, 323, 30426, 827, 20967, 3645, 10346, 414, 330, 606, 788, 330, 29116, 13442, 698, 262, 1153, 262, 341, 414, 330, 2116, 788, 341, 286, 330, 1700, 788, 330, 2024, 1659, 907, 307, 756, 286, 330, 17997, 788, 330, 2024, 1659, 698, 414, 1153, 414, 330, 48406, 788, 220, 24, 21, 345, 414, 330, 20257, 788, 330, 18216, 3710, 3567, 5880, 3567, 48585, 4096, 8203, 22, 16508, 3567, 22993, 6922, 21811, 9922, 15, 13, 16, 20, 76, 756, 414, 330, 54974, 788, 330, 17371, 279, 61795, 26334, 389, 279, 61795, 11, 4879, 432, 1283, 432, 374, 357, 2845, 7248, 11, 1221, 3271, 279, 22993, 6922, 2797, 10346, 414, 330, 606, 788, 330, 35875, 13442, 698, 262, 456, 220, 5133, 92, 151645]",321,515,True,True,False,eos_token,"[151645, 151643]",12344.806585460901,raw/official_instruct__seed0_full_plan.txt
+official_instruct,seed1_full_plan,1f7046a25f9ee0c92a2b0d641e8dfc89a98f58d1be68f5849dfa30232d2411e3,aed161462ad31511db3b30b4216dcc626a144b461249fe59439c980a5bd15985,"{
+  ""plan"": [
+    {
+      ""args"": {
+        ""object"": ""blender lid"",
+        ""grasp_region"": ""handle""
+      },
+      ""budget"": 208,
+      ""contract"": ""done_when"",
+      ""instruction"": ""Grasp the blender lid securely at its handle and lift it clear."",
+      ""name"": ""GRASP_OBJECT""
+    },
+    {
+      ""args"": {
+        ""object"": ""blender lid"",
+        ""destination"": ""blender""
+      },
+      ""budget"": 288,
+      ""contract"": ""done_when"",
+      ""instruction"": ""Move the held blender lid to the pre-place region above the blender while maintaining a stable grasp and avoiding disallowed contact."",
+      ""name"": ""MOVE_OBJECT""
+    },
+    {
+      ""args"": {
+        ""object"": ""blender lid"",
+        ""destination"": ""blender""
+      },
+      ""budget"": 96,
+      ""contract"": ""done_when"",
+      ""instruction"": ""Place the blender lid on the blender, release it after it is stably supported, then move the gripper clear."",
+      ""name"": ""PLACE_OBJECT""
+    }
+  ]
+}","[515, 220, 330, 10393, 788, 2278, 262, 341, 414, 330, 2116, 788, 341, 286, 330, 1700, 788, 330, 2024, 1659, 26334, 756, 286, 330, 901, 13367, 20627, 788, 330, 8192, 698, 414, 1153, 414, 330, 48406, 788, 220, 17, 15, 23, 345, 414, 330, 20257, 788, 330, 10438, 47636, 756, 414, 330, 54974, 788, 330, 6464, 13367, 279, 61795, 26334, 51023, 518, 1181, 3705, 323, 11893, 432, 2797, 10346, 414, 330, 606, 788, 330, 8626, 65104, 13442, 698, 262, 1153, 262, 341, 414, 330, 2116, 788, 341, 286, 330, 1700, 788, 330, 2024, 1659, 26334, 756, 286, 330, 17997, 788, 330, 2024, 1659, 698, 414, 1153, 414, 330, 48406, 788, 220, 17, 23, 23, 345, 414, 330, 20257, 788, 330, 10438, 47636, 756, 414, 330, 54974, 788, 330, 9860, 279, 5644, 61795, 26334, 311, 279, 855, 41661, 5537, 3403, 279, 61795, 1393, 20337, 264, 15175, 33377, 323, 30426, 827, 20967, 3645, 10346, 414, 330, 606, 788, 330, 29116, 13442, 698, 262, 1153, 262, 341, 414, 330, 2116, 788, 341, 286, 330, 1700, 788, 330, 2024, 1659, 26334, 756, 286, 330, 17997, 788, 330, 2024, 1659, 698, 414, 1153, 414, 330, 48406, 788, 220, 24, 21, 345, 414, 330, 20257, 788, 330, 10438, 47636, 756, 414, 330, 54974, 788, 330, 17371, 279, 61795, 26334, 389, 279, 61795, 11, 4879, 432, 1283, 432, 374, 357, 2845, 7248, 11, 1221, 3271, 279, 22993, 6922, 2797, 10346, 414, 330, 606, 788, 330, 35875, 13442, 698, 262, 456, 220, 5133, 92, 151645]",247,515,True,True,False,eos_token,"[151645, 151643]",8877.681467682123,raw/official_instruct__seed1_full_plan.txt
+official_instruct,seed2_full_plan,9b5f2837ab78183ba92ec3f2e4cfd5682e6557a723efc883ac32f6d8f0fadf1c,aed161462ad31511db3b30b4216dcc626a144b461249fe59439c980a5bd15985,"{
+  ""plan"": [
+    {
+      ""args"": {
+        ""object"": ""blender_lid"",
+        ""grasp_region"": ""handle""
+      },
+      ""budget"": 208,
+      ""contract"": ""held AND lifted>=0.05m AND stable_for(20) AND no_disallowed_contact"",
+      ""instruction"": ""Grasp the blender lid securely at its handle and lift it clear."",
+      ""name"": ""GRASP_OBJECT""
+    },
+    {
+      ""args"": {
+        ""object"": ""blender_lid"",
+        ""destination"": ""blender""
+      },
+      ""budget"": 288,
+      ""contract"": ""held AND at_target(xy<=0.06m,z 0.015-0.25m) AND stable_for(3) AND no_disallowed_contact"",
+      ""instruction"": ""Move the held blender lid to the pre-place region above the blender while maintaining a stable grasp and avoiding disallowed contact."",
+      ""name"": ""MOVE_OBJECT""
+    },
+    {
+      ""args"": {
+        ""object"": ""blender_lid"",
+        ""destination"": ""blender""
+      },
+      ""budget"": 96,
+      ""contract"": ""supported_by AND released AND upright_error<=7deg AND gripper_clear>=0.15m"",
+      ""instruction"": ""Place the blender lid on the blender, release it after it is stably supported, then move the gripper clear."",
+      ""name"": ""PLACE_OBJECT""
+    }
+  ]
+}","[515, 220, 330, 10393, 788, 2278, 262, 341, 414, 330, 2116, 788, 341, 286, 330, 1700, 788, 330, 2024, 1659, 907, 307, 756, 286, 330, 901, 13367, 20627, 788, 330, 8192, 698, 414, 1153, 414, 330, 48406, 788, 220, 17, 15, 23, 345, 414, 330, 20257, 788, 330, 27608, 3567, 29731, 9922, 15, 13, 15, 20, 76, 3567, 15175, 5478, 7, 17, 15, 8, 3567, 902, 9932, 20967, 20597, 756, 414, 330, 54974, 788, 330, 6464, 13367, 279, 61795, 26334, 51023, 518, 1181, 3705, 323, 11893, 432, 2797, 10346, 414, 330, 606, 788, 330, 8626, 65104, 13442, 698, 262, 1153, 262, 341, 414, 330, 2116, 788, 341, 286, 330, 1700, 788, 330, 2024, 1659, 907, 307, 756, 286, 330, 17997, 788, 330, 2024, 1659, 698, 414, 1153, 414, 330, 48406, 788, 220, 17, 23, 23, 345, 414, 330, 20257, 788, 330, 27608, 3567, 518, 11123, 93219, 8203, 15, 13, 15, 21, 76, 22669, 220, 15, 13, 15, 16, 20, 12, 15, 13, 17, 20, 76, 8, 3567, 15175, 5478, 7, 18, 8, 3567, 902, 9932, 20967, 20597, 756, 414, 330, 54974, 788, 330, 9860, 279, 5644, 61795, 26334, 311, 279, 855, 41661, 5537, 3403, 279, 61795, 1393, 20337, 264, 15175, 33377, 323, 30426, 827, 20967, 3645, 10346, 414, 330, 606, 788, 330, 29116, 13442, 698, 262, 1153, 262, 341, 414, 330, 2116, 788, 341, 286, 330, 1700, 788, 330, 2024, 1659, 907, 307, 756, 286, 330, 17997, 788, 330, 2024, 1659, 698, 414, 1153, 414, 330, 48406, 788, 220, 24, 21, 345, 414, 330, 20257, 788, 330, 18216, 3710, 3567, 5880, 3567, 48585, 4096, 8203, 22, 16508, 3567, 22993, 6922, 21811, 9922, 15, 13, 16, 20, 76, 756, 414, 330, 54974, 788, 330, 17371, 279, 61795, 26334, 389, 279, 61795, 11, 4879, 432, 1283, 432, 374, 357, 2845, 7248, 11, 1221, 3271, 279, 22993, 6922, 2797, 10346, 414, 330, 606, 788, 330, 35875, 13442, 698, 262, 456, 220, 5133, 92, 151645]",321,515,True,True,False,eos_token,"[151645, 151643]",11365.236386656761,raw/official_instruct__seed2_full_plan.txt

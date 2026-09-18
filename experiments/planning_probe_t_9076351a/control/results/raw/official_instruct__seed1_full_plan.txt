@@ -1,0 +1,34 @@
+{
+  "plan": [
+    {
+      "args": {
+        "object": "blender lid",
+        "grasp_region": "handle"
+      },
+      "budget": 208,
+      "contract": "done_when",
+      "instruction": "Grasp the blender lid securely at its handle and lift it clear.",
+      "name": "GRASP_OBJECT"
+    },
+    {
+      "args": {
+        "object": "blender lid",
+        "destination": "blender"
+      },
+      "budget": 288,
+      "contract": "done_when",
+      "instruction": "Move the held blender lid to the pre-place region above the blender while maintaining a stable grasp and avoiding disallowed contact.",
+      "name": "MOVE_OBJECT"
+    },
+    {
+      "args": {
+        "object": "blender lid",
+        "destination": "blender"
+      },
+      "budget": 96,
+      "contract": "done_when",
+      "instruction": "Place the blender lid on the blender, release it after it is stably supported, then move the gripper clear.",
+      "name": "PLACE_OBJECT"
+    }
+  ]
+}
