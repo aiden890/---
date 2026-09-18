@@ -1,0 +1,70 @@
+[
+  {
+    "case": "malformed_json",
+    "accepted": false,
+    "actions_executed": 0,
+    "fallback_used": false,
+    "automatic_sequence_correction": false,
+    "errors": [
+      "JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 2 (char 1)"
+    ],
+    "pass": true
+  },
+  {
+    "case": "unknown_skill",
+    "accepted": false,
+    "actions_executed": 0,
+    "fallback_used": false,
+    "automatic_sequence_correction": false,
+    "errors": [
+      "step 0: unknown skill 'GUESS'",
+      "canonical strict plan invalid"
+    ],
+    "pass": true
+  },
+  {
+    "case": "wrong_sequence",
+    "accepted": false,
+    "actions_executed": 0,
+    "fallback_used": false,
+    "automatic_sequence_correction": false,
+    "errors": [
+      "canonical sequence is not the required complete plan"
+    ],
+    "pass": true
+  },
+  {
+    "case": "extra_field",
+    "accepted": false,
+    "actions_executed": 0,
+    "fallback_used": false,
+    "automatic_sequence_correction": false,
+    "errors": [
+      "step 0: fields must be exactly name,args",
+      "canonical strict plan invalid"
+    ],
+    "pass": true
+  },
+  {
+    "case": "stale_reset_observation",
+    "accepted": false,
+    "actions_executed": 0,
+    "fallback_used": false,
+    "automatic_sequence_correction": false,
+    "errors": [
+      "reset observation is stale"
+    ],
+    "pass": true
+  },
+  {
+    "case": "reset_observation_divergence",
+    "accepted": false,
+    "actions_executed": 0,
+    "fallback_used": false,
+    "automatic_sequence_correction": false,
+    "errors": [
+      "reset observation diverged before execution"
+    ],
+    "pass": true
+  }
+]

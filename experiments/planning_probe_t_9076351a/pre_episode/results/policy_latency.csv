@@ -1,0 +1,4 @@
+skill_index,skill,latency_ms,deadline_ms,deadline_miss
+0,GRASP_OBJECT,256.19535706937313,800.0,False
+1,MOVE_OBJECT,277.040695771575,800.0,False
+2,PLACE_OBJECT,275.4334360361099,800.0,False

@@ -1,0 +1,38 @@
+{
+  "task_id": "t_b5368d68",
+  "source_commit_at_execution": "545cbc9fe0789816772d0763248345f215c3f6cb",
+  "host": "amp_csi (hostname amp2)",
+  "gpu": "NVIDIA GeForce RTX 3090 24576 MiB",
+  "container_image": "xiaomi-cu121:t_9f03a613",
+  "container_image_id": "sha256:aac5e8e597636dc80df55a3150da68f2fb5897e28bfb02836319578fba477c87",
+  "models": {
+    "policy": {
+      "id": "XiaomiRobotics/Xiaomi-Robotics-1-RoboCasa365",
+      "revision": "3a6d0293bfa90759d34a7fc48c2c62413cd7bcf4"
+    },
+    "planner": {
+      "id": "Qwen/Qwen3-VL-4B-Instruct",
+      "revision": "ebb281ec70b05090aa6165b016eac8ec08e71b17"
+    }
+  },
+  "execution": {
+    "one_python_process": true,
+    "one_visible_gpu": true,
+    "cuda_calls_serialized_per_model": true,
+    "planner_calls_pre_episode": 1,
+    "planner_calls_runtime": 0,
+    "production_runtime_modified": false,
+    "fallback_used": false,
+    "automatic_sequence_correction": false
+  },
+  "parent_report": "../integration_readiness/results/report.json",
+  "parent_report_source_commit": "d4e36fdaa9385434265308b46214a4987fe41c51",
+  "remote_output": "/home/guest/experiments/planning_probe_t_9076351a/pre_episode/results_remote_run3",
+  "cleanup": {
+    "experiment_containers": 0,
+    "ports_10086_10087": 0,
+    "compute_processes": 0,
+    "gpu_memory_used_mib": 38,
+    "gpu_utilization_percent": 0
+  }
+}

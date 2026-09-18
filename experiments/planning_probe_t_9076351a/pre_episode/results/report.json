@@ -1,0 +1,273 @@
+{
+  "verdict": "PRE_EPISODE_READY",
+  "contract": {
+    "policy_output_chunk_actions": 16,
+    "action_consumption_rate_hz": 20.0,
+    "action_period_ms": 50.0,
+    "chunk_generation_deadline_ms": 800.0,
+    "action_schedule_jitter_deadline_ms": 25.0,
+    "max_action_observation_age_ms": 1100.0,
+    "prefetch_trigger_action_index": 10,
+    "max_buffer_chunks": 1,
+    "boundary_definition": "three canonical skill starts (episode start plus two runtime transitions)",
+    "failure_policy": "fail closed; zero actions; no SequentialPlanner, repair, sequence substitution, or fallback"
+  },
+  "models": {
+    "policy": {
+      "id": "XiaomiRobotics/Xiaomi-Robotics-1-RoboCasa365",
+      "revision": "3a6d0293bfa90759d34a7fc48c2c62413cd7bcf4"
+    },
+    "planner": {
+      "id": "Qwen/Qwen3-VL-4B-Instruct",
+      "revision": "ebb281ec70b05090aa6165b016eac8ec08e71b17"
+    }
+  },
+  "source_commit": "545cbc9fe0789816772d0763248345f215c3f6cb",
+  "planner": {
+    "calls": 1,
+    "latency_ms": 3230.3014155477285,
+    "rendered_chat_sha256": "87b59e6b1cfab20caab4008cbe2aab21aa01ca323094daf84f1b38dd7486a023",
+    "raw_output": "{\"plan\": [{\"name\": \"GRASP_OBJECT\", \"args\": {\"grasp_region\": \"lid_handle\", \"object\": \"blender_lid\"}}, {\"name\": \"MOVE_OBJECT\", \"args\": {\"destination\": \"closed_preplace_region\", \"object\": \"blender_lid\"}}, {\"name\": \"PLACE_OBJECT\", \"args\": {\"destination\": \"blender\", \"object\": \"blender_lid\"}}]}",
+    "raw_output_sha256": "f14c9967c765f39c5f50ea2ee70bed78f734de21a156729eeb7e9ee8fdf19dab",
+    "strict_plan": {
+      "plan": [
+        {
+          "name": "GRASP_OBJECT",
+          "args": {
+            "grasp_region": "lid_handle",
+            "object": "blender_lid"
+          },
+          "instruction": "Grasp the blender lid securely at its handle and lift it clear.",
+          "contract": "held AND lifted>=0.05m AND stable_for(20) AND no_disallowed_contact",
+          "budget": 208
+        },
+        {
+          "name": "MOVE_OBJECT",
+          "args": {
+            "destination": "closed_preplace_region",
+            "object": "blender_lid"
+          },
+          "instruction": "Move the held blender lid to the pre-place region above the blender while maintaining a stable grasp and avoiding disallowed contact.",
+          "contract": "held AND at_target(xy<=0.06m,z 0.015-0.25m) AND stable_for(3) AND no_disallowed_contact",
+          "budget": 288
+        },
+        {
+          "name": "PLACE_OBJECT",
+          "args": {
+            "destination": "blender",
+            "object": "blender_lid"
+          },
+          "instruction": "Place the blender lid on the blender, release it after it is stably supported, then move the gripper clear.",
+          "contract": "supported_by AND released AND upright_error<=7deg AND gripper_clear>=0.15m",
+          "budget": 96
+        }
+      ]
+    },
+    "validation_errors": []
+  },
+  "episode_start_latency_ms": 3550.9749688208103,
+  "policy_warmup_ms_outside_episode": [
+    1153.7291649729013,
+    250.65502151846886
+  ],
+  "policy_scheduler_stats": {
+    "count": 3,
+    "p50_ms": 275.4334360361099,
+    "p95_ms": 276.87996979802847,
+    "max_ms": 277.040695771575,
+    "mean_ms": 269.5564962923527,
+    "throughput_hz": 3.7097974404424323
+  },
+  "dual_loaded_policy_benchmark_12": {
+    "count": 12,
+    "p50_ms": 251.01288408041,
+    "p95_ms": 270.022214576602,
+    "max_ms": 279.44259718060493,
+    "mean_ms": 254.5178827519218,
+    "throughput_hz": 3.9289970087276678
+  },
+  "dual_loaded_policy_benchmark_latencies_ms": [
+    279.44259718060493,
+    262.3146288096905,
+    253.91974300146103,
+    250.85152685642242,
+    250.6974022835493,
+    250.136099755764,
+    250.5928222090006,
+    250.4777517169714,
+    251.07701309025288,
+    250.94875507056713,
+    252.50947289168835,
+    251.24678015708923
+  ],
+  "parent_dual_policy_stats": {
+    "count": 12,
+    "p50_ms": 253.26636899262667,
+    "p95_ms": 254.66795675456524,
+    "max_ms": 255.33294677734375,
+    "mean_ms": 253.44932125881314,
+    "throughput_hz": 3.9455619570542733
+  },
+  "parent_throughput_degradation_pct": -0.25864728941698,
+  "scheduler": {
+    "policy_latencies": [
+      {
+        "skill_index": 0,
+        "skill": "GRASP_OBJECT",
+        "latency_ms": 256.19535706937313,
+        "deadline_ms": 800.0,
+        "deadline_miss": false
+      },
+      {
+        "skill_index": 1,
+        "skill": "MOVE_OBJECT",
+        "latency_ms": 277.040695771575,
+        "deadline_ms": 800.0,
+        "deadline_miss": false
+      },
+      {
+        "skill_index": 2,
+        "skill": "PLACE_OBJECT",
+        "latency_ms": 275.4334360361099,
+        "deadline_ms": 800.0,
+        "deadline_miss": false
+      }
+    ],
+    "planning_action_count": 0,
+    "runtime_planner_calls": 0,
+    "underflows": 0,
+    "deadline_misses": 0,
+    "stale_actions": 0,
+    "max_queue_depth_chunks": 1,
+    "producer_errors": [],
+    "actions_executed": 48,
+    "skill_boundaries": 3,
+    "episode_loop_started_monotonic_s": 9066726.042465372,
+    "first_action_monotonic_s": 9066726.042473545
+  },
+  "failure_modes": [
+    {
+      "case": "malformed_json",
+      "accepted": false,
+      "actions_executed": 0,
+      "fallback_used": false,
+      "automatic_sequence_correction": false,
+      "errors": [
+        "JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 2 (char 1)"
+      ],
+      "pass": true
+    },
+    {
+      "case": "unknown_skill",
+      "accepted": false,
+      "actions_executed": 0,
+      "fallback_used": false,
+      "automatic_sequence_correction": false,
+      "errors": [
+        "step 0: unknown skill 'GUESS'",
+        "canonical strict plan invalid"
+      ],
+      "pass": true
+    },
+    {
+      "case": "wrong_sequence",
+      "accepted": false,
+      "actions_executed": 0,
+      "fallback_used": false,
+      "automatic_sequence_correction": false,
+      "errors": [
+        "canonical sequence is not the required complete plan"
+      ],
+      "pass": true
+    },
+    {
+      "case": "extra_field",
+      "accepted": false,
+      "actions_executed": 0,
+      "fallback_used": false,
+      "automatic_sequence_correction": false,
+      "errors": [
+        "step 0: fields must be exactly name,args",
+        "canonical strict plan invalid"
+      ],
+      "pass": true
+    },
+    {
+      "case": "stale_reset_observation",
+      "accepted": false,
+      "actions_executed": 0,
+      "fallback_used": false,
+      "automatic_sequence_correction": false,
+      "errors": [
+        "reset observation is stale"
+      ],
+      "pass": true
+    },
+    {
+      "case": "reset_observation_divergence",
+      "accepted": false,
+      "actions_executed": 0,
+      "fallback_used": false,
+      "automatic_sequence_correction": false,
+      "errors": [
+        "reset observation diverged before execution"
+      ],
+      "pass": true
+    }
+  ],
+  "gates": {
+    "planning_actions_zero": true,
+    "first_action_after_planning": true,
+    "planner_called_exactly_once_pre_episode": true,
+    "runtime_skill_boundary_planner_calls_zero": true,
+    "three_skill_boundaries": true,
+    "action_buffer_underflow_zero": true,
+    "stale_action_zero": true,
+    "deadline_miss_zero": true,
+    "bounded_queue": true,
+    "fallback_zero": true,
+    "failure_modes_action_zero": true,
+    "exact_policy_chunk_length": true,
+    "scheduler_policy_p95_meets_chunk_deadline": true,
+    "parent_dual_throughput_range_retained": true,
+    "parent_dual_p95_range_retained": true,
+    "parent_degradation_gate_retained": true,
+    "no_producer_errors": true
+  },
+  "inventory": {
+    "startup": {
+      "container_pid": 1,
+      "returncode": 0,
+      "compute_processes": []
+    },
+    "dual_loaded": {
+      "container_pid": 1,
+      "returncode": 0,
+      "compute_processes": [
+        {
+          "pid": 237946,
+          "process_name": "[Not Found]",
+          "used_memory_mib": 18662
+        }
+      ]
+    },
+    "complete": {
+      "container_pid": 1,
+      "returncode": 0,
+      "compute_processes": [
+        {
+          "pid": 237946,
+          "process_name": "[Not Found]",
+          "used_memory_mib": 19328
+        }
+      ]
+    }
+  },
+  "constraints": {
+    "production_runtime_modified": false,
+    "one_process": true,
+    "one_visible_gpu": true,
+    "fallback_used": false,
+    "automatic_sequence_correction": false
+  }
+}

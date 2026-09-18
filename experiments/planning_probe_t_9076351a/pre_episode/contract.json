@@ -1,0 +1,25 @@
+{
+  "contract_version": 1,
+  "architecture": "pre-episode full-plan, deterministic canonical executor, bounded one-chunk look-ahead",
+  "episode_order": [
+    "models already loaded and warmed",
+    "reset observation acquired while simulator/action loop paused",
+    "generic planner called exactly once for the complete plan",
+    "direct JSON and canonical strict validation",
+    "first Xiaomi policy chunk generated",
+    "first action and 20 Hz action loop begin"
+  ],
+  "policy_output_chunk_actions": 16,
+  "action_consumption_rate_hz": 20.0,
+  "action_period_ms": 50.0,
+  "chunk_generation_deadline_ms": 800.0,
+  "action_schedule_jitter_deadline_ms": 25.0,
+  "max_action_observation_age_ms": 1100.0,
+  "prefetch_trigger_action_index": 10,
+  "max_buffer_chunks": 1,
+  "runtime_planner_calls_allowed": 0,
+  "fallback_allowed": false,
+  "automatic_sequence_correction_allowed": false,
+  "failure_behavior": "zero actions; fail closed",
+  "production_note": "The current production evaluator is synchronous and has no control-rate sleep or deadline. This is a measured throwaway contract, not a production deployment."
+}

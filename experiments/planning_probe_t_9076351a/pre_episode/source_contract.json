@@ -1,0 +1,38 @@
+{
+  "inspected_commit": "545cbc9fe0789816772d0763248345f215c3f6cb",
+  "production_source_last_change_commit": "f9138bc803ff014ca7826327fa4be75a6a33a42d",
+  "files": [
+    {
+      "path": "xiaomi-cu121/rollout.py",
+      "sha256": "cd83a86a93a5dac97b7933a77414d3b0c1763171f51625e855017ed405a972e8",
+      "evidence": [
+        "lines 184-186: policy output is sliced to actions[0, :, :12]; chunk length is preserved from the model",
+        "lines 237-260: deque is replenished synchronously only when empty, truncated to replan_steps, then one action is popped",
+        "lines 260-262: every popped action immediately calls env.step; there is no control-rate sleep or deadline",
+        "line 330: default --replan-steps is 16",
+        "line 341 and lines 275-280: --video-fps defaults to 20 and is passed only to video encoding"
+      ]
+    },
+    {
+      "path": "xiaomi-cu121/upstream/deploy/client.py",
+      "sha256": "5e50b3a110fa7ac08f171a8c226ceb45bccf5881c1a589beab4679c8a68239b3",
+      "evidence": [
+        "lines 57-62: request/response and action decode are synchronous; no request deadline is set"
+      ]
+    },
+    {
+      "path": "xiaomi-cu121/upstream/deploy/server.py",
+      "sha256": "648eb93680c530d7f6cd3056f98e69339e021fb0e91cee06f135e91c461d37d4",
+      "evidence": [
+        "lines 39-73: single accepted connection is processed synchronously; latency is displayed but not deadline-gated"
+      ]
+    }
+  ],
+  "conclusion": {
+    "model_output_chunk_length": "must be measured from actual model output; production code does not declare it",
+    "production_action_consumption": "16 actions per synchronous replan by default, one env.step per action",
+    "production_target_control_rate_hz": null,
+    "production_action_or_chunk_deadline_ms": null,
+    "video_fps_is_control_rate": false
+  }
+}
