@@ -50,7 +50,8 @@ from update_batch import (  # noqa: E402
 from training_correctness import (  # noqa: E402
     ExactHoldWindow, RewardComponents, append_progress, hold_enabled_for_variant,
     nonduplicated_skill_reward,
-    reset_gated_store, skill_timeout_reward, verify_deployment_manifest,
+    reset_gated_store, skill_terminal_enabled_for_variant, skill_timeout_reward,
+    verify_deployment_manifest,
 )
 from reward import RewardConfig, RewardManager, official_success, HoldConfig, hold_step_reward  # noqa: E402
 from skill_manager import (  # noqa: E402
@@ -309,12 +310,18 @@ def _run_one_skill(sim, client, obs, args, skill, reward_mgr, *, eta, traj_id, s
         if outcome is SkillOutcome.SUCCESS and success_step is None:
             success_step = steps
             success_chunk = chunk_idx
-            terminal_reward = nonduplicated_skill_reward(
-                reward_components.official_terminal,
-                success_chunk,
-                getattr(args, "skill_success_reward", 1.0),
-                getattr(args, "skill_success_gamma", 0.998),
-                getattr(args, "skill_success_decay", True),
+            terminal_reward = (
+                nonduplicated_skill_reward(
+                    reward_components.official_terminal,
+                    success_chunk,
+                    getattr(args, "skill_success_reward", 1.0),
+                    getattr(args, "skill_success_gamma", 0.998),
+                    getattr(args, "skill_success_decay", True),
+                )
+                if skill_terminal_enabled_for_variant(
+                    getattr(args, "reward_variant", "simulator_terminal_only")
+                )
+                else 0.0
             )
             reward_sum += terminal_reward
             reward_components.skill_terminal += terminal_reward
@@ -909,7 +916,8 @@ def build_parser():
                          "terminal_plus_hold: terminal success (+1.0) PLUS the 20-step post-success "
                          "hold shaping (the ACTUAL reward when --hold-steps>0; the honest rename of "
                          "the mislabeled 'terminal_only'). simulator_terminal_only: pure terminal "
-                         "predicate with hold weights forced to zero (verifier condition retained).")
+                         "official whole-task predicate only: task failure=0, task success=1; "
+                         "no per-skill payment, decay, hold shaping, or failure penalty.")
     ap.add_argument("--reward-std-gate", type=float, default=0.05,
                     help="Minimum within-group reward std for an optimizer update. Groups with a "
                          "smaller std (all-failure or effectively-constant reward) are gated: "

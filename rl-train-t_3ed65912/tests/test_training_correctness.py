@@ -25,6 +25,7 @@ from training_correctness import (  # noqa: E402
     validate_optimizer_config,
     verify_deployment_manifest,
     verify_source_manifest,
+    skill_terminal_enabled_for_variant,
 )
 from update_batch import validate_batch_config  # noqa: E402
 
@@ -57,6 +58,11 @@ def test_terminal_only_ablation_disables_hold_shaping():
     assert not hold_enabled_for_variant("simulator_terminal_only", 20)
     assert hold_enabled_for_variant("terminal_plus_hold", 20)
     assert not hold_enabled_for_variant("terminal_plus_hold", 0)
+
+
+def test_task_success_binary_disables_per_skill_terminal_payment():
+    assert not skill_terminal_enabled_for_variant("simulator_terminal_only")
+    assert skill_terminal_enabled_for_variant("terminal_plus_hold")
 
 
 def test_gated_single_group_resets_store_but_deferred_batch_group_does_not():

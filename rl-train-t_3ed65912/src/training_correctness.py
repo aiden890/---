@@ -72,6 +72,11 @@ def hold_enabled_for_variant(reward_variant: str, hold_steps: int) -> bool:
     return str(reward_variant) != "simulator_terminal_only" and int(hold_steps) > 0
 
 
+def skill_terminal_enabled_for_variant(reward_variant: str) -> bool:
+    """Task-success binary reward must not pay intermediate skill completion."""
+    return str(reward_variant) != "simulator_terminal_only"
+
+
 def reset_gated_store(client, defer_update: bool) -> bool:
     """Clear a skipped single-group rollout; preserve prior groups in batched collection."""
     if defer_update:
