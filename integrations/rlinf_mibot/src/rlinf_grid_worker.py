@@ -76,7 +76,11 @@ class RoboCasaGridWorker(Worker):
                 pass
             else:
                 os.close(fd)
-                raise RuntimeError(f"validation-injected worker failure for seed {job['seed']}")
+                return {
+                    "worker_error": f"RuntimeError: validation-injected worker failure for seed {job['seed']}",
+                    "started_at": started,
+                    "finished_at": time.time(),
+                }
         args = self._args(parameters)
         skill = {
             "GRASP_OBJECT": Skill.GRASP,
@@ -145,12 +149,18 @@ class RoboCasaGridWorker(Worker):
                               "trainer_store": str(payload_path)},
                 "skill_key": SKILL_KEY[skill],
             }
-        except Exception:
+        except Exception as exc:
             try:
                 trainer.discard_store([traj_id])
             except Exception:
                 pass
-            raise
+            # RLinf treats an actor exception as process-fatal. Return a serializable failure
+            # envelope so the collector can apply its bounded retry policy instead.
+            return {
+                "worker_error": f"{type(exc).__name__}: {exc}",
+                "started_at": started,
+                "finished_at": time.time(),
+            }
         finally:
             genv.close()
 

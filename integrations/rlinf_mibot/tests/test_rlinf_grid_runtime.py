@@ -33,6 +33,8 @@ class Call:
 class Proxy:
     def __init__(self, group, rank): self.group, self.rank = group, rank
     def run_episode(self, job):
+        if self.group.fail_once and int(job.get("_attempt", 0)) == 0 and job["seed"] == 10:
+            return Call({"worker_error": "RuntimeError: planned failure"})
         payload = self.group.output / f"payload-{job['job_id']}.pkl"
         video = self.group.output / f"video-{job['job_id']}.mp4"
         payload.write_bytes(job["job_id"].encode())
@@ -55,7 +57,8 @@ class Proxy:
 
 
 class Group:
-    def __init__(self, output): self.output, self.closed = output, False
+    def __init__(self, output, fail_once=False):
+        self.output, self.closed, self.fail_once = output, False, fail_once
     def execute_on(self, rank): return Proxy(self, rank)
     def close_client(self): self.closed = True; return Call(True)
     def _close(self): self.closed = True
@@ -63,9 +66,10 @@ class Group:
 
 class Builder:
     group = None
+    fail_once = False
     def __init__(self, cfg): self.cfg = cfg
     def launch(self, **kwargs):
-        Builder.group = Group(Path(self.cfg["results_root"]) / self.cfg["run_id"])
+        Builder.group = Group(Path(self.cfg["results_root"]) / self.cfg["run_id"], Builder.fail_once)
         return Builder.group
 
 
@@ -98,6 +102,35 @@ class ProductionRuntimeTests(unittest.TestCase):
                 rows = [json.loads(line) for line in (output / "episodes.jsonl").read_text().splitlines()]
                 self.assertEqual({row["worker_id"] for row in rows}, {"rlinf-0", "rlinf-1"})
         finally:
+            for name, module in old.items():
+                if module is None: sys.modules.pop(name, None)
+                else: sys.modules[name] = module
+
+    def test_worker_error_envelope_is_retried_without_actor_failure(self):
+        scheduler = types.ModuleType("rlinf.scheduler")
+        scheduler.Cluster = lambda **kwargs: object()
+        scheduler.NodePlacementStrategy = lambda ranks: list(ranks)
+        rlinf = types.ModuleType("rlinf")
+        rlinf.scheduler = scheduler
+        worker_module = types.ModuleType("rlinf_grid_worker")
+        worker_module.RoboCasaGridWorker = Worker
+        old = {name: sys.modules.get(name) for name in ("rlinf", "rlinf.scheduler", "rlinf_grid_worker")}
+        sys.modules.update({"rlinf": rlinf, "rlinf.scheduler": scheduler,
+                            "rlinf_grid_worker": worker_module})
+        Builder.fail_once = True
+        try:
+            with tempfile.TemporaryDirectory() as td:
+                cfg = copy.deepcopy(CFG)
+                cfg["runtime"]["retries"] = 1
+                output = Path(td) / "run"
+                result = collect_with_rlinf(cfg, output)
+                self.assertEqual(result["status"], "done")
+                self.assertEqual(result["retry_count"], 1)
+                failures = [json.loads(line) for line in
+                            (output / "failures.jsonl").read_text().splitlines()]
+                self.assertEqual(len(failures), 1)
+        finally:
+            Builder.fail_once = False
             for name, module in old.items():
                 if module is None: sys.modules.pop(name, None)
                 else: sys.modules[name] = module

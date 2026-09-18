@@ -77,6 +77,8 @@ def collect_with_rlinf(cfg: dict, output_dir: Path) -> dict:
                 for rank, (job, call) in enumerate(zip(wave, calls)):
                     try:
                         result = call.wait()[0]
+                        if result.get("worker_error"):
+                            raise RuntimeError(result["worker_error"])
                         record = {"schema": SCHEMA, **job, **result}
                         if record["trainer_payload"].get("optimizer_update_requested") is not False:
                             raise RuntimeError("worker requested optimizer update during collection")
