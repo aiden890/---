@@ -37,3 +37,20 @@ fields. A response is advisory data. Only `ExecutionManager` validates its
 Queue submit/supersede, RPC start/done, timeout, retry, stale/drop, cancel, error,
 and shutdown events are written as `async_control` trace records without image
 or proprio payloads.
+
+## Shared-GPU server scheduling
+
+`infer_verify_server.py` loads one Xiaomi/Qwen3-VL model object and exposes two
+logical lanes through `PriorityDispatcher`:
+
+- requests without an `op` retain the stock policy wire API and enter the FIFO
+  high-priority policy queue;
+- `op=background_vlm` requires the canonical envelope above and enters one
+  latest-only background slot (`boundary`, `endpoint`, or `planner`).
+
+One dispatcher thread performs all CUDA forwards. A running background forward
+is non-preemptive, but once it completes all waiting policy work is selected
+before pending background work. Replacing an unstarted background request returns
+`dropped`; expired work returns `timeout`. `op=health` reports readiness, queue
+depths, drop/supersede/stale/timeout counters, per-kind queue wait and model
+latency, and policy delay caused by a running background forward.

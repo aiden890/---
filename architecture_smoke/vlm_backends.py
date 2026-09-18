@@ -180,8 +180,8 @@ class RemoteVLMScorerBackend(VLMBackend):
     sees every view the policy sees. No simulator predicate is ever referenced.
 
     This backend holds its OWN persistent socket to the same server the action
-    client uses (the server threads + a CUDA lock serialise the two request
-    types), so no second model load is needed.
+    client uses. The server's policy-priority dispatcher serialises all model
+    forwards, so no second model load is needed.
     """
 
     def __init__(self, processor, host, port, *, robot_type: str,
@@ -197,6 +197,8 @@ class RemoteVLMScorerBackend(VLMBackend):
         self.state_length = state_length
         self.compose = compose or compose_three_cam
         self._sock = None
+        self._control_request = None
+        self._timeout_s = None
         self._connect()
 
     def _connect(self):
@@ -206,8 +208,13 @@ class RemoteVLMScorerBackend(VLMBackend):
 
     def set_timeout(self, timeout_s: float) -> None:
         """Set the RPC deadline required by AsyncVerifierClient's contract."""
+        self._timeout_s = float(timeout_s)
         if self._sock is not None:
             self._sock.settimeout(timeout_s)
+
+    def set_control_request(self, request) -> None:
+        """Attach the canonical async-control identity to subsequent VLM calls."""
+        self._control_request = request
 
     def _rpc(self, req: dict) -> dict:
         try:
@@ -245,8 +252,24 @@ class RemoteVLMScorerBackend(VLMBackend):
         inputs = self._vs.build_vqa_inputs(
             self.processor, image, question_text, robot_type=self.robot_type,
             state_dim=self.state_dim, state_length=self.state_length)
-        resp = self._rpc({"op": "vlm_score", "inputs": inputs, "question": question_text})
-        return float(resp["prob"])
+        request = self._control_request
+        if request is None:
+            raise RuntimeError("canonical control request context was not set")
+        resp = self._rpc({
+            "op": "background_vlm",
+            "episode_id": request.episode_id,
+            "skill_id": request.skill_id,
+            "observation_step": request.observation_step,
+            "request_id": request.request_id,
+            "request_kind": request.request_kind.value,
+            "payload": {"inputs": inputs, "question": question_text},
+            "timeout_s": self._timeout_s,
+        })
+        if resp.get("status") == "timeout":
+            raise TimeoutError(resp.get("error") or "background VLM request timed out")
+        if resp.get("status") != "ok":
+            raise RuntimeError(resp.get("error") or f"background VLM status={resp.get('status')}")
+        return float(resp["result"]["prob"])
 
     def close(self):
         if self._sock is not None:

@@ -15,7 +15,7 @@ runs on a realistic cadence (proprio-event gate + a min step interval) and a
 hysteresis latch, so it fires the moment the skill's goal is recognised.
 
 Both the base-policy action forward AND the VLM VQA forward hit the SAME single
-model load via ``infer_verify_server.py`` (server threads + a CUDA lock), so the
+model load via ``infer_verify_server.py`` (policy-priority dispatcher), so the
 5B backbone is loaded once. Run inside the xiaomi-client container with the RL
 env card's ``vlm_scorer`` on the path (mounted at /rl_env/src).
 """

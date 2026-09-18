@@ -88,6 +88,9 @@ class ExecutionManager:
             # deadline.  The worker serialises this entire service: max one forward.
             if hasattr(self.vlm_backend, "set_timeout"):
                 self.vlm_backend.set_timeout(timeout_s)
+            set_control_request = getattr(self.vlm_backend, "set_control_request", None)
+            if set_control_request is not None:
+                set_control_request(request)
             obs = request.payload["observation"]
             if request.request_kind is RequestKind.BOUNDARY:
                 result = verifier.update(obs)
