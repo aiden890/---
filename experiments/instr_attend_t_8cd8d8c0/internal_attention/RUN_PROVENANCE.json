@@ -11,10 +11,10 @@
   "source": {
     "repository": "/home/aiden/Desktop/lab/robot/robocasa-docker",
     "extraction_commit": "1e72b465a400e9084d55b6a075bf87e29bd8048d",
-    "analysis_commit": "a73c497896b9c07ce26f45ab122801ee1dff0ba0",
+    "analysis_commit": "4ad511dbdf2286e4445cca80776678429c9ed8b2",
     "attention_server_sha256": "bd89f8d1b9434d3cb8659b0373307be6c601cfae9f0674903d2a102fc04dc322",
     "internal_probe_sha256": "f1e300278b5859691c5175757bca0dec91a7d7534508abf1f932e969e2f349e2",
-    "analyzer_sha256": "d6fe2e0b0806ee85fde16df9758798f4cd6e040897cacc312761f419911b375f"
+    "analyzer_sha256": "79f9b2e64f9d7c7f6caa64ee95ed363ee6b5192ba24db870e1004cf27e0455da"
   },
   "checkpoint": {
     "model": "XiaomiRobotics/Xiaomi-Robotics-1-RoboCasa365",
