@@ -1,0 +1,95 @@
+{
+  "task_id": "t_4f4a4786",
+  "verdict": "ARCHITECTURE_BOTTLENECK_LOCALIZED",
+  "production_ready_claimed": false,
+  "source_evidence_commit": "cf07ec11db1f03b02e972cd4300e0ed254babead",
+  "normalized_evidence_commit": "4c4558f09caa07a1c65e0034393f1c0726562618",
+  "execution_source_commit": "45280448bd9f650c3cfd94f26939a8830374a05b",
+  "gpu_rollout_run": false,
+  "metrics": {
+    "denominator": 20,
+    "planner_valid": 20,
+    "official_success": 3,
+    "official_success_seeds": [5005, 5011, 5017],
+    "coarse_failure_stage": {"GRASP_OBJECT": 13, "PLACE_OBJECT": 4, "none": 3}
+  },
+  "localized_bottleneck": {
+    "primary": "skill_transition_semantics_and_fixed_budget_allocation",
+    "secondary": ["PLACE_OBJECT_policy_execution", "obs_only_verifier_false_negatives", "failure_stage_accounting"],
+    "facts": [
+      "The executor advances after SUCCESS and TIMEOUT alike.",
+      "failure_from reports the first non-SUCCESS status although later skills execute.",
+      "PLACE_OBJECT is TIMEOUT in 20/20 while the official predicate is true in 3/20.",
+      "Baseline-only seeds used 172 and 112 PLACE steps; planned runtime fixed PLACE at 96."
+    ]
+  },
+  "primary_classification": {
+    "GRASP_policy": [5003, 5006, 5010, 5013, 5014, 5018],
+    "MOVE_policy": [],
+    "PLACE_policy": [5002, 5008, 5009, 5012, 5016, 5019],
+    "verifier_false_negative": [5005, 5011, 5017],
+    "verifier_false_positive": [],
+    "transition_budget_timeout": [5000, 5001, 5007, 5015],
+    "official_predicate_mismatch": [5004]
+  },
+  "secondary_findings": {
+    "verifier_false_positive": [5010],
+    "grasp_sequence_positive_strict_gate_negative": [5000, 5004, 5019],
+    "all_boundaries_timeout_but_official_success": [5017],
+    "place_timeout_but_official_success": [5005, 5011, 5017],
+    "low_confidence_due_to_missing_boundary_GT": [5001, 5007]
+  },
+  "per_seed": [
+    {"seed": 5000, "statuses": "T/T/T", "official": false, "primary": "transition_budget_timeout", "confidence": "medium", "note": "GRASP sequence p=.999 but strict gate rejects; final lid near target but not upright/on-blender."},
+    {"seed": 5001, "statuses": "T/S/T", "official": false, "primary": "transition_budget_timeout", "confidence": "low", "note": "Advance after GRASP timeout; final XY error .181 m and gripper not clear."},
+    {"seed": 5002, "statuses": "S/S/T", "official": false, "primary": "PLACE_policy", "confidence": "high", "note": "Prior stages pass; final lid near target but not upright/on-blender."},
+    {"seed": 5003, "statuses": "T/T/T", "official": false, "primary": "GRASP_policy", "confidence": "high", "note": "Boundary video shows lid on counter at GRASP end."},
+    {"seed": 5004, "statuses": "T/T/T", "official": false, "primary": "official_predicate_mismatch", "confidence": "medium", "note": "Final near/upright/clear but lid_on_blender=false; baseline succeeds with 172 PLACE steps."},
+    {"seed": 5005, "statuses": "S/T/T", "official": true, "primary": "verifier_false_negative", "confidence": "high", "note": "Final official and all terminal placement predicates true."},
+    {"seed": 5006, "statuses": "T/T/T", "official": false, "primary": "GRASP_policy", "confidence": "high", "note": "Boundary video and final predicate show lid on counter."},
+    {"seed": 5007, "statuses": "T/T/T", "official": false, "primary": "transition_budget_timeout", "confidence": "low", "note": "Later policies move lid near target; no boundary GT to identify first physical failure."},
+    {"seed": 5008, "statuses": "S/S/T", "official": false, "primary": "PLACE_policy", "confidence": "high", "note": "Final lid near target but not upright/on-blender; gripper not clear."},
+    {"seed": 5009, "statuses": "T/T/T", "official": false, "primary": "PLACE_policy", "confidence": "medium", "note": "Final lid near target but not upright/on-blender; gripper not clear."},
+    {"seed": 5010, "statuses": "T/S/T", "official": false, "primary": "GRASP_policy", "confidence": "high", "note": "MOVE-end video shows lid on counter despite MOVE SUCCESS; final XY error .444 m."},
+    {"seed": 5011, "statuses": "S/S/T", "official": true, "primary": "verifier_false_negative", "confidence": "high", "note": "Official final predicate true after PLACE TIMEOUT."},
+    {"seed": 5012, "statuses": "S/S/T", "official": false, "primary": "PLACE_policy", "confidence": "high", "note": "Final lid on counter, XY error .228 m."},
+    {"seed": 5013, "statuses": "T/T/T", "official": false, "primary": "GRASP_policy", "confidence": "high", "note": "Final lid on counter, XY error .471 m."},
+    {"seed": 5014, "statuses": "T/T/T", "official": false, "primary": "GRASP_policy", "confidence": "medium", "note": "No boundary succeeds; final dz from closed pose -1.346 m."},
+    {"seed": 5015, "statuses": "T/S/T", "official": false, "primary": "transition_budget_timeout", "confidence": "high", "note": "Baseline succeeds with 112 PLACE steps; planned cap is 96."},
+    {"seed": 5016, "statuses": "S/S/T", "official": false, "primary": "PLACE_policy", "confidence": "high", "note": "Final lid near target but not upright/on-blender; gripper not clear."},
+    {"seed": 5017, "statuses": "T/T/T", "official": true, "primary": "verifier_false_negative", "confidence": "high", "note": "All three boundary labels disagree with official success."},
+    {"seed": 5018, "statuses": "T/T/T", "official": false, "primary": "GRASP_policy", "confidence": "high", "note": "Final lid on counter, XY error .632 m."},
+    {"seed": 5019, "statuses": "T/T/T", "official": false, "primary": "PLACE_policy", "confidence": "medium", "note": "Final lid near target but not upright/on-blender; gripper not clear."}
+  ],
+  "paired_discordance": {
+    "baseline_only": {
+      "5004": {"baseline": "G128S-M82S-P172S", "planned": "G208T-M288T-P96T", "effect": "harm: transition overrun plus short PLACE budget"},
+      "5015": {"baseline": "G159S-M82S-P112S", "planned": "G208T-M55S-P96T", "effect": "harm: verifier miss plus PLACE budget 16 steps short"}
+    },
+    "planned_only": {
+      "5005": {"baseline": "G110S-M67S-P200T", "planned": "G200S-M288T-P96T-officialS", "effect": "benefit from changed conditioning/timing despite boundary misses"},
+      "5011": {"baseline": "G126S-M89S-P200T", "planned": "G178S-M106S-P96T-officialS", "effect": "benefit from changed trajectory; PLACE remains false negative"}
+    }
+  },
+  "representative_video_index": [
+    {"seed": 5005, "video": "results/videos/success_seed5005.mp4", "fps": 20, "boundaries": [{"skill": "GRASP", "frame": 100, "video_s": 5.0, "trace_elapsed_s": 29.217}, {"skill": "MOVE", "frame": 244, "video_s": 12.2, "trace_elapsed_s": 46.355}, {"skill": "PLACE", "frame": 292, "video_s": 14.6, "trace_elapsed_s": 52.041}]},
+    {"seed": 5000, "video": "results/videos/execution_failure_grasp_seed5000.mp4", "fps": 20, "boundaries": [{"skill": "GRASP", "frame": 104, "video_s": 5.2, "trace_elapsed_s": 34.723}, {"skill": "MOVE", "frame": 248, "video_s": 12.4, "trace_elapsed_s": 54.04}, {"skill": "PLACE", "frame": 296, "video_s": 14.8, "trace_elapsed_s": 61.003}]},
+    {"seed": 5002, "video": "results/videos/execution_failure_late_seed5002.mp4", "fps": 20, "boundaries": [{"skill": "GRASP", "frame": 104, "video_s": 5.2, "trace_elapsed_s": 27.487}, {"skill": "MOVE", "frame": 143, "video_s": 7.15, "trace_elapsed_s": 32.596}, {"skill": "PLACE", "frame": 191, "video_s": 9.55, "trace_elapsed_s": 39.423}]}
+  ],
+  "recommended_change": {
+    "single_change": "Use a shared episode budget and advance after timeout only when an obs-only next-skill handoff gate passes; otherwise retain/retry the current skill, with unused budget flowing to PLACE.",
+    "acceptance_gate": [
+      "Same seeds/models/checkpoints and one pre-episode planner call; no simulator GT at runtime.",
+      "Planner-valid remains 20/20 and mechanics violations remain zero.",
+      "Seeds 5004 and 5015 both become official successes.",
+      "Official success is at least 5/20 with no loss of seeds 5005, 5011, 5017.",
+      "TIMEOUT followed by unconditional advance is zero.",
+      "Offline PLACE false negatives are 0 among official-positive episodes."
+    ]
+  },
+  "limitations": [
+    "Only final simulator predicates were logged; boundary-level GT is unavailable.",
+    "Low-confidence rows use offline boundary-adjacent video and are not treated as runtime inputs.",
+    "No new rollout was run."
+  ]
+}
