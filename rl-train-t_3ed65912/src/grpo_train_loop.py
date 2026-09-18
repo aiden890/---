@@ -903,7 +903,7 @@ def build_parser():
     ap.add_argument("--seed-base", type=int, default=1000)
     ap.add_argument("--eval-seed-base", type=int, default=5000)
     ap.add_argument("--heldout-seed-base", type=int, default=9000)
-    ap.add_argument("--reward-variant", default="simulator_milestones",
+    ap.add_argument("--reward-variant", default="simulator_terminal_only",
                     choices=("simulator_milestones", "simulator_terminal_only", "terminal_plus_hold"),
                     help="Reward composition label. simulator_milestones: per-milestone bonuses. "
                          "terminal_plus_hold: terminal success (+1.0) PLUS the 20-step post-success "
@@ -1042,11 +1042,16 @@ def main():
         args.hold_stay_bonus = 0.0
         args.hold_drift_penalty = 0.0
         args.hold_drop_penalty = 0.0
+        args.skill_success_decay = False
 
-    reward_cfg = RewardConfig( horizon=my.horizon_place,
-                              use_milestones=(my.reward_variant == "simulator_milestones"))
-    if my.reward_variant == "simulator_terminal_only":
-        reward_cfg.penalties = {name: 0.0 for name in reward_cfg.penalties}
+    reward_cfg = (
+        RewardConfig.binary(horizon=my.horizon_place)
+        if my.reward_variant == "simulator_terminal_only"
+        else RewardConfig(
+            horizon=my.horizon_place,
+            use_milestones=(my.reward_variant == "simulator_milestones"),
+        )
+    )
 
     client = TrainerClient(my.model_path, my.server_addr, my.trainer_port,
                            args.robot_type, args.crop_ratio)

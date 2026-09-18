@@ -88,6 +88,21 @@ class RewardConfig:
         "timeout": -0.10,
     })
 
+    @classmethod
+    def binary(cls, *, horizon: int = 400) -> "RewardConfig":
+        """Exact outcome reward: failed trajectory=0, successful trajectory=1."""
+        return cls(
+            terminal_success=1.0,
+            terminal_decay_gamma=1.0,
+            horizon=horizon,
+            use_milestones=False,
+            penalties={
+                "object_dropped": 0.0,
+                "disallowed_collision": 0.0,
+                "timeout": 0.0,
+            },
+        )
+
 
 @dataclass
 class RewardBreakdown:

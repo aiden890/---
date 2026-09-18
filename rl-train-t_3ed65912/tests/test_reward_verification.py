@@ -63,6 +63,27 @@ def test_terminal_positive_matches_official():
     check(rb.terminal > 0 and rb.success, "terminal reward fires exactly when official_check_success=True")
 
 
+def test_binary_reward_is_exactly_zero_for_failure_and_one_for_success():
+    failed = RewardManager(RewardConfig.binary())
+    failed.step_reward(1, _p(lid_grasped=True))
+    rb_fail = failed.step_reward(
+        99,
+        _p(lid_grasped=False, lid_other_contacts=["counter"]),
+        truncated=True,
+    )
+    check(rb_fail.primary == 0.0,
+          "binary reward pays exactly 0 for failed/drop/collision/timeout trajectories")
+
+    succeeded = RewardManager(RewardConfig.binary())
+    rb_success = succeeded.step_reward(
+        99,
+        _p(lid_on_blender=True, gripper_far=True, official_check_success=True),
+        done=True,
+    )
+    check(rb_success.primary == 1.0 and rb_success.terminal == 1.0,
+          "binary reward pays exactly 1 for official success without decay")
+
+
 def test_terminal_negative_no_reward_on_partial():
     # every partial-but-not-official state must yield ZERO terminal reward
     partials = [
