@@ -52,6 +52,11 @@ class ValidationTest(unittest.TestCase):
         self.assertTrue(scored["hallucinated_skill"])
         self.assertFalse(scored["exact_sequence"])
 
+    def test_non_plan_output_counts_as_missing_plan(self):
+        scored = PROBE.score_plan(None)
+        self.assertTrue(scored["missing_step"])
+        self.assertFalse(scored["schema_valid"])
+
     def test_direct_and_repair_are_separate(self):
         raw = "```json\n" + json.dumps({"plan": []}) + "\n```"
         parsed, error = PROBE.direct_json(raw)

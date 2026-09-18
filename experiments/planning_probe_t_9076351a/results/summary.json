@@ -1,0 +1,27 @@
+{
+  "cases": 12,
+  "direct_valid_json": 0,
+  "direct_valid_plan": 0,
+  "exact_sequence": 0,
+  "first_skill_full_plan": 0,
+  "current_next_valid_call": 0,
+  "current_next_first_skill": 0,
+  "args_valid": 0,
+  "instruction_valid": 0,
+  "contract_valid": 0,
+  "budget_valid": 0,
+  "hallucinated_skill": 0,
+  "extra_step": 0,
+  "missing_step": 12,
+  "duplicate_cycle": 0,
+  "repair_only_parseable": 0,
+  "fallback_used": 0,
+  "decoding": {
+    "do_sample": false,
+    "max_new_tokens": 512,
+    "sampling_seed_runs": 0,
+    "reason": "deterministic greedy decoding"
+  },
+  "input_format": "three RGB reset views concatenated horizontally into one lossless PNG contact sheet",
+  "pass": false
+}

@@ -1,0 +1,6 @@
+{
+  "ready": true,
+  "model_load_count": 1,
+  "device": "cuda:0",
+  "dtype": "torch.bfloat16"
+}

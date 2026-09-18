@@ -32,3 +32,7 @@ Local validation:
 
        python3 -m unittest experiments/planning_probe_t_9076351a/test_probe.py
        python3 -m py_compile experiments/planning_probe_t_9076351a/probe.py experiments/planning_probe_t_9076351a/probe_server.py
+
+The preserved run is under `results/`. Recompute metrics from its immutable raw texts with:
+
+       python3 experiments/planning_probe_t_9076351a/reanalyze.py experiments/planning_probe_t_9076351a/results

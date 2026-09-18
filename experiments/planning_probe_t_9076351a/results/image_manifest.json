@@ -1,0 +1,134 @@
+[
+  {
+    "seed": 0,
+    "views": [
+      {
+        "camera": "video.robot0_agentview_left",
+        "path": "/output/images/seed0_video.robot0_agentview_left.png",
+        "sha256": "0720eb8303b2ce61bd04e08aaf94656770461733050df36b66d046e90109899d",
+        "shape": [
+          256,
+          256,
+          3
+        ]
+      },
+      {
+        "camera": "video.robot0_agentview_right",
+        "path": "/output/images/seed0_video.robot0_agentview_right.png",
+        "sha256": "904c9d0e2d38fd30ec87205ddbc5f59ade1f7a78d8a1e9e3e621aa1d61a51960",
+        "shape": [
+          256,
+          256,
+          3
+        ]
+      },
+      {
+        "camera": "video.robot0_eye_in_hand",
+        "path": "/output/images/seed0_video.robot0_eye_in_hand.png",
+        "sha256": "bc7879a0f2e45e6d4c2c27e7b4dc08231e2468efc659e10bc61c617c97d7a3e4",
+        "shape": [
+          256,
+          256,
+          3
+        ]
+      }
+    ],
+    "contact_sheet": {
+      "path": "/output/images/seed0_contact_sheet.png",
+      "sha256": "bcd5112880c6d26d690547e0b4a37c20730c5b8e7eb84280b0520016899d977d",
+      "shape": [
+        256,
+        768,
+        3
+      ]
+    }
+  },
+  {
+    "seed": 1,
+    "views": [
+      {
+        "camera": "video.robot0_agentview_left",
+        "path": "/output/images/seed1_video.robot0_agentview_left.png",
+        "sha256": "061048fa941a8d7c0569b084c369f15ffe2dd9c51dd4f5cf92392dc3d4bc742d",
+        "shape": [
+          256,
+          256,
+          3
+        ]
+      },
+      {
+        "camera": "video.robot0_agentview_right",
+        "path": "/output/images/seed1_video.robot0_agentview_right.png",
+        "sha256": "2feb84155b866695dc545ff318033fd335783e30f8299562dc0c26d8376cc79e",
+        "shape": [
+          256,
+          256,
+          3
+        ]
+      },
+      {
+        "camera": "video.robot0_eye_in_hand",
+        "path": "/output/images/seed1_video.robot0_eye_in_hand.png",
+        "sha256": "0956c37bc88bc023d3c4a295835b043e1b31c7d04e4393e43959579a439d3f91",
+        "shape": [
+          256,
+          256,
+          3
+        ]
+      }
+    ],
+    "contact_sheet": {
+      "path": "/output/images/seed1_contact_sheet.png",
+      "sha256": "1f7046a25f9ee0c92a2b0d641e8dfc89a98f58d1be68f5849dfa30232d2411e3",
+      "shape": [
+        256,
+        768,
+        3
+      ]
+    }
+  },
+  {
+    "seed": 2,
+    "views": [
+      {
+        "camera": "video.robot0_agentview_left",
+        "path": "/output/images/seed2_video.robot0_agentview_left.png",
+        "sha256": "670b9f824c007bc78013dbd6cff224db2e354b3532bd6e4092f976b9061a4a47",
+        "shape": [
+          256,
+          256,
+          3
+        ]
+      },
+      {
+        "camera": "video.robot0_agentview_right",
+        "path": "/output/images/seed2_video.robot0_agentview_right.png",
+        "sha256": "6b8f2ccba904fa085087f22eeccf598a2bdf557d0269db2cca87e340faa99183",
+        "shape": [
+          256,
+          256,
+          3
+        ]
+      },
+      {
+        "camera": "video.robot0_eye_in_hand",
+        "path": "/output/images/seed2_video.robot0_eye_in_hand.png",
+        "sha256": "bda43d09fa36251ac9ce54496655ebb35107d21fcff573fb404cb6cd437ece39",
+        "shape": [
+          256,
+          256,
+          3
+        ]
+      }
+    ],
+    "contact_sheet": {
+      "path": "/output/images/seed2_contact_sheet.png",
+      "sha256": "9b5f2837ab78183ba92ec3f2e4cfd5682e6557a723efc883ac32f6d8f0fadf1c",
+      "shape": [
+        256,
+        768,
+        3
+      ]
+    }
+  }
+]
