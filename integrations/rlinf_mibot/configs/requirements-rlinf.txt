@@ -30,3 +30,10 @@ numba==0.61.2
 lxml==6.0.1
 qpsolvers==4.8.0
 quadprog==0.1.13
+# RoboCasa / robosuite runtime imports. Dataset-conversion-only packages (lerobot,
+# tianshou) stay out of this rollout image.
+termcolor==3.1.0
+h5py==3.14.0
+pygame==2.6.1
+pynput==1.8.1
+hidapi==0.14.0.post4

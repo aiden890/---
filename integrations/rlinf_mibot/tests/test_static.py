@@ -87,6 +87,9 @@ def test_pins():
     # lock file present and non-empty
     lk = (ROOT / "configs" / "requirements-rlinf.lock").read_text()
     check("lock has torch cu121", "torch==2.5.1+cu121" in lk)
+    requirements = (ROOT / "configs" / "requirements-rlinf.txt").read_text()
+    for package in ("termcolor", "h5py", "pygame", "pynput", "hidapi"):
+        check(f"RoboCasa runtime dependency {package}", f"{package}==" in requirements)
 
 
 def test_no_secrets():
