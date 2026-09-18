@@ -1,0 +1,770 @@
+[
+  {
+    "state_tag": "reset",
+    "label": "correct_full",
+    "instruction": "Close the lid blender by securely placing the lid on top.",
+    "predicates": {
+      "gripper_lid_contact": false,
+      "lid_on_counter": true,
+      "lid_lifted": false,
+      "lid_grasped": false,
+      "lid_dz_from_rest": 0.0,
+      "lid_xy_to_closed_pos": 0.21796667428045136,
+      "lid_dz_to_closed_pos": -0.40140535564687085,
+      "lid_dist_to_closed_pos": 0.45676660411951225,
+      "in_preplace_region": false,
+      "lid_on_blender": false,
+      "lid_upright_7deg": true,
+      "gripper_lid_far_0.15": true,
+      "eef_lid_dist": 0.530418755513215,
+      "official_check_success": false,
+      "finger_qpos": [
+        0.02056489610934018,
+        -0.02050166294807547
+      ],
+      "gripper_ramp_action": [
+        0.0,
+        0.0
+      ],
+      "lid_other_contacts": [
+        "island_island_group_1_top_1",
+        "island_island_group_1_top_2"
+      ],
+      "lid_pos": [
+        1.9830752500206275,
+        -3.6910960588986197,
+        0.9412001768176548
+      ],
+      "eef_pos": [
+        2.083567968743833,
+        -3.3210103585145987,
+        1.3076450485993119
+      ],
+      "base_pos": [
+        2.331631839835699,
+        -3.318476806564092,
+        0.700000021605797
+      ]
+    },
+    "action_shape": [
+      16,
+      12
+    ],
+    "first_action": [
+      -0.04345703125,
+      0.005859375,
+      -0.00439453125,
+      -0.001953125,
+      -0.00390625,
+      -0.0009765625,
+      -1.0078125,
+      0.003173828125,
+      0.0009765625,
+      0.001953125,
+      -0.0009765625,
+      -1.0
+    ]
+  },
+  {
+    "state_tag": "reset",
+    "label": "skill_grasp",
+    "instruction": "Pick up the blender lid securely.",
+    "predicates": {
+      "gripper_lid_contact": false,
+      "lid_on_counter": true,
+      "lid_lifted": false,
+      "lid_grasped": false,
+      "lid_dz_from_rest": 0.0,
+      "lid_xy_to_closed_pos": 0.21796667428045136,
+      "lid_dz_to_closed_pos": -0.40140535564687085,
+      "lid_dist_to_closed_pos": 0.45676660411951225,
+      "in_preplace_region": false,
+      "lid_on_blender": false,
+      "lid_upright_7deg": true,
+      "gripper_lid_far_0.15": true,
+      "eef_lid_dist": 0.530418755513215,
+      "official_check_success": false,
+      "finger_qpos": [
+        0.02056489610934018,
+        -0.02050166294807547
+      ],
+      "gripper_ramp_action": [
+        0.0,
+        0.0
+      ],
+      "lid_other_contacts": [
+        "island_island_group_1_top_1",
+        "island_island_group_1_top_2"
+      ],
+      "lid_pos": [
+        1.9830752500206275,
+        -3.6910960588986197,
+        0.9412001768176548
+      ],
+      "eef_pos": [
+        2.083567968743833,
+        -3.3210103585145987,
+        1.3076450485993119
+      ],
+      "base_pos": [
+        2.331631839835699,
+        -3.318476806564092,
+        0.700000021605797
+      ]
+    },
+    "action_shape": [
+      16,
+      12
+    ],
+    "first_action": [
+      -0.01171875,
+      0.009765625,
+      -0.00390625,
+      -0.001953125,
+      -0.00390625,
+      0.00390625,
+      -1.0,
+      0.0029296875,
+      0.001953125,
+      6.103515625e-05,
+      -0.0048828125,
+      -1.0
+    ]
+  },
+  {
+    "state_tag": "reset",
+    "label": "skill_move",
+    "instruction": "Move the grasped blender lid above the blender without colliding with the surroundings.",
+    "predicates": {
+      "gripper_lid_contact": false,
+      "lid_on_counter": true,
+      "lid_lifted": false,
+      "lid_grasped": false,
+      "lid_dz_from_rest": 0.0,
+      "lid_xy_to_closed_pos": 0.21796667428045136,
+      "lid_dz_to_closed_pos": -0.40140535564687085,
+      "lid_dist_to_closed_pos": 0.45676660411951225,
+      "in_preplace_region": false,
+      "lid_on_blender": false,
+      "lid_upright_7deg": true,
+      "gripper_lid_far_0.15": true,
+      "eef_lid_dist": 0.530418755513215,
+      "official_check_success": false,
+      "finger_qpos": [
+        0.02056489610934018,
+        -0.02050166294807547
+      ],
+      "gripper_ramp_action": [
+        0.0,
+        0.0
+      ],
+      "lid_other_contacts": [
+        "island_island_group_1_top_1",
+        "island_island_group_1_top_2"
+      ],
+      "lid_pos": [
+        1.9830752500206275,
+        -3.6910960588986197,
+        0.9412001768176548
+      ],
+      "eef_pos": [
+        2.083567968743833,
+        -3.3210103585145987,
+        1.3076450485993119
+      ],
+      "base_pos": [
+        2.331631839835699,
+        -3.318476806564092,
+        0.700000021605797
+      ]
+    },
+    "action_shape": [
+      16,
+      12
+    ],
+    "first_action": [
+      -0.037109375,
+      0.005126953125,
+      -0.005126953125,
+      0.0029296875,
+      -0.00390625,
+      0.001953125,
+      -1.0,
+      0.00390625,
+      0.0018310546875,
+      0.001953125,
+      0.0,
+      -1.0
+    ]
+  },
+  {
+    "state_tag": "reset",
+    "label": "skill_place",
+    "instruction": "Place the grasped blender lid securely on top of the blender, release it, and move the gripper away.",
+    "predicates": {
+      "gripper_lid_contact": false,
+      "lid_on_counter": true,
+      "lid_lifted": false,
+      "lid_grasped": false,
+      "lid_dz_from_rest": 0.0,
+      "lid_xy_to_closed_pos": 0.21796667428045136,
+      "lid_dz_to_closed_pos": -0.40140535564687085,
+      "lid_dist_to_closed_pos": 0.45676660411951225,
+      "in_preplace_region": false,
+      "lid_on_blender": false,
+      "lid_upright_7deg": true,
+      "gripper_lid_far_0.15": true,
+      "eef_lid_dist": 0.530418755513215,
+      "official_check_success": false,
+      "finger_qpos": [
+        0.02056489610934018,
+        -0.02050166294807547
+      ],
+      "gripper_ramp_action": [
+        0.0,
+        0.0
+      ],
+      "lid_other_contacts": [
+        "island_island_group_1_top_1",
+        "island_island_group_1_top_2"
+      ],
+      "lid_pos": [
+        1.9830752500206275,
+        -3.6910960588986197,
+        0.9412001768176548
+      ],
+      "eef_pos": [
+        2.083567968743833,
+        -3.3210103585145987,
+        1.3076450485993119
+      ],
+      "base_pos": [
+        2.331631839835699,
+        -3.318476806564092,
+        0.700000021605797
+      ]
+    },
+    "action_shape": [
+      16,
+      12
+    ],
+    "first_action": [
+      -0.025634765625,
+      0.006591796875,
+      -0.0068359375,
+      -0.00048828125,
+      -0.005859375,
+      0.0029296875,
+      -1.0,
+      0.00390625,
+      0.00146484375,
+      0.00146484375,
+      -0.0001220703125,
+      -1.0
+    ]
+  },
+  {
+    "state_tag": "move",
+    "label": "correct_full",
+    "instruction": "Close the lid blender by securely placing the lid on top.",
+    "predicates": {
+      "gripper_lid_contact": true,
+      "lid_on_counter": false,
+      "lid_lifted": true,
+      "lid_grasped": true,
+      "lid_dz_from_rest": 0.10119325308530747,
+      "lid_xy_to_closed_pos": 0.22010046306957076,
+      "lid_dz_to_closed_pos": -0.3002121025615634,
+      "lid_dist_to_closed_pos": 0.3722519581786967,
+      "in_preplace_region": false,
+      "lid_on_blender": false,
+      "lid_upright_7deg": false,
+      "gripper_lid_far_0.15": false,
+      "eef_lid_dist": 0.028709355300933593,
+      "official_check_success": false,
+      "finger_qpos": [
+        0.03326200241523598,
+        -0.024791414112887218
+      ],
+      "gripper_ramp_action": [
+        -1.0,
+        1.0
+      ],
+      "lid_other_contacts": [],
+      "lid_pos": [
+        2.017491272237922,
+        -3.6954695175930854,
+        1.0423934299029622
+      ],
+      "eef_pos": [
+        2.0273807097050205,
+        -3.7018850895049797,
+        1.0685710261528647
+      ],
+      "base_pos": [
+        2.3535426149717478,
+        -3.572313362151319,
+        0.7011099666579788
+      ]
+    },
+    "action_shape": [
+      16,
+      12
+    ],
+    "first_action": [
+      -0.01171875,
+      0.001953125,
+      0.0078125,
+      0.0029296875,
+      -0.00390625,
+      -0.00048828125,
+      1.0,
+      0.003662109375,
+      0.0,
+      -0.00341796875,
+      -0.00048828125,
+      -1.0
+    ]
+  },
+  {
+    "state_tag": "move",
+    "label": "skill_grasp",
+    "instruction": "Pick up the blender lid securely.",
+    "predicates": {
+      "gripper_lid_contact": true,
+      "lid_on_counter": false,
+      "lid_lifted": true,
+      "lid_grasped": true,
+      "lid_dz_from_rest": 0.10119325308530747,
+      "lid_xy_to_closed_pos": 0.22010046306957076,
+      "lid_dz_to_closed_pos": -0.3002121025615634,
+      "lid_dist_to_closed_pos": 0.3722519581786967,
+      "in_preplace_region": false,
+      "lid_on_blender": false,
+      "lid_upright_7deg": false,
+      "gripper_lid_far_0.15": false,
+      "eef_lid_dist": 0.028709355300933593,
+      "official_check_success": false,
+      "finger_qpos": [
+        0.03326200241523598,
+        -0.024791414112887218
+      ],
+      "gripper_ramp_action": [
+        -1.0,
+        1.0
+      ],
+      "lid_other_contacts": [],
+      "lid_pos": [
+        2.017491272237922,
+        -3.6954695175930854,
+        1.0423934299029622
+      ],
+      "eef_pos": [
+        2.0273807097050205,
+        -3.7018850895049797,
+        1.0685710261528647
+      ],
+      "base_pos": [
+        2.3535426149717478,
+        -3.572313362151319,
+        0.7011099666579788
+      ]
+    },
+    "action_shape": [
+      16,
+      12
+    ],
+    "first_action": [
+      -0.0009765625,
+      0.0087890625,
+      0.01409912109375,
+      -0.0029296875,
+      -0.0029296875,
+      0.002197265625,
+      1.0,
+      0.001953125,
+      0.0009765625,
+      0.0009765625,
+      -0.001953125,
+      -1.0
+    ]
+  },
+  {
+    "state_tag": "move",
+    "label": "skill_move",
+    "instruction": "Move the grasped blender lid above the blender without colliding with the surroundings.",
+    "predicates": {
+      "gripper_lid_contact": true,
+      "lid_on_counter": false,
+      "lid_lifted": true,
+      "lid_grasped": true,
+      "lid_dz_from_rest": 0.10119325308530747,
+      "lid_xy_to_closed_pos": 0.22010046306957076,
+      "lid_dz_to_closed_pos": -0.3002121025615634,
+      "lid_dist_to_closed_pos": 0.3722519581786967,
+      "in_preplace_region": false,
+      "lid_on_blender": false,
+      "lid_upright_7deg": false,
+      "gripper_lid_far_0.15": false,
+      "eef_lid_dist": 0.028709355300933593,
+      "official_check_success": false,
+      "finger_qpos": [
+        0.03326200241523598,
+        -0.024791414112887218
+      ],
+      "gripper_ramp_action": [
+        -1.0,
+        1.0
+      ],
+      "lid_other_contacts": [],
+      "lid_pos": [
+        2.017491272237922,
+        -3.6954695175930854,
+        1.0423934299029622
+      ],
+      "eef_pos": [
+        2.0273807097050205,
+        -3.7018850895049797,
+        1.0685710261528647
+      ],
+      "base_pos": [
+        2.3535426149717478,
+        -3.572313362151319,
+        0.7011099666579788
+      ]
+    },
+    "action_shape": [
+      16,
+      12
+    ],
+    "first_action": [
+      0.001953125,
+      0.00341796875,
+      0.015625,
+      -0.0029296875,
+      -0.001953125,
+      0.00225830078125,
+      1.0,
+      0.001708984375,
+      -0.00048828125,
+      0.0,
+      -0.001953125,
+      -1.0
+    ]
+  },
+  {
+    "state_tag": "move",
+    "label": "skill_place",
+    "instruction": "Place the grasped blender lid securely on top of the blender, release it, and move the gripper away.",
+    "predicates": {
+      "gripper_lid_contact": true,
+      "lid_on_counter": false,
+      "lid_lifted": true,
+      "lid_grasped": true,
+      "lid_dz_from_rest": 0.10119325308530747,
+      "lid_xy_to_closed_pos": 0.22010046306957076,
+      "lid_dz_to_closed_pos": -0.3002121025615634,
+      "lid_dist_to_closed_pos": 0.3722519581786967,
+      "in_preplace_region": false,
+      "lid_on_blender": false,
+      "lid_upright_7deg": false,
+      "gripper_lid_far_0.15": false,
+      "eef_lid_dist": 0.028709355300933593,
+      "official_check_success": false,
+      "finger_qpos": [
+        0.03326200241523598,
+        -0.024791414112887218
+      ],
+      "gripper_ramp_action": [
+        -1.0,
+        1.0
+      ],
+      "lid_other_contacts": [],
+      "lid_pos": [
+        2.017491272237922,
+        -3.6954695175930854,
+        1.0423934299029622
+      ],
+      "eef_pos": [
+        2.0273807097050205,
+        -3.7018850895049797,
+        1.0685710261528647
+      ],
+      "base_pos": [
+        2.3535426149717478,
+        -3.572313362151319,
+        0.7011099666579788
+      ]
+    },
+    "action_shape": [
+      16,
+      12
+    ],
+    "first_action": [
+      -0.0009765625,
+      0.0,
+      0.01953125,
+      0.0009765625,
+      -0.00146484375,
+      -0.001953125,
+      1.0078125,
+      0.000244140625,
+      -0.0018310546875,
+      -0.001953125,
+      0.00390625,
+      -1.0
+    ]
+  },
+  {
+    "state_tag": "place",
+    "label": "correct_full",
+    "instruction": "Close the lid blender by securely placing the lid on top.",
+    "predicates": {
+      "gripper_lid_contact": true,
+      "lid_on_counter": false,
+      "lid_lifted": true,
+      "lid_grasped": true,
+      "lid_dz_from_rest": 0.4650657849952413,
+      "lid_xy_to_closed_pos": 0.052380471757839275,
+      "lid_dz_to_closed_pos": 0.06366042934837046,
+      "lid_dist_to_closed_pos": 0.08244006360012505,
+      "in_preplace_region": true,
+      "lid_on_blender": false,
+      "lid_upright_7deg": false,
+      "gripper_lid_far_0.15": false,
+      "eef_lid_dist": 0.02848306060502286,
+      "official_check_success": false,
+      "finger_qpos": [
+        0.031124570655020212,
+        -0.026874982791590226
+      ],
+      "gripper_ramp_action": [
+        -1.0,
+        1.0
+      ],
+      "lid_other_contacts": [],
+      "lid_pos": [
+        2.0587644522045307,
+        -3.5032262420173765,
+        1.406265961812896
+      ],
+      "eef_pos": [
+        2.071141392294297,
+        -3.506573160791205,
+        1.4317000772912283
+      ],
+      "base_pos": [
+        2.3534735819177426,
+        -3.572600659639965,
+        0.7001575333179817
+      ]
+    },
+    "action_shape": [
+      16,
+      12
+    ],
+    "first_action": [
+      0.0087890625,
+      0.001953125,
+      -0.000885009765625,
+      -0.0009765625,
+      0.001953125,
+      0.0,
+      1.0,
+      -0.001708984375,
+      0.0,
+      0.0,
+      -0.0009765625,
+      -1.0
+    ]
+  },
+  {
+    "state_tag": "place",
+    "label": "skill_grasp",
+    "instruction": "Pick up the blender lid securely.",
+    "predicates": {
+      "gripper_lid_contact": true,
+      "lid_on_counter": false,
+      "lid_lifted": true,
+      "lid_grasped": true,
+      "lid_dz_from_rest": 0.4650657849952413,
+      "lid_xy_to_closed_pos": 0.052380471757839275,
+      "lid_dz_to_closed_pos": 0.06366042934837046,
+      "lid_dist_to_closed_pos": 0.08244006360012505,
+      "in_preplace_region": true,
+      "lid_on_blender": false,
+      "lid_upright_7deg": false,
+      "gripper_lid_far_0.15": false,
+      "eef_lid_dist": 0.02848306060502286,
+      "official_check_success": false,
+      "finger_qpos": [
+        0.031124570655020212,
+        -0.026874982791590226
+      ],
+      "gripper_ramp_action": [
+        -1.0,
+        1.0
+      ],
+      "lid_other_contacts": [],
+      "lid_pos": [
+        2.0587644522045307,
+        -3.5032262420173765,
+        1.406265961812896
+      ],
+      "eef_pos": [
+        2.071141392294297,
+        -3.506573160791205,
+        1.4317000772912283
+      ],
+      "base_pos": [
+        2.3534735819177426,
+        -3.572600659639965,
+        0.7001575333179817
+      ]
+    },
+    "action_shape": [
+      16,
+      12
+    ],
+    "first_action": [
+      0.012939453125,
+      0.0048828125,
+      -0.0029449462890625,
+      0.0,
+      0.0009765625,
+      0.001953125,
+      1.0,
+      -0.001953125,
+      0.0,
+      0.00048828125,
+      0.0,
+      -1.0
+    ]
+  },
+  {
+    "state_tag": "place",
+    "label": "skill_move",
+    "instruction": "Move the grasped blender lid above the blender without colliding with the surroundings.",
+    "predicates": {
+      "gripper_lid_contact": true,
+      "lid_on_counter": false,
+      "lid_lifted": true,
+      "lid_grasped": true,
+      "lid_dz_from_rest": 0.4650657849952413,
+      "lid_xy_to_closed_pos": 0.052380471757839275,
+      "lid_dz_to_closed_pos": 0.06366042934837046,
+      "lid_dist_to_closed_pos": 0.08244006360012505,
+      "in_preplace_region": true,
+      "lid_on_blender": false,
+      "lid_upright_7deg": false,
+      "gripper_lid_far_0.15": false,
+      "eef_lid_dist": 0.02848306060502286,
+      "official_check_success": false,
+      "finger_qpos": [
+        0.031124570655020212,
+        -0.026874982791590226
+      ],
+      "gripper_ramp_action": [
+        -1.0,
+        1.0
+      ],
+      "lid_other_contacts": [],
+      "lid_pos": [
+        2.0587644522045307,
+        -3.5032262420173765,
+        1.406265961812896
+      ],
+      "eef_pos": [
+        2.071141392294297,
+        -3.506573160791205,
+        1.4317000772912283
+      ],
+      "base_pos": [
+        2.3534735819177426,
+        -3.572600659639965,
+        0.7001575333179817
+      ]
+    },
+    "action_shape": [
+      16,
+      12
+    ],
+    "first_action": [
+      0.015625,
+      -0.0009765625,
+      -0.001220703125,
+      0.0029296875,
+      0.00146484375,
+      0.0,
+      1.0,
+      0.001953125,
+      -0.001953125,
+      0.0,
+      0.0,
+      -1.0
+    ]
+  },
+  {
+    "state_tag": "place",
+    "label": "skill_place",
+    "instruction": "Place the grasped blender lid securely on top of the blender, release it, and move the gripper away.",
+    "predicates": {
+      "gripper_lid_contact": true,
+      "lid_on_counter": false,
+      "lid_lifted": true,
+      "lid_grasped": true,
+      "lid_dz_from_rest": 0.4650657849952413,
+      "lid_xy_to_closed_pos": 0.052380471757839275,
+      "lid_dz_to_closed_pos": 0.06366042934837046,
+      "lid_dist_to_closed_pos": 0.08244006360012505,
+      "in_preplace_region": true,
+      "lid_on_blender": false,
+      "lid_upright_7deg": false,
+      "gripper_lid_far_0.15": false,
+      "eef_lid_dist": 0.02848306060502286,
+      "official_check_success": false,
+      "finger_qpos": [
+        0.031124570655020212,
+        -0.026874982791590226
+      ],
+      "gripper_ramp_action": [
+        -1.0,
+        1.0
+      ],
+      "lid_other_contacts": [],
+      "lid_pos": [
+        2.0587644522045307,
+        -3.5032262420173765,
+        1.406265961812896
+      ],
+      "eef_pos": [
+        2.071141392294297,
+        -3.506573160791205,
+        1.4317000772912283
+      ],
+      "base_pos": [
+        2.3534735819177426,
+        -3.572600659639965,
+        0.7001575333179817
+      ]
+    },
+    "action_shape": [
+      16,
+      12
+    ],
+    "first_action": [
+      0.0166015625,
+      0.000244140625,
+      0.00146484375,
+      0.001953125,
+      0.001953125,
+      0.001220703125,
+      1.0,
+      -0.00390625,
+      -0.001953125,
+      0.0009765625,
+      -0.001953125,
+      -1.0
+    ]
+  }
+]

@@ -1,0 +1,11 @@
+{
+  "checkpoint": "/checkpoint",
+  "config_sha256": "ff3fdf7b128376b3c52626c4874c3748d3ce087afa81af5cb1b574683ad0bedf",
+  "model_index_sha256": "9663e68cab7d296c4b41f3a1885afb1f6f2722828825ad4ba6bb7768c29ae396",
+  "checkpoint_model_class": "MiBoTForActionGeneration",
+  "torch": "2.5.1+cu121",
+  "cuda": "12.1",
+  "gpu": "NVIDIA GeForce RTX 3090",
+  "attention_backend": "flash_attention_2 (policy); exact selected QK probabilities reconstructed read-only",
+  "server_source_sha256": "bd89f8d1b9434d3cb8659b0373307be6c601cfae9f0674903d2a102fc04dc322"
+}
