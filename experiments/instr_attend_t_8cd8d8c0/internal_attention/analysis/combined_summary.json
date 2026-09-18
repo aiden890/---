@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "cases": [
     {
       "state": "reset",
@@ -237,7 +237,733 @@
       16
     ],
     "all_finite": true,
-    "dtype": "float32"
+    "dtype": "float32",
+    "verification_basis": [
+      "attention_server.py allocates arrays from model layer/head counts and action_length metadata",
+      "analyzer validates every one of the 12 raw arrays against the declared axes",
+      "raw token metadata records num_steps=5 and action_length=16"
+    ],
+    "axis_evidence": {
+      "source_file": "attention_server.py",
+      "vlm": "(len(model.vlm.model.language_model.layers), self_attn.config.num_attention_heads)",
+      "dit": "(meta.num_steps, len(model.dit.layers), layer.attn.num_heads)",
+      "action_query": "dit_query_to_instruction[..., meta.action_length], populated from query[:, :, -action_length:, :]",
+      "raw_metadata": {
+        "num_steps": 5,
+        "action_length": 16
+      }
+    }
+  },
+  "interpretation_guide": {
+    "axis_semantics": {
+      "vlm_36x32": [
+        "VLM layer index 0..35",
+        "VLM attention head index 0..31"
+      ],
+      "dit_5x36x8": [
+        "flow/denoising call index 0..4",
+        "DiT layer index 0..35",
+        "DiT attention head index 0..7"
+      ],
+      "action_query_5x36x8x16": [
+        "flow/denoising call index 0..4",
+        "DiT layer index 0..35",
+        "DiT attention head index 0..7",
+        "action query index 0..15"
+      ]
+    },
+    "direction_and_normalization": {
+      "direction": "query -> key",
+      "values": "post-softmax attention probabilities over the full allowed key axis",
+      "instruction_mass": "sum over instruction key indices; not renormalized within the instruction span",
+      "image_mass": "sum over image key indices using the same full-key denominator",
+      "vlm_query_reduction": "mean across instruction query positions after summing image keys",
+      "dit_query_reduction": "mean across 16 action queries after summing instruction/image keys"
+    },
+    "aggregation": {
+      "attention_samples_per_condition": 1,
+      "conditions": 12,
+      "state_mean": "unweighted mean of the four instruction-condition scalar means in that observation state",
+      "condition_scalar": "unweighted mean over all timestep/layer/head cells; action queries were already averaged by the recorder",
+      "layer_timestep_plot": "mean over 8 heads; 16 action queries already averaged",
+      "layer_head_plot": "mean over 5 flow timesteps; 16 action queries already averaged",
+      "vlm_layer_head_plot": "mean over instruction query positions; image keys summed",
+      "normalization": "no min-max or z-score normalization of numeric outputs; color mapping only linearly maps each plot's shared actual range"
+    },
+    "token_boundaries": {
+      "correct_full": {
+        "instruction": "Close the lid blender by securely placing the lid on top.",
+        "sequence_length": 483,
+        "instruction_index_ranges": [
+          [
+            455,
+            466
+          ]
+        ],
+        "image_index_ranges": [
+          [
+            13,
+            76
+          ],
+          [
+            85,
+            148
+          ],
+          [
+            161,
+            224
+          ],
+          [
+            233,
+            296
+          ],
+          [
+            310,
+            373
+          ],
+          [
+            382,
+            445
+          ]
+        ],
+        "special_token_index_ranges": {
+          "<|im_end|>": [
+            [
+              471,
+              471
+            ],
+            [
+              481,
+              481
+            ]
+          ],
+          "<|im_start|>": [
+            [
+              0,
+              0
+            ],
+            [
+              473,
+              473
+            ]
+          ],
+          "<|video_pad|>": [
+            [
+              13,
+              76
+            ],
+            [
+              85,
+              148
+            ],
+            [
+              161,
+              224
+            ],
+            [
+              233,
+              296
+            ],
+            [
+              310,
+              373
+            ],
+            [
+              382,
+              445
+            ]
+          ],
+          "<|vision_end|>": [
+            [
+              77,
+              77
+            ],
+            [
+              149,
+              149
+            ],
+            [
+              225,
+              225
+            ],
+            [
+              297,
+              297
+            ],
+            [
+              374,
+              374
+            ],
+            [
+              446,
+              446
+            ]
+          ],
+          "<|vision_start|>": [
+            [
+              12,
+              12
+            ],
+            [
+              84,
+              84
+            ],
+            [
+              160,
+              160
+            ],
+            [
+              232,
+              232
+            ],
+            [
+              309,
+              309
+            ],
+            [
+              381,
+              381
+            ]
+          ]
+        },
+        "semantic_token_indices": {
+          "GRASP": [
+            460
+          ],
+          "MOVE": [],
+          "PLACE": [
+            461,
+            465
+          ]
+        },
+        "action_query_index_range": [
+          0,
+          15
+        ],
+        "index_base": 0,
+        "note": "action queries are DiT query-axis positions, not VLM sequence-token positions"
+      },
+      "skill_grasp": {
+        "instruction": "Pick up the blender lid securely.",
+        "sequence_length": 478,
+        "instruction_index_ranges": [
+          [
+            455,
+            461
+          ]
+        ],
+        "image_index_ranges": [
+          [
+            13,
+            76
+          ],
+          [
+            85,
+            148
+          ],
+          [
+            161,
+            224
+          ],
+          [
+            233,
+            296
+          ],
+          [
+            310,
+            373
+          ],
+          [
+            382,
+            445
+          ]
+        ],
+        "special_token_index_ranges": {
+          "<|im_end|>": [
+            [
+              466,
+              466
+            ],
+            [
+              476,
+              476
+            ]
+          ],
+          "<|im_start|>": [
+            [
+              0,
+              0
+            ],
+            [
+              468,
+              468
+            ]
+          ],
+          "<|video_pad|>": [
+            [
+              13,
+              76
+            ],
+            [
+              85,
+              148
+            ],
+            [
+              161,
+              224
+            ],
+            [
+              233,
+              296
+            ],
+            [
+              310,
+              373
+            ],
+            [
+              382,
+              445
+            ]
+          ],
+          "<|vision_end|>": [
+            [
+              77,
+              77
+            ],
+            [
+              149,
+              149
+            ],
+            [
+              225,
+              225
+            ],
+            [
+              297,
+              297
+            ],
+            [
+              374,
+              374
+            ],
+            [
+              446,
+              446
+            ]
+          ],
+          "<|vision_start|>": [
+            [
+              12,
+              12
+            ],
+            [
+              84,
+              84
+            ],
+            [
+              160,
+              160
+            ],
+            [
+              232,
+              232
+            ],
+            [
+              309,
+              309
+            ],
+            [
+              381,
+              381
+            ]
+          ]
+        },
+        "semantic_token_indices": {
+          "GRASP": [
+            455,
+            460
+          ],
+          "MOVE": [],
+          "PLACE": []
+        },
+        "action_query_index_range": [
+          0,
+          15
+        ],
+        "index_base": 0,
+        "note": "action queries are DiT query-axis positions, not VLM sequence-token positions"
+      },
+      "skill_move": {
+        "instruction": "Move the grasped blender lid above the blender without colliding with the surroundings.",
+        "sequence_length": 487,
+        "instruction_index_ranges": [
+          [
+            455,
+            470
+          ]
+        ],
+        "image_index_ranges": [
+          [
+            13,
+            76
+          ],
+          [
+            85,
+            148
+          ],
+          [
+            161,
+            224
+          ],
+          [
+            233,
+            296
+          ],
+          [
+            310,
+            373
+          ],
+          [
+            382,
+            445
+          ]
+        ],
+        "special_token_index_ranges": {
+          "<|im_end|>": [
+            [
+              475,
+              475
+            ],
+            [
+              485,
+              485
+            ]
+          ],
+          "<|im_start|>": [
+            [
+              0,
+              0
+            ],
+            [
+              477,
+              477
+            ]
+          ],
+          "<|video_pad|>": [
+            [
+              13,
+              76
+            ],
+            [
+              85,
+              148
+            ],
+            [
+              161,
+              224
+            ],
+            [
+              233,
+              296
+            ],
+            [
+              310,
+              373
+            ],
+            [
+              382,
+              445
+            ]
+          ],
+          "<|vision_end|>": [
+            [
+              77,
+              77
+            ],
+            [
+              149,
+              149
+            ],
+            [
+              225,
+              225
+            ],
+            [
+              297,
+              297
+            ],
+            [
+              374,
+              374
+            ],
+            [
+              446,
+              446
+            ]
+          ],
+          "<|vision_start|>": [
+            [
+              12,
+              12
+            ],
+            [
+              84,
+              84
+            ],
+            [
+              160,
+              160
+            ],
+            [
+              232,
+              232
+            ],
+            [
+              309,
+              309
+            ],
+            [
+              381,
+              381
+            ]
+          ]
+        },
+        "semantic_token_indices": {
+          "GRASP": [],
+          "MOVE": [
+            455,
+            461,
+            469
+          ],
+          "PLACE": []
+        },
+        "action_query_index_range": [
+          0,
+          15
+        ],
+        "index_base": 0,
+        "note": "action queries are DiT query-axis positions, not VLM sequence-token positions"
+      },
+      "skill_place": {
+        "instruction": "Place the grasped blender lid securely on top of the blender, release it, and move the gripper away.",
+        "sequence_length": 494,
+        "instruction_index_ranges": [
+          [
+            455,
+            477
+          ]
+        ],
+        "image_index_ranges": [
+          [
+            13,
+            76
+          ],
+          [
+            85,
+            148
+          ],
+          [
+            161,
+            224
+          ],
+          [
+            233,
+            296
+          ],
+          [
+            310,
+            373
+          ],
+          [
+            382,
+            445
+          ]
+        ],
+        "special_token_index_ranges": {
+          "<|im_end|>": [
+            [
+              482,
+              482
+            ],
+            [
+              492,
+              492
+            ]
+          ],
+          "<|im_start|>": [
+            [
+              0,
+              0
+            ],
+            [
+              484,
+              484
+            ]
+          ],
+          "<|video_pad|>": [
+            [
+              13,
+              76
+            ],
+            [
+              85,
+              148
+            ],
+            [
+              161,
+              224
+            ],
+            [
+              233,
+              296
+            ],
+            [
+              310,
+              373
+            ],
+            [
+              382,
+              445
+            ]
+          ],
+          "<|vision_end|>": [
+            [
+              77,
+              77
+            ],
+            [
+              149,
+              149
+            ],
+            [
+              225,
+              225
+            ],
+            [
+              297,
+              297
+            ],
+            [
+              374,
+              374
+            ],
+            [
+              446,
+              446
+            ]
+          ],
+          "<|vision_start|>": [
+            [
+              12,
+              12
+            ],
+            [
+              84,
+              84
+            ],
+            [
+              160,
+              160
+            ],
+            [
+              232,
+              232
+            ],
+            [
+              309,
+              309
+            ],
+            [
+              381,
+              381
+            ]
+          ]
+        },
+        "semantic_token_indices": {
+          "GRASP": [
+            461
+          ],
+          "MOVE": [
+            472
+          ],
+          "PLACE": [
+            455,
+            463,
+            468
+          ]
+        },
+        "action_query_index_range": [
+          0,
+          15
+        ],
+        "index_base": 0,
+        "note": "action queries are DiT query-axis positions, not VLM sequence-token positions"
+      }
+    },
+    "action_sensitivity": {
+      "effect_size_formula": "ES = d_means / (noise_floor / sqrt(N))",
+      "effect_size_unit": "dimensionless multiple of the null mean-difference noise scale; not an attention value",
+      "cosine": "closer to 1 means the mean action direction is closer to the full-task-instruction reference",
+      "per_state_inputs": {
+        "reset": {
+          "N": 24,
+          "noise_floor_pairwise_L2": 3.5582,
+          "null_meandiff_scale": 0.7263
+        },
+        "move": {
+          "N": 24,
+          "noise_floor_pairwise_L2": 1.0396,
+          "null_meandiff_scale": 0.2122
+        },
+        "place": {
+          "N": 24,
+          "noise_floor_pairwise_L2": 2.0316,
+          "null_meandiff_scale": 0.4147
+        }
+      }
+    },
+    "caveat": "attention != causal importance, performance, or accuracy; attention and ES/cosine may disagree"
+  },
+  "plot_metadata": {
+    "action_instruction_layer_timestep.png": {
+      "actual_value_range": [
+        0.0009639597265049815,
+        0.13895276188850403
+      ],
+      "shared_color_scale_across_panels": true,
+      "color_direction": "blue (low) -> cyan -> yellow (high)",
+      "panel_definition": "observation state / instruction condition"
+    },
+    "action_instruction_layer_head.png": {
+      "actual_value_range": [
+        0.0,
+        0.9154842495918274
+      ],
+      "shared_color_scale_across_panels": true,
+      "color_direction": "blue (low) -> cyan -> yellow (high)",
+      "panel_definition": "observation state / instruction condition"
+    },
+    "vlm_instruction_image_layer_head.png": {
+      "actual_value_range": [
+        2.1904765162616968e-05,
+        0.9386115074157715
+      ],
+      "shared_color_scale_across_panels": true,
+      "color_direction": "blue (low) -> cyan -> yellow (high)",
+      "panel_definition": "observation state / instruction condition"
+    },
+    "attention_vs_action_sensitivity.png": {
+      "x_actual_value_range": [
+        0.02355608157813549,
+        0.05299187824130058
+      ],
+      "y_actual_value_range": [
+        0.0,
+        10.476
+      ],
+      "shared_axes_across_panels": true,
+      "panel_definition": "observation state; point color/label = instruction condition"
+    }
   },
   "joint_analysis": {
     "pearson_attention_vs_effect_nonreference": -0.4140238704426003,
