@@ -121,6 +121,19 @@ def test_env_example_no_abs_paths():
     check(".env.example uses placeholders", not bad, str(bad))
 
 
+def test_assets_mount_contract():
+    """Task-scoped Docker volumes must work without weakening the default RO mount."""
+    run = (ROOT / "run.sh").read_text()
+    preflight = (ROOT / "preflight.sh").read_text()
+    env = (ROOT / ".env.example").read_text()
+    check("run supports explicit assets mount mode",
+          'RLINF_ASSETS_MODE:-ro' in run and 'assets_mount' in run)
+    check("preflight recognizes Docker asset volumes",
+          'docker volume inspect "$RLINF_ASSETS"' in preflight)
+    check("assets mount defaults read-only",
+          "RLINF_ASSETS_MODE=ro" in env)
+
+
 if __name__ == "__main__":
     test_imports()
     test_configs()
@@ -128,6 +141,7 @@ if __name__ == "__main__":
     test_pins()
     test_no_secrets()
     test_env_example_no_abs_paths()
+    test_assets_mount_contract()
     print()
     if FAILS:
         print(f"FAILED ({len(FAILS)}):")

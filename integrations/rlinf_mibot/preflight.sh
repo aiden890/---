@@ -131,9 +131,13 @@ else
   fail "checkpoint_mount" "RLINF_CHECKPOINT not set or not a dir" "set RLINF_CHECKPOINT in .env to the checkpoint path"
 fi
 if [[ -n "${RLINF_ASSETS:-}" && -d "${RLINF_ASSETS}" ]]; then
-  pass "assets_mount" "${RLINF_ASSETS} present"
+  pass "assets_mount" "host directory ${RLINF_ASSETS} present (mode=${RLINF_ASSETS_MODE:-ro})"
+elif [[ -n "${RLINF_ASSETS:-}" ]] && command -v docker >/dev/null 2>&1 &&
+     docker volume inspect "$RLINF_ASSETS" >/dev/null 2>&1; then
+  pass "assets_mount" "Docker volume ${RLINF_ASSETS} present (mode=${RLINF_ASSETS_MODE:-ro})"
 else
-  fail "assets_mount" "RLINF_ASSETS not set or not a dir" "set RLINF_ASSETS to the RoboCasa assets dir"
+  fail "assets_mount" "RLINF_ASSETS is neither a host dir nor a Docker volume" \
+    "set RLINF_ASSETS to the RoboCasa assets dir or a pre-populated Docker volume"
 fi
 
 echo

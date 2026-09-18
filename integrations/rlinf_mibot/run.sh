@@ -17,6 +17,11 @@ SOURCE_COMMIT="$(git -C "$repo_root" rev-parse HEAD)"
 : "${RLINF_RESULTS:?set RLINF_RESULTS in .env}"
 : "${RLINF_CACHE:?set RLINF_CACHE in .env}"
 mkdir -p "$RLINF_RESULTS" "$RLINF_CACHE"
+ASSETS_MODE="${RLINF_ASSETS_MODE:-ro}"
+[[ "$ASSETS_MODE" == ro || "$ASSETS_MODE" == rw ]] || {
+  echo "RLINF_ASSETS_MODE must be ro or rw" >&2; exit 2
+}
+assets_mount="$RLINF_ASSETS:/opt/robocasa/robocasa/models/assets:$ASSETS_MODE"
 
 validate_run_id() {
   [[ "$1" =~ ^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$ ]] || {
@@ -37,7 +42,7 @@ common_args=(--gpus "$GPUS" --shm-size=8g
   -v "$repo_root/xiaomi-cu121:/work:ro"
   -v "$repo_root/rollouts-xiaomi-t_4a072806/tools:/skill_eval_tools:ro"
   -v "$RLINF_CHECKPOINT:/checkpoint:ro"
-  -v "$RLINF_ASSETS:/opt/robocasa/robocasa/models/assets:ro"
+  -v "$assets_mount"
   -v "$RLINF_RESULTS:/results"
   -v "$RLINF_CACHE:/cache")
 

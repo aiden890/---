@@ -26,6 +26,9 @@ report under `required_server_inputs`):
 - Confirmation that **Docker** and **nvidia-container-toolkit** are installed.
 - **Host mount paths**: RoboCasa assets dir, and the Xiaomi checkpoint dir
   (`Xiaomi-Robotics-1-RoboCasa365`, sha `3a6d0293…`).
+- A pre-populated Docker volume is also accepted for `RLINF_ASSETS`. If object construction
+  needs to write temporary MJCF files, clone the validated shared volume into a task-scoped
+  volume and set `RLINF_ASSETS_MODE=rw`; never make the shared parent volume writable.
 - Whether **outbound network** is allowed (needed once to clone RLinf + pull the base
   image; otherwise pre-seed `vendor/rlinf` and the base image offline).
 
