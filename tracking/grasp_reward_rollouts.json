@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "title": "변경된 GRASP reward 환경 · rollout 10개",
+  "source_run": "grasp-reward-viewer-20260919",
+  "source_result_dir": "spark2:/home/csi-agent-dgx_spark2/workspace/rlinf-mibot-prep/results/grasp-reward-viewer-20260919",
+  "policy_version": 0,
+  "policy_hash": "22383706487db9aeb6f6f8387e7a9bf906b08169c1320a3bd12676bc6ede03a6",
+  "configuration": {
+    "env.horizon": 208,
+    "env.skill": "GRASP_OBJECT",
+    "env.split": "pretrain",
+    "reward.use_milestones": false,
+    "reward.variant": "grasp_binary",
+    "rollout.episodes": 10,
+    "rollout.obs_history": 4,
+    "rollout.obs_interval": 2,
+    "rollout.replan_steps": 16,
+    "rollout.save_video": true,
+    "sampler.name": "pirl_flow_sde",
+    "sampler.noise_level": 0.1
+  },
+  "reward_semantics": "GRASP 20-step stable success terminal × 0.998^step; milestones disabled",
+  "rollouts": [
+    {
+      "job_id": "cfg-73b85c5c4871-ep00000",
+      "seed": 710000,
+      "outcome": "TIMEOUT",
+      "success": false,
+      "steps": 208,
+      "success_step": null,
+      "reward_sum": 0.0,
+      "reward_frame": null,
+      "reward_time_seconds": null,
+      "video_stride": 2,
+      "video_fps": 20,
+      "source_mp4": "/results/grasp-reward-viewer-20260919/cfg-73b85c5c4871/episodes/cfg-73b85c5c4871-ep00000/attempt-1/rollout.mp4",
+      "mp4": "media/grasp_reward_rollouts/grasp_seed_710000_reward_sum.mp4",
+      "video": {
+        "frames": 105,
+        "fps": 20.0,
+        "width": 768,
+        "height": 256
+      }
+    },
+    {
+      "job_id": "cfg-73b85c5c4871-ep00001",
+      "seed": 710001,
+      "outcome": "SUCCESS",
+      "success": true,
+      "steps": 129,
+      "success_step": 129,
+      "reward_sum": 0.9821433300119734,
+      "reward_frame": 65,
+      "reward_time_seconds": 3.25,
+      "video_stride": 2,
+      "video_fps": 20,
+      "source_mp4": "/results/grasp-reward-viewer-20260919/cfg-73b85c5c4871/episodes/cfg-73b85c5c4871-ep00001/attempt-1/rollout.mp4",
+      "mp4": "media/grasp_reward_rollouts/grasp_seed_710001_reward_sum.mp4",
+      "video": {
+        "frames": 66,
+        "fps": 20.0,
+        "width": 768,
+        "height": 256
+      }
+    },
+    {
+      "job_id": "cfg-73b85c5c4871-ep00002",
+      "seed": 710002,
+      "outcome": "TIMEOUT",
+      "success": false,
+      "steps": 208,
+      "success_step": null,
+      "reward_sum": 0.0,
+      "reward_frame": null,
+      "reward_time_seconds": null,
+      "video_stride": 2,
+      "video_fps": 20,
+      "source_mp4": "/results/grasp-reward-viewer-20260919/cfg-73b85c5c4871/episodes/cfg-73b85c5c4871-ep00002/attempt-1/rollout.mp4",
+      "mp4": "media/grasp_reward_rollouts/grasp_seed_710002_reward_sum.mp4",
+      "video": {
+        "frames": 105,
+        "fps": 20.0,
+        "width": 768,
+        "height": 256
+      }
+    },
+    {
+      "job_id": "cfg-73b85c5c4871-ep00003",
+      "seed": 710003,
+      "outcome": "SUCCESS",
+      "success": true,
+      "steps": 156,
+      "success_step": 156,
+      "reward_sum": 0.9801790433519494,
+      "reward_frame": 78,
+      "reward_time_seconds": 3.9,
+      "video_stride": 2,
+      "video_fps": 20,
+      "source_mp4": "/results/grasp-reward-viewer-20260919/cfg-73b85c5c4871/episodes/cfg-73b85c5c4871-ep00003/attempt-1/rollout.mp4",
+      "mp4": "media/grasp_reward_rollouts/grasp_seed_710003_reward_sum.mp4",
+      "video": {
+        "frames": 79,
+        "fps": 20.0,
+        "width": 768,
+        "height": 256
+      }
+    },
+    {
+      "job_id": "cfg-73b85c5c4871-ep00004",
+      "seed": 710004,
+      "outcome": "TIMEOUT",
+      "success": false,
+      "steps": 208,
+      "success_step": null,
+      "reward_sum": 0.0,
+      "reward_frame": null,
+      "reward_time_seconds": null,
+      "video_stride": 2,
+      "video_fps": 20,
+      "source_mp4": "/results/grasp-reward-viewer-20260919/cfg-73b85c5c4871/episodes/cfg-73b85c5c4871-ep00004/attempt-1/rollout.mp4",
+      "mp4": "media/grasp_reward_rollouts/grasp_seed_710004_reward_sum.mp4",
+      "video": {
+        "frames": 105,
+        "fps": 20.0,
+        "width": 768,
+        "height": 256
+      }
+    },
+    {
+      "job_id": "cfg-73b85c5c4871-ep00005",
+      "seed": 710005,
+      "outcome": "SUCCESS",
+      "success": true,
+      "steps": 121,
+      "success_step": 121,
+      "reward_sum": 0.9841115531182097,
+      "reward_frame": 61,
+      "reward_time_seconds": 3.05,
+      "video_stride": 2,
+      "video_fps": 20,
+      "source_mp4": "/results/grasp-reward-viewer-20260919/cfg-73b85c5c4871/episodes/cfg-73b85c5c4871-ep00005/attempt-1/rollout.mp4",
+      "mp4": "media/grasp_reward_rollouts/grasp_seed_710005_reward_sum.mp4",
+      "video": {
+        "frames": 62,
+        "fps": 20.0,
+        "width": 768,
+        "height": 256
+      }
+    },
+    {
+      "job_id": "cfg-73b85c5c4871-ep00006",
+      "seed": 710006,
+      "outcome": "TIMEOUT",
+      "success": false,
+      "steps": 208,
+      "success_step": null,
+      "reward_sum": 0.0,
+      "reward_frame": null,
+      "reward_time_seconds": null,
+      "video_stride": 2,
+      "video_fps": 20,
+      "source_mp4": "/results/grasp-reward-viewer-20260919/cfg-73b85c5c4871/episodes/cfg-73b85c5c4871-ep00006/attempt-1/rollout.mp4",
+      "mp4": "media/grasp_reward_rollouts/grasp_seed_710006_reward_sum.mp4",
+      "video": {
+        "frames": 105,
+        "fps": 20.0,
+        "width": 768,
+        "height": 256
+      }
+    },
+    {
+      "job_id": "cfg-73b85c5c4871-ep00007",
+      "seed": 710007,
+      "outcome": "SUCCESS",
+      "success": true,
+      "steps": 140,
+      "success_step": 140,
+      "reward_sum": 0.9821433300119734,
+      "reward_frame": 70,
+      "reward_time_seconds": 3.5,
+      "video_stride": 2,
+      "video_fps": 20,
+      "source_mp4": "/results/grasp-reward-viewer-20260919/cfg-73b85c5c4871/episodes/cfg-73b85c5c4871-ep00007/attempt-1/rollout.mp4",
+      "mp4": "media/grasp_reward_rollouts/grasp_seed_710007_reward_sum.mp4",
+      "video": {
+        "frames": 71,
+        "fps": 20.0,
+        "width": 768,
+        "height": 256
+      }
+    },
+    {
+      "job_id": "cfg-73b85c5c4871-ep00008",
+      "seed": 710008,
+      "outcome": "TIMEOUT",
+      "success": false,
+      "steps": 208,
+      "success_step": null,
+      "reward_sum": 0.0,
+      "reward_frame": null,
+      "reward_time_seconds": null,
+      "video_stride": 2,
+      "video_fps": 20,
+      "source_mp4": "/results/grasp-reward-viewer-20260919/cfg-73b85c5c4871/episodes/cfg-73b85c5c4871-ep00008/attempt-1/rollout.mp4",
+      "mp4": "media/grasp_reward_rollouts/grasp_seed_710008_reward_sum.mp4",
+      "video": {
+        "frames": 105,
+        "fps": 20.0,
+        "width": 768,
+        "height": 256
+      }
+    },
+    {
+      "job_id": "cfg-73b85c5c4871-ep00009",
+      "seed": 710009,
+      "outcome": "SUCCESS",
+      "success": true,
+      "steps": 153,
+      "success_step": 153,
+      "reward_sum": 0.9801790433519494,
+      "reward_frame": 77,
+      "reward_time_seconds": 3.85,
+      "video_stride": 2,
+      "video_fps": 20,
+      "source_mp4": "/results/grasp-reward-viewer-20260919/cfg-73b85c5c4871/episodes/cfg-73b85c5c4871-ep00009/attempt-1/rollout.mp4",
+      "mp4": "media/grasp_reward_rollouts/grasp_seed_710009_reward_sum.mp4",
+      "video": {
+        "frames": 78,
+        "fps": 20.0,
+        "width": 768,
+        "height": 256
+      }
+    }
+  ]
+}

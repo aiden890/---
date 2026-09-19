@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>변경된 GRASP reward 환경 · rollout 10개</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="../assets/theme.js"></script>
+</head>
+<body>
+<header><div class="bar"><a href="../index.html#rlenv">← RL 환경</a><b>RoboCasa · Xiaomi VLA</b></div></header>
+<main id="app"><p class="dim">rollout 정보를 불러오는 중…</p></main>
+<script>
+const f6=v=>Number(v).toFixed(6);
+fetch('../grasp_reward_rollouts.json').then(r=>r.json()).then(data=>{
+  const e={
+    id:'EXP-20260919-GRASP-REWARD-ROLL-10',
+    date:'2026-09-19',
+    model:'Xiaomi-Robotics-1-RoboCasa365',
+    task:'CloseBlenderLid / GRASP',
+    title:'변경된 GRASP reward 환경 · rollout 10개',
+    question:'변경된 GRASP reward 설정에서 실제 rollout별 누적 reward 합계가 성공 시점에 정확히 표시되는가?'
+  };
+  const rows=data.rollouts;
+  const success=rows.filter(x=>x.success);
+  const cards=rows.map((r,i)=>`
+    <article class="video-card">
+      <video controls preload="metadata" src="../${r.mp4}"></video>
+      <h3>#${i+1} · seed ${r.seed} ${r.success?'<span class="ok">SUCCESS</span>':'<span class="no">TIMEOUT</span>'}</h3>
+      <p><b>reward 합계 ${f6(r.reward_sum)}</b> · 성공 step ${r.success_step??'—'} · 전체 ${r.steps} steps</p>
+    </article>`).join('');
+  const table=rows.map((r,i)=>`<tr>
+    <td>${i+1}</td><td>${r.seed}</td><td class="${r.success?'ok':'no'}">${r.outcome}</td>
+    <td>${r.success_step??'—'}</td><td>${r.steps}</td><td>${f6(r.reward_sum)}</td>
+  </tr>`).join('');
+  document.getElementById('app').innerHTML=`
+    <div class="dim">${e.id} · ${e.date}</div>
+    <h1>${e.title}</h1>
+    <div class="meta"><span class="chip">${e.model}</span><span class="chip">${e.task}</span><span class="chip">fresh 10 rollouts</span><span class="chip">완료</span></div>
+    <div class="question"><b>목적</b><br>${e.question}</div>
+    <div class="card">
+      <h2>현재 reward 설정</h2>
+      <p>GRASP 성공은 <code>lid_grasped</code>가 20 step 연속 유지될 때 확정됩니다. 성공 시 그 step에 <code>1.0 × 0.998<sup>step</sup></code> terminal reward를 한 번 지급하며, milestone reward는 사용하지 않습니다.</p>
+      <p class="dim">horizon 208 · pi-RL Flow-SDE · noise 0.1 · replan 16 · policy v${data.policy_version} / ${data.policy_hash.slice(0,12)}</p>
+    </div>
+    <div class="verdict"><div><b>성공</b>${success.length}/10</div><div><b>reward 합계</b>성공 ${f6(Math.min(...success.map(x=>x.reward_sum)))}~${f6(Math.max(...success.map(x=>x.reward_sum)))} · timeout 0</div></div>
+    <div class="card">
+      <h2>reward 합계 overlay 영상 10개</h2>
+      <p class="dim">성공 전에는 누적합 0, 성공 terminal 지급 프레임부터 실제 decayed reward 합계가 표시됩니다.</p>
+      <div class="videos">${cards}</div>
+    </div>
+    <div class="card"><h2>rollout별 수치</h2>
+      <table><thead><tr><th>#</th><th>seed</th><th>결과</th><th>성공 step</th><th>전체 steps</th><th>reward 합계</th></tr></thead><tbody>${table}</tbody></table>
+    </div>
+    <div class="artifact">원본 run: <code>${data.source_run}</code> · manifest <code>tracking/grasp_reward_rollouts.json</code> · renderer <code>tracking/make_grasp_reward_sum_overlays.py</code></div>`;
+}).catch(err=>{
+  document.getElementById('app').innerHTML='<p class="no">rollout 정보를 불러오지 못했습니다.</p>';
+  console.error(err);
+});
+</script>
+</body>
+</html>
