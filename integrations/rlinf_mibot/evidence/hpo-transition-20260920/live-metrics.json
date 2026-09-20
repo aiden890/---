@@ -1,0 +1,34 @@
+{
+  "spark1": {
+    "n_trajs": 0,
+    "n_chunks": 0,
+    "chunks_by_traj": {},
+    "free_gb": 46.44,
+    "allocated_gb": 10.29,
+    "peak_allocated_gb": 10.51,
+    "policy_version": 100,
+    "policy_hash": "b3816f107390fcbbf44e605f87021da38664429f1d031feaa3334dc8dfd6105b",
+    "policy_hash_history": {
+      "99": "709126317fe87563a5f1d558b9057f1bef84948023685d900de1f60c081a43c3",
+      "100": "b3816f107390fcbbf44e605f87021da38664429f1d031feaa3334dc8dfd6105b"
+    },
+    "fail_stopped": false,
+    "fatal_error": null
+  },
+  "amp_csi": {
+    "n_trajs": 0,
+    "n_chunks": 0,
+    "chunks_by_traj": {},
+    "free_gb": 12.94,
+    "allocated_gb": 10.34,
+    "peak_allocated_gb": 11.1,
+    "policy_version": 100,
+    "policy_hash": "b3816f107390fcbbf44e605f87021da38664429f1d031feaa3334dc8dfd6105b",
+    "policy_hash_history": {
+      "99": "709126317fe87563a5f1d558b9057f1bef84948023685d900de1f60c081a43c3",
+      "100": "b3816f107390fcbbf44e605f87021da38664429f1d031feaa3334dc8dfd6105b"
+    },
+    "fail_stopped": false,
+    "fatal_error": null
+  }
+}

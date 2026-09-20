@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "ssh",
+    "spark2",
+    "docker ps --format '{{.Names}} {{.Status}}'; pgrep -af '[s]treaming_consume.py|[a]sync_distributed_grasp_train.py|[c]ollector' || true; nvidia-smi --query-gpu=name,utilization.gpu --format=csv,noheader"
+  ],
+  "returncode": 0,
+  "stdout": "NVIDIA GB10, 0 %\n",
+  "stderr": ""
+}

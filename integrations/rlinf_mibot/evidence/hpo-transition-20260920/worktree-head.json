@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "git",
+    "rev-parse",
+    "HEAD"
+  ],
+  "returncode": 0,
+  "stdout": "a4ee45622c735bf65b34497d5ef47b32dab8a9bd\n",
+  "stderr": ""
+}

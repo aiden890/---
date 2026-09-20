@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "ssh",
+    "amp_csi",
+    "docker exec rlinf-merged-verify-trainer sha256sum /results/grasp-z1-b0101-v0098/consume_smoke/checkpoint.pt"
+  ],
+  "returncode": 0,
+  "stdout": "88709544e52bb173946bf7f86076fd1b34c41e24d58b82d16c7ce3ca91ab0646  /results/grasp-z1-b0101-v0098/consume_smoke/checkpoint.pt\n",
+  "stderr": ""
+}

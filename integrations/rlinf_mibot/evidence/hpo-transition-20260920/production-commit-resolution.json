@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "git",
+    "cat-file",
+    "-t",
+    "d98abfe882ccbd74d526537ac25f15b801a86bef"
+  ],
+  "returncode": 128,
+  "stdout": "",
+  "stderr": "fatal: git cat-file: could not get object info\n"
+}

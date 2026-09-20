@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "ssh",
+    "amp_csi",
+    "docker ps --format '{{.Names}} {{.Status}}'; docker inspect rlinf-merged-verify-trainer --format '{{.State.Pid}} {{json .Mounts}}'; pgrep -af '[s]treaming_consume.py|[a]sync_distributed_grasp_train.py|[c]ollector' || true"
+  ],
+  "returncode": 0,
+  "stdout": "rlinf-merged-verify-trainer Up 20 hours\ngpu-nccl Up 4 weeks\n503988 [{\"Type\":\"bind\",\"Source\":\"/home/guest/rlinf_merge_verify/results\",\"Destination\":\"/results\",\"Mode\":\"\",\"RW\":true,\"Propagation\":\"rprivate\"},{\"Type\":\"bind\",\"Source\":\"/home/guest/robocasa-docker-t_9f03a613/checkpoint\",\"Destination\":\"/checkpoint\",\"Mode\":\"ro\",\"RW\":false,\"Propagation\":\"rprivate\"},{\"Type\":\"bind\",\"Source\":\"/home/guest/rlinf_merge_verify/integration\",\"Destination\":\"/integration\",\"Mode\":\"ro\",\"RW\":false,\"Propagation\":\"rprivate\"},{\"Type\":\"bind\",\"Source\":\"/home/guest/rlinf_merge_verify/train\",\"Destination\":\"/train\",\"Mode\":\"ro\",\"RW\":false,\"Propagation\":\"rprivate\"},{\"Type\":\"bind\",\"Source\":\"/home/guest/rlinf_merge_verify/env\",\"Destination\":\"/rl_env\",\"Mode\":\"ro\",\"RW\":false,\"Propagation\":\"rprivate\"}]\n",
+  "stderr": ""
+}

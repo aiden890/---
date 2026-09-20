@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "ssh",
+    "spark1",
+    "docker ps --format '{{.Names}} {{.Status}}'; docker inspect rlinf-dist-current-actor --format '{{.State.Pid}} {{json .Mounts}}'; pgrep -af '[s]treaming_consume.py|[a]sync_distributed_grasp_train.py|[c]ollector' || true"
+  ],
+  "returncode": 0,
+  "stdout": "rlinf-dist-current-actor Up 20 hours\n1045560 [{\"Type\":\"bind\",\"Source\":\"/home/csi-agent-dgx_spark1/workspace/rlinf-mibot-prep/checkpoint\",\"Destination\":\"/checkpoint\",\"Mode\":\"ro\",\"RW\":false,\"Propagation\":\"rprivate\"},{\"Type\":\"bind\",\"Source\":\"/home/csi-agent-dgx_spark1/workspace/rlinf-mibot-prep/results\",\"Destination\":\"/results\",\"Mode\":\"\",\"RW\":true,\"Propagation\":\"rprivate\"},{\"Type\":\"bind\",\"Source\":\"/home/csi-agent-dgx_spark1/workspace/rlinf-mibot-prep/cache\",\"Destination\":\"/cache\",\"Mode\":\"\",\"RW\":true,\"Propagation\":\"rprivate\"},{\"Type\":\"bind\",\"Source\":\"/home/csi-agent-dgx_spark1/workspace/rlinf-mibot-prep/source-current/integrations/rlinf_mibot\",\"Destination\":\"/integration\",\"Mode\":\"ro\",\"RW\":false,\"Propagation\":\"rprivate\"},{\"Type\":\"bind\",\"Source\":\"/home/csi-agent-dgx_spark1/workspace/rlinf-mibot-prep/source-current/rl-train-t_3ed65912\",\"Destination\":\"/train\",\"Mode\":\"ro\",\"RW\":false,\"Propagation\":\"rprivate\"},{\"Type\":\"bind\",\"Source\":\"/home/csi-agent-dgx_spark1/workspace/rlinf-mibot-prep/source-current/rl-env-t_4f3f2b20\",\"Destination\":\"/rl_env\",\"Mode\":\"ro\",\"RW\":false,\"Propagation\":\"rprivate\"}]\n",
+  "stderr": ""
+}
