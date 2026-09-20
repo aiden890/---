@@ -224,7 +224,8 @@ def main() -> None:
     manifest = json.loads(args.manifest.read_text())
     state = {"status": "searching", "source_commit": args.source_commit,
              "source_manifest": str(args.manifest), "run_root": str(args.run_root),
-             "driver_pid": os.getpid(), "arms": {}}
+             "driver_pid": os.getpid(),
+             "tmux_session": os.environ.get("RLINF_TMUX_SESSION"), "arms": {}}
     atomic_json(STATE, state)
     args.run_root.mkdir(parents=True, exist_ok=True)
     results = {}
