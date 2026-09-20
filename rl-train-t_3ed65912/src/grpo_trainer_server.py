@@ -648,10 +648,11 @@ class GRPOTrainerServer:
             try:
                 if self.store:
                     probe = next(iter(next(iter(self.store.values()))))
-                    self.roundtrip_probe = {
-                        "inputs_cpu": self._cpu_clone(probe["inputs_cpu"]),
-                        "skill": probe.get("skill") or "grasp",
-                    }
+                    if "inputs_cpu" in probe:
+                        self.roundtrip_probe = {
+                            "inputs_cpu": self._cpu_clone(probe["inputs_cpu"]),
+                            "skill": probe.get("skill") or "grasp",
+                        }
                 snapshots = {(chunk.get("policy_version", self.policy_version),
                               chunk.get("policy_hash", self.policy_hash))
                              for chunks in self.store.values() for chunk in chunks}
