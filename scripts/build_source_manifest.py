@@ -26,9 +26,18 @@ def main() -> None:
 
     project = args.project.rstrip("/")
     commit = git("rev-parse", args.commit).strip()
+    output = Path(args.output).resolve()
+    try:
+        output_repo_rel = output.relative_to(repo).as_posix()
+    except ValueError:
+        output_repo_rel = None
     names = git("ls-tree", "-r", "--name-only", commit, "--", project).splitlines()
     selected: list[str] = []
     for name in names:
+        # A manifest cannot contain its own digest: rewriting it would immediately
+        # invalidate that digest and make every freshly generated deployment fail.
+        if name == output_repo_rel:
+            continue
         rel = name[len(project) + 1:]
         if not rel or rel.startswith(("results/", "REPORT/", "vendor/", "data/", "pylibs/")):
             continue
@@ -49,7 +58,7 @@ def main() -> None:
     for rel in sorted(selected):
         blob = git("show", f"{commit}:{project}/{rel}", text=False)
         file_hashes[rel] = hashlib.sha256(blob).hexdigest()
-    Path(args.output).write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
+    output.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
 
 
 if __name__ == "__main__":

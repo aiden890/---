@@ -37,6 +37,26 @@ def test_manifest_reads_exact_commit_not_dirty_worktree():
         assert nested_data["files"] == data["files"]
 
 
+def test_manifest_excludes_itself_when_output_is_inside_project():
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+        subprocess.run(["git", "config", "user.email", "test@example.invalid"], cwd=root, check=True)
+        subprocess.run(["git", "config", "user.name", "test"], cwd=root, check=True)
+        project = root / "project"
+        project.mkdir()
+        (project / "x.py").write_text("one\n")
+        (project / "source_manifest.json").write_text("{}\n")
+        subprocess.run(["git", "add", "."], cwd=root, check=True)
+        subprocess.run(["git", "commit", "-qm", "base"], cwd=root, check=True)
+        subprocess.run(["python3", str(SCRIPT), "project", "project/source_manifest.json",
+                        "--commit", "HEAD"], cwd=root, check=True)
+        data = json.loads((project / "source_manifest.json").read_text())
+        assert "x.py" in data["files"]
+        assert "source_manifest.json" not in data["files"]
+
+
 if __name__ == "__main__":
     test_manifest_reads_exact_commit_not_dirty_worktree()
+    test_manifest_excludes_itself_when_output_is_inside_project()
     print("build source manifest tests passed")
