@@ -1,6 +1,6 @@
 {
   "build_worktree_dirty": false,
-  "commit": "d98abfe882ccbd74d526537ac25f15b801a86bef",
+  "commit": "650a5c106a126488ba3750bcd6b88d4692f13436",
   "dirty": false,
   "files": {
     "INDEX.md": "ee0d1f254c159ffa69b5bbf20795b8da29734d0934757b8665c7bf4565f51342",
@@ -43,11 +43,12 @@
     "scripts/stage1_sweep.sh": "0552b60b195f46edcb9405425467c6335160d5255634f3a14903c7ca7cede423",
     "scripts/train_feasibility_probe.py": "59b1b2d2fbcba3b2d5762db799824aa7fa557d68d0c0ce3fc26d53be8100d867",
     "scripts/verify_real_checkpoint_roundtrip.py": "77456dc202e48c7cdb618a8d8e0a703f64efabcc7f44bc2d0faabaf1ca5e20ff",
+    "source_manifest.json": "0ac7ddb77c7c3f11c9c39424f8ab4f94c4f2e8ca1c7e4ac607993b2c127f37ac",
     "src/adaptive_curriculum.py": "3b1af3f98f17e4effd2624ade956cab9cd1a1e539bb61255f4a4b7590d32007a",
     "src/advantage.py": "8f8bee62ac67cc72adb522612f9a120c229f10b17dcb1baa8706773efddfcd3e",
     "src/checkpoint_schema.py": "80493443107d719dbf872c3fc2e9b034715f3d57e146ca64cc243d0193aad75c",
-    "src/grpo_train_loop.py": "faca2d50a5b3dd1ff6d7279838b62e6a5c2d9ab1ce0eeb13a2af262306de8d3e",
-    "src/grpo_trainer_server.py": "8120b1e78bdac4b5520792c0cd377775d802518ef20c9d16709d89039570a379",
+    "src/grpo_train_loop.py": "abb5192b6ea5e6eed840a512b9461843d1c8ca14770beeec6e36b5c88328dd5d",
+    "src/grpo_trainer_server.py": "d3b294fc6a5a54e9f47a9bbc69f0d117fea24d96a7a9b20dfe8c98fe0d936cd2",
     "src/lora.py": "410c495ec38fa44d8966a0c4c4125b3c7a10f92968c385e128bb10c1a711c3b9",
     "src/skill_sft_conditioning.py": "039b18a063cb7a23bf602bb9a10785e3da5585543441ecf81961988af2992a48",
     "src/skill_sft_dataset.py": "a0e30ab93af491bb1d9776a711ab64933989bd06184519430ff39692b171c581",

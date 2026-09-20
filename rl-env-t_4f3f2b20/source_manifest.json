@@ -1,6 +1,6 @@
 {
-  "build_worktree_dirty": false,
-  "commit": "f533d458449c473d4b17f40996eea2ac2924282b",
+  "build_worktree_dirty": true,
+  "commit": "650a5c106a126488ba3750bcd6b88d4692f13436",
   "dirty": false,
   "files": {
     "README.md": "48c307c72ce0149aca6ee297a4b742a7b44cb39027185c7db9973740ec5b6575",
@@ -12,6 +12,7 @@
     "scripts/pirl_sampler_gpu_gates.py": "828d4e058b999006346880b01d1ee379b3a238d66b39625cd684fec36466fa75",
     "scripts/run-rl-env.sh": "37f26d1662cdd16d3c95cae7a841518979aaec9cebb422dd5e78da06b47facb1",
     "scripts/sde_probe.py": "ae799bceb264650c4ee03a6492ab2c9a9d353dbf917deecc0917c7be994e3a39",
+    "source_manifest.json": "a727f1127b92feb986b70c18dd1985773afe45f6ad2ad5c926986851400d9ba0",
     "src/flow_policy.py": "2a9fbf3a25ac27995bd5e085d1dcc7170156f01c3b9bc278f2fee5ebb4d28cc4",
     "src/flow_sde.py": "2dee3975cfc8cf478fa4ed9664a9c6a64a604376cb44fb4f0c5dd4dfc8653fc7",
     "src/pirl_flow_sde.py": "636ccf17131fd9984ced5b5bc4c30a2d2cc2359d18002b14d966e566ee6513cf",
