@@ -11,7 +11,7 @@ if [[ -f .env ]]; then set -a; . ./.env; set +a; fi
 IMAGE="${RLINF_IMAGE:-rlinf-mibot:latest}"
 GPUS="${RLINF_GPUS:-all}"
 PORT="${RLINF_TRAINER_PORT:-10088}"
-SOURCE_COMMIT="$(git -C "$repo_root" rev-parse HEAD)"
+SOURCE_COMMIT="${RLINF_SOURCE_COMMIT:-$(git -C "$repo_root" rev-parse HEAD)}"
 : "${RLINF_CHECKPOINT:?set RLINF_CHECKPOINT in .env}"
 : "${RLINF_ASSETS:?set RLINF_ASSETS in .env}"
 : "${RLINF_RESULTS:?set RLINF_RESULTS in .env}"

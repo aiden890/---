@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
+import os
 import shutil
 import sys
 import time
@@ -96,8 +98,9 @@ def collect_batch(batch: dict) -> dict:
             if not same_snapshot(actor, expected):
                 raise RuntimeError(
                     f"actor changed before adaptive batch completed: {actor} != {expected}")
+        seed_base = int(os.environ.get("RLINF_TRAIN_SEED_BASE", "820000"))
         rows = legacy.collect(
-            epoch["run_id"], 820000 + int(batch["attempt"]) * 1000 + int(epoch["index"]) * 100,
+            epoch["run_id"], seed_base + int(batch["attempt"]) * 1000 + int(epoch["index"]) * 100,
             groups=8, group_size=8, workers=4)
         validate_rows_snapshot(rows, expected)
         estimate = estimate_trainable_chunks(rows, epoch_index)
@@ -121,7 +124,8 @@ def collect_batch(batch: dict) -> dict:
     return batch
 
 
-def consume_streamed(batch: dict, *, recover: bool = False) -> dict:
+def consume_streamed(batch: dict, *, recover: bool = False,
+                     checkpoint_roundtrip: bool = False) -> dict:
     validate_batch(batch)
     batch_id = batch["batch_id"]
     if recover:
@@ -169,7 +173,8 @@ def consume_streamed(batch: dict, *, recover: bool = False) -> dict:
             if archive.exists():
                 archive.unlink()
     finalize_started = time.time()
-    report = _remote_stream("finalize", batch_id)
+    extra = ["--checkpoint-roundtrip"] if checkpoint_roundtrip else []
+    report = _remote_stream("finalize", batch_id, *extra)
     report["pipeline_timing"] = {
         "epochs": epoch_timings,
         "transfer_import_seconds": finalize_started - pipeline_started,
@@ -246,7 +251,8 @@ def validate_production_servers(actor_metrics: dict, learner_metrics: dict,
     config = legacy.rpc(legacy.LEARNER, legacy.LEARNER_CONTAINER,
                         {"op": "config", "code_rev": "z1-async"})["config"]
     expected = {
-        "sampler": "pirl", "eta": 0.1, "lr": 5e-6,
+        "sampler": "pirl", "eta": 0.1,
+        "lr": float(os.environ.get("RLINF_EXPECTED_LR", "5e-6")),
         "weight_decay": 0.01, "grad_clip": 1.0,
         "clip": 0.2, "kl_coef": 0.0, "update_epochs": 1,
         "lora_targets": "all_linear", "rank": 16, "alpha": 32,
@@ -268,11 +274,38 @@ def validate_production_servers(actor_metrics: dict, learner_metrics: dict,
         raise RuntimeError(f"learner is not async Z-1 ready: {mismatches}")
 
 
+def validate_fast_hpo_gate(report: dict, *, require_roundtrip: bool) -> dict:
+    update = report["update"]
+    ratio = float(update.get("epoch0_mean_ratio", float("nan")))
+    checks = {
+        "epoch0_ratio_approximately_one": math.isfinite(ratio) and abs(ratio - 1.0) <= 0.02,
+        "adapter_delta_positive": float(update.get("adapter_delta_l2", 0.0)) > 0.0,
+        "nonfinite_zero": int(update.get("n_nonfinite", 0)) +
+                          int(update.get("post_step_n_nonfinite", 0)) == 0,
+        "dropped_zero": int(update.get("n_dropped", 0)) +
+                        int(update.get("post_step_n_dropped", 0)) == 0,
+        "clamped_zero": int(update.get("n_clamped", 0)) +
+                        int(update.get("post_step_n_clamped", 0)) == 0,
+        "post_step_ess": float(update.get("post_step_ess", 0.0)) >= 0.95,
+        "post_step_kl": float(update.get("post_step_mean_kl", float("inf"))) <= 0.02,
+        "post_step_clip_fraction": float(
+            update.get("post_step_clip_fraction", float("inf"))) <= 0.30,
+    }
+    if require_roundtrip:
+        checks["checkpoint_roundtrip"] = bool(
+            report.get("checkpoint_roundtrip", {}).get("overall_pass", False))
+    result = {"pass": all(checks.values()), "checks": checks}
+    if not result["pass"]:
+        raise RuntimeError(f"fast HPO update gate failed: {result}")
+    return result
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--updates", type=int, default=100)
     parser.add_argument("--state", type=Path,
                         default=legacy.LOCAL_STAGE / "async_state.json")
+    parser.add_argument("--run-prefix", default=os.environ.get("RLINF_RUN_PREFIX", "grasp-z1"))
     args = parser.parse_args()
     store = StateStore(args.state)
     with store.locked():
@@ -306,9 +339,13 @@ def main() -> None:
                     "consume_smoke/consume_smoke.json", capture=True).stdout
                 report = json.loads(text)
             elif action == "retry_same_update_id":
-                report = consume_streamed(current, recover=True)
+                report = consume_streamed(
+                    current, recover=True,
+                    checkpoint_roundtrip=state["accepted_updates"] == 0)
             else:  # pragma: no cover - recovery_action is exhaustive
                 raise RuntimeError(action)
+            validate_fast_hpo_gate(
+                report, require_roundtrip=state["accepted_updates"] == 0)
             next_batch = collect_batch(state["inflight"]["next"])
             committed = sync_and_verify(current, report, state["inflight"]["learner_before"])
             state["accepted_updates"] += 1
@@ -326,7 +363,7 @@ def main() -> None:
             attempt = state["next_attempt"]
             state["next_attempt"] += 1
             state["ready"] = collect_batch(make_batch(
-                f"grasp-z1-b{attempt:04d}-v{state['actor']['version']:04d}",
+                f"{args.run_prefix}-b{attempt:04d}-v{state['actor']['version']:04d}",
                 state["actor"], attempt))
             store.save(state)
 
@@ -336,17 +373,21 @@ def main() -> None:
             attempt = state["next_attempt"]
             state["next_attempt"] += 1
             next_batch = make_batch(
-                f"grasp-z1-b{attempt:04d}-v{state['actor']['version']:04d}",
+                f"{args.run_prefix}-b{attempt:04d}-v{state['actor']['version']:04d}",
                 state["actor"], attempt)
             state["inflight"] = {"current": current, "next": next_batch,
                                  "learner_before": state["learner"]}
             state["ready"] = None
             store.save(state)
             with ThreadPoolExecutor(max_workers=2) as pool:
-                update_future = pool.submit(consume_streamed, current)
+                update_future = pool.submit(
+                    consume_streamed, current,
+                    checkpoint_roundtrip=state["accepted_updates"] == 0)
                 rollout_future = pool.submit(collect_batch, next_batch)
                 report = update_future.result()
                 next_batch = rollout_future.result()
+            report["fast_hpo_gate"] = validate_fast_hpo_gate(
+                report, require_roundtrip=state["accepted_updates"] == 0)
             committed = sync_and_verify(current, report, state["inflight"]["learner_before"])
             state["accepted_updates"] += 1
             state["history"].append({"batch_id": current["batch_id"],

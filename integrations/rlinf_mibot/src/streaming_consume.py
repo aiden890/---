@@ -121,7 +121,8 @@ def stage_epoch(batch_dir: Path, run_dir: Path, epoch_index: int,
     return manifest
 
 
-def finalize(batch_dir: Path, host: str, port: int, cfg: dict[str, Any]) -> dict[str, Any]:
+def finalize(batch_dir: Path, host: str, port: int, cfg: dict[str, Any],
+             *, checkpoint_roundtrip: bool = False) -> dict[str, Any]:
     batch_dir = Path(batch_dir)
     manifest_path = batch_dir / "streaming_manifest.json"
     report_path = batch_dir / "consume_smoke" / "consume_smoke.json"
@@ -169,6 +170,9 @@ def finalize(batch_dir: Path, host: str, port: int, cfg: dict[str, Any]) -> dict
         phase_started = time.time()
         loaded = client.call({"op": "load", "path": str(checkpoint)})
         timings["checkpoint_reload_seconds"] = time.time() - phase_started
+        roundtrip = None
+        if checkpoint_roundtrip:
+            roundtrip = client.call({"op": "checkpoint_roundtrip", "path": str(checkpoint)})
     finally:
         client.close()
     gate = validate_update(update)
@@ -184,6 +188,7 @@ def finalize(batch_dir: Path, host: str, port: int, cfg: dict[str, Any]) -> dict
             "action_chunks_total": manifest["action_chunks_total"],
             "optimizer_update_epochs": 1,
         },
+        "checkpoint_roundtrip": roundtrip,
         "stage_timings": timings,
         "elapsed_seconds": time.time() - started,
     }
@@ -204,6 +209,7 @@ def main() -> None:
     parser.add_argument("--config", required=True)
     parser.add_argument("--policy-version", type=int)
     parser.add_argument("--policy-hash")
+    parser.add_argument("--checkpoint-roundtrip", action="store_true")
     args = parser.parse_args()
     import yaml
     cfg = yaml.safe_load(Path(args.config).read_text())["consume_smoke"]
@@ -214,7 +220,8 @@ def main() -> None:
         result = stage_epoch(Path(args.batch_dir), Path(args.run_dir), args.epoch,
                              args.host, args.port, cfg)
     else:
-        result = finalize(Path(args.batch_dir), args.host, args.port, cfg)
+        result = finalize(Path(args.batch_dir), args.host, args.port, cfg,
+                          checkpoint_roundtrip=args.checkpoint_roundtrip)
     print(json.dumps(result, default=str))
 
 

@@ -13,6 +13,7 @@ import argparse
 import base64
 import hashlib
 import json
+import os
 import re
 import shlex
 import shutil
@@ -22,14 +23,15 @@ from pathlib import Path
 
 
 HERE = Path(__file__).resolve().parent
-SPARK = "spark1"
-LEARNER = "amp_csi"
-ACTOR_CONTAINER = "rlinf-dist-current-actor"
-LEARNER_CONTAINER = "rlinf-merged-verify-trainer"
-SPARK_ROOT = "/home/csi-agent-dgx_spark1/workspace/rlinf-mibot-prep"
-LEARNER_ROOT = "/home/guest/rlinf_merge_verify"
-RUNNER = f"{SPARK_ROOT}/source-current/integrations/rlinf_mibot/run.sh"
-LOCAL_STAGE = Path("/tmp/rlinf-mibot-long-training")
+SPARK = os.environ.get("RLINF_SPARK_HOST", "spark1")
+LEARNER = os.environ.get("RLINF_LEARNER_HOST", "amp_csi")
+ACTOR_CONTAINER = os.environ.get("RLINF_ACTOR_CONTAINER", "rlinf-dist-current-actor")
+LEARNER_CONTAINER = os.environ.get("RLINF_LEARNER_CONTAINER", "rlinf-merged-verify-trainer")
+SPARK_ROOT = os.environ.get("RLINF_SPARK_ROOT", "/home/csi-agent-dgx_spark1/workspace/rlinf-mibot-prep")
+LEARNER_ROOT = os.environ.get("RLINF_LEARNER_ROOT", "/home/guest/rlinf_merge_verify")
+RUNNER = os.environ.get(
+    "RLINF_RUNNER", f"{SPARK_ROOT}/source-current/integrations/rlinf_mibot/run.sh")
+LOCAL_STAGE = Path(os.environ.get("RLINF_LOCAL_STAGE", "/tmp/rlinf-mibot-long-training"))
 SAFE_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
 
 

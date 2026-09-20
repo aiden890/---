@@ -228,7 +228,8 @@ def _make_env(split, seed):
 
 def _run_one_skill(sim, client, obs, args, skill, reward_mgr, *, eta, traj_id, seed,
                    frames=None, save_video=None, approach_coef=0.0, timeout_penalty=0.0,
-                   hold_cfg=None, hold_steps=0, expected_policy_version=None):
+                   hold_cfg=None, hold_steps=0, expected_policy_version=None,
+                   use_adapter=True):
     """Run ONE skill's VLA loop; return (obs, outcome, reward, steps, predicates).
 
     Training-only dense shaping (not used in eval; all default to off):
@@ -248,7 +249,7 @@ def _run_one_skill(sim, client, obs, args, skill, reward_mgr, *, eta, traj_id, s
     reads from reward_mgr? -> simplest: attach to a mutable, see stats dict below.
     """
     instruction = SKILL_INSTRUCTION[skill]
-    skill_key = SKILL_KEY[skill]
+    skill_key = SKILL_KEY[skill] if use_adapter else None
     monitor = SkillMonitor(skill, MonitorConfig(grasp_hold_steps=skill_eval.GRASP_HOLD_STEPS,
                                                  move_hold_steps=skill_eval.MOVE_HOLD_STEPS))
     horizon = {Skill.GRASP: args.horizon_grasp, Skill.MOVE_HOLDING: args.horizon_move,

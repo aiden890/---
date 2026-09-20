@@ -164,6 +164,7 @@ class GRPOTrainerServer:
         else:
             raise ValueError(a.optimizer)
         self.store: dict = {}
+        self.roundtrip_probe = None
         self.update_cache = IdempotentUpdateCache()
         # One resident model serves multiple simulator clients. Connections may overlap,
         # while model/store mutations remain serialized through this actor lock.
@@ -645,6 +646,12 @@ class GRPOTrainerServer:
         def perform():
             transaction = self._snapshot_mutable_state(include_optimizer=True)
             try:
+                if self.store:
+                    probe = next(iter(next(iter(self.store.values()))))
+                    self.roundtrip_probe = {
+                        "inputs_cpu": self._cpu_clone(probe["inputs_cpu"]),
+                        "skill": probe.get("skill") or "grasp",
+                    }
                 snapshots = {(chunk.get("policy_version", self.policy_version),
                               chunk.get("policy_hash", self.policy_hash))
                              for chunks in self.store.values() for chunk in chunks}
@@ -966,6 +973,62 @@ class GRPOTrainerServer:
                 "n_extra": len(extra), "metadata": blob["metadata"],
                 "policy_version": self.policy_version, "policy_hash": self.policy_hash}
 
+    def op_checkpoint_roundtrip(self, req):
+        """Mutation-test a saved checkpoint against tensors, action, optimizer and RNG."""
+        if not self.roundtrip_probe:
+            raise RuntimeError("checkpoint roundtrip requires a probe captured by op_update")
+        probe_inputs = self._cpu_clone(self.roundtrip_probe["inputs_cpu"])
+        probe_skill = self.roundtrip_probe["skill"]
+        first_load = self.op_load({"path": req["path"]})
+        reference = {name: tensor.clone() for name, tensor in lora_state_dict(self.wrappers).items()}
+        reference_action = self.op_sample({
+            "op": "sample", "inputs": self._cpu_clone(probe_inputs), "eta": 0.0,
+            "skill": probe_skill, "seed": 424242, "chunk_index": 0,
+        })["actions"]
+        wrapper = self.wrappers[0]
+        with torch.no_grad():
+            wrapper.lora_B[probe_skill].add_(
+                torch.full_like(wrapper.lora_B[probe_skill], 0.01))
+        mutated_hash = self._compute_policy_hash()
+        mutated_action = self.op_sample({
+            "op": "sample", "inputs": self._cpu_clone(probe_inputs), "eta": 0.0,
+            "skill": probe_skill, "seed": 424242, "chunk_index": 0,
+        })["actions"]
+        mutation_action_delta = float(
+            (mutated_action.float() - reference_action.float()).abs().max().item())
+        second_load = self.op_load({"path": req["path"]})
+        restored = lora_state_dict(self.wrappers)
+        mismatched = [name for name in reference
+                      if not torch.equal(reference[name], restored[name])]
+        restored_action = self.op_sample({
+            "op": "sample", "inputs": self._cpu_clone(probe_inputs), "eta": 0.0,
+            "skill": probe_skill, "seed": 424242, "chunk_index": 0,
+        })["actions"]
+        restore_action_delta = float(
+            (restored_action.float() - reference_action.float()).abs().max().item())
+        blob = torch.load(req["path"], map_location="cpu")
+        rng = blob.get("rng") or {}
+        checks = {
+            "mutation_changed_policy_hash": mutated_hash != first_load["policy_hash"],
+            "mutation_changed_action": mutation_action_delta > 0.0,
+            "named_tensors_restored_bit_exact": not mismatched,
+            "action_restored_bit_exact": restore_action_delta == 0.0,
+            "policy_identity_restored": second_load["policy_hash"] == first_load["policy_hash"] and
+                                        second_load["policy_version"] == first_load["policy_version"],
+            "optimizer_schema_present": isinstance(blob.get("optimizer"), dict) and
+                                        "param_groups" in blob["optimizer"] and
+                                        "state" in blob["optimizer"],
+            "rng_schema_present": all(key in rng for key in ("torch", "cuda", "python")),
+        }
+        return {
+            "overall_pass": all(checks.values()), "checks": checks,
+            "first_load": first_load, "second_load": second_load,
+            "mutated_tensor": f"{wrapper.target_name}.lora_B.{probe_skill}",
+            "mutation_action_max_abs": mutation_action_delta,
+            "restore_action_max_abs": restore_action_delta,
+            "mismatched_tensors": mismatched[:10],
+        }
+
     def op_publish_adapter(self, req):
         """Atomically publish only mutable policy weights for the two rollout actors."""
         path = Path(req["path"])
@@ -1250,6 +1313,7 @@ class GRPOTrainerServer:
               "load": self.op_load, "metrics": self.op_metrics, "config": self.op_config,
               "publish_adapter": self.op_publish_adapter,
               "load_adapter": self.op_load_adapter,
+              "checkpoint_roundtrip": self.op_checkpoint_roundtrip,
               "reset": self.op_reset, "export_store": self.op_export_store,
               "import_store": self.op_import_store, "discard_store": self.op_discard_store,
               "set_last_chunk_executed_steps": self.op_set_last_chunk_executed_steps,

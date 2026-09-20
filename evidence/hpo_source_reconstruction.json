@@ -1,0 +1,49 @@
+{
+  "changed_or_missing_files": [
+    {
+      "component": "integration",
+      "deployed_sha256": "fa956233e3ed4a2417161289eaecc10c4a5e0c333ce7ae51fce3e13a5b27b17f",
+      "old_sha256": "075a6cba498ccbb0961b98480fc7229189261af41719724a4edd2793280d37c0",
+      "path": "configs/requirements-rlinf.lock"
+    },
+    {
+      "component": "integration",
+      "deployed_sha256": "f34f7126c8308dd53a2ef6b91b623b1c7b3c406ff494fafd44a6818e25730b13",
+      "old_sha256": "0f6a3d793a654b3283ada65c341f5f20804f73add29e022c823b0db360741c3c",
+      "path": "configs/requirements-rlinf.txt"
+    },
+    {
+      "component": "integration",
+      "deployed_sha256": "cf660a1394a4ca6f990983751c76a4a239e563e8e55175deaa09b55bda484597",
+      "old_sha256": "2f5ed0685bc5f3dc6edaab93c249f8086e1b73040ccd29c5bb3a355048baa08a",
+      "path": "scripts/async_distributed_grasp_train.py"
+    },
+    {
+      "component": "integration",
+      "deployed_sha256": "31e198b7a26064b625875ce54345082db6bff348876b5ff26e927189ff9e8fd2",
+      "old_sha256": "419995b75b33e468cd90ed91222050feb649f82ab6d929d2a5be389de0c187c3",
+      "path": "scripts/distributed_grasp_train.py"
+    },
+    {
+      "component": "integration",
+      "deployed_sha256": "e74435a40f07f1c21c57c4b43ea554987125bafc811ddc4070e0dad06b051cd5",
+      "old_sha256": "b990e10d4b30d1a181431edffdc7388ae36083a1a2d645dbf860ab99791948af",
+      "path": "src/grid_collection.py"
+    },
+    {
+      "component": "integration",
+      "deployed_sha256": "3dae246a48e3c2a51b7ddab938a8438700c3e2f58537a2dd2ae0b95f64b6e5ab",
+      "old_sha256": "12dd4cd13f6e298e67bdc1faccd331525d91a951a50deab98499c04155e3c8ae",
+      "path": "src/rlinf_grid_worker.py"
+    }
+  ],
+  "critical_host_hashes_identical": true,
+  "local_anchor_commit": "c4c69754ebae9a4b4c169ae54f40f09dfeca326f",
+  "purpose": "Reconstruct exact production source used by completed async GRASP v100 before two-arm HPO.",
+  "schema_version": 1,
+  "verified_deployments": [
+    "amp_csi:/home/guest/rlinf_merge_verify",
+    "spark1:source-current",
+    "spark2:source-current"
+  ]
+}

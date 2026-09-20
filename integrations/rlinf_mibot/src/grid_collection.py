@@ -25,7 +25,8 @@ SUPPORTED_GRID_KEYS = {
     "rollout.groups", "rollout.group_size",
     "rollout.replan_steps", "rollout.obs_history", "rollout.obs_interval",
     "rollout.save_video",
-    "rollout.video_stride", "rollout.video_fps", "reward.variant",
+    "rollout.video_stride", "rollout.video_fps", "rollout.eval_only", "rollout.policy_mode",
+    "reward.variant",
     "reward.use_milestones", "reward.skill_success", "reward.success_gamma",
     "reward.success_decay",
 }
@@ -497,15 +498,23 @@ def audit_collection(output_dir: Path) -> dict[str, Any]:
         root = output_dir.resolve()
         for row in rows:
             artifacts = row.get("artifacts", {})
-            payload = Path(artifacts.get("trainer_store", ""))
+            eval_only = bool(row.get("parameters", {}).get("rollout.eval_only", False))
+            payload_value = artifacts.get("trainer_store")
+            payload = Path(payload_value) if payload_value else None
             video_value = artifacts.get("video")
             video_required = bool(row.get("parameters", {}).get("rollout.save_video", True))
-            try:
-                payload.resolve().relative_to(root)
-                payload_in_root = True
-            except ValueError:
-                payload_in_root = False
-            payload_ok = (payload_in_root and not payload.is_symlink() and payload.is_file())
+            payload_in_root = False
+            if payload is not None:
+                try:
+                    payload.resolve().relative_to(root)
+                    payload_in_root = True
+                except ValueError:
+                    pass
+            payload_ok = (eval_only and payload is None and
+                          row.get("trainer_payload", {}).get("schema") == "evaluation-only")
+            if not eval_only:
+                payload_ok = bool(payload is not None and payload_in_root and
+                                  not payload.is_symlink() and payload.is_file())
             video_ok = video_value in (None, "")
             if video_required and video_value:
                 video = Path(video_value)
@@ -518,7 +527,9 @@ def audit_collection(output_dir: Path) -> dict[str, Any]:
             if not payload_ok or not video_ok:
                 artifacts_present = False
             expected_hash = row.get("trainer_payload", {}).get("sha256")
-            if not payload.is_file() or not expected_hash:
+            if eval_only:
+                continue
+            if payload is None or not payload.is_file() or not expected_hash:
                 payload_hashes_valid = False
             elif hashlib.sha256(payload.read_bytes()).hexdigest() != expected_hash:
                 payload_hashes_valid = False

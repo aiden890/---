@@ -142,14 +142,25 @@ class RoboCasaGridWorker(Worker):
                 approach_coef=0.0, timeout_penalty=0.0, hold_cfg=None, hold_steps=0,
                 frames=frames, save_video=str(video_path) if save_rollout_video else None,
                 expected_policy_version=episode_policy_version,
+                use_adapter=parameters.get("rollout.policy_mode", "trained") != "base",
             )
-            payload_path = (Path(self.runtime_cfg["results_root"]) / self.runtime_cfg["run_id"] /
-                            job["config_id"] / "payloads" /
-                            f"{job['job_id']}__attempt{attempt}.pt")
-            trainer_payload = trainer.export_store(
-                [traj_id], payload_path, drop_after_export=True, actor_id=actor_id,
-                group_id=str(job.get("group_id", job["config_id"])))
-            trainer_payload["optimizer_update_requested"] = False
+            eval_only = bool(parameters.get("rollout.eval_only", False))
+            payload_path = None
+            if eval_only:
+                trainer_payload = {
+                    "schema": "evaluation-only", "trajectory_ids": [],
+                    "optimizer_update_requested": False,
+                    "policy_version": episode_policy_version,
+                    "policy_hash": trainer_memory_before["policy_hash"],
+                }
+            else:
+                payload_path = (Path(self.runtime_cfg["results_root"]) /
+                                self.runtime_cfg["run_id"] / job["config_id"] /
+                                "payloads" / f"{job['job_id']}__attempt{attempt}.pt")
+                trainer_payload = trainer.export_store(
+                    [traj_id], payload_path, drop_after_export=True, actor_id=actor_id,
+                    group_id=str(job.get("group_id", job["config_id"])))
+                trainer_payload["optimizer_update_requested"] = False
             trainer_memory_after = trainer.metrics()
             return {
                 "started_at": started,
@@ -171,7 +182,7 @@ class RoboCasaGridWorker(Worker):
                 "trainer_memory_after": trainer_memory_after,
                 "trainer_payload": trainer_payload,
                 "artifacts": {"video": str(video_path) if save_rollout_video else None,
-                              "trainer_store": str(payload_path)},
+                              "trainer_store": str(payload_path) if payload_path else None},
                 "skill_key": SKILL_KEY[skill],
             }
         except Exception as exc:
@@ -270,14 +281,25 @@ class RoboCasaGridWorker(Worker):
                     approach_coef=0.0, timeout_penalty=0.0, hold_cfg=None, hold_steps=0,
                     frames=frames, save_video=str(video_path) if save_video else None,
                     expected_policy_version=policy_version,
+                    use_adapter=parameters.get("rollout.policy_mode", "trained") != "base",
                 )
-                payload_path = (Path(self.runtime_cfg["results_root"]) /
-                                self.runtime_cfg["run_id"] / job["config_id"] / "payloads" /
-                                f"{job['job_id']}__attempt{attempt}.pt")
-                trainer_payload = trainer.export_store(
-                    [traj_id], payload_path, drop_after_export=True, actor_id=actor_id,
-                    group_id=str(job["group_id"]))
-                trainer_payload["optimizer_update_requested"] = False
+                eval_only = bool(parameters.get("rollout.eval_only", False))
+                payload_path = None
+                if eval_only:
+                    trainer_payload = {
+                        "schema": "evaluation-only", "trajectory_ids": [],
+                        "optimizer_update_requested": False,
+                        "policy_version": policy_version,
+                        "policy_hash": trainer_memory_before["policy_hash"],
+                    }
+                else:
+                    payload_path = (Path(self.runtime_cfg["results_root"]) /
+                                    self.runtime_cfg["run_id"] / job["config_id"] / "payloads" /
+                                    f"{job['job_id']}__attempt{attempt}.pt")
+                    trainer_payload = trainer.export_store(
+                        [traj_id], payload_path, drop_after_export=True, actor_id=actor_id,
+                        group_id=str(job["group_id"]))
+                    trainer_payload["optimizer_update_requested"] = False
                 results.append({
                     "job_id": job["job_id"],
                     "started_at": member_started,
@@ -301,7 +323,7 @@ class RoboCasaGridWorker(Worker):
                     "trainer_memory_after": trainer.metrics(),
                     "trainer_payload": trainer_payload,
                     "artifacts": {"video": str(video_path) if save_video else None,
-                                  "trainer_store": str(payload_path)},
+                                  "trainer_store": str(payload_path) if payload_path else None},
                     "skill_key": SKILL_KEY[skill],
                 })
             return {"results": results, "group_id": first["group_id"],
