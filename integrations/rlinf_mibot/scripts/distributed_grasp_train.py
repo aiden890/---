@@ -210,6 +210,7 @@ def sync_adapter(run_id: str, expected_version: int) -> dict:
                     {"op": "publish_adapter", "path": learner_path})
     if int(published["policy_version"]) != expected_version:
         raise RuntimeError(f"learner version mismatch: {published}")
+    LOCAL_STAGE.mkdir(parents=True, exist_ok=True)
     local_adapter = LOCAL_STAGE / f"adapter-v{expected_version}.pt"
     with local_adapter.open("wb") as stream:
         run(["ssh", LEARNER,
