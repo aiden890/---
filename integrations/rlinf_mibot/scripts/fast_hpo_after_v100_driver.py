@@ -222,6 +222,9 @@ def main() -> None:
     parser.add_argument("--run-root", required=True, type=Path)
     args = parser.parse_args()
     manifest = json.loads(args.manifest.read_text())
+    run_tag = args.run_root.name.lower()
+    if not legacy.SAFE_NAME.fullmatch(run_tag) or len(run_tag) > 32:
+        raise ValueError(f"unsafe HPO run tag: {run_tag!r}")
     state = {"status": "searching", "source_commit": args.source_commit,
              "source_manifest": str(args.manifest), "run_root": str(args.run_root),
              "driver_pid": os.getpid(),
@@ -231,7 +234,7 @@ def main() -> None:
     results = {}
     try:
         for arm, lr in ARMS:
-            arm_id = f"grasp-fast-hpo-{arm.lower()}-lr{lr:.0e}-v8"
+            arm_id = f"grasp-fast-hpo-{run_tag}-{arm.lower()}-lr{lr:.0e}-v8"
             arm_dir = args.run_root / arm_id
             arm_dir.mkdir(parents=True, exist_ok=False)
             fresh = start_fresh_servers(lr, args.source_commit)
