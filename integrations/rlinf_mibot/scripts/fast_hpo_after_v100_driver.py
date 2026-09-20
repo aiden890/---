@@ -220,7 +220,11 @@ def main() -> None:
     parser.add_argument("--source-commit", required=True)
     parser.add_argument("--manifest", required=True, type=Path)
     parser.add_argument("--run-root", required=True, type=Path)
+    parser.add_argument("--updates", type=int, default=8)
+    parser.add_argument("--arms", choices=("A", "B", "AB"), default="AB")
     args = parser.parse_args()
+    if args.updates <= 0:
+        raise ValueError("--updates must be positive")
     manifest = json.loads(args.manifest.read_text())
     run_tag = args.run_root.name.lower()
     if not legacy.SAFE_NAME.fullmatch(run_tag) or len(run_tag) > 32:
@@ -233,8 +237,11 @@ def main() -> None:
     args.run_root.mkdir(parents=True, exist_ok=True)
     results = {}
     try:
+        selected_arms = set(args.arms)
         for arm, lr in ARMS:
-            arm_id = f"grasp-fast-hpo-{run_tag}-{arm.lower()}-lr{lr:.0e}-v8"
+            if arm not in selected_arms:
+                continue
+            arm_id = f"grasp-fast-hpo-{run_tag}-{arm.lower()}-lr{lr:.0e}-v{args.updates}"
             arm_dir = args.run_root / arm_id
             arm_dir.mkdir(parents=True, exist_ok=False)
             fresh = start_fresh_servers(lr, args.source_commit)
@@ -245,12 +252,14 @@ def main() -> None:
                         "RLINF_TRAIN_SEED_BASE": "820000" if arm == "A" else "840000"})
             subprocess.run([
                 sys.executable, str(HERE / "async_distributed_grasp_train.py"),
-                "--updates", "8", "--state", str(coordinator_state),
+                "--updates", str(args.updates), "--state", str(coordinator_state),
                 "--run-prefix", arm_id,
             ], check=True, env=env)
             coord = json.loads(coordinator_state.read_text())
-            if int(coord["accepted_updates"]) != 8 or int(coord["actor"]["version"]) != 8:
-                raise RuntimeError(f"arm {arm} did not reach eight accepted updates")
+            if (int(coord["accepted_updates"]) != args.updates or
+                    int(coord["actor"]["version"]) != args.updates):
+                raise RuntimeError(
+                    f"arm {arm} did not reach {args.updates} accepted updates")
             base_id = f"{arm_id}-heldout-base-100"
             trained_id = f"{arm_id}-heldout-trained-100"
             base_rows = run_eval(base_id, "base", args.source_commit)
