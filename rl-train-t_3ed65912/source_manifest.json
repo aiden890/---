@@ -1,6 +1,6 @@
 {
   "build_worktree_dirty": false,
-  "commit": "650a5c106a126488ba3750bcd6b88d4692f13436",
+  "commit": "302b9006fcb1479940f9a6ccb44a2f989ecb5fd4",
   "dirty": false,
   "files": {
     "INDEX.md": "ee0d1f254c159ffa69b5bbf20795b8da29734d0934757b8665c7bf4565f51342",
@@ -43,7 +43,6 @@
     "scripts/stage1_sweep.sh": "0552b60b195f46edcb9405425467c6335160d5255634f3a14903c7ca7cede423",
     "scripts/train_feasibility_probe.py": "59b1b2d2fbcba3b2d5762db799824aa7fa557d68d0c0ce3fc26d53be8100d867",
     "scripts/verify_real_checkpoint_roundtrip.py": "77456dc202e48c7cdb618a8d8e0a703f64efabcc7f44bc2d0faabaf1ca5e20ff",
-    "source_manifest.json": "0ac7ddb77c7c3f11c9c39424f8ab4f94c4f2e8ca1c7e4ac607993b2c127f37ac",
     "src/adaptive_curriculum.py": "3b1af3f98f17e4effd2624ade956cab9cd1a1e539bb61255f4a4b7590d32007a",
     "src/advantage.py": "8f8bee62ac67cc72adb522612f9a120c229f10b17dcb1baa8706773efddfcd3e",
     "src/checkpoint_schema.py": "80493443107d719dbf872c3fc2e9b034715f3d57e146ca64cc243d0193aad75c",
@@ -57,7 +56,7 @@
     "src/update_batch.py": "14a8487b714bcb14ccf5a25a05817083a5fcdc56bb83124161d9c6459c68a1c3",
     "tests/test_advantage.py": "a20cccb45676ddae5f20562dfdc5c518c448417fa5fa61659abe8fb168dcf53a",
     "tests/test_alllinear_smoke_gate.py": "6f3bf7d33917785e04ac2c38bc065295057750754f769dca76acff6c1b733da9",
-    "tests/test_build_source_manifest.py": "36a2f9339603c396ca2c58e4aacf20c82f7dd3445e55271b705fa555ac74b4b1",
+    "tests/test_build_source_manifest.py": "92807e08136dc849d8862dd36adcb854f921380c0e4d94741886fc09af90b425",
     "tests/test_checkpoint_schema.py": "e83842c6b5fc83f45856a4549213af46d08073317155ef9538c86b7f977d17fc",
     "tests/test_lora.py": "79e7de300073a98b3551da3db078d93aefbea87102031ddbe0ae1fb7cf8cabad",
     "tests/test_multigroup_batch.py": "3660a21d514c1112389008549e81cbf3dd9441e3ba8a31be51b71f878ee0c66b",
