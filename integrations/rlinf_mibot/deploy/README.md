@@ -106,7 +106,50 @@ To resume actual training from a checkpoint (once training is explicitly enabled
 server), the trainer reads `eval.adapter_checkpoint` / the run dir under `/results`; long
 training remains disabled by the config `guards` until explicitly turned on.
 
-## 6. Expected outputs
+## 6. Native RLinf GRPO on DAX + RTX 3090
+
+The native path uses RLinf for GRPO advantage/loss execution, FSDP actor ownership, worker
+placement and patch-delta weight synchronization. MiBoT supplies only preprocessing, the
+verified pi-RL Flow-SDE sampler/recompute contract, and the existing per-skill LoRA modules.
+
+Both machines need the same checkout, checkpoint/assets mounts, image tag, and a shared or
+equivalent results path. RLinf uses a Ray cluster for heterogeneous worker placement; this
+path must not be launched with `torchrun`. Port 6379 (or `RLINF_RAY_PORT`) and Ray's worker
+ports must be reachable between the hosts. Start the Ray head on DAX, join the 3090 worker,
+verify `ray status`, and then launch exactly one driver on DAX:
+
+```bash
+# DAX: Ray head; scheduler assigns simulator + rollout here (node rank 0)
+RLINF_NODE_IP=<dax-ip> bash run.sh native-ray-head
+
+# RTX 3090: join the same Ray cluster as node rank 1
+RLINF_HEAD_ADDR=<dax-ip> RLINF_NODE_IP=<3090-ip> RLINF_NODE_RANK=1 \
+  bash run.sh native-ray-worker
+
+# DAX only: confirm two nodes, then start the single RLinf driver
+docker exec rlinf-mibot-ray-head ray status
+RLINF_HEAD_ADDR=<dax-ip> bash run.sh native-grpo
+```
+
+Run `bash run.sh native-ray-stop` separately on each host after preserving relevant
+container logs. Ray captures mounts, Python packages, and `RLINF_NODE_RANK` when each daemon
+starts, so rebuild/restart both Ray containers after changing the image or environment.
+The native launch commands also set `RLINF_ENABLE_MIBOT_REGISTRATION=1`; this activates the
+integration's `sitecustomize.py` hook so every fresh Ray actor process registers the custom
+MiBoT policy and installs the RoboCasa365 environment override before RLinf constructs either.
+
+The initial config is intentionally a four-environment GRASP run with one active adapter and
+micro-batch size 1. A subprocess wrapper replaces `CloseBlenderLid` completion with the same
+stable-grasp predicate used by the verified skill evaluator: gripper contact, lid lifted more
+than 5 cm from its reset height, clear of the counter, held for 20 consecutive environment
+steps. The success latch and RLinf relative reward produce exactly one `+1` event; timeout and
+all other outcomes produce zero. MOVE/PLACE still require their own native reward wiring.
+`mibot_rlinf_env.py` wraps RLinf's stock RoboCasa365 environment with reset-aware four-frame,
+interval-two histories while retaining the standard observation keys. The MOVE/PLACE
+snapshot-reset semantics remain a follow-up gate; they should be imported from the parallel
+collector branch rather than reimplemented here before claiming three-skill parity.
+
+## 7. Expected outputs
 
 All under the mounted `RLINF_RESULTS`:
 - `smoke/smoke_report.json` — health gates.
@@ -114,7 +157,7 @@ All under the mounted `RLINF_RESULTS`:
 - `ode_eval/ode_eval_report.json` — deterministic eval, per-seed + before/after.
 - training runs (when enabled): per-run dir with logs, adapter checkpoint, rollout MP4s.
 
-## 7. RLinf parameter-grid collector (DGX Spark acceptance)
+## 8. RLinf parameter-grid collector (DGX Spark acceptance)
 
 The grid collector is optimizer-free: RLinf `WorkerGroup` actors own independent RoboCasa
 simulators while one resident Xiaomi trainer/model server serializes GPU inference and stores
@@ -173,7 +216,7 @@ the `runtime.cluster`/`.env` network hooks. The inter-host fabric is **ConnectX-
 NVLink. Validate Ray membership, the RoCE interface/GID and shared result/checkpoint mounts on
 both nodes before changing `num_nodes`; the single-Spark acceptance does not prove this mode.
 
-## 8. Rollback / removal command
+## 9. Rollback / removal command
 
 Remove the image and (optionally) the pinned RLinf clone; host mounts (checkpoint, assets,
 results) are untouched:
@@ -208,6 +251,9 @@ integrations/rlinf_mibot/
     mibot_adapter.py               model load / obs transforms / 12-D decode / velocity /
                                    pi-RL sampler (reuses verified rl-env code by import)
     rlinf_env.py                   reward/env adapter + skill contracts + RLinf registration
+    mibot_rlinf_policy.py          native BasePolicy-compatible rollout/recompute + LoRA
+    mibot_rlinf_env.py             reset-safe temporal history extension for RoboCasa365
+    rlinf_train.py                 model registration + unmodified RLinf embodied launcher
     train_entry.py / eval_entry.py Hydra PPO-smoke / ODE-eval entry points (guarded)
     grid_collection.py              deterministic grid/seed/artifact contract + audit
     rlinf_grid_runtime.py           production RLinf WorkerGroup scheduler
@@ -218,6 +264,7 @@ integrations/rlinf_mibot/
   configs/ppo_smoke.yaml           adapter-only PPO smoke (1 iter, long training disabled)
   configs/ode_eval.yaml            deterministic ODE eval (noise=0)
   configs/grid_smoke.yaml          2-config/2-worker collection acceptance config
+  configs/rlinf_mibot_grpo.yaml    DAX rollout / RTX 3090 actor native GRPO placement
   tests/test_*.py                  no-GPU unit/static/mutation validation
   readiness_report.json            READY / NEEDS_SERVER per gate
   deploy/README.md                 this file

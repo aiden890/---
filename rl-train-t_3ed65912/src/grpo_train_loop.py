@@ -48,7 +48,8 @@ from update_batch import (  # noqa: E402
     trajectory_action_seed, validate_batch_config,
 )
 from training_correctness import (  # noqa: E402
-    ExactHoldWindow, RewardComponents, append_progress, hold_enabled_for_variant,
+    ExactHoldWindow, RewardComponents, append_progress, binary_skill_episode_reward,
+    hold_enabled_for_variant,
     nonduplicated_skill_reward,
     reset_gated_store, skill_terminal_enabled_for_variant, skill_timeout_reward,
     verify_deployment_manifest,
@@ -128,10 +129,12 @@ class TrainerClient:
         return d
 
     def infer(self, states, images, instruction, *, eta, traj_id=None, seed=None, skill=None,
-              chunk_index=0):
+              chunk_index=0, expected_policy_version=None):
         inputs = self._build_inputs(states, images, instruction)
         req = {"op": "sample", "inputs": inputs, "eta": eta, "traj_id": traj_id, "seed": seed,
                "skill": skill, "chunk_index": chunk_index}
+        if expected_policy_version is not None:
+            req["expected_policy_version"] = int(expected_policy_version)
         t_rpc = time.perf_counter()
         resp = self._rpc(req)
         self.sample_rpc_seconds += time.perf_counter() - t_rpc
@@ -140,6 +143,8 @@ class TrainerClient:
         decoded = self.processor.decode_action(actions, robot_type=self.robot_type)
         decoded = decoded[0, :, : self.ACTION_DIM]
         decoded = decoded.float().cpu().numpy() if hasattr(decoded, "float") else np.asarray(decoded)
+        self.last_sample_policy = {"policy_version": resp.get("policy_version"),
+                                   "policy_hash": resp.get("policy_hash")}
         return np.asarray(decoded, dtype=np.float32), resp.get("logprob")
 
     def update(self, advantages, clip=0.1, kl_coef=0.005, ratio_max=10.0, adv_clip=3.0,
@@ -168,10 +173,18 @@ class TrainerClient:
     def metrics(self):
         return self._rpc({"op": "metrics"})
 
-    def export_store(self, trajectory_ids, path, *, drop_after_export=False):
+    def export_store(self, trajectory_ids, path, *, drop_after_export=False,
+                     actor_id="local", group_id="default"):
         """Persist selected sampled chunks without asking the optimizer to update."""
         return self._rpc({"op": "export_store", "trajectory_ids": list(trajectory_ids),
-                          "path": str(path), "drop_after_export": bool(drop_after_export)})
+                          "path": str(path), "drop_after_export": bool(drop_after_export),
+                          "actor_id": str(actor_id), "group_id": str(group_id)})
+
+    def publish_adapter(self, path):
+        return self._rpc({"op": "publish_adapter", "path": str(path)})
+
+    def load_adapter(self, path):
+        return self._rpc({"op": "load_adapter", "path": str(path)})
 
     def import_store(self, path, expected_sha256):
         """Restore a collector payload for the existing update path to consume later."""
@@ -181,6 +194,14 @@ class TrainerClient:
     def discard_store(self, trajectory_ids):
         """Drop failed-attempt chunks without performing an optimizer update."""
         return self._rpc({"op": "discard_store", "trajectory_ids": list(trajectory_ids)})
+
+    def set_last_chunk_executed_steps(self, trajectory_id, executed_steps):
+        """Exclude actions after a terminal env step from the GRPO ratio loss."""
+        return self._rpc({
+            "op": "set_last_chunk_executed_steps",
+            "trajectory_id": str(trajectory_id),
+            "executed_steps": int(executed_steps),
+        })
 
     def config(self, code_rev=None):
         """Fetch the full trainer configuration (optimizer/LR/grad-clip/LoRA/trainable count/
@@ -207,7 +228,7 @@ def _make_env(split, seed):
 
 def _run_one_skill(sim, client, obs, args, skill, reward_mgr, *, eta, traj_id, seed,
                    frames=None, save_video=None, approach_coef=0.0, timeout_penalty=0.0,
-                   hold_cfg=None, hold_steps=0):
+                   hold_cfg=None, hold_steps=0, expected_policy_version=None):
     """Run ONE skill's VLA loop; return (obs, outcome, reward, steps, predicates).
 
     Training-only dense shaping (not used in eval; all default to off):
@@ -239,6 +260,7 @@ def _run_one_skill(sim, client, obs, args, skill, reward_mgr, *, eta, traj_id, s
         image_queues[k].append(im)
     state_queue.append(rollout.observation_to_state(obs))
     action_plan = collections.deque()
+    executed_in_chunk = 0
     if frames is not None and not frames:
         frames.append(rollout.make_video_frame(obs))
     steps = 0
@@ -270,14 +292,17 @@ def _run_one_skill(sim, client, obs, args, skill, reward_mgr, *, eta, traj_id, s
             images = {k: rollout.sample_history(q, args.obs_history, args.obs_interval)
                       for k, q in image_queues.items()}
             chunk, _ = client.infer(states, images, instruction, eta=eta, traj_id=traj_id,
-                                    seed=seed, skill=skill_key, chunk_index=chunk_idx)
+                                    seed=seed, skill=skill_key, chunk_index=chunk_idx,
+                                    expected_policy_version=expected_policy_version)
             chunk_idx += 1
             if len(chunk) < args.replan_steps:
                 raise RuntimeError(f"chunk {len(chunk)} < replan {args.replan_steps}")
             action_plan.extend(chunk[: args.replan_steps])
+            executed_in_chunk = 0
         a = np.asarray(action_plan.popleft(), dtype=np.float32)
         obs, _, done, trunc, info = sim.genv.step(convert_action(a))
         steps += 1
+        executed_in_chunk += 1
         for k, im in rollout.collect_images(obs).items():
             image_queues[k].append(im)
         state_queue.append(rollout.observation_to_state(obs))
@@ -354,11 +379,24 @@ def _run_one_skill(sim, client, obs, args, skill, reward_mgr, *, eta, traj_id, s
             continue
         if outcome or done or trunc:
             break
+    # Sampling stores likelihood terms for the full planned action prefix.  If the
+    # simulator terminated in the middle of that prefix, retain only terms for actions
+    # that were actually executed.  This is especially important for grasp_binary:
+    # post-success actions must not inherit the successful trajectory advantage.
+    if eta > 0.0 and traj_id is not None and 0 < executed_in_chunk < args.replan_steps:
+        client.set_last_chunk_executed_steps(traj_id, executed_in_chunk)
     if outcome is None:
         outcome = SkillOutcome.TIMEOUT
     timeout_reward = skill_timeout_reward(outcome.name, timeout_penalty)
     reward_sum += timeout_reward
     reward_components.timeout += timeout_reward
+    if getattr(args, "reward_variant", "") == "grasp_binary":
+        if skill is not Skill.GRASP:
+            raise ValueError("grasp_binary reward is valid only for the GRASP skill")
+        # SkillMonitor already requires consecutive grasped states. Collapse all
+        # shaping and penalties to the exact sparse episode outcome.
+        reward_sum = binary_skill_episode_reward(outcome)
+        reward_components = RewardComponents(skill_terminal=reward_sum)
     if save_video is not None and frames is not None:
         import imageio.v2 as imageio
         imageio.mimsave(save_video, frames, fps=args.video_fps)
@@ -635,8 +673,10 @@ def train_iteration(client, args, reward_cfg, seed, it, *, defer_update=False):
     # approach shaping disabled (operator 2026-09-16): reward only at final success,
     # no dense per-step distance shaping before success.
     train_approach_coef = 0.0
-    train_timeout_penalty = (0.0 if getattr(args, "reward_variant", "") ==
-                             "simulator_terminal_only" else 0.5)
+    train_timeout_penalty = (
+        0.0 if getattr(args, "reward_variant", "") in
+        {"simulator_terminal_only", "grasp_binary"} else 0.5
+    )
     # Boundary-compliance hold (operator decision B): reward stopping after success. Config
     # from args (0 hold_steps disables it -> identical to the pre-B behaviour).
     hold_steps = int(getattr(args, "hold_steps", 0))
@@ -930,13 +970,16 @@ def build_parser():
     ap.add_argument("--eval-seed-base", type=int, default=5000)
     ap.add_argument("--heldout-seed-base", type=int, default=9000)
     ap.add_argument("--reward-variant", default="simulator_terminal_only",
-                    choices=("simulator_milestones", "simulator_terminal_only", "terminal_plus_hold"),
+                    choices=("simulator_milestones", "simulator_terminal_only",
+                             "terminal_plus_hold", "grasp_binary"),
                     help="Reward composition label. simulator_milestones: per-milestone bonuses. "
                          "terminal_plus_hold: terminal success (+1.0) PLUS the 20-step post-success "
                          "hold shaping (the ACTUAL reward when --hold-steps>0; the honest rename of "
                          "the mislabeled 'terminal_only'). simulator_terminal_only: pure terminal "
                          "official whole-task predicate only: task failure=0, task success=1; "
-                         "no per-skill payment, decay, hold shaping, or failure penalty.")
+                         "no per-skill payment, decay, hold shaping, or failure penalty. "
+                         "grasp_binary: a stable GRASP episode is worth exactly 1 and every "
+                         "other outcome is 0.")
     ap.add_argument("--reward-std-gate", type=float, default=0.05,
                     help="Minimum within-group reward std for an optimizer update. Groups with a "
                          "smaller std (all-failure or effectively-constant reward) are gated: "
@@ -1065,7 +1108,7 @@ def main():
     # weights (the hold window is retained only as a verifier condition, not a reward).
     # terminal_plus_hold keeps the hold shaping (the honest label for the run that ships
     # +1.0 terminal AND the 20-step hold bonus). simulator_milestones enables milestones.
-    if my.reward_variant == "simulator_terminal_only":
+    if my.reward_variant in {"simulator_terminal_only", "grasp_binary"}:
         args.hold_stay_bonus = 0.0
         args.hold_drift_penalty = 0.0
         args.hold_drop_penalty = 0.0
@@ -1073,7 +1116,7 @@ def main():
 
     reward_cfg = (
         RewardConfig.binary(horizon=my.horizon_place)
-        if my.reward_variant == "simulator_terminal_only"
+        if my.reward_variant in {"simulator_terminal_only", "grasp_binary"}
         else RewardConfig(
             horizon=my.horizon_place,
             use_milestones=(my.reward_variant == "simulator_milestones"),

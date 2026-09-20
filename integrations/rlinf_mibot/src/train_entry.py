@@ -76,8 +76,12 @@ def main():
         if not torch.cuda.is_available():
             raise RuntimeError("no CUDA")
         model = MA.MiBoTModel(mcfg).load()
-        RE.register_mibot()  # raises NotImplementedError until wired on server
-        report["steps"].append({"run": "one PPO update", "ok": True})
+        RE.register_mibot()
+        report["steps"].append({
+            "wire": "RLinf MiBoT registry",
+            "ok": True,
+            "detail": "Use rlinf_train.py for the native GRPO optimizer run",
+        })
         report["status"] = "PASS"
     except Exception as e:
         report["steps"].append({"run": "one PPO update", "ok": False, "detail": f"{type(e).__name__}: {e}"})

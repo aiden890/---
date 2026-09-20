@@ -67,9 +67,16 @@ def skill_timeout_reward(outcome_name: str, timeout_penalty: float) -> float:
     return -float(timeout_penalty) if str(outcome_name) == "TIMEOUT" else 0.0
 
 
+def binary_skill_episode_reward(outcome_name: str) -> float:
+    """Map a stable skill-monitor outcome to the exact sparse episode reward."""
+    value = getattr(outcome_name, "name", outcome_name)
+    return 1.0 if str(value).upper() == "SUCCESS" else 0.0
+
+
 def hold_enabled_for_variant(reward_variant: str, hold_steps: int) -> bool:
     """The terminal-only ablation must not silently include hold shaping."""
-    return str(reward_variant) != "simulator_terminal_only" and int(hold_steps) > 0
+    return str(reward_variant) not in {"simulator_terminal_only", "grasp_binary"} \
+        and int(hold_steps) > 0
 
 
 def skill_terminal_enabled_for_variant(reward_variant: str) -> bool:

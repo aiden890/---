@@ -32,7 +32,8 @@ validate_run_id() {
 
 # Common mounts: integration layer + reused verified in-repo components (read-only),
 # host checkpoint/assets read-only, results/cache read-write. GPU + EGL like the sim image.
-common_args=(--gpus "$GPUS" --shm-size=8g
+# Ray otherwise falls back from /dev/shm to /tmp on DGX Spark (it requires >10.24 GiB).
+common_args=(--gpus "$GPUS" --shm-size=16g
   -e RLINF_SOURCE_COMMIT="$SOURCE_COMMIT"
   -e MUJOCO_GL=egl -e PYOPENGL_PLATFORM=egl -e NVIDIA_DRIVER_CAPABILITIES=compute,utility,graphics
   -e HF_HOME=/cache/hf -e HF_HUB_OFFLINE=1
@@ -59,7 +60,7 @@ case "${1:-help}" in
     ;;
   smoke)
     docker run --rm --network none "${common_args[@]}" "$IMAGE" \
-      python3 /integration/src/smoke.py --all --out /results/smoke "${@:2}"
+      python3 /integration/src/smoke.py --out /results/smoke "${@:2}"
     ;;
   ppo-smoke)
     docker run --rm --network none "${common_args[@]}" "$IMAGE" \
@@ -68,6 +69,55 @@ case "${1:-help}" in
   ode-eval)
     docker run --rm --network none "${common_args[@]}" "$IMAGE" \
       python3 /integration/src/eval_entry.py --config-name ode_eval results_dir=/results/ode_eval "${@:2}"
+    ;;
+  native-ray-head)
+    : "${RLINF_NODE_IP:?set RLINF_NODE_IP to the DAX IP reachable from the 3090 host}"
+    ray_port="${RLINF_RAY_PORT:-6379}"
+    name="rlinf-mibot-ray-head"
+    [[ ! "$(docker ps -aq -f name=^/${name}$)" ]] || {
+      echo "container $name already exists; run native-ray-stop after preserving logs" >&2; exit 1
+    }
+    docker run -d --name "$name" --network host \
+      -e RLINF_NODE_RANK=0 -e RLINF_ENABLE_MIBOT_REGISTRATION=1 \
+      "${common_args[@]}" "$IMAGE" \
+      ray start --head --block --port "$ray_port" --node-ip-address "$RLINF_NODE_IP"
+    ;;
+  native-ray-worker)
+    : "${RLINF_HEAD_ADDR:?set RLINF_HEAD_ADDR to the DAX IP}"
+    : "${RLINF_NODE_IP:?set RLINF_NODE_IP to this RTX 3090 host IP}"
+    ray_port="${RLINF_RAY_PORT:-6379}"
+    node_rank="${RLINF_NODE_RANK:-1}"
+    [[ "$node_rank" =~ ^[1-9][0-9]*$ ]] || {
+      echo "native Ray worker RLINF_NODE_RANK must be >= 1" >&2; exit 2
+    }
+    name="rlinf-mibot-ray-worker-${node_rank}"
+    [[ ! "$(docker ps -aq -f name=^/${name}$)" ]] || {
+      echo "container $name already exists; run native-ray-stop after preserving logs" >&2; exit 1
+    }
+    docker run -d --name "$name" --network host \
+      -e RLINF_NODE_RANK="$node_rank" -e RLINF_ENABLE_MIBOT_REGISTRATION=1 \
+      "${common_args[@]}" "$IMAGE" \
+      ray start --block --address "$RLINF_HEAD_ADDR:$ray_port" \
+      --node-ip-address "$RLINF_NODE_IP"
+    ;;
+  native-grpo)
+    # Run this driver once, after native-ray-head/native-ray-worker report both nodes.
+    # RLinf launches actor/env/rollout processes through Ray; torchrun would create two
+    # independent drivers and does not establish RLinf's scheduler topology.
+    : "${RLINF_HEAD_ADDR:?set RLINF_HEAD_ADDR to the DAX IP}"
+    ray_port="${RLINF_RAY_PORT:-6379}"
+    docker run --rm --network host \
+      -e RAY_ADDRESS="$RLINF_HEAD_ADDR:$ray_port" \
+      -e RLINF_ENABLE_MIBOT_REGISTRATION=1 "${common_args[@]}" "$IMAGE" \
+      python3 /integration/src/rlinf_train.py \
+      --config-path /integration/configs --config-name rlinf_mibot_grpo "${@:2}"
+    ;;
+  native-ray-stop)
+    # Run on each host. Preserve `docker logs <name>` first when diagnosing a failure.
+    for name in $(docker ps -a --format '{{.Names}}' | grep -E '^rlinf-mibot-ray-(head|worker-[0-9]+)$' || true); do
+      docker rm -f "$name" >/dev/null
+      echo "removed $name"
+    done
     ;;
   shell)
     docker run --rm -it --network host "${common_args[@]}" --entrypoint bash "$IMAGE"
@@ -83,14 +133,21 @@ case "${1:-help}" in
       echo "refusing stale container reuse: remove $name after preserving its logs" >&2; exit 1
     fi
     mkdir -p "$RLINF_RESULTS/$run_id/provenance"
-    python3 "$repo_root/scripts/build_source_manifest.py" \
-      rl-train-t_3ed65912 "$RLINF_RESULTS/$run_id/provenance/train.json"
-    python3 "$repo_root/scripts/build_source_manifest.py" \
-      rl-env-t_4f3f2b20 "$RLINF_RESULTS/$run_id/provenance/env.json"
+    if [[ "${RLINF_BENCHMARK_MANIFESTS:-0}" == 1 ]]; then
+      train_manifest=/integration/configs/benchmark_train_manifest.json
+      env_manifest=/integration/configs/benchmark_env_manifest.json
+    else
+      python3 "$repo_root/scripts/build_source_manifest.py" \
+        rl-train-t_3ed65912 "$RLINF_RESULTS/$run_id/provenance/train.json"
+      python3 "$repo_root/scripts/build_source_manifest.py" \
+        rl-env-t_4f3f2b20 "$RLINF_RESULTS/$run_id/provenance/env.json"
+      train_manifest="/results/$run_id/provenance/train.json"
+      env_manifest="/results/$run_id/provenance/env.json"
+    fi
     docker run -d --name "$name" --network host "${common_args[@]}" "$IMAGE" \
       python3 /train/src/grpo_trainer_server.py --model /checkpoint --host 127.0.0.1 --port "$PORT" \
-      --train-source-manifest "/results/$run_id/provenance/train.json" \
-      --env-source-manifest "/results/$run_id/provenance/env.json" \
+      --train-source-manifest "$train_manifest" \
+      --env-source-manifest "$env_manifest" \
       --sampler pirl --eta 0.1 --optimizer adamw --lr 1e-5 --update-epochs 1
     for _ in $(seq 1 180); do
       if docker logs "$name" 2>&1 | grep -q 'GRPO trainer server on'; then
@@ -108,6 +165,31 @@ case "${1:-help}" in
     validate_run_id "$run_id"
     docker stop "rlinf-mibot-model-${run_id}" >/dev/null
     docker rm "rlinf-mibot-model-${run_id}" >/dev/null
+    ;;
+  benchmark-policy)
+    observation="${2:-/results/benchmark/observation.npz}"
+    shift
+    [[ $# -eq 0 ]] || shift
+    mkdir -p "$RLINF_RESULTS/benchmark"
+    docker run --rm --network host "${common_args[@]}" "$IMAGE" \
+      python3 /integration/scripts/benchmark_policy_concurrency.py \
+      --observation "$observation" --host 127.0.0.1 --port "$PORT" \
+      --output /results/benchmark/policy_concurrency.json "${@}"
+    ;;
+  benchmark-env)
+    shift
+    mkdir -p "$RLINF_RESULTS/benchmark"
+    docker run --rm --network none "${common_args[@]}" "$IMAGE" \
+      python3 /integration/scripts/benchmark_env_step.py \
+      --output /results/benchmark/env_step.json "${@}"
+    ;;
+  benchmark-group-reuse)
+    shift
+    mkdir -p "$RLINF_RESULTS/benchmark"
+    docker run --rm --network host "${common_args[@]}" "$IMAGE" \
+      python3 /integration/scripts/benchmark_group_reuse.py \
+      --host 127.0.0.1 --port "$PORT" \
+      --output /results/benchmark/group_reuse.json "${@}"
     ;;
   grid-parallel|grid-serial|grid-resume)
     cmd="$1"; run_id="${2:?Usage: bash run.sh $1 RUN_ID [OmegaConf overrides...]}"; shift 2
@@ -178,6 +260,6 @@ case "${1:-help}" in
     lifecycle_status=0
     ;;
   *)
-    printf '%s\n' 'Usage: bash run.sh {build|smoke|ppo-smoke|ode-eval|shell|model-start|model-stop|grid-parallel|grid-serial|grid-resume|grid-consume|grid-stop|grid-compare|grid-smoke}' >&2
+    printf '%s\n' 'Usage: bash run.sh {build|smoke|ppo-smoke|ode-eval|native-ray-head|native-ray-worker|native-grpo|native-ray-stop|shell|model-start|model-stop|benchmark-policy|benchmark-env|benchmark-group-reuse|grid-parallel|grid-serial|grid-resume|grid-consume|grid-stop|grid-compare|grid-smoke}' >&2
     exit 2;;
 esac

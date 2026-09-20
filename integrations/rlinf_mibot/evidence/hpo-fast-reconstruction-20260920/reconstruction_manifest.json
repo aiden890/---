@@ -1,0 +1,379 @@
+{
+  "anchor_commit": "a4ee45622c735bf65b34497d5ef47b32dab8a9bd",
+  "verified_remote_identity": {
+    "spark_files": 157,
+    "amp_files": 157,
+    "only_spark": [],
+    "only_amp": [],
+    "hash_diffs": {}
+  },
+  "reconstructed_files": [
+    {
+      "path": "integrations/rlinf_mibot/configs/benchmark_env_manifest.json",
+      "old": null,
+      "new": "e035eb9db67707d42a25b963bcdc03e934f7fcf6432725b0b94a777433bf7a91",
+      "status": "new"
+    },
+    {
+      "path": "integrations/rlinf_mibot/configs/benchmark_train_manifest.json",
+      "old": null,
+      "new": "31e0dac955da8713b003608678775d23807ac6b072b04939d0242e6487d98a5d",
+      "status": "new"
+    },
+    {
+      "path": "integrations/rlinf_mibot/configs/consume_benchmark_1epoch.yaml",
+      "old": null,
+      "new": "fc7d2788facfc046ebd8c6528747a3a32826b83dc3d0fa20c6c410f347e94c67",
+      "status": "new"
+    },
+    {
+      "path": "integrations/rlinf_mibot/configs/consume_production.yaml",
+      "old": null,
+      "new": "ce7dfdc4182a3c3d937cace710476263b78409b225b7d7a9d472d48587f9f36d",
+      "status": "new"
+    },
+    {
+      "path": "integrations/rlinf_mibot/configs/grid_smoke.yaml",
+      "old": "b87258cdfa3662f93c0224d3fb96f0f284043f4fa0fac5d672b7f4be4bed13fd",
+      "new": "60d02defa36e934be20fbd9125ccfc1bbb4cae91d235c0059e9642070fb26741",
+      "status": "changed"
+    },
+    {
+      "path": "integrations/rlinf_mibot/configs/rlinf_mibot_grpo.yaml",
+      "old": null,
+      "new": "1d7e089644d5ecbaf91336c13e6545ada3c3a50820995b97c851ab52b07c7cb6",
+      "status": "new"
+    },
+    {
+      "path": "integrations/rlinf_mibot/deploy/MERGE_READY.md",
+      "old": null,
+      "new": "3c595af84dd1295ff2f89043369c519ca98c36d98db77b5847699306b1452208",
+      "status": "new"
+    },
+    {
+      "path": "integrations/rlinf_mibot/deploy/README.md",
+      "old": "a1ee3dd97e7436d184a0df4ec399a9e7793257477b2eef05a843fdd3ed1a4040",
+      "new": "e0f47bc0c261fc6cf01b47e460e2919ef93a647a0c675404280fe17c03b358ea",
+      "status": "changed"
+    },
+    {
+      "path": "integrations/rlinf_mibot/docker-compose.yml",
+      "old": "07cfd4c65627d6bc119c726e5e24557c596d5f88b285734df9f0253f184b8745",
+      "new": "e3921208549272a60d026541b4d52dc27b437e6ed5dc845eb279e470b4b538d1",
+      "status": "changed"
+    },
+    {
+      "path": "integrations/rlinf_mibot/readiness_report.json",
+      "old": "182b31456c65a0d61e98afb96a569141902da791648d2459d14ef6f22364d598",
+      "new": "a31c0beea192297665980bf9c522c12256a5e821b60b20acfeb4c4ab840e85e1",
+      "status": "changed"
+    },
+    {
+      "path": "integrations/rlinf_mibot/run.sh",
+      "old": "42e48572d370b6abcb14bcee35eb3f98926c0b32c778272d1a8faad419b5ba46",
+      "new": "7c60a867ec704295d459a0bf59a0e4d0c2adc9c89c429731c48f5a22188d1f1f",
+      "status": "changed"
+    },
+    {
+      "path": "integrations/rlinf_mibot/scripts/async_3gpu_preflight.sh",
+      "old": null,
+      "new": "077a4ef73126698bf6bd5e8cbc5842575987ce64ea921868e69169f1474489eb",
+      "status": "new"
+    },
+    {
+      "path": "integrations/rlinf_mibot/scripts/async_distributed_grasp_train.py",
+      "old": null,
+      "new": "cf660a1394a4ca6f990983751c76a4a239e563e8e55175deaa09b55bda484597",
+      "status": "new"
+    },
+    {
+      "path": "integrations/rlinf_mibot/scripts/benchmark_env_step.py",
+      "old": null,
+      "new": "fbedbd112273f3929c6f43efe7fa10685101a397e2558b41aaf03ce1e21cb945",
+      "status": "new"
+    },
+    {
+      "path": "integrations/rlinf_mibot/scripts/benchmark_group_reuse.py",
+      "old": null,
+      "new": "fa94eba1912ca7dd7724ebbcfed9431b8e6e39643e186164d34128c6c02b3c18",
+      "status": "new"
+    },
+    {
+      "path": "integrations/rlinf_mibot/scripts/benchmark_policy_concurrency.py",
+      "old": null,
+      "new": "50bd26e0116f8c45c656fa9bfa4d2da80616f67bf345bf7573de5d7f645e5da4",
+      "status": "new"
+    },
+    {
+      "path": "integrations/rlinf_mibot/scripts/build_batch_benchmark_payloads.py",
+      "old": null,
+      "new": "deda1b5c13d48d4328a0227c5aad6bd80d5009dd9e7689b3360493a6834cad2a",
+      "status": "new"
+    },
+    {
+      "path": "integrations/rlinf_mibot/scripts/distributed_grasp_train.py",
+      "old": null,
+      "new": "31e198b7a26064b625875ce54345082db6bff348876b5ff26e927189ff9e8fd2",
+      "status": "new"
+    },
+    {
+      "path": "integrations/rlinf_mibot/scripts/expand_lora_adapter.py",
+      "old": null,
+      "new": "963fc567ceb541cc9549ab5e06cbfe6d94aa29f20427191124ffb918f1370a5a",
+      "status": "new"
+    },
+    {
+      "path": "integrations/rlinf_mibot/src/async_policy.py",
+      "old": null,
+      "new": "0b0d555fb46a09db85c86703ad7327d5273edb9f75b9ed4c1b8f3c636371d1aa",
+      "status": "new"
+    },
+    {
+      "path": "integrations/rlinf_mibot/src/async_training_coordinator.py",
+      "old": null,
+      "new": "a1a4020239500834ff39b8639e44a89ce8d5013e4b7e61c770b21cae61ce1b26",
+      "status": "new"
+    },
+    {
+      "path": "integrations/rlinf_mibot/src/consume_collector.py",
+      "old": "f3f2611ed929e20326029b305d25f10435b49419887898323332a5d510ccb80f",
+      "new": "f6e373cb4a92ee28fa4bdd3ee7c4b0d4b1a4aec126c5cadf06485c249f66f3fe",
+      "status": "changed"
+    },
+    {
+      "path": "integrations/rlinf_mibot/src/grasp_binary_reward.py",
+      "old": null,
+      "new": "8242fd35bae7c72e4cf99d7782e22667dd02fd23fe78ab88f2e3bf54da12b32e",
+      "status": "new"
+    },
+    {
+      "path": "integrations/rlinf_mibot/src/grid_collection.py",
+      "old": "072d0cc858d84b83d334ce44fa4e928a77bc7547a6bdb437c16abdd1c870ba2a",
+      "new": "e74435a40f07f1c21c57c4b43ea554987125bafc811ddc4070e0dad06b051cd5",
+      "status": "changed"
+    },
+    {
+      "path": "integrations/rlinf_mibot/src/grid_entry.py",
+      "old": "25b233da56038d8addf9062f4dae2ed0b44d9ce97a1ef58767badfa245854c99",
+      "new": "02ebd50967ddf31a002e3e3dcce25b63027d91eb2038b0798fd402629dea83df",
+      "status": "changed"
+    },
+    {
+      "path": "integrations/rlinf_mibot/src/mibot_adapter.py",
+      "old": "c0fa2794136b714ec586e634267fbacea0036934c9afbc8ec54fd389bae6e62a",
+      "new": "f10e0fe46136b7e6cc8d9db83ce0d9bdbe72d649edc4f9dbf9d2fb8287f11696",
+      "status": "changed"
+    },
+    {
+      "path": "integrations/rlinf_mibot/src/mibot_rlinf_env.py",
+      "old": null,
+      "new": "49512cc5ad75750b45cb480ab592369d898fc70cfbbb9e2d86dc51caf6cc094c",
+      "status": "new"
+    },
+    {
+      "path": "integrations/rlinf_mibot/src/mibot_rlinf_policy.py",
+      "old": null,
+      "new": "07afee7c6b285494df94fcb3a144562af8fef386f4bd951d7252444ec9bb2f6f",
+      "status": "new"
+    },
+    {
+      "path": "integrations/rlinf_mibot/src/prepare_streaming_transfer.py",
+      "old": null,
+      "new": "808b57e858e9fe35dbf2190e7f7bc16082b19f00709db579a95b0d3ad82c170d",
+      "status": "new"
+    },
+    {
+      "path": "integrations/rlinf_mibot/src/rlinf_env.py",
+      "old": "0c846a7c736fd1b72bc6b2999d03ed09eb1d9333b74a1387d796aead30c2af9d",
+      "new": "e71cdc99a2478645d94b3bde17c4dfb36ebbc0fed7e3d3a11753b458db425321",
+      "status": "changed"
+    },
+    {
+      "path": "integrations/rlinf_mibot/src/rlinf_grid_runtime.py",
+      "old": "e199ac594d404d60b6f2d2f507b07dc8072d28b271ef03f363971381d151aa08",
+      "new": "111633ba7b34f1d4b66f3552b9803913581c43d00482a6f5653ed784142661f1",
+      "status": "changed"
+    },
+    {
+      "path": "integrations/rlinf_mibot/src/rlinf_grid_worker.py",
+      "old": "21ddf5fe9276ef854d3b29c9f3636d7e138c550b633e80cd6b93c14d7a0f9d34",
+      "new": "3dae246a48e3c2a51b7ddab938a8438700c3e2f58537a2dd2ae0b95f64b6e5ab",
+      "status": "changed"
+    },
+    {
+      "path": "integrations/rlinf_mibot/src/rlinf_train.py",
+      "old": null,
+      "new": "9f8a6a0e39716df06adff2d592acd7b7182339e13474ba3e1007967cc842a2c4",
+      "status": "new"
+    },
+    {
+      "path": "integrations/rlinf_mibot/src/rollout_store.py",
+      "old": "08032e173533721959cdf8424877bf27e5781f4bef7d11552e9367ae4825fb2c",
+      "new": "608a423eb7280d2062124f7b04dfdd1e7d4482b18e02e980fbea95b23594df24",
+      "status": "changed"
+    },
+    {
+      "path": "integrations/rlinf_mibot/src/sitecustomize.py",
+      "old": null,
+      "new": "2bfd4c969bb42784d553e1a53bfb839f384951c2e23b5722d4a42b01a6f604bc",
+      "status": "new"
+    },
+    {
+      "path": "integrations/rlinf_mibot/src/streaming_consume.py",
+      "old": null,
+      "new": "046e49e3d8304453e5eeea87dfd09ea5d779e788def4697722712b05709434bd",
+      "status": "new"
+    },
+    {
+      "path": "integrations/rlinf_mibot/src/train_entry.py",
+      "old": "03b753e02b594add28c738b6426f12d23ab9dac8ba27f36962c6939677521f94",
+      "new": "129812a423a1a90c5fd3d5b4d1e58e28011506a7ee7c41ac46b358ec10d025ee",
+      "status": "changed"
+    },
+    {
+      "path": "integrations/rlinf_mibot/tests/test_async_policy.py",
+      "old": null,
+      "new": "2123366e0080ba48c0016fada80c7aa350550f4ee1e50444a0ca9864651c906c",
+      "status": "new"
+    },
+    {
+      "path": "integrations/rlinf_mibot/tests/test_async_training_coordinator.py",
+      "old": null,
+      "new": "07ba966d9f6eb82d8824956c3566e257433cf7ddd2d55297ccbea283333f598d",
+      "status": "new"
+    },
+    {
+      "path": "integrations/rlinf_mibot/tests/test_batch_benchmark_payloads.py",
+      "old": null,
+      "new": "5f35abe6fd0b1bdcb38b8bf2165ef42b838340030efc23335e5623ede1caee91",
+      "status": "new"
+    },
+    {
+      "path": "integrations/rlinf_mibot/tests/test_consume_collector.py",
+      "old": "78eaa3cf9670e57932433e8950d805584eaf754f2e9860fe0a9299358e2caa25",
+      "new": "e130e5d4d5f8c68aa4aeec9bc136beae09f16389b34876b8402abedbae053e18",
+      "status": "changed"
+    },
+    {
+      "path": "integrations/rlinf_mibot/tests/test_grasp_binary_reward.py",
+      "old": null,
+      "new": "6194dcf4969418c08705445e057ad505a856878ea398c049a599446004e24b50",
+      "status": "new"
+    },
+    {
+      "path": "integrations/rlinf_mibot/tests/test_grid_collection.py",
+      "old": "05069a5fc5ae3bbedede3d33dcb8a21a5947dbafb2d96cfa4516147cb1b4c4ce",
+      "new": "cdc544478a720a050e54a7ec6b4b61f452d15792a646b40b6e57aa397b0fd328",
+      "status": "changed"
+    },
+    {
+      "path": "integrations/rlinf_mibot/tests/test_grid_entry.py",
+      "old": "11baa7d595d0c24e63578587ce0261bc6fa8246f8f45a2f1b6a2acc2e3fe0a72",
+      "new": "73983fd30237628d85ccdecfb35566017440f09250b79f4a94765d57824224de",
+      "status": "changed"
+    },
+    {
+      "path": "integrations/rlinf_mibot/tests/test_mibot_history.py",
+      "old": null,
+      "new": "865bc4ee0d2ffbf6906a92546d9251aa7ea7bb4c4ba34d763d225c748f028ff5",
+      "status": "new"
+    },
+    {
+      "path": "integrations/rlinf_mibot/tests/test_prepare_streaming_transfer.py",
+      "old": null,
+      "new": "2d0a7a1a5fdf8725028afafda3df68073af594689f55e27dca6e8f21630bb2d1",
+      "status": "new"
+    },
+    {
+      "path": "integrations/rlinf_mibot/tests/test_rlinf_grid_runtime.py",
+      "old": "2db7bc2dd84ccae4d1b68b248ca4584ad74bf143b14bfdbaf3f1e5d3810799f2",
+      "new": "6f5359946a4674e67f16af31143002c6b919a4c1566ae4efa77e2f9a608bf922",
+      "status": "changed"
+    },
+    {
+      "path": "integrations/rlinf_mibot/tests/test_rlinf_policy_contract.py",
+      "old": null,
+      "new": "c5bb9e12414447730f53ed5fc6573733bf034addb050ffba5beb7e679b05fc91",
+      "status": "new"
+    },
+    {
+      "path": "integrations/rlinf_mibot/tests/test_rollout_store.py",
+      "old": "642e1a1cf4a549e3e44bde280b1bb438322bb3707d00fbee610abc0a1407640e",
+      "new": "6e9cc2526e6fcc53080d062c6caa55ced6aef35c6add8e8ccb41187f6f1e7bf7",
+      "status": "changed"
+    },
+    {
+      "path": "integrations/rlinf_mibot/tests/test_static.py",
+      "old": "1f0a0859671a622ceda60635024d7a07dd5d5cd4f6068e9f05f852fb7e42ad36",
+      "new": "d2376b078ce0ae84d73d08cfedfc133300d46ba0423d8c744adf385dbeb25ae0",
+      "status": "changed"
+    },
+    {
+      "path": "integrations/rlinf_mibot/tests/test_streaming_consume.py",
+      "old": null,
+      "new": "f5bf06cbcbaf2cceb52b19121609ed7db36c3f24555e422ea21e2549ed9bb86e",
+      "status": "new"
+    },
+    {
+      "path": "rl-train-t_3ed65912/configs/multigroup_grasp_v1.json",
+      "old": "b499f54cd569ce0ff6c9cf199fec10c6fccb9b53ed4495f23fb09d47740df877",
+      "new": "609b7b767bcf83b8816dd2248a384eef454856eef762ef4981edc49dd44dbceb",
+      "status": "changed"
+    },
+    {
+      "path": "rl-train-t_3ed65912/scripts/probe_real_microbatch.py",
+      "old": null,
+      "new": "483361db5e0091547ab4840ae8799db53ad8a5981781c25d0bd677a3cc60887e",
+      "status": "new"
+    },
+    {
+      "path": "rl-train-t_3ed65912/source_manifest.json",
+      "old": null,
+      "new": "0ac7ddb77c7c3f11c9c39424f8ab4f94c4f2e8ca1c7e4ac607993b2c127f37ac",
+      "status": "new"
+    },
+    {
+      "path": "rl-train-t_3ed65912/src/grpo_train_loop.py",
+      "old": "cfc34878f96ec6a19acbb6c07264f6fe64637872ba37b3ca1cfbb3cce3ed842e",
+      "new": "faca2d50a5b3dd1ff6d7279838b62e6a5c2d9ab1ce0eeb13a2af262306de8d3e",
+      "status": "changed"
+    },
+    {
+      "path": "rl-train-t_3ed65912/src/grpo_trainer_server.py",
+      "old": "37fca70802f4f341e388477f6f4caff39f3c701849de3cbe1980a011518dfc2e",
+      "new": "8120b1e78bdac4b5520792c0cd377775d802518ef20c9d16709d89039570a379",
+      "status": "changed"
+    },
+    {
+      "path": "rl-train-t_3ed65912/src/training_correctness.py",
+      "old": "c8ce88d3f3b76b68ed62b8c185e90bc7d85cd5155c8c3a525879d8ee027f5e67",
+      "new": "d3e953706ff054587dd80109e1d92506e9235aae5a5c8e2ad4a0686354429775",
+      "status": "changed"
+    },
+    {
+      "path": "rl-train-t_3ed65912/tests/test_selected_pirl_recompute.py",
+      "old": null,
+      "new": "a1d032d586f356980547d9d54be7d63538405652241c355792b3c376d1ad843d",
+      "status": "new"
+    },
+    {
+      "path": "rl-train-t_3ed65912/tests/test_server_transactions.py",
+      "old": null,
+      "new": "2ff438e78ec276864a16a3303861ba35e136433dcebd2c162658bfe68c7937b3",
+      "status": "new"
+    },
+    {
+      "path": "rl-train-t_3ed65912/tests/test_training_correctness.py",
+      "old": "8bf2bdf04b1ce0349e22b27b25b3b1775be1bfaf357cf2cdf58884c4c6fa3c88",
+      "new": "09087f2a39bd5487020e4b7d0f9f884c5a577df80d193bfe5c3e9de20faf11f8",
+      "status": "changed"
+    },
+    {
+      "path": "rl-env-t_4f3f2b20/source_manifest.json",
+      "old": null,
+      "new": "a727f1127b92feb986b70c18dd1985773afe45f6ad2ad5c926986851400d9ba0",
+      "status": "new"
+    }
+  ],
+  "source": "spark1 deployed tree, byte-identical to amp_csi for every compared training-critical py/sh/json/yaml/yml/md/Dockerfile file"
+}

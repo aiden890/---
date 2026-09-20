@@ -1,0 +1,30 @@
+{
+  "build_worktree_dirty": false,
+  "commit": "f533d458449c473d4b17f40996eea2ac2924282b",
+  "dirty": false,
+  "files": {
+    "README.md": "48c307c72ce0149aca6ee297a4b742a7b44cb39027185c7db9973740ec5b6575",
+    "configs/pilot_single_gpu.json": "82b3f4c801b625f4b34858707fdb9e4f15bd850ee914146f621a9d37ed23b61f",
+    "configs/randomization.json": "b10dca52a9f6ecda936e27218aedffcbdd862062a15bc21df6d1c7700118aed2",
+    "configs/scale_multi_gpu.json": "97992fb48e2bf24473d64c802c2658126c6b0d2c3585ba88c4c72d72f10d8723",
+    "docs/CHECK_GUIDE.md": "4a07e9eb6967ec1fe187bb0b791c651e90c8ff49621ef392edb4fa39896d60c7",
+    "docs/IMPLEMENTATION.md": "29081a969161882cac5b33d0c5e196d77112e8c828dbd734e114776f5afb4b91",
+    "scripts/pirl_sampler_gpu_gates.py": "828d4e058b999006346880b01d1ee379b3a238d66b39625cd684fec36466fa75",
+    "scripts/run-rl-env.sh": "37f26d1662cdd16d3c95cae7a841518979aaec9cebb422dd5e78da06b47facb1",
+    "scripts/sde_probe.py": "ae799bceb264650c4ee03a6492ab2c9a9d353dbf917deecc0917c7be994e3a39",
+    "src/flow_policy.py": "2a9fbf3a25ac27995bd5e085d1dcc7170156f01c3b9bc278f2fee5ebb4d28cc4",
+    "src/flow_sde.py": "2dee3975cfc8cf478fa4ed9664a9c6a64a604376cb44fb4f0c5dd4dfc8653fc7",
+    "src/pirl_flow_sde.py": "636ccf17131fd9984ced5b5bc4c30a2d2cc2359d18002b14d966e566ee6513cf",
+    "src/randomization.py": "b7cbecf20db8d3c4a4c8cfb582417112caabaa099e52902eff331143ea47b2e2",
+    "src/reward.py": "92d57ec2dfc9a61f97237b6e47e26b5a81fbb10a491b7b9dce5a608ad5f874e4",
+    "src/rl_rollout.py": "684214d84968bb05ae1ba7c9ef678881bc5592e9d493b8bdd48abc44cee54717",
+    "src/rl_server.py": "58737fa7789b08ac3e1a0c0904ba9eb4e1ada16e02980bc5d6ad5b831f662920",
+    "src/skill_manager.py": "c63dfcaaa0cabe79e69520c29ecb800c6dbd399dc8fdfe47d41ffa63e7f13c5e",
+    "src/vlm_scorer.py": "07e3cc7cd655faacb90842e59044f3bfc927aa1415b09f7213008b5d39a96c4e",
+    "tests/test_env_components.py": "04ed1571e232a2b9f9a22c895b4126af6123c46574aa48d806e21b3a049feec6",
+    "tests/test_flow_sde.py": "65596591af3e7754e0736128024565a85e333b41281a33c74d8d2a52f0b86896",
+    "tests/test_pirl_flow_sde.py": "76fe097e6caf750dc5a022c479ec090303555f5b0716047499a7e05d75575e28",
+    "tests/test_vlm_scorer.py": "8a8676246b173599ab4d004b3232d8c63840dfe2af174377368e91cf427f656e"
+  },
+  "project": "rl-env-t_4f3f2b20"
+}

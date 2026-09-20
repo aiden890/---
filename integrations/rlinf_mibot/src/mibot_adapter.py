@@ -20,9 +20,9 @@ locally they resolve via the repo tree. Everything here is import-time safe WITH
 (the heavy objects are created lazily inside methods), so static import tests pass on
 lab-desktop while the actual model work happens only inside the GPU container.
 
-NOTE: this is a SKELETON with verified interfaces wired but the GPU-only execution paths
-(checkpoint load, sampler on real weights, RLinf model registration) marked NEEDS_SERVER.
-Nothing here may be reported as "passing" until run on the new GPU server.
+The RLinf-native policy and registry bridge live in ``mibot_rlinf_policy.py`` and
+``rlinf_env.py``.  GPU execution still requires the checkpoint and simulator image, but
+the framework registration is no longer a placeholder.
 """
 from __future__ import annotations
 
@@ -32,21 +32,30 @@ from pathlib import Path
 from typing import Any, Callable, Optional
 
 # --- resolve the reused verified components (mounted or in-repo) ----------------------
-_CANDIDATE_RL_ENV = [
-    Path("/rl_env/src"),                                              # container mount
-    Path(__file__).resolve().parents[3] / "rl-env-t_4f3f2b20" / "src",  # repo tree
-]
+def _find_repo_path(relative: Path) -> Path | None:
+    """Find a sibling component without assuming the integration's install depth."""
+    for ancestor in Path(__file__).resolve().parents:
+        candidate = ancestor / relative
+        if candidate.exists():
+            return candidate
+    return None
+
+
+_CANDIDATE_RL_ENV = [Path("/rl_env/src"), _find_repo_path(Path("rl-env-t_4f3f2b20/src"))]
 _CANDIDATE_SKILL = [
     Path("/skill_eval_tools"),
-    Path(__file__).resolve().parents[3] / "rollouts-xiaomi-t_4a072806" / "tools",
+    _find_repo_path(Path("rollouts-xiaomi-t_4a072806/tools")),
 ]
-_CANDIDATE_ROLLOUT = [
-    Path("/work"),
-    Path(__file__).resolve().parents[3] / "xiaomi-cu121",
-]
-for cands in (_CANDIDATE_RL_ENV, _CANDIDATE_SKILL, _CANDIDATE_ROLLOUT):
+_CANDIDATE_ROLLOUT = [Path("/work"), _find_repo_path(Path("xiaomi-cu121"))]
+_CANDIDATE_TRAIN = [Path("/train/src"), _find_repo_path(Path("rl-train-t_3ed65912/src"))]
+for cands in (
+    _CANDIDATE_RL_ENV,
+    _CANDIDATE_SKILL,
+    _CANDIDATE_ROLLOUT,
+    _CANDIDATE_TRAIN,
+):
     for p in cands:
-        if p.exists() and str(p) not in sys.path:
+        if p is not None and p.exists() and str(p) not in sys.path:
             sys.path.insert(0, str(p))
 
 # 12 active action dims (RoboCasa365 EE-first: 0-11 mean0/std1 -> raw action[12] is the
@@ -196,14 +205,14 @@ def load_skill_monitor(skill: str):
     return skill_manager.SkillMonitor(skill)
 
 
-# --- interface 6: RLinf registration (NEEDS_SERVER) ------------------------------------
+# --- interface 6: RLinf registration descriptor ----------------------------------------
 @dataclass
 class RLinfModelSpec:
     """Descriptor RLinf needs to register MiBoT as an embodied action model.
 
-    Filled at deploy time; the actual `register_model` call runs inside the container
-    against the pinned RLinf commit (rlinf_env.register_mibot). Kept as data here so the
-    contract is inspectable without importing RLinf.
+    The actual ``register_model`` call runs inside the container via
+    :func:`rlinf_env.register_mibot`. Kept as data here so the contract is inspectable
+    without importing RLinf.
     """
     name: str = "mibot_robocasa365"
     action_dim: int = ACTIVE_ACTION_DIM

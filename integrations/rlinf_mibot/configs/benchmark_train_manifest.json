@@ -1,0 +1,8 @@
+{
+  "commit": "a4ee45622c735bf65b34497d5ef47b32dab8a9bd",
+  "dirty": false,
+  "project": "rl-train-t_3ed65912",
+  "files": {
+    "src/grpo_trainer_server.py": "260fa66b2a356a087fde47a80b9f51405832c61b0265ccd133514b407c366421"
+  }
+}

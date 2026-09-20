@@ -17,6 +17,7 @@ grid:
   rollout.replan_steps: 16
   rollout.obs_history: 4
   rollout.obs_interval: 2
+  rollout.save_video: false
   reward.variant: simulator_terminal_only
   reward.use_milestones: false
 
@@ -28,6 +29,7 @@ runtime:
   backend: rlinf
   workers: 2
   max_in_flight: 2
+  reuse_env: true
   retries: 1
   fail_fast: per_config
   node_ranks: [0, 0]

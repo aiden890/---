@@ -30,7 +30,7 @@
     "adaptive_ema": 0.5,
     "adaptive_avoid_recent": 3,
     "eta": 0.1,
-    "reward_variant": "simulator_terminal_only",
+    "reward_variant": "grasp_binary",
     "hold_steps": 0,
     "eval_n": 0,
     "heldout_n": 0,

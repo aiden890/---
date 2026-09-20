@@ -25,6 +25,7 @@ def check(name, cond, detail=""):
 
 def test_imports():
     import mibot_adapter as MA
+    import mibot_rlinf_env as MRE
     import rlinf_env as RE
     for n in ("MiBoTConfig", "MiBoTModel", "MiBoTSampler", "RLinfModelSpec",
               "load_reward_manager", "load_skill_monitor"):
@@ -37,6 +38,47 @@ def test_imports():
           MA.RLinfModelSpec().framework_commit == "bde6c918642abf9a4776cb1d5fabcc5087dfe195")
     check("skill contracts complete",
           set(RE.SKILL_CONTRACTS) == {"GRASP_OBJECT", "MOVE_OBJECT", "PLACE_OBJECT"})
+    check("temporal history is import-safe", hasattr(MRE, "TemporalHistoryBuffer"))
+
+
+def test_rlinf_registration_contract():
+    """Exercise the registry seam without installing the GPU framework."""
+    import types
+    import rlinf_env as RE
+
+    calls = []
+    fake_rlinf = types.ModuleType("rlinf")
+    fake_models = types.ModuleType("rlinf.models")
+    fake_models.register_model = lambda *a, **kw: calls.append((a, kw))
+    fake_policy = types.ModuleType("mibot_rlinf_policy")
+    fake_policy.build_mibot_policy = lambda cfg, dtype=None: (cfg, dtype)
+    old_rlinf = sys.modules.get("rlinf")
+    old_models = sys.modules.get("rlinf.models")
+    old_policy = sys.modules.get("mibot_rlinf_policy")
+    try:
+        sys.modules["rlinf"] = fake_rlinf
+        sys.modules["rlinf.models"] = fake_models
+        sys.modules["mibot_rlinf_policy"] = fake_policy
+        spec = RE.register_mibot()
+    finally:
+        if old_rlinf is None:
+            sys.modules.pop("rlinf", None)
+        else:
+            sys.modules["rlinf"] = old_rlinf
+        if old_models is None:
+            sys.modules.pop("rlinf.models", None)
+        else:
+            sys.modules["rlinf.models"] = old_models
+        if old_policy is None:
+            sys.modules.pop("mibot_rlinf_policy", None)
+        else:
+            sys.modules["mibot_rlinf_policy"] = old_policy
+    check("RLinf custom model registered", len(calls) == 1)
+    if calls:
+        args, kwargs = calls[0]
+        check("RLinf model name", args[0] == spec.name)
+        check("RLinf embodied category", kwargs.get("category") == "embodied")
+        check("RLinf registration idempotent", kwargs.get("force") is True)
 
 
 def test_configs():
@@ -64,6 +106,42 @@ def test_configs():
     deployment_doc = " ".join((ROOT / "deploy" / "README.md").read_text().split())
     check("two-Spark fabric named RoCE not NVLink",
           "ConnectX-7/RoCE" in deployment_doc and "not NVLink" in deployment_doc)
+    native = yaml.safe_load((ROOT / "configs" / "rlinf_mibot_grpo.yaml").read_text())
+    check("native GRPO config parses", isinstance(native, dict))
+    check("native config uses GRPO", native["algorithm"]["adv_type"] == "grpo")
+    check("native config keeps elementwise ratios",
+          native["algorithm"]["logprob_type"] == "token_level")
+    placement = native["cluster"]["component_placement"]
+    check("3090 is actor", placement["actor"]["node_group"] == "train_3090")
+    check("DAX is rollout+env",
+          placement["rollout"]["node_group"] == "dax_rollout"
+          and placement["env"]["node_group"] == "dax_rollout")
+    check("patch weight sync enabled", native["defaults"][2] == "weight_syncer/patch_syncer@weight_syncer")
+    for split in ("train", "eval"):
+        history = native["env"][split]["mibot_history"]
+        check(f"native {split} temporal history enabled",
+              history["enabled"] is True and int(history["interval"]) == 2)
+        grasp_reward = native["env"][split]["grasp_binary_reward"]
+        check(f"native {split} stable-grasp binary reward enabled",
+              grasp_reward["enabled"] is True
+              and int(grasp_reward["hold_steps"]) == 20
+              and float(grasp_reward["lift_dz"]) == 0.05
+              and native["env"][split]["use_rel_reward"] is True)
+    check("native GRPO members share reset seed",
+          native["env"]["train"]["seed_strategy"] == "same")
+    check("native evaluation seeds remain unique",
+          native["env"]["eval"]["seed_strategy"] == "global_unique")
+    check("native generic-worker eval disables stochastic sampling",
+          float(native["rollout"]["sampling_params"]["temperature_eval"]) <= 0.0)
+    check("native Ray workers enable MiBoT registry bootstrap",
+          "RLINF_ENABLE_MIBOT_REGISTRATION=1" in
+          (ROOT / "run.sh").read_text())
+    bootstrap = (ROOT / "src" / "sitecustomize.py").read_text()
+    check("fresh Ray workers install model and environment integration",
+          "register_mibot()" in bootstrap
+          and "install_mibot_env_override()" in bootstrap)
+    check("native reward is a labeled GRASP binary run",
+          native["runner"]["logger"]["experiment_name"].endswith("grasp_binary"))
 
 
 def test_guard():
@@ -85,6 +163,8 @@ def test_pins():
                 "CHECKPOINT_SHA=3a6d0293bfa90759d34a7fc48c2c62413cd7bcf4",
                 "BASE_IMAGE_DIGEST=sha256:7012e535"):
         check(f"pin {key.split('=')[0]}", key in lock, "missing/incorrect pin")
+    requirements = (ROOT / "configs" / "requirements-rlinf.txt").read_text()
+    check("RLinf legacy vector-env gym dependency", "gym==0.23.1" in requirements)
     check("checkpoint.sha256 present", (ROOT / "checkpoint.sha256").exists())
     # lock file present and non-empty
     lk = (ROOT / "configs" / "requirements-rlinf.lock").read_text()
@@ -146,6 +226,7 @@ def test_assets_mount_contract():
 
 if __name__ == "__main__":
     test_imports()
+    test_rlinf_registration_contract()
     test_configs()
     test_guard()
     test_pins()

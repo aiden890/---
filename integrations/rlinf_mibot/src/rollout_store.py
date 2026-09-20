@@ -11,7 +11,13 @@ from typing import Any
 
 import torch
 
-STORE_SCHEMA = "grpo-trainer-store-v1"
+from async_policy import (
+    validate_policy_identity,
+    validate_policy_lag,
+    validate_trajectory_policy,
+)
+
+STORE_SCHEMA = "grpo-trainer-store-v2"
 
 
 def _allowed_path(path: Path, allowed_root: Path | None) -> Path:
@@ -28,15 +34,29 @@ def _allowed_path(path: Path, allowed_root: Path | None) -> Path:
 
 
 def export_rollout_store(store: dict, trajectory_ids: list[str], path: Path,
-                         allowed_root: Path | None = None) -> dict[str, Any]:
+                         allowed_root: Path | None = None, *, actor_id: str = "local",
+                         group_id: str = "default", policy_version: int = 0,
+                         policy_hash: str = "initial") -> dict[str, Any]:
     ids = [str(item) for item in trajectory_ids]
     missing = [item for item in ids if item not in store]
     if missing:
         raise KeyError(f"missing rollout trajectories: {missing}")
+    policy_version, policy_hash = validate_policy_identity(policy_version, policy_hash)
+    trajectories = {item: copy.deepcopy(store[item]) for item in ids}
+    validate_trajectory_policy(trajectories, policy_version=policy_version,
+                               policy_hash=policy_hash)
+    for chunks in trajectories.values():
+        for chunk in chunks:
+            chunk.setdefault("policy_version", policy_version)
+            chunk.setdefault("policy_hash", policy_hash)
     payload = {
         "schema": STORE_SCHEMA,
         "optimizer_update_requested": False,
-        "trajectories": {item: copy.deepcopy(store[item]) for item in ids},
+        "actor_id": str(actor_id),
+        "group_id": str(group_id),
+        "policy_version": policy_version,
+        "policy_hash": policy_hash,
+        "trajectories": trajectories,
     }
     path = _allowed_path(path, allowed_root)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -56,12 +76,18 @@ def export_rollout_store(store: dict, trajectory_ids: list[str], path: Path,
         "sha256": sha256,
         "trajectory_ids": ids,
         "n_chunks": sum(len(payload["trajectories"][item]) for item in ids),
+        "actor_id": payload["actor_id"],
+        "group_id": payload["group_id"],
+        "policy_version": policy_version,
+        "policy_hash": policy_hash,
         "optimizer_update_requested": False,
     }
 
 
 def import_rollout_store(store: dict, path: Path, *, expected_sha256: str,
-                         allowed_root: Path | None = None) -> dict[str, Any]:
+                         allowed_root: Path | None = None,
+                         learner_policy_version: int | None = None,
+                         max_policy_lag: int = 1) -> dict[str, Any]:
     path = _allowed_path(path, allowed_root)
     fd = os.open(path, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0))
     with os.fdopen(fd, "rb") as stream:
@@ -74,14 +100,18 @@ def import_rollout_store(store: dict, path: Path, *, expected_sha256: str,
         raise ValueError(f"unsupported rollout store schema: {payload.get('schema')!r}")
     if payload.get("optimizer_update_requested") is not False:
         raise ValueError("collector payload must not request an optimizer update")
+    policy_version, policy_hash = validate_policy_identity(
+        payload.get("policy_version"), payload.get("policy_hash"))
+    policy_lag = None
+    if learner_policy_version is not None:
+        policy_lag = validate_policy_lag(
+            rollout_version=policy_version, learner_version=learner_policy_version,
+            max_policy_lag=max_policy_lag)
     trajectories = payload.get("trajectories", {})
     if not isinstance(trajectories, dict) or not trajectories:
         raise ValueError("rollout-store trajectories must be a non-empty mapping")
-    for trajectory_id, chunks in trajectories.items():
-        if not isinstance(trajectory_id, str) or not isinstance(chunks, list) or not chunks:
-            raise ValueError("rollout-store trajectory IDs/chunks have invalid structure")
-        if not all(isinstance(chunk, dict) for chunk in chunks):
-            raise ValueError("rollout-store chunks must be dictionaries")
+    validate_trajectory_policy(trajectories, policy_version=policy_version,
+                               policy_hash=policy_hash)
     duplicates = sorted(set(map(str, trajectories)) & set(map(str, store)))
     if duplicates:
         raise RuntimeError(f"rollout trajectory already exists in trainer store: {duplicates}")
@@ -92,5 +122,10 @@ def import_rollout_store(store: dict, path: Path, *, expected_sha256: str,
         "schema": STORE_SCHEMA,
         "imported_trajectory_ids": list(map(str, trajectories)),
         "n_chunks": sum(len(chunks) for chunks in trajectories.values()),
+        "actor_id": str(payload.get("actor_id", "unknown")),
+        "group_id": str(payload.get("group_id", "default")),
+        "policy_version": policy_version,
+        "policy_hash": policy_hash,
+        "policy_lag": policy_lag,
         "optimizer_update_requested": False,
     }

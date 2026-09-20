@@ -55,6 +55,18 @@ class Proxy:
         }
         return Call(result)
 
+    def run_group(self, jobs):
+        results = []
+        for offset, job in enumerate(jobs):
+            result = self.run_episode(job).result
+            if result.get("worker_error"):
+                return Call({"worker_error": result["worker_error"], "results": []})
+            result["job_id"] = job["job_id"]
+            result["started_at"] += offset
+            result["finished_at"] += offset
+            results.append(result)
+        return Call({"group_id": jobs[0]["group_id"], "results": results})
+
 
 class Group:
     def __init__(self, output, fail_once=False):
@@ -79,6 +91,17 @@ class Worker:
 
 
 class ProductionRuntimeTests(unittest.TestCase):
+    @staticmethod
+    def _modules():
+        scheduler = types.ModuleType("rlinf.scheduler")
+        scheduler.Cluster = lambda **kwargs: object()
+        scheduler.NodePlacementStrategy = lambda ranks: list(ranks)
+        rlinf = types.ModuleType("rlinf")
+        rlinf.scheduler = scheduler
+        worker_module = types.ModuleType("rlinf_grid_worker")
+        worker_module.RoboCasaGridWorker = Worker
+        return rlinf, scheduler, worker_module
+
     def test_rlinf_worker_group_path_runs_parallel_wave_and_closes(self):
         scheduler = types.ModuleType("rlinf.scheduler")
         scheduler.Cluster = lambda **kwargs: object()
@@ -131,6 +154,33 @@ class ProductionRuntimeTests(unittest.TestCase):
                 self.assertEqual(len(failures), 1)
         finally:
             Builder.fail_once = False
+            for name, module in old.items():
+                if module is None: sys.modules.pop(name, None)
+                else: sys.modules[name] = module
+
+    def test_group_members_stay_on_one_worker_and_share_seed(self):
+        rlinf, scheduler, worker_module = self._modules()
+        old = {name: sys.modules.get(name) for name in
+               ("rlinf", "rlinf.scheduler", "rlinf_grid_worker")}
+        sys.modules.update({"rlinf": rlinf, "rlinf.scheduler": scheduler,
+                            "rlinf_grid_worker": worker_module})
+        try:
+            with tempfile.TemporaryDirectory() as td:
+                cfg = copy.deepcopy(CFG)
+                cfg["grid"].pop("rollout.episodes")
+                cfg["grid"].update({"rollout.groups": 1, "rollout.group_size": 3})
+                output = Path(td) / "run"
+                result = collect_with_rlinf(cfg, output)
+                self.assertEqual(result["status"], "done", result)
+                rows = [json.loads(line) for line in
+                        (output / "episodes.jsonl").read_text().splitlines()]
+                self.assertEqual(len(rows), 6)
+                for group_id in {row["group_id"] for row in rows}:
+                    members = [row for row in rows if row["group_id"] == group_id]
+                    self.assertEqual(len({row["worker_id"] for row in members}), 1)
+                    self.assertEqual(len({row["seed"] for row in members}), 1)
+                    self.assertEqual(len({row["action_seed"] for row in members}), 3)
+        finally:
             for name, module in old.items():
                 if module is None: sys.modules.pop(name, None)
                 else: sys.modules[name] = module

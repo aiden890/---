@@ -18,7 +18,9 @@ services:
         TORCH_CUDA_ARCH_LIST: ${RLINF_CUDA_ARCH:-8.6}
         MAX_JOBS: ${RLINF_MAX_JOBS:-4}
         RLINF_COMMIT: ${RLINF_COMMIT:-bde6c918642abf9a4776cb1d5fabcc5087dfe195}
-    shm_size: "2gb"
+    # Match the measured async rollout path. Ray/RoboCasa otherwise spill from
+    # /dev/shm to /tmp on DGX Spark, and the native RLinf service inherits this value.
+    shm_size: "16gb"
     network_mode: none
     environment:
       MUJOCO_GL: egl
@@ -37,6 +39,8 @@ services:
       # integration layer (this dir) + reused verified components, all read-only.
       - .:/integration:ro
       - ../../rl-env-t_4f3f2b20:/rl_env:ro
+      - ../../rl-train-t_3ed65912:/train:ro
+      - ../../xiaomi-cu121:/work:ro
       - ../../rollouts-xiaomi-t_4a072806/tools:/skill_eval_tools:ro
       - ${RLINF_CHECKPOINT}:/checkpoint:ro
       - ${RLINF_ASSETS}:/opt/robocasa/robocasa/models/assets:ro
@@ -55,3 +59,22 @@ services:
   ode-eval:
     <<: *base
     command: ["python3", "/integration/src/eval_entry.py", "--config-name", "ode_eval", "results_dir=/results/ode_eval"]
+
+  native-grpo:
+    <<: *base
+    network_mode: host
+    environment:
+      RAY_ADDRESS: ${RLINF_HEAD_ADDR:?set DAX Ray head IP}:${RLINF_RAY_PORT:-6379}
+      RLINF_ENABLE_MIBOT_REGISTRATION: "1"
+      MUJOCO_GL: egl
+      PYOPENGL_PLATFORM: egl
+      NVIDIA_DRIVER_CAPABILITIES: compute,utility,graphics
+      HF_HOME: /cache/hf
+      HF_HUB_OFFLINE: "1"
+    command:
+      - python3
+      - /integration/src/rlinf_train.py
+      - --config-path
+      - /integration/configs
+      - --config-name
+      - rlinf_mibot_grpo

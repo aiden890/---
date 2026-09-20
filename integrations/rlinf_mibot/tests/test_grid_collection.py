@@ -99,6 +99,26 @@ class GridExpansionTests(unittest.TestCase):
         self.assertEqual(seeds, [100, 101, 1100, 1101])
         self.assertEqual(jobs, CollectionPlan.from_config(BASE_CONFIG).jobs())
 
+    def test_group_plan_shares_environment_seed_but_not_action_seed(self):
+        cfg = json.loads(json.dumps(BASE_CONFIG))
+        cfg["grid"].pop("rollout.episodes")
+        cfg["grid"].update({"rollout.groups": 2, "rollout.group_size": 3})
+        jobs = CollectionPlan.from_config(cfg).jobs()
+        self.assertEqual(len(jobs), 12)
+        groups = {job["group_id"] for job in jobs}
+        self.assertEqual(len(groups), 4)
+        for group_id in groups:
+            members = [job for job in jobs if job["group_id"] == group_id]
+            self.assertEqual(len({job["seed"] for job in members}), 1)
+            self.assertEqual(len({job["action_seed"] for job in members}), 3)
+            self.assertEqual([job["member_index"] for job in members], [0, 1, 2])
+
+    def test_group_fields_must_be_configured_together(self):
+        cfg = json.loads(json.dumps(BASE_CONFIG))
+        cfg["grid"]["rollout.groups"] = 2
+        with self.assertRaisesRegex(ValueError, "set together"):
+            CollectionPlan.from_config(cfg)
+
 
 class CollectionTests(unittest.TestCase):
     def test_serial_baseline_audits_without_requiring_parallel_overlap(self):
@@ -131,6 +151,18 @@ class CollectionTests(unittest.TestCase):
             self.assertEqual({r["worker_id"] for r in records}, {"fake-0", "fake-1"})
             self.assertTrue(all(r["schema"] == "mibot-grpo-rollout-v1" for r in records))
             self.assertTrue(all(r["trainer_payload"]["optimizer_update_requested"] is False for r in records))
+
+    def test_one_config_parallelism_does_not_require_impossible_cross_config_overlap(self):
+        with tempfile.TemporaryDirectory() as td:
+            config = json.loads(json.dumps(BASE_CONFIG))
+            config["grid"]["sampler.noise_level"] = 0.1
+            config["grid"]["rollout.episodes"] = 4
+            result = collect_grid(config, Path(td), FakeEpisodeBackend(delay_seconds=0.02))
+            audit = audit_collection(Path(td))
+            self.assertEqual(result["status"], "done")
+            self.assertTrue(audit["pass"], audit)
+            self.assertTrue(audit["checks"]["parallel_workers_observed"])
+            self.assertNotIn("cross_config_overlap_observed", audit["checks"])
 
     def test_resume_skips_completed_episode_and_is_deterministic(self):
         with tempfile.TemporaryDirectory() as td:

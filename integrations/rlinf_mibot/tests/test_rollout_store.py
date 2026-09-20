@@ -20,13 +20,20 @@ class RolloutStoreTests(unittest.TestCase):
         source = {"traj-a": [{"old_logp": 1.0}], "traj-b": [{"old_logp": 2.0}]}
         with tempfile.TemporaryDirectory() as td:
             path = Path(td) / "payload.pt"
-            meta = export_rollout_store(source, ["traj-b"], path)
+            meta = export_rollout_store(
+                source, ["traj-b"], path, actor_id="spark1", group_id="g1",
+                policy_version=4, policy_hash="adapter-4")
             target = {}
-            loaded = import_rollout_store(target, path, expected_sha256=meta["sha256"])
+            loaded = import_rollout_store(
+                target, path, expected_sha256=meta["sha256"], learner_policy_version=5)
         self.assertEqual(meta["trajectory_ids"], ["traj-b"])
         self.assertEqual(meta["optimizer_update_requested"], False)
         self.assertEqual(loaded["imported_trajectory_ids"], ["traj-b"])
-        self.assertEqual(target, {"traj-b": [{"old_logp": 2.0}]})
+        self.assertEqual(loaded["policy_lag"], 1)
+        self.assertEqual(loaded["actor_id"], "spark1")
+        self.assertEqual(target, {"traj-b": [{"old_logp": 2.0,
+                                               "policy_version": 4,
+                                               "policy_hash": "adapter-4"}]})
 
     def test_export_rejects_missing_trajectory(self):
         with tempfile.TemporaryDirectory() as td:
@@ -49,6 +56,30 @@ class RolloutStoreTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "hash mismatch"):
                 import_rollout_store(target, path, expected_sha256="0" * 64)
             self.assertEqual(target, {})
+
+    def test_import_rejects_stale_policy_without_mutating_store(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "payload.pt"
+            meta = export_rollout_store(
+                {"traj-a": [{"x": 1}]}, ["traj-a"], path,
+                policy_version=1, policy_hash="adapter-1")
+            target = {}
+            with self.assertRaisesRegex(ValueError, "stale rollout"):
+                import_rollout_store(
+                    target, path, expected_sha256=meta["sha256"],
+                    learner_policy_version=3, max_policy_lag=1)
+            self.assertEqual(target, {})
+
+    def test_export_rejects_policy_mix_inside_episode(self):
+        source = {"traj-a": [
+            {"x": 1, "policy_version": 2, "policy_hash": "adapter-2"},
+            {"x": 2, "policy_version": 3, "policy_hash": "adapter-3"},
+        ]}
+        with tempfile.TemporaryDirectory() as td:
+            with self.assertRaisesRegex(ValueError, "mixes policy snapshots"):
+                export_rollout_store(
+                    source, ["traj-a"], Path(td) / "payload.pt",
+                    policy_version=2, policy_hash="adapter-2")
 
 
 if __name__ == "__main__":

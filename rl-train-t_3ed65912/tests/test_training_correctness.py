@@ -13,6 +13,7 @@ from training_correctness import (  # noqa: E402
     ExactHoldWindow,
     RewardComponents,
     append_progress,
+    binary_skill_episode_reward,
     guarded_ratio,
     hold_enabled_for_variant,
     mean_loss_scale,
@@ -54,8 +55,16 @@ def test_skill_timeout_penalty_applies_only_to_timeout():
     assert skill_timeout_reward("SUCCESS", 0.5) == 0.0
 
 
+def test_binary_skill_episode_reward_is_exactly_one_or_zero():
+    assert binary_skill_episode_reward("SUCCESS") == 1.0
+    assert binary_skill_episode_reward("TIMEOUT") == 0.0
+    assert binary_skill_episode_reward("DROPPED") == 0.0
+    assert binary_skill_episode_reward(None) == 0.0
+
+
 def test_terminal_only_ablation_disables_hold_shaping():
     assert not hold_enabled_for_variant("simulator_terminal_only", 20)
+    assert not hold_enabled_for_variant("grasp_binary", 20)
     assert hold_enabled_for_variant("terminal_plus_hold", 20)
     assert not hold_enabled_for_variant("terminal_plus_hold", 0)
 

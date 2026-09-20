@@ -20,8 +20,11 @@ def partition_grid_overrides(grid_keys: set[str], overrides: list[str]):
 
 def load_config(path: Path, overrides: list[str]) -> dict:
     from omegaconf import OmegaConf
+    from grid_collection import SUPPORTED_GRID_KEYS
     config = OmegaConf.load(path)
-    grid_overrides, regular_overrides = partition_grid_overrides(set(config.grid), overrides)
+    # Accept supported grid keys even when an optional key is absent from the base YAML.
+    grid_overrides, regular_overrides = partition_grid_overrides(
+        set(config.grid) | SUPPORTED_GRID_KEYS, overrides)
     if regular_overrides:
         config = OmegaConf.merge(config, OmegaConf.from_dotlist(regular_overrides))
     for item in grid_overrides:

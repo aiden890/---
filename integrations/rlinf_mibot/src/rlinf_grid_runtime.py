@@ -43,6 +43,7 @@ def collect_with_rlinf(cfg: dict, output_dir: Path) -> dict:
         "results_root": str(output_dir.parent),
         "model_server": dict(cfg.get("model_server", {})),
         "validation": dict(cfg.get("validation", {})),
+        "runtime": dict(runtime),
     }
     with _RunLock(output_dir / ".collector.lock", worker_cfg["run_id"]):
         group = RoboCasaGridWorker.create_group(worker_cfg).launch(
@@ -57,8 +58,16 @@ def collect_with_rlinf(cfg: dict, output_dir: Path) -> dict:
         episodes_path = output_dir / "episodes.jsonl"
         failures_path = output_dir / "failures.jsonl"
         done_ids = validated_completed_ids(plan, _read_jsonl(episodes_path))
-        pending = [job for job in plan.jobs() if job["job_id"] not in done_ids]
-        pending.sort(key=lambda job: (job["episode_index"], job["config_index"]))
+        pending_jobs = [job for job in plan.jobs() if job["job_id"] not in done_ids]
+        pending_jobs.sort(key=lambda job: (job["episode_index"], job["config_index"]))
+        pending = []
+        units: dict[str, list[dict]] = {}
+        for job in pending_jobs:
+            unit_id = str(job.get("group_id", job["job_id"]))
+            if unit_id not in units:
+                units[unit_id] = []
+                pending.append(units[unit_id])
+            units[unit_id].append(job)
         retry_count = 0
         fatal = []
         cancelled_configs: set[str] = set()
@@ -69,40 +78,57 @@ def collect_with_rlinf(cfg: dict, output_dir: Path) -> dict:
                 wave = []
                 wave_limit = min(plan.workers, plan.max_in_flight)
                 while pending and len(wave) < wave_limit:
-                    job = pending.pop(0)
-                    if job["config_id"] not in cancelled_configs:
-                        wave.append(job)
-                calls = [group.execute_on(rank).run_episode(job)
-                         for rank, job in enumerate(wave)]
-                for rank, (job, call) in enumerate(zip(wave, calls)):
+                    unit = pending.pop(0)
+                    if unit[0]["config_id"] not in cancelled_configs:
+                        wave.append(unit)
+                calls = []
+                for rank, unit in enumerate(wave):
+                    proxy = group.execute_on(rank)
+                    calls.append(proxy.run_group(unit) if "group_id" in unit[0]
+                                 else proxy.run_episode(unit[0]))
+                for rank, (unit, call) in enumerate(zip(wave, calls)):
+                    first = unit[0]
                     try:
-                        result = call.wait()[0]
-                        if result.get("worker_error"):
-                            raise RuntimeError(result["worker_error"])
-                        record = {"schema": SCHEMA, **job, **result}
-                        if record["trainer_payload"].get("optimizer_update_requested") is not False:
-                            raise RuntimeError("worker requested optimizer update during collection")
-                        _append_jsonl(episodes_path, record, io_lock)
-                        config_dir = output_dir / job["config_id"]
-                        config_dir.mkdir(exist_ok=True)
-                        _append_jsonl(config_dir / "episodes.jsonl", record, io_lock)
+                        envelope = call.wait()[0]
+                        if envelope.get("worker_error"):
+                            raise RuntimeError(envelope["worker_error"])
+                        results = envelope["results"] if "group_id" in first else [envelope]
+                        result_by_id = {result.get("job_id", first["job_id"]): result
+                                        for result in results}
+                        if set(result_by_id) != {job["job_id"] for job in unit}:
+                            raise RuntimeError("worker returned incomplete or mixed group results")
+                        records = []
+                        for job in unit:
+                            record = {"schema": SCHEMA, **job, **result_by_id[job["job_id"]]}
+                            if record["trainer_payload"].get(
+                                    "optimizer_update_requested") is not False:
+                                raise RuntimeError(
+                                    "worker requested optimizer update during collection")
+                            records.append(record)
+                        for record in records:
+                            _append_jsonl(episodes_path, record, io_lock)
+                            config_dir = output_dir / record["config_id"]
+                            config_dir.mkdir(exist_ok=True)
+                            _append_jsonl(config_dir / "episodes.jsonl", record, io_lock)
                     except Exception as exc:
-                        attempts = int(job.get("_attempt", 0)) + 1
-                        failure = {**job, "worker_id": f"rlinf-{rank}", "attempt": attempts,
+                        attempts = int(first.get("_attempt", 0)) + 1
+                        failure = {**first, "worker_id": f"rlinf-{rank}",
+                                   "attempt": attempts, "group_jobs": len(unit),
                                    "error": f"{type(exc).__name__}: {exc}", "ts": time.time()}
                         _append_jsonl(failures_path, failure, io_lock)
                         if attempts <= plan.retries:
                             retry_count += 1
-                            job["_attempt"] = attempts
-                            pending.append(job)
+                            for job in unit:
+                                job["_attempt"] = attempts
+                            pending.append(unit)
                         else:
                             fatal.append(failure)
                             if plan.fail_fast == "global":
                                 pending.clear()
                             elif plan.fail_fast == "per_config":
-                                cancelled_configs.add(job["config_id"])
+                                cancelled_configs.add(first["config_id"])
                                 pending = [item for item in pending
-                                           if item["config_id"] != job["config_id"]]
+                                           if item[0]["config_id"] != first["config_id"]]
         finally:
             try:
                 group.close_client().wait()

@@ -1,8 +1,9 @@
-"""RLinf environment/reward adapter + MiBoT model registration.
+"""MiBoT model registration plus reusable skill-reward contracts for RLinf.
 
-Connects RoboCasa365 CloseBlenderLid + the verified simulator reward + skill entry-state
-reset + GRASP/MOVE/PLACE skill contracts to RLinf's PPO/GRPO data flow, and registers the
-MiBoT action model with the pinned RLinf commit.
+The native RLinf RoboCasa365 path currently uses RLinf's official full-task success reward.
+The reward and entry-state helpers below expose the verified GRASP/MOVE/PLACE contracts for
+the collector path and for a future native environment hook; merely constructing them does
+not replace RLinf's native ``_calc_step_reward`` implementation.
 
 Import-safe without a GPU or RLinf installed: RLinf and simulator objects are imported
 lazily inside functions. The static shape/contract data is available for inspection.
@@ -43,11 +44,11 @@ class EnvSpec:
 
 
 class RoboCasaRewardAdapter:
-    """Wraps the verified RewardManager + SkillMonitor for RLinf step rewards.
+    """Wrap the verified RewardManager + SkillMonitor for predicate-aware callers.
 
     Reuses reward.py (definition) and skill_manager.py (FSM) by import — no reward logic
-    is redefined here. RLinf calls step() with the per-step predicate dict produced by the
-    simulator (skill_eval.Sim.predicates()).
+    is redefined here. The async collector supplies ``skill_eval.Sim.predicates()``. The
+    stock native RLinf environment does not yet expose that predicate dict to this adapter.
     """
 
     def __init__(self, spec: EnvSpec):
@@ -79,23 +80,25 @@ def make_entry_state_reset(skill: str):
 def register_mibot(rlinf_cfg: Optional[dict] = None) -> MA.RLinfModelSpec:
     """Register Xiaomi MiBoT as an RLinf embodied action model at the pinned commit.
 
-    The MiBoT velocity field + pi-RL Flow-SDE sampler are exposed to RLinf's PPO/GRPO
-    log-prob machinery via MiBoTSampler. This function performs the actual RLinf-side
-    registration inside the container (import rlinf); NEEDS_SERVER to execute.
+    The MiBoT velocity field + pi-RL Flow-SDE sampler are exposed to RLinf's GRPO
+    log-prob machinery by :class:`mibot_rlinf_policy.MiBoTRLinfPolicy`.
 
-    Returns the RLinfModelSpec descriptor either way (inspectable statically).
+    Returns the descriptor.  When RLinf is not installed this remains import-safe so
+    host-side static checks can still inspect the integration.
     """
     spec = MA.RLinfModelSpec()
     try:
-        import rlinf  # noqa: F401
-        # Actual registration wiring lives against the pinned RLinf API. Kept as an
-        # explicit NEEDS_SERVER seam rather than guessed code, so it fails loudly on the
-        # server instead of silently drifting from the pinned commit's real API.
-        raise NotImplementedError(
-            "RLinf model registration is a NEEDS_SERVER gate: wire spec -> rlinf model "
-            "registry against commit %s on the GPU server." % spec.framework_commit)
+        from rlinf.models import register_model
     except ImportError:
-        pass
+        return spec
+
+    # Do not swallow policy dependency/import failures once RLinf is present. A partially
+    # configured GPU worker must fail at startup instead of appearing unregistered later.
+    from mibot_rlinf_policy import build_mibot_policy
+
+    # ``force`` makes registration idempotent in worker processes and Hydra relaunches.
+    # RLinf also adds the dynamic name to SupportedModel/EMBODIED_MODEL.
+    register_model(spec.name, build_mibot_policy, category="embodied", force=True)
     return spec
 
 

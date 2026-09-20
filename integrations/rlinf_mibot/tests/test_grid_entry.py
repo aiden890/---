@@ -8,7 +8,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from grid_entry import parse_cli, partition_grid_overrides
+from grid_entry import load_config, parse_cli, partition_grid_overrides
 
 
 class GridEntryTests(unittest.TestCase):
@@ -28,3 +28,9 @@ class GridEntryTests(unittest.TestCase):
         )
         self.assertEqual(grid, ["env.horizon=16", "rollout.replan_steps=8"])
         self.assertEqual(regular, ["validation.inject_fail_once_seed=1"])
+
+    def test_optional_group_grid_keys_can_be_added_by_override(self):
+        cfg = load_config(ROOT / "configs" / "grid_smoke.yaml",
+                          ["rollout.groups=1", "rollout.group_size=4"])
+        self.assertEqual(cfg["grid"]["rollout.groups"], 1)
+        self.assertEqual(cfg["grid"]["rollout.group_size"], 4)

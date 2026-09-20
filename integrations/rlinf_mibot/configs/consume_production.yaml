@@ -1,0 +1,16 @@
+consume_smoke:
+  # Z-1 GRPO post-training defaults (arXiv:2606.31846, App. C.3/D.2).
+  # Hardware-adaptive collection adds fresh waves until the actual payload gate is met.
+  # Rollout waves are not optimizer reuse passes.
+  min_rollout_epochs: 1
+  expected_group_size: 8
+  min_trainable_action_chunks: 1024
+  optimizer_update_epochs: 1
+  clip: 0.2
+  kl_coef: 0.0
+  ratio_max: 10.0
+  adv_clip: 3.0
+  target_kl: null
+  discard_homogeneous_groups: true
+  success_decay_gamma: 0.998
+  action_chunk_steps: 16

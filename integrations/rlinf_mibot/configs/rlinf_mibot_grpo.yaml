@@ -1,0 +1,211 @@
+# RLinf-native MiBoT GRPO: DAX rank 0 runs simulation+rollout, RTX 3090 rank 1
+# runs the FSDP actor/optimizer. A single driver schedules both through Ray.
+defaults:
+  - env/robocasa365@env.train
+  - env/robocasa365@env.eval
+  - weight_syncer/patch_syncer@weight_syncer
+  - hybrid_engines/fsdp@actor.fsdp_config
+  - _self_
+  - override hydra/job_logging: stdout
+
+hydra:
+  run:
+    dir: .
+  output_subdir: null
+  searchpath:
+    - file://${oc.env:EMBODIED_PATH,/opt/rlinf/examples/embodiment}/config/
+
+cluster:
+  num_nodes: 2
+  component_placement:
+    actor:
+      node_group: train_3090
+      placement: 0
+    env:
+      node_group: dax_rollout
+      placement: 0
+    rollout:
+      node_group: dax_rollout
+      placement: 0
+  node_groups:
+    - label: dax_rollout
+      node_ranks: 0
+    - label: train_3090
+      node_ranks: 1
+
+runner:
+  task_type: embodied
+  logger:
+    log_path: ${oc.env:RLINF_RESULTS,/results}/native_grpo
+    project_name: rlinf-mibot
+    experiment_name: robocasa365_close_blender_lid_grasp_binary
+    logger_backends: [tensorboard]
+  max_epochs: 1000
+  max_steps: -1
+  only_eval: false
+  val_check_interval: -1
+  save_interval: 20
+  resume_dir: null
+  ckpt_path: null
+
+algorithm:
+  normalize_advantages: true
+  kl_penalty: kl
+  group_size: 4
+  reward_coef: 1.0
+  reward_type: chunk_level
+  # Preserve pi-RL's independent [time, action-dimension] ratios. Do not collapse
+  # MiBoT's 16x12 transition log-prob into one high-dimensional joint ratio.
+  logprob_type: token_level
+  entropy_type: token_level
+  update_epoch: 1
+  adv_type: grpo
+  loss_type: actor
+  loss_agg_func: token-mean
+  kl_beta: 0.0
+  entropy_bonus: 0.0
+  clip_ratio_high: 0.2
+  clip_ratio_low: 0.2
+  clip_ratio_c: 3.0
+  value_clip: 0.2
+  huber_delta: 10.0
+  gamma: 0.99
+  gae_lambda: 0.95
+  filter_rewards: false
+  rewards_lower_bound: 0.0
+  rewards_upper_bound: 1.0
+
+env:
+  group_name: EnvGroup
+  train:
+    rollout_epoch: 4
+    total_num_envs: 4
+    split: pretrain
+    task_soup: atomic_seen
+    task_filter: [CloseBlenderLid]
+    task_mode: atomic
+    task_sampling_strategy: random
+    # GRPO members must start from the same stochastic reset. This is the native
+    # parallel-env approximation of the collector branch's reset-once/snapshot group.
+    # Snapshot restore remains the stronger production contract to merge later.
+    seed_strategy: same
+    max_episode_steps: 400
+    max_steps_per_rollout_epoch: 400
+    reward_coef: ${algorithm.reward_coef}
+    group_size: ${algorithm.group_size}
+    # The subprocess wrapper replaces official task completion with a latched stable
+    # grasp event. Relative reward turns the False->True transition into exactly +1.
+    use_rel_reward: true
+    grasp_binary_reward:
+      enabled: true
+      hold_steps: 20
+      lift_dz: 0.05
+    mibot_history:
+      enabled: true
+      length: ${actor.model.obs_history}
+      interval: 2
+  eval:
+    rollout_epoch: 1
+    total_num_envs: 4
+    split: pretrain
+    task_soup: atomic_seen
+    task_filter: [CloseBlenderLid]
+    task_mode: atomic
+    task_sampling_strategy: ordered
+    seed_strategy: global_unique
+    auto_reset: true
+    ignore_terminations: true
+    max_episode_steps: 400
+    max_steps_per_rollout_epoch: 400
+    group_size: 1
+    is_eval: true
+    use_rel_reward: true
+    grasp_binary_reward:
+      enabled: true
+      hold_steps: 20
+      lift_dz: 0.05
+    mibot_history:
+      enabled: true
+      length: ${actor.model.obs_history}
+      interval: 2
+    video_cfg:
+      save_video: false
+      info_on_video: true
+      video_base_dir: ${runner.logger.log_path}/video/eval
+
+rollout:
+  group_name: RolloutGroup
+  generation_backend: huggingface
+  recompute_logprobs: false
+  enable_offload: false
+  pipeline_stage_num: 1
+  sampling_params:
+    do_sample: true
+    temperature_train: 1.0
+    # Dynamic custom models are not in RLinf's hard-coded mode-forwarding list. A
+    # non-positive eval temperature makes its generic worker pass do_sample=false;
+    # MiBoTRLinfPolicy maps that signal to the deterministic noise_level=0 path.
+    temperature_eval: 0.0
+    top_k: -1
+    top_p: 1.0
+    repetition_penalty: 1.0
+    add_BOS: false
+    max_new_tokens: null
+  model:
+    model_path: ${actor.model.model_path}
+    precision: ${actor.model.precision}
+
+actor:
+  group_name: ActorGroup
+  training_backend: fsdp
+  micro_batch_size: 1
+  global_batch_size: 4
+  seed: 42
+  enable_offload: false
+  model:
+    model_type: mibot_robocasa365
+    model_path: ${oc.env:RLINF_CHECKPOINT,/checkpoint}
+    precision: bf16
+    is_lora: false  # custom PerSkillLoRA is injected by the builder, not PEFT
+    lora_rank: 8
+    lora_alpha: 32
+    # Cover the complete action-expert Linear path (attention, MLP, and I/O/time
+    # projectors).  The VLM and original expert weights remain frozen.
+    lora_targets: [all_linear]
+    adapter_skills: [grasp]
+    train_mode: adapter_only
+    robot_type: robocasa365
+    action_dim: 12
+    num_action_chunks: 16
+    num_steps: 5
+    noise_level: 0.1
+    denoise_index: 2
+    obs_history: 4
+    crop: 0.9
+    add_value_head: false
+    use_proprio: true
+  optim:
+    lr: 1.0e-5
+    value_lr: 1.0e-4
+    adam_beta1: 0.9
+    adam_beta2: 0.95
+    adam_eps: 1.0e-8
+    weight_decay: 0.01
+    clip_grad: 1.0
+  fsdp_config:
+    strategy: fsdp
+    sharding_strategy: no_shard
+    gradient_checkpointing: false
+    # Required because the custom model contains frozen base weights and trainable LoRA
+    # tensors in the same top-level FSDP unit.
+    use_orig_params: true
+    mixed_precision:
+      param_dtype: bf16
+      reduce_dtype: bf16
+      buffer_dtype: bf16
+
+reward:
+  use_reward_model: false
+
+critic:
+  use_critic_model: false

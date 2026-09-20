@@ -22,7 +22,9 @@ SCHEMA = "mibot-grpo-rollout-v1"
 SUPPORTED_GRID_KEYS = {
     "sampler.noise_level", "sampler.name", "env.skill", "env.split", "env.horizon",
     "env.horizon_grasp", "env.horizon_move", "env.horizon_place", "rollout.episodes",
+    "rollout.groups", "rollout.group_size",
     "rollout.replan_steps", "rollout.obs_history", "rollout.obs_interval",
+    "rollout.save_video",
     "rollout.video_stride", "rollout.video_fps", "reward.variant",
     "reward.use_milestones", "reward.skill_success", "reward.success_gamma",
     "reward.success_decay",
@@ -109,9 +111,23 @@ class CollectionPlan:
         episodes = {int(c["parameters"].get("rollout.episodes", 1)) for c in configs}
         if any(n < 1 for n in episodes):
             raise ValueError("rollout.episodes must be >= 1")
+        group_counts = []
+        for config in configs:
+            parameters = config["parameters"]
+            has_groups = "rollout.groups" in parameters
+            has_group_size = "rollout.group_size" in parameters
+            if has_groups != has_group_size:
+                raise ValueError("rollout.groups and rollout.group_size must be set together")
+            if has_groups:
+                groups = int(parameters["rollout.groups"])
+                group_size = int(parameters["rollout.group_size"])
+                if groups < 1 or group_size < 1:
+                    raise ValueError("rollout.groups and rollout.group_size must be >= 1")
+                group_counts.append(groups)
         stride = int(seed_cfg.get("stride", 100000))
-        if stride < max(episodes):
-            raise ValueError("seed.stride must be >= the largest rollout.episodes value")
+        required_stride = max([*episodes, *group_counts])
+        if stride < required_stride:
+            raise ValueError("seed.stride must cover the largest episode or group count")
         workers = int(runtime.get("workers", 1))
         max_in_flight = int(runtime.get("max_in_flight", workers))
         if workers < 1 or max_in_flight < 1:
@@ -136,21 +152,47 @@ class CollectionPlan:
     def jobs(self) -> list[dict[str, Any]]:
         jobs = []
         for config_index, config in enumerate(self.configs):
-            count = int(config["parameters"].get("rollout.episodes", 1))
-            for episode_index in range(count):
-                seed = self.seed_base + config_index * self.seed_stride + episode_index
-                jobs.append({
-                    "job_id": f"{config['config_id']}-ep{episode_index:05d}",
-                    "config_index": config_index,
-                    "config_id": config["config_id"],
-                    "config_hash": config["config_hash"],
-                    "parameters": copy.deepcopy(config["parameters"]),
-                    "episode_index": episode_index,
-                    "seed": seed,
-                })
-        seeds = [job["seed"] for job in jobs]
-        if len(seeds) != len(set(seeds)):
-            raise ValueError("seed allocator produced duplicates")
+            parameters = config["parameters"]
+            if "rollout.groups" in parameters:
+                group_count = int(parameters["rollout.groups"])
+                group_size = int(parameters["rollout.group_size"])
+                for group_index in range(group_count):
+                    seed = self.seed_base + config_index * self.seed_stride + group_index
+                    group_id = f"{config['config_id']}-g{group_index:05d}"
+                    for member_index in range(group_size):
+                        episode_index = group_index * group_size + member_index
+                        jobs.append({
+                            "job_id": f"{group_id}-m{member_index:03d}",
+                            "group_id": group_id,
+                            "group_index": group_index,
+                            "member_index": member_index,
+                            "action_seed": seed * 100000 + member_index,
+                            "config_index": config_index,
+                            "config_id": config["config_id"],
+                            "config_hash": config["config_hash"],
+                            "parameters": copy.deepcopy(parameters),
+                            "episode_index": episode_index,
+                            "seed": seed,
+                        })
+            else:
+                count = int(parameters.get("rollout.episodes", 1))
+                for episode_index in range(count):
+                    seed = self.seed_base + config_index * self.seed_stride + episode_index
+                    jobs.append({
+                        "job_id": f"{config['config_id']}-ep{episode_index:05d}",
+                        "config_index": config_index,
+                        "config_id": config["config_id"],
+                        "config_hash": config["config_hash"],
+                        "parameters": copy.deepcopy(parameters),
+                        "episode_index": episode_index,
+                        "seed": seed,
+                    })
+        seed_owners: dict[int, str] = {}
+        for job in jobs:
+            owner = str(job.get("group_id", job["job_id"]))
+            old_owner = seed_owners.setdefault(int(job["seed"]), owner)
+            if old_owner != owner:
+                raise ValueError("seed allocator produced a seed shared across groups")
         return jobs
 
     def manifest(self) -> dict[str, Any]:
@@ -263,7 +305,10 @@ def validated_completed_ids(plan: CollectionPlan, rows: list[dict[str, Any]]) ->
         job = expected.get(job_id)
         if job is None:
             raise ValueError(f"unknown resume row job_id {job_id!r}")
-        for key in ("config_id", "config_hash", "parameters", "episode_index", "seed"):
+        keys = ["config_id", "config_hash", "parameters", "episode_index", "seed"]
+        keys.extend(key for key in ("group_id", "group_index", "member_index", "action_seed")
+                    if key in expected)
+        for key in keys:
             if row.get(key) != job[key]:
                 raise ValueError(f"resume row {job_id!r} has mismatched {key}")
         seen.add(job_id)
@@ -380,15 +425,23 @@ def audit_collection(output_dir: Path) -> dict[str, Any]:
     seeds = [int(row["seed"]) for row in rows]
     job_ids = [row.get("job_id") for row in rows]
     expected_jobs = {job["job_id"]: job for job in manifest.get("jobs", [])}
-    duplicate_seed_count = len(seeds) - len(set(seeds))
+    seed_groups: dict[int, set[str]] = {}
+    for row in rows:
+        seed_groups.setdefault(int(row["seed"]), set()).add(
+            str(row.get("group_id", row.get("job_id"))))
+    duplicate_seed_count = sum(max(0, len(owners) - 1) for owners in seed_groups.values())
     mixing = 0
     job_mismatches = 0
     update_requests = 0
     for row in rows:
         expected_job = expected_jobs.get(row.get("job_id"))
+        match_keys = ["config_id", "config_hash", "parameters", "episode_index", "seed"]
+        if expected_job is not None:
+            match_keys.extend(key for key in
+                              ("group_id", "group_index", "member_index", "action_seed")
+                              if key in expected_job)
         if expected_job is None or any(
-                row.get(key) != expected_job[key]
-                for key in ("config_id", "config_hash", "parameters", "episode_index", "seed")):
+                row.get(key) != expected_job[key] for key in match_keys):
             job_mismatches += 1
         expected = by_id.get(row.get("config_id"))
         if (expected is None or row.get("config_hash") != expected["config_hash"] or
@@ -419,7 +472,8 @@ def audit_collection(output_dir: Path) -> dict[str, Any]:
                            int(runtime_manifest.get("max_in_flight", 1)))
     parallel_expected = expected_workers >= 2
     checks = {
-        "has_multiple_configs": len(by_id) >= 2,
+        "planned_configs_present": bool(by_id) and
+        {row.get("config_id") for row in rows} == set(by_id),
         "episodes_present": bool(rows),
         "no_duplicate_seeds": duplicate_seed_count == 0,
         "no_config_mixing": mixing == 0,
@@ -430,7 +484,11 @@ def audit_collection(output_dir: Path) -> dict[str, Any]:
     }
     if parallel_expected:
         checks["parallel_workers_observed"] = max_concurrency >= 2
-        checks["cross_config_overlap_observed"] = overlap > 0.0
+        # Cross-config overlap is a meaningful scheduling gate only when the plan
+        # actually contains multiple configurations. A single-config GRPO wave still
+        # proves parallelism via max_concurrency, but can never overlap two configs.
+        if len(by_id) >= 2:
+            checks["cross_config_overlap_observed"] = overlap > 0.0
     else:
         checks["serial_execution_observed"] = max_concurrency <= 1
     if manifest.get("runtime_backend") == "rlinf-worker-group":
@@ -440,9 +498,24 @@ def audit_collection(output_dir: Path) -> dict[str, Any]:
         for row in rows:
             artifacts = row.get("artifacts", {})
             payload = Path(artifacts.get("trainer_store", ""))
-            video = Path(artifacts.get("video", ""))
-            contained = (payload.resolve().is_relative_to(root) and video.resolve().is_relative_to(root))
-            if not contained or payload.is_symlink() or video.is_symlink() or not payload.is_file() or not video.is_file():
+            video_value = artifacts.get("video")
+            video_required = bool(row.get("parameters", {}).get("rollout.save_video", True))
+            try:
+                payload.resolve().relative_to(root)
+                payload_in_root = True
+            except ValueError:
+                payload_in_root = False
+            payload_ok = (payload_in_root and not payload.is_symlink() and payload.is_file())
+            video_ok = video_value in (None, "")
+            if video_required and video_value:
+                video = Path(video_value)
+                try:
+                    video.resolve().relative_to(root)
+                    video_in_root = True
+                except ValueError:
+                    video_in_root = False
+                video_ok = video_in_root and not video.is_symlink() and video.is_file()
+            if not payload_ok or not video_ok:
                 artifacts_present = False
             expected_hash = row.get("trainer_payload", {}).get("sha256")
             if not payload.is_file() or not expected_hash:

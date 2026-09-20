@@ -1,0 +1,8 @@
+consume_smoke:
+  update_epochs: 1
+  clip: 0.1
+  kl_coef: 0.005
+  ratio_max: 10.0
+  adv_clip: 3.0
+  target_kl: 0.02
+  discard_homogeneous_groups: true
