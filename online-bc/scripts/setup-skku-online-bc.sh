@@ -6,22 +6,51 @@ kit_dir="${PI_CUP_KIT:-$HOME/online-bc-kit}"
 mkdir -p "$work_dir" "$kit_dir"
 mode="${1:---connect}"
 case "$mode" in
-  --connect)
+  --connect|--install-tailscale)
     if test "$(id -u)" -eq 0; then root_cmd=(env); else
       command -v sudo >/dev/null || { printf 'sudo is required for Tailscale SSH.\n' >&2; exit 1; }
       sudo -v
       root_cmd=(sudo)
     fi
     if ! command -v tailscale >/dev/null || ! command -v tailscaled >/dev/null; then
-      curl -fsSL https://tailscale.com/install.sh -o "$work_dir/install-tailscale.sh"
-      if ! "${root_cmd[@]}" bash "$work_dir/install-tailscale.sh"; then
-        # Some SKKU images contain obsolete third-party apt repositories.
-        # Refresh only the Tailscale source; preserve all existing repositories.
-        test -f /etc/apt/sources.list.d/tailscale.list || exit 1
-        "${root_cmd[@]}" apt-get -o Dir::Etc::sourcelist=/etc/apt/sources.list.d/tailscale.list -o Dir::Etc::sourceparts=- update
-        "${root_cmd[@]}" apt-get install -y tailscale
-      fi
+      case "$(uname -m)" in
+        x86_64) task_ts_arch=amd64 ;;
+        aarch64|arm64) task_ts_arch=arm64 ;;
+        *) printf 'Unsupported architecture: %s\n' "$(uname -m)" >&2; exit 1 ;;
+      esac
+      task_ts_name="tailscale_1.102.4_${task_ts_arch}"
+      task_ts_dir="$work_dir/tailscale-binaries"
+      mkdir -p "$task_ts_dir"
+      python3 - "$task_ts_dir" "$task_ts_name" <<'PY_DOWNLOAD'
+import sys, time, urllib.request
+from pathlib import Path
+folder, name = Path(sys.argv[1]), sys.argv[2]
+for suffix, target in [('.tgz', 'tailscale.tgz'), ('.tgz.sha256', 'SHA256')]:
+    url = 'https://pkgs.tailscale.com/stable/' + name + suffix
+    for attempt in range(3):
+        try:
+            with urllib.request.urlopen(url, timeout=120) as source, (folder/target).open('wb') as dest:
+                while True:
+                    block = source.read(1024*1024)
+                    if not block: break
+                    dest.write(block)
+            break
+        except OSError:
+            if attempt == 2: raise
+            time.sleep(2)
+PY_DOWNLOAD
+      python3 - "$task_ts_dir" <<'PY_CHECKSUM'
+import hashlib, sys
+from pathlib import Path
+folder = Path(sys.argv[1])
+assert hashlib.sha256((folder/'tailscale.tgz').read_bytes()).hexdigest() == (folder/'SHA256').read_text().split()[0], 'Tailscale checksum mismatch'
+PY_CHECKSUM
+      tar -xzf "$task_ts_dir/tailscale.tgz" -C "$task_ts_dir" --strip-components=1 "$task_ts_name/tailscale" "$task_ts_name/tailscaled"
+      "${root_cmd[@]}" install -m 0755 "$task_ts_dir/tailscale" /usr/local/bin/tailscale
+      "${root_cmd[@]}" install -m 0755 "$task_ts_dir/tailscaled" /usr/local/bin/tailscaled
     fi
+    export PATH="/usr/local/bin:$PATH"
+    if test "$mode" = --install-tailscale; then tailscale version; exit 0; fi
     ts_dir="$work_dir/tailscale"
     mkdir -p "$ts_dir"
     socket="$ts_dir/tailscaled.sock"
@@ -39,7 +68,7 @@ case "$mode" in
     exit 0
     ;;
   --install) ;;
-  *) printf 'Usage: bash setup-skku-online-bc.sh --connect|--install\n' >&2; exit 2 ;;
+  *) printf 'Usage: bash setup-skku-online-bc.sh --connect|--install|--install-tailscale\n' >&2; exit 2 ;;
 esac
 export HF_TOKEN_FILE="${HF_TOKEN_FILE:-$work_dir/secrets/hf-token}"
 if ! test -s "$HF_TOKEN_FILE"; then
