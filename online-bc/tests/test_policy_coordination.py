@@ -3,10 +3,24 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from online_bc.rollout.worker import active_policy_readers, conditional_cup_rate, reused_rollouts
+from online_bc.rollout.worker import (
+    active_policy_readers,
+    conditional_cup_rate,
+    reused_rollouts,
+    worker_count,
+)
 
 
 class PolicyCoordination(unittest.TestCase):
+    def test_collection_trial_leaves_evaluation_concurrency_unchanged(self):
+        config = dict(workers=2, collection_workers=4)
+        self.assertEqual(worker_count(config, "collect"), 4)
+        self.assertEqual(worker_count(config, "eval"), 2)
+        self.assertEqual(worker_count(config, "reload"), 2)
+        self.assertEqual(worker_count(dict(workers=2), "collect"), 2)
+        with self.assertRaises(ValueError):
+            worker_count(dict(workers=2, collection_workers=0), "collect")
+
     def test_recovery_rejects_a_result_from_another_policy_version(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

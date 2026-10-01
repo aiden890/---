@@ -1,0 +1,184 @@
+{
+  "trial": {
+    "status": "waiting_for_next_collection",
+    "armed_at": 1790895444.501215,
+    "eval_workers": 2,
+    "trial_collection_workers": 4,
+    "training_algorithm_changed": false,
+    "policy_restarted": false
+  },
+  "profile": {
+    "at": 1790895200.9540117,
+    "rows": [
+      {
+        "node": "amp",
+        "batch": 4,
+        "policy_version": 7,
+        "workers": 4,
+        "episodes": 4,
+        "control_steps": 7200,
+        "collection_seconds": 172.80879806540906,
+        "control_steps_per_second": 41.664545327575055,
+        "upload_seconds": 2.496586536988616,
+        "upload_fraction_of_collection": 0.014447103185357753,
+        "episode_control_steps": [
+          1800,
+          1800,
+          1800,
+          1800
+        ],
+        "episode_seconds": [
+          154.02609073370695,
+          161.67123986780643,
+          163.03063681907952,
+          158.4651458133012
+        ]
+      },
+      {
+        "node": "amp",
+        "batch": 5,
+        "policy_version": 7,
+        "workers": 4,
+        "episodes": 4,
+        "control_steps": 7200,
+        "collection_seconds": 189.1257434003055,
+        "control_steps_per_second": 38.069909841731096,
+        "upload_seconds": 2.5462909918278456,
+        "upload_fraction_of_collection": 0.013463481734680295,
+        "episode_control_steps": [
+          1800,
+          1800,
+          1800,
+          1800
+        ],
+        "episode_seconds": [
+          153.69093324802816,
+          151.12862765416503,
+          143.51534855924547,
+          178.8378866519779
+        ]
+      },
+      {
+        "node": "amp",
+        "batch": 6,
+        "policy_version": 7,
+        "workers": 4,
+        "episodes": 4,
+        "control_steps": 6849,
+        "collection_seconds": 169.81290258467197,
+        "control_steps_per_second": 40.33262429269741,
+        "upload_seconds": 7.896099124103785,
+        "upload_fraction_of_collection": 0.046498817250748295,
+        "episode_control_steps": [
+          1800,
+          1800,
+          1800,
+          1449
+        ],
+        "episode_seconds": [
+          159.6535022445023,
+          154.15825404785573,
+          152.65557059645653,
+          127.37254874967039
+        ]
+      },
+      {
+        "node": "v4",
+        "batch": 4,
+        "policy_version": 7,
+        "workers": 2,
+        "episodes": 4,
+        "control_steps": 5397,
+        "collection_seconds": 177.38708164915442,
+        "control_steps_per_second": 30.424988955365265,
+        "upload_seconds": 8.930565686896443,
+        "upload_fraction_of_collection": 0.05034507363145976,
+        "episode_control_steps": [
+          1800,
+          1800,
+          1051,
+          746
+        ],
+        "episode_seconds": [
+          108.86660271510482,
+          108.18874066206627,
+          64.07511192699894,
+          46.9827890759334
+        ]
+      },
+      {
+        "node": "v4",
+        "batch": 5,
+        "policy_version": 7,
+        "workers": 2,
+        "episodes": 4,
+        "control_steps": 7200,
+        "collection_seconds": 239.76894418499433,
+        "control_steps_per_second": 30.02890980929049,
+        "upload_seconds": 2.548172154929489,
+        "upload_fraction_of_collection": 0.010627615530405974,
+        "episode_control_steps": [
+          1800,
+          1800,
+          1800,
+          1800
+        ],
+        "episode_seconds": [
+          126.89438455319032,
+          115.62620736821555,
+          108.24437607289292,
+          108.60439781309105
+        ]
+      },
+      {
+        "node": "v4",
+        "batch": 6,
+        "policy_version": 7,
+        "workers": 2,
+        "episodes": 4,
+        "control_steps": 7200,
+        "collection_seconds": 216.0671097098384,
+        "control_steps_per_second": 33.32298011330391,
+        "upload_seconds": 2.541715733008459,
+        "upload_fraction_of_collection": 0.011763547614543412,
+        "episode_control_steps": [
+          1800,
+          1800,
+          1800,
+          1800
+        ],
+        "episode_seconds": [
+          109.21433114493266,
+          107.7471052990295,
+          99.96184800984338,
+          103.68864535680041
+        ]
+      }
+    ],
+    "note": "Cross-node, same policy version7, different hardware/seeds. These are observations, not controlled worker-count comparison. NPY headers count executed12D control actions, no arrays rewritten.",
+    "changes": false
+  },
+  "verification": {
+    "unit_tests": 33,
+    "ruff_passed": true,
+    "project_config_used": true,
+    "evaluation_workers_unaffected": true,
+    "model_action_observation_success_logic_unchanged": true
+  },
+  "native": {
+    "cumulative_updates": 400,
+    "round": 8,
+    "eligible_episodes": 79,
+    "learning_rate": 1.25e-05,
+    "batch_size": 4,
+    "updates": 50,
+    "loss": 0.03596494346857071,
+    "grad_norm": 0.017947854474186897,
+    "warm_median_seconds": 0.36237768828868866,
+    "update_total_seconds": 76.99141770694405,
+    "first_two_seconds": [
+      30.034241349436343,
+      29.556944449432194
+    ]
+  }
+}

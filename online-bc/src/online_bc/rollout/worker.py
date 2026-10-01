@@ -60,6 +60,16 @@ def conditional_cup_rate(outcomes):
     return sum(row["cup_placed"] for row in grasped) / len(grasped) if grasped else None
 
 
+def worker_count(config, action):
+    """Allow collection profiling without changing evaluation concurrency."""
+    count = config.get("workers", 3)
+    if action == "collect":
+        count = config.get("collection_workers", count)
+    if not isinstance(count, int) or count < 1:
+        raise ValueError("Worker count must be a positive integer")
+    return count
+
+
 def reused_rollouts(root, model, seeds, version):
     count = 0
     for seed in seeds:
@@ -172,7 +182,8 @@ def main():
     reused = reused_rollouts(
         root, model, seeds, args.round if args.action == "eval" else args.round - 1
     )
-    shards = [seeds[i :: c.get("workers", 3)] for i in range(c.get("workers", 3))]
+    workers = worker_count(c, args.action)
+    shards = [seeds[i::workers] for i in range(workers)]
 
     def collect(pair):
         index, seeds = pair
@@ -191,7 +202,7 @@ def main():
                 check=True,
             )
 
-    with ThreadPoolExecutor(max_workers=c.get("workers", 3)) as pool:
+    with ThreadPoolExecutor(max_workers=workers) as pool:
         list(pool.map(collect, enumerate(shards)))
     # A retry may skip completed episodes in run_coffee. Its recovery wall time
     # must not masquerade as the original simulator throughput measurement.
