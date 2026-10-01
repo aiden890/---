@@ -39,7 +39,11 @@ def main():
 import json, pathlib, urllib.request, subprocess, time
 c=json.loads(pathlib.Path({config!r}).read_text())
 with urllib.request.urlopen(c["policy_url"],timeout=5) as response: policy=json.load(response)
-logs=list(pathlib.Path(c["output_root"]).rglob("worker-*.log"))+list(pathlib.Path(c["output_root"]).parent.glob("evaluation/**/worker-*.log"))
+output=pathlib.Path(c["output_root"])
+# Enter each round explicitly: rglob does not descend into symlinked rounds.
+rounds=[p for p in output.glob("round-*") if p.is_dir()]
+logs=[p for r in rounds for p in r.rglob("worker-*.log")]
+logs+=list(output.parent.glob("evaluation/**/worker-*.log"))
 recent=sorted(logs,key=lambda p:p.stat().st_mtime,reverse=True)[:2]
 gpu=subprocess.run(["nvidia-smi","--query-gpu=memory.used,utilization.gpu","--format=csv,noheader,nounits"],text=True,capture_output=True)
 print(json.dumps(dict(policy=policy,logs=[dict(path=str(p),age_seconds=time.time()-p.stat().st_mtime,tail=p.read_text()[-1000:]) for p in recent],gpu=gpu.stdout.strip())))
