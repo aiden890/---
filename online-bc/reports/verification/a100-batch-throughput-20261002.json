@@ -1,0 +1,91 @@
+{
+  "at": 1790879008.2924376,
+  "rows": [
+    {
+      "batch_size": 1,
+      "passed": true,
+      "wall_seconds": 80.7734410064295,
+      "warm_median_seconds": 0.13233955297619104,
+      "samples_per_second": 7.556319917295686,
+      "losses": [
+        0.008744146674871445,
+        0.012689233757555485,
+        0.007509162183851004,
+        0.025624891743063927,
+        0.02038504183292389,
+        0.02223161607980728
+      ]
+    },
+    {
+      "batch_size": 2,
+      "passed": true,
+      "wall_seconds": 87.98732785601169,
+      "warm_median_seconds": 0.21775104431435466,
+      "samples_per_second": 9.184800956052891,
+      "losses": [
+        0.012136094272136688,
+        0.025356607511639595,
+        0.024591371417045593,
+        0.023049330338835716,
+        0.022874612361192703,
+        0.02827676199376583
+      ]
+    },
+    {
+      "batch_size": 4,
+      "passed": true,
+      "wall_seconds": 92.14804057776928,
+      "warm_median_seconds": 0.3651966731995344,
+      "samples_per_second": 10.95300229587387,
+      "losses": [
+        0.021588902920484543,
+        0.030712617561221123,
+        0.024025414139032364,
+        0.023369185626506805,
+        0.020334430038928986,
+        0.026318006217479706
+      ]
+    },
+    {
+      "batch_size": 8,
+      "passed": true,
+      "wall_seconds": 96.53889391478151,
+      "warm_median_seconds": 0.649803364649415,
+      "samples_per_second": 12.31141670729298,
+      "losses": [
+        0.024122465401887894,
+        0.024649271741509438,
+        0.01824139431118965,
+        0.018631065264344215,
+        0.0420353002846241,
+        0.013639942742884159
+      ]
+    },
+    {
+      "batch_size": 16,
+      "passed": true,
+      "wall_seconds": 107.10014254692942,
+      "warm_median_seconds": 1.2071448061615229,
+      "samples_per_second": 13.254416469617075,
+      "losses": [
+        0.026053501293063164,
+        0.021799789741635323,
+        0.01948053203523159,
+        0.018888456746935844,
+        0.024857765063643456,
+        0.028649020940065384
+      ]
+    }
+  ],
+  "selected_batch_size": 4,
+  "best_measured_sample_throughput_batch": 16,
+  "production_batch_changed": false,
+  "disposable_adapters": true,
+  "benchmark_updates_per_batch": 6,
+  "warm_measurement_updates": 4,
+  "reason": "Keep batch4 for the fixed 50-update pilot: larger batches improve samples/s but increase update wall time and alter the number of replay samples per round. Collection dominates overall time. Batch16 is a verified throughput candidate, not a demonstrated learning improvement.",
+  "sources": [
+    "https://docs.jax.dev/en/latest/gpu_performance_tips.html",
+    "https://docs.jax.dev/en/latest/benchmarking.html"
+  ]
+}
