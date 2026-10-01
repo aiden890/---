@@ -1,0 +1,37 @@
+{
+  "model": "xiaomi",
+  "policy_url": "http://127.0.0.1:18317",
+  "episodes_per_round": 8,
+  "workers": 3,
+  "output_root": "/home/csi-agent-dgx_spark2/workspace/rlinf-mibot-prep/results/coffee-online-bc/rollouts",
+  "adapter_root": "/home/csi-agent-dgx_spark2/workspace/rlinf-mibot-prep/results/coffee-online-bc/adapters",
+  "adapter_container_root": "/results/coffee-online-bc/adapters",
+  "host_python": "python3",
+  "transport_argv": [
+    "/home/csi-agent-dgx_spark2/workspace/rlinf-mibot-prep/results/coffee-online-bc/transport/bin/python",
+    "/home/csi-agent-dgx_spark2/workspace/rlinf-mibot-prep/results/coffee-online-bc/hf_transfer.py",
+    "{direction}",
+    "{directory}",
+    "{prefix}",
+    "--token-file",
+    "/home/csi-agent-dgx_spark2/workspace/rlinf-mibot-prep/results/coffee-online-bc/secrets/hf-token"
+  ],
+  "ensure_policy_argv": [
+    "python3",
+    "/home/csi-agent-dgx_spark2/workspace/rlinf-mibot-prep/results/coffee-online-bc/docker_worker.py",
+    "--model",
+    "xiaomi",
+    "ensure"
+  ],
+  "collector_argv": [
+    "python3",
+    "/home/csi-agent-dgx_spark2/workspace/rlinf-mibot-prep/results/coffee-online-bc/docker_worker.py",
+    "--model",
+    "xiaomi",
+    "collect",
+    "--seeds",
+    "{seeds}",
+    "--out",
+    "/results/coffee-online-bc/rollouts/round-{round:04d}/{model}"
+  ]
+}

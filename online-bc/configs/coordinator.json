@@ -1,0 +1,45 @@
+{
+  "run": "coffee-online-bc-20261001",
+  "root": "/home/aiden/Desktop/lab/robot/pan-skill-models-20261001/coffee-online-bc/run",
+  "steps_per_round": 50,
+  "transport_python": "/home/aiden/Desktop/lab/robot/skku-vla-20260930/transport-venv/bin/python",
+  "token_file": "/home/aiden/Desktop/lab/robot/skku-vla-20260930/secrets/hf-token",
+  "workers": {
+    "xiaomi": {
+      "collect_argv": [
+        "ssh",
+        "spark2",
+        "python3 /home/csi-agent-dgx_spark2/workspace/rlinf-mibot-prep/results/coffee-online-bc/worker.py --config /home/csi-agent-dgx_spark2/workspace/rlinf-mibot-prep/results/coffee-online-bc/configs/xiaomi-worker.json --round {round} --run {run} collect"
+      ],
+      "reload_argv": [
+        "ssh",
+        "spark2",
+        "python3 /home/csi-agent-dgx_spark2/workspace/rlinf-mibot-prep/results/coffee-online-bc/worker.py --config /home/csi-agent-dgx_spark2/workspace/rlinf-mibot-prep/results/coffee-online-bc/configs/xiaomi-worker.json --round {round} --run {run} reload"
+      ]
+    },
+    "pi05": {
+      "collect_argv": [
+        "ssh",
+        "amp_csi",
+        "python3 /home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/worker.py --config /home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/configs/pi05-worker.json --round {round} --run {run} collect"
+      ],
+      "reload_argv": [
+        "ssh",
+        "amp_csi",
+        "python3 /home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/worker.py --config /home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/configs/pi05-worker.json --round {round} --run {run} reload"
+      ]
+    },
+    "groot": {
+      "collect_argv": [
+        "ssh",
+        "v4@115.145.175.197",
+        "python3 /home/v4/skku-vla-grasp-only-20260930/results/coffee-online-bc/worker.py --config /home/v4/skku-vla-grasp-only-20260930/results/coffee-online-bc/configs/groot-worker.json --round {round} --run {run} collect"
+      ],
+      "reload_argv": [
+        "ssh",
+        "v4@115.145.175.197",
+        "python3 /home/v4/skku-vla-grasp-only-20260930/results/coffee-online-bc/worker.py --config /home/v4/skku-vla-grasp-only-20260930/results/coffee-online-bc/configs/groot-worker.json --round {round} --run {run} reload"
+      ]
+    }
+  }
+}

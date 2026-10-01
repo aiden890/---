@@ -1,0 +1,100 @@
+{
+  "instruction": "Place the mug you are holding upright on the coffee machine tray directly under the dispenser, then release the mug.",
+  "episodes": 11,
+  "samples": 235,
+  "examples": [
+    {
+      "episode": "pi05-seed981014",
+      "source_model": "pi05",
+      "seed": 981014,
+      "start": 432,
+      "end": 739,
+      "samples": 20,
+      "url": "/media/pi05-cup-bc-20261001/pi05-seed981014/video.mp4"
+    },
+    {
+      "episode": "pi05-seed981017",
+      "source_model": "pi05",
+      "seed": 981017,
+      "start": 352,
+      "end": 951,
+      "samples": 38,
+      "url": "/media/pi05-cup-bc-20261001/pi05-seed981017/video.mp4"
+    },
+    {
+      "episode": "pi05-seed981018",
+      "source_model": "pi05",
+      "seed": 981018,
+      "start": 336,
+      "end": 646,
+      "samples": 20,
+      "url": "/media/pi05-cup-bc-20261001/pi05-seed981018/video.mp4"
+    },
+    {
+      "episode": "pi05-seed981023",
+      "source_model": "pi05",
+      "seed": 981023,
+      "start": 480,
+      "end": 806,
+      "samples": 21,
+      "url": "/media/pi05-cup-bc-20261001/pi05-seed981023/video.mp4"
+    },
+    {
+      "episode": "pi05-seed981026",
+      "source_model": "pi05",
+      "seed": 981026,
+      "start": 464,
+      "end": 887,
+      "samples": 27,
+      "url": "/media/pi05-cup-bc-20261001/pi05-seed981026/video.mp4"
+    },
+    {
+      "episode": "xiaomi-seed981011",
+      "source_model": "xiaomi",
+      "seed": 981011,
+      "start": 240,
+      "end": 689,
+      "samples": 29,
+      "url": "/media/pi05-cup-bc-20261001/xiaomi-seed981011/video.mp4"
+    },
+    {
+      "episode": "xiaomi-seed981014",
+      "source_model": "xiaomi",
+      "seed": 981014,
+      "start": 208,
+      "end": 495,
+      "samples": 18,
+      "url": "/media/pi05-cup-bc-20261001/xiaomi-seed981014/video.mp4"
+    },
+    {
+      "episode": "xiaomi-seed981018",
+      "source_model": "xiaomi",
+      "seed": 981018,
+      "start": 208,
+      "end": 476,
+      "samples": 17,
+      "url": "/media/pi05-cup-bc-20261001/xiaomi-seed981018/video.mp4"
+    },
+    {
+      "episode": "xiaomi-seed981020",
+      "source_model": "xiaomi",
+      "seed": 981020,
+      "start": 256,
+      "end": 579,
+      "samples": 21,
+      "url": "/media/pi05-cup-bc-20261001/xiaomi-seed981020/video.mp4"
+    },
+    {
+      "episode": "xiaomi-seed981022",
+      "source_model": "xiaomi",
+      "seed": 981022,
+      "start": 288,
+      "end": 588,
+      "samples": 19,
+      "url": "/media/pi05-cup-bc-20261001/xiaomi-seed981022/video.mp4"
+    }
+  ],
+  "labels": "Actual successful policy rollouts; not human expert demonstrations",
+  "training_model": "pi05",
+  "stage": "cup_placement_only"
+}

@@ -1,0 +1,79 @@
+{
+  "model": "pi05",
+  "passed": true,
+  "status": "passed",
+  "native_optimizer_updates": 2,
+  "skills_tested": [
+    "cup_placement",
+    "cup_placement"
+  ],
+  "finite_loss_and_grad": true,
+  "adapter_changed": true,
+  "checkpoint_reload_equal": true,
+  "inference_after_reload": true,
+  "inference_action_shape": [
+    50,
+    12
+  ],
+  "trainable_parameters": 22118400,
+  "frozen_backbone_unchanged": true,
+  "optimizer_resume_equal": true,
+  "updates": [
+    {
+      "step": 1,
+      "model": "pi05",
+      "skill": "cup_placement",
+      "source_model": "xiaomi",
+      "source_seed": 981022,
+      "seconds": 46.611343678086996,
+      "loss": 0.008782332763075829,
+      "grad_norm": 0.00501072546467185,
+      "canonicalized_zero_std_dims": [
+        10
+      ]
+    },
+    {
+      "step": 2,
+      "model": "pi05",
+      "skill": "cup_placement",
+      "source_model": "pi05",
+      "source_seed": 981014,
+      "seconds": 25.064079811796546,
+      "loss": 0.012690349481999874,
+      "grad_norm": 0.003821717342361808,
+      "canonicalized_zero_std_dims": [
+        10
+      ]
+    }
+  ],
+  "http_requests": [
+    {
+      "index": 0,
+      "shape": [
+        50,
+        12
+      ],
+      "seconds": 19.427107993513346,
+      "source_model": "xiaomi"
+    },
+    {
+      "index": 1,
+      "shape": [
+        50,
+        12
+      ],
+      "seconds": 19.590659495443106,
+      "source_model": "pi05"
+    },
+    {
+      "index": 2,
+      "shape": [
+        50,
+        12
+      ],
+      "seconds": 19.741881163790822,
+      "source_model": "pi05"
+    }
+  ],
+  "parallel_rollout_requests": 3
+}
