@@ -1,0 +1,565 @@
+{
+  "at": 1790898901.4962614,
+  "main_status": {
+    "next_round": 10,
+    "status": "collecting",
+    "attempts": 24,
+    "successes": 7,
+    "batch": 4
+  },
+  "cumulative_native_updates": 450,
+  "eligible_episodes": 87,
+  "hosts": {
+    "amp": {
+      "time": 1790898748.2190938,
+      "storage-archiver_process": "PID     ELAPSED COMMAND\n3322201    03:47:21 python",
+      "storage-archiver.log": {
+        "age": 562.0935633182526,
+        "tail": "ts/round-0005\", \"remote_size_verified\": true, \"removed_npz\": 5590, \"pruned_npz_bytes\": 5174303761, \"archived_at\": 1790892163.3911543, \"videos_actions_traces_manifests_retained\": true}\n{\"event\": \"round_observations_archived\", \"round\": 6, \"bytes\": 4482227645, \"sha256\": \"f67f896c9b2714fdf25b5d79108617820527c83668afe33c54997d553e2d4c4c\", \"bucket\": \"khmin101/vla-rollout-transfer\", \"remote_path\": \"pi05-cup-online-bc-20261001/archives/pi05/amp/round-0006/rollouts.tar.gz\", \"local_round\": \"/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0006\", \"remote_size_verified\": true, \"removed_npz\": 4766, \"pruned_npz_bytes\": 4382515091, \"archived_at\": 1790895670.3324718, \"videos_actions_traces_manifests_retained\": true}\n{\"event\": \"round_observations_archived\", \"round\": 7, \"bytes\": 3687760638, \"sha256\": \"67028343f330d2d107db433988d182b82734f337e4534ff07050635e09ceccd8\", \"bucket\": \"khmin101/vla-rollout-transfer\", \"remote_path\": \"pi05-cup-online-bc-20261001/archives/pi05/amp/round-0007/rollouts.tar.gz\", \"local_round\": \"/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0007\", \"remote_size_verified\": true, \"removed_npz\": 4782, \"pruned_npz_bytes\": 3647396521, \"archived_at\": 1790898185.7669423, \"videos_actions_traces_manifests_retained\": true}\n"
+      },
+      "free_/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc": 11498950656,
+      "free_/mnt/data/guest": 24524673024,
+      "rollouts/round-0010": {
+        "results": 16,
+        "versions": [
+          9
+        ],
+        "logs": [
+          {
+            "path": "rollouts/round-0010/batch-03/worker-0.log",
+            "age": 0.3081941604614258,
+            "tail": "true, \"mug_lift\": -0.011846598530296681, \"mug_lifted\": false, \"mug_moved_while_held\": true, \"mug_motion\": 0.3717643307040346, \"mug_under_dispenser\": false, \"coffee_machine_on\": false, \"gripper_mug_far\": false, \"gripper_button_far\": true, \"official_success\": false, \"mug_world_position\": [1.7367320921818656, -2.3555672331016364, 1.2830256192282787]}\n"
+          },
+          {
+            "path": "rollouts/round-0010/batch-03/worker-2.log",
+            "age": 1.3582353591918945,
+            "tail": "mug_lift\": -4.404484360120975e-06, \"mug_lifted\": false, \"mug_moved_while_held\": false, \"mug_motion\": 2.6962667682633656e-05, \"mug_under_dispenser\": false, \"coffee_machine_on\": false, \"gripper_mug_far\": true, \"gripper_button_far\": false, \"official_success\": false, \"mug_world_position\": [-0.6532291610850168, -0.2771577982550314, 1.4579147543881015]}\n"
+          },
+          {
+            "path": "rollouts/round-0010/batch-03/worker-3.log",
+            "age": 4.711209535598755,
+            "tail": ", \"mug_lift\": 4.969679812116823e-07, \"mug_lifted\": false, \"mug_moved_while_held\": false, \"mug_motion\": 6.168210429654132e-06, \"mug_under_dispenser\": false, \"coffee_machine_on\": false, \"gripper_mug_far\": false, \"gripper_button_far\": true, \"official_success\": false, \"mug_world_position\": [4.217224312365382, -0.39675117360801593, 1.4821786795080232]}\n"
+          },
+          {
+            "path": "rollouts/round-0010/batch-03/worker-1.log",
+            "age": 8.435173511505127,
+            "tail": ", \"mug_lift\": -3.49148674683164e-06, \"mug_lifted\": false, \"mug_moved_while_held\": false, \"mug_motion\": 2.215119607852694e-05, \"mug_under_dispenser\": false, \"coffee_machine_on\": false, \"gripper_mug_far\": false, \"gripper_button_far\": true, \"official_success\": false, \"mug_world_position\": [2.430961754529319, -0.24171972995766303, 1.4551688525438944]}\n"
+          }
+        ]
+      },
+      "policy": {
+        "model": "pi05",
+        "version": 9,
+        "ready": true
+      },
+      "active_workers": [],
+      "sim_pids": {
+        "40482955e5fe rlinf-mibot:t_43b4edc9 nervous_dewdney": [
+          "3427557             python3             python3 -m online_bc.rollout.run_coffee --seeds 994020 --model pi05 --out /results/coffee-online-bc/rollouts/round-0010/batch-03/pi05 --skill cup_placement"
+        ],
+        "769d5dce0a44 rlinf-mibot:t_43b4edc9 happy_mahavira": [
+          "3427550             python3             python3 -m online_bc.rollout.run_coffee --seeds 994019 --model pi05 --out /results/coffee-online-bc/rollouts/round-0010/batch-03/pi05 --skill cup_placement"
+        ],
+        "4d3b5e565f8d rlinf-mibot:t_43b4edc9 clever_williams": [
+          "3427565             python3             python3 -m online_bc.rollout.run_coffee --seeds 994017 --model pi05 --out /results/coffee-online-bc/rollouts/round-0010/batch-03/pi05 --skill cup_placement"
+        ],
+        "1300715199fc rlinf-mibot:t_43b4edc9 condescending_banzai": [
+          "3427496             python3             python3 -m online_bc.rollout.run_coffee --seeds 994018 --model pi05 --out /results/coffee-online-bc/rollouts/round-0010/batch-03/pi05 --skill cup_placement"
+        ]
+      },
+      "gpu": "13581, 24576, 4",
+      "archives": {
+        "round-0005": {
+          "round": 5,
+          "bytes": 5281461360,
+          "sha256": "f0501fd12c91a1228068c2941f9b64f98235a7a192c9915ad04d14958ed993f4",
+          "bucket": "khmin101/vla-rollout-transfer",
+          "remote_path": "pi05-cup-online-bc-20261001/archives/pi05/amp/round-0005/rollouts.tar.gz",
+          "local_round": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0005",
+          "remote_size_verified": true,
+          "removed_npz": 5590,
+          "pruned_npz_bytes": 5174303761,
+          "archived_at": 1790892163.3911543,
+          "videos_actions_traces_manifests_retained": true
+        },
+        "round-0007": {
+          "round": 7,
+          "bytes": 3687760638,
+          "sha256": "67028343f330d2d107db433988d182b82734f337e4534ff07050635e09ceccd8",
+          "bucket": "khmin101/vla-rollout-transfer",
+          "remote_path": "pi05-cup-online-bc-20261001/archives/pi05/amp/round-0007/rollouts.tar.gz",
+          "local_round": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0007",
+          "remote_size_verified": true,
+          "removed_npz": 4782,
+          "pruned_npz_bytes": 3647396521,
+          "archived_at": 1790898185.7669423,
+          "videos_actions_traces_manifests_retained": true
+        },
+        "round-0006": {
+          "round": 6,
+          "bytes": 4482227645,
+          "sha256": "f67f896c9b2714fdf25b5d79108617820527c83668afe33c54997d553e2d4c4c",
+          "bucket": "khmin101/vla-rollout-transfer",
+          "remote_path": "pi05-cup-online-bc-20261001/archives/pi05/amp/round-0006/rollouts.tar.gz",
+          "local_round": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0006",
+          "remote_size_verified": true,
+          "removed_npz": 4766,
+          "pruned_npz_bytes": 4382515091,
+          "archived_at": 1790895670.3324718,
+          "videos_actions_traces_manifests_retained": true
+        },
+        "round-0003": {
+          "round": 3,
+          "bytes": 4257633638,
+          "sha256": "77b727a269b47daf2a58b790389a2d82b11744ae6345f69243360eff2bebd812",
+          "bucket": "khmin101/vla-rollout-transfer",
+          "remote_path": "pi05-cup-online-bc-20261001/archives/pi05/amp/round-0003/rollouts.tar.gz",
+          "local_round": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0003",
+          "remote_size_verified": true,
+          "removed_npz": 4680,
+          "pruned_npz_bytes": 3962323934,
+          "archived_at": 1790887502.4689784,
+          "videos_actions_traces_manifests_retained": true
+        },
+        "round-0004": {
+          "round": 4,
+          "bytes": 5492333896,
+          "sha256": "e769832231f522bc10c5408cbb325a1f31b27558098be8e0bd055e415deb3326",
+          "bucket": "khmin101/vla-rollout-transfer",
+          "remote_path": "pi05-cup-online-bc-20261001/archives/pi05/amp/round-0004/rollouts.tar.gz",
+          "local_round": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0004",
+          "remote_size_verified": true,
+          "removed_npz": 5233,
+          "pruned_npz_bytes": 5091699238,
+          "archived_at": 1790890497.220903,
+          "videos_actions_traces_manifests_retained": true
+        },
+        "round-0001": {
+          "round": 1,
+          "bytes": 2356353408,
+          "sha256": "f2d564ad2d9f1127fbb473da7da4abd972ec945dc4ef650ad740947a87eecac4",
+          "bucket": "khmin101/vla-rollout-transfer",
+          "remote_path": "pi05-cup-online-bc-20261001/archives/pi05/amp/round-0001/rollouts.tar.gz",
+          "local_round": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0001",
+          "remote_size_verified": true,
+          "removed_npz": 2116,
+          "archived_at": 1790884874.398507,
+          "videos_actions_traces_manifests_retained": true,
+          "pruned_npz_bytes": 2184887998
+        },
+        "round-0002": {
+          "round": 2,
+          "bytes": 3296418730,
+          "sha256": "6fc08e3f3f6ced13ad4aff3024c6498940ac7b8699afb28165f3548abe06ea90",
+          "bucket": "khmin101/vla-rollout-transfer",
+          "remote_path": "pi05-cup-online-bc-20261001/archives/pi05/amp/round-0002/rollouts.tar.gz",
+          "local_round": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0002",
+          "remote_size_verified": true,
+          "removed_npz": 3727,
+          "pruned_npz_bytes": 3075421321,
+          "archived_at": 1790885323.820529,
+          "videos_actions_traces_manifests_retained": true
+        }
+      }
+    },
+    "v4": {
+      "time": 1790898748.096827,
+      "benchmarks/v4-worker-trial/status.json": {
+        "status": "episodes_complete_pending_metrics",
+        "armed_at": 1790895444.501215,
+        "eval_workers": 2,
+        "trial_collection_workers": 4,
+        "training_algorithm_changed": false,
+        "policy_restarted": false,
+        "batch_root": "/home/v4/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0009/batch-06",
+        "restored_at": 1790897156.5049982,
+        "policy": {
+          "model": "pi05",
+          "version": 8,
+          "ready": true,
+          "base_prefix_enabled": true
+        },
+        "gpu_peak_mib": 21503,
+        "completed_at": 1790897282.5300596,
+        "seeds": [
+          993945,
+          993946,
+          993947,
+          993948
+        ],
+        "versions": [
+          8
+        ],
+        "cups": 0
+      },
+      "benchmarks/v4-worker-trial/watch.log": {
+        "age": 3303.6281435489655,
+        "tail": ""
+      },
+      "watch_ps": "PID     ELAPSED COMMAND",
+      "workers": {
+        "workers": 2,
+        "collection_workers": 4
+      },
+      "free_/home/v4/skku-vla-grasp-only-20260930/results/coffee-online-bc": 33157505024,
+      "rollouts/round-0010": {
+        "results": 0,
+        "versions": [],
+        "logs": [
+          {
+            "path": "rollouts/round-0010/batch-03/worker-1.log",
+            "age": 0.5320813655853271,
+            "tail": "rue, \"mug_lift\": 0.00019772458215228106, \"mug_lifted\": false, \"mug_moved_while_held\": true, \"mug_motion\": 0.13315495544038136, \"mug_under_dispenser\": false, \"coffee_machine_on\": false, \"gripper_mug_far\": false, \"gripper_button_far\": true, \"official_success\": false, \"mug_world_position\": [4.128012135229253, -0.4009969087371536, 1.5081199699517975]}\n"
+          },
+          {
+            "path": "rollouts/round-0010/batch-03/worker-3.log",
+            "age": 1.868107557296753,
+            "tail": "\": true, \"mug_lift\": 0.004328632616638739, \"mug_lifted\": false, \"mug_moved_while_held\": true, \"mug_motion\": 0.1325607768299846, \"mug_under_dispenser\": false, \"coffee_machine_on\": false, \"gripper_mug_far\": false, \"gripper_button_far\": true, \"official_success\": false, \"mug_world_position\": [0.3817710986017405, -4.174414405900272, 1.462373534659021]}\n"
+          },
+          {
+            "path": "rollouts/round-0010/batch-03/worker-2.log",
+            "age": 2.032137155532837,
+            "tail": "\": true, \"mug_lift\": -0.34759481657874436, \"mug_lifted\": false, \"mug_moved_while_held\": true, \"mug_motion\": 0.4888780274618103, \"mug_under_dispenser\": false, \"coffee_machine_on\": false, \"gripper_mug_far\": false, \"gripper_button_far\": false, \"official_success\": false, \"mug_world_position\": [2.87903400657819, -0.5442880681705117, 1.137152776558287]}\n"
+          },
+          {
+            "path": "rollouts/round-0010/batch-03/worker-0.log",
+            "age": 3.740140199661255,
+            "tail": " \"mug_lift\": 1.5014398082602298e-06, \"mug_lifted\": false, \"mug_moved_while_held\": false, \"mug_motion\": 4.5250753983893104e-05, \"mug_under_dispenser\": false, \"coffee_machine_on\": false, \"gripper_mug_far\": false, \"gripper_button_far\": true, \"official_success\": false, \"mug_world_position\": [0.4522531825551161, -6.119074402760349, 1.4573365596640582]}\n"
+          }
+        ]
+      },
+      "evaluation/version-0009": {
+        "results": 10,
+        "versions": [
+          9
+        ],
+        "logs": [
+          {
+            "path": "evaluation/version-0009/worker-1.log",
+            "age": 157.7126750946045,
+            "tail": "capture\": 5.731819102307782, \"environment_step_with_observations\": 59.90496852458455, \"observation_history\": 0.09219837887212634, \"success_predicates\": 0.6009708568453789, \"video_encode\": 1.9439394574146718, \"result_and_capture_storage\": 0.0299544429872185, \"policy_inference\": 19.509342193603516, \"episode_before_result_write\": 107.62935552583076}}\n"
+          },
+          {
+            "path": "evaluation/version-0009/worker-0.log",
+            "age": 241.25151562690735,
+            "tail": "ure\": 2.4533698805607855, \"environment_step_with_observations\": 21.753668296616524, \"observation_history\": 0.03389412467367947, \"success_predicates\": 0.11299356981180608, \"video_encode\": 0.7572170940693468, \"result_and_capture_storage\": 0.021141957957297564, \"policy_inference\": 7.4906675815582275, \"episode_before_result_write\": 47.26208320609294}}\n"
+          }
+        ]
+      },
+      "shadow-evaluation/base_prefix/version-0006": {
+        "results": 30,
+        "versions": [
+          6
+        ],
+        "logs": [
+          {
+            "path": "shadow-evaluation/base_prefix/version-0006/worker-1.log",
+            "age": 5110.74422955513,
+            "tail": "ture\": 9.628922485047951, \"environment_step_with_observations\": 64.18450127961114, \"observation_history\": 0.09143873956054449, \"success_predicates\": 0.32521624490618706, \"video_encode\": 1.8845870953518897, \"result_and_capture_storage\": 0.028922950848937035, \"policy_inference\": 19.550601482391357, \"episode_before_result_write\": 108.46059256303124}}\n"
+          },
+          {
+            "path": "shadow-evaluation/base_prefix/version-0006/worker-0.log",
+            "age": 5196.063118696213,
+            "tail": "apture\": 7.266301703406498, \"environment_step_with_observations\": 53.42965311463922, \"observation_history\": 0.09542294847778976, \"success_predicates\": 0.24558253004215658, \"video_encode\": 2.0070634211879224, \"result_and_capture_storage\": 0.029884841991588473, \"policy_inference\": 22.60042142868042, \"episode_before_result_write\": 99.52119339886121}}\n"
+          }
+        ]
+      },
+      "policy": {
+        "model": "pi05",
+        "version": 9,
+        "ready": true,
+        "base_prefix_enabled": true
+      },
+      "active_workers": [],
+      "sim_pids": {
+        "05e59541de2d rlinf-mibot-eval:v4 naughty_turing": [
+          "3510446             python3             python3 -m online_bc.rollout.run_coffee --seeds 994024 --model pi05 --out /results/coffee-online-bc/rollouts/round-0010/batch-03/pi05 --skill cup_placement"
+        ],
+        "7d4b33837f30 rlinf-mibot-eval:v4 pedantic_bhabha": [
+          "3510491             python3             python3 -m online_bc.rollout.run_coffee --seeds 994023 --model pi05 --out /results/coffee-online-bc/rollouts/round-0010/batch-03/pi05 --skill cup_placement"
+        ],
+        "7cdf2ebbe48d rlinf-mibot-eval:v4 great_chebyshev": [
+          "3510530             python3             python3 -m online_bc.rollout.run_coffee --seeds 994021 --model pi05 --out /results/coffee-online-bc/rollouts/round-0010/batch-03/pi05 --skill cup_placement"
+        ],
+        "a4e4863109df rlinf-mibot-eval:v4 pedantic_boyd": [
+          "3510508             python3             python3 -m online_bc.rollout.run_coffee --seeds 994022 --model pi05 --out /results/coffee-online-bc/rollouts/round-0010/batch-03/pi05 --skill cup_placement"
+        ]
+      },
+      "gpu": "21242, 24576, 87"
+    },
+    "learner": {
+      "time": 1790898748.5723486,
+      "learner_process": "PID     ELAPSED COMMAND\n  26119    05:45:00 python",
+      "run/service-status.json": {
+        "model": "pi05",
+        "completed_round": 9,
+        "checkpoint": "/home/work/robot_aiden_260930/pi-cup-online-bc/run/training/round-0009/update-000050",
+        "status": "waiting_for_rollouts"
+      },
+      "learner.log": {
+        "age": 830.7504773139954,
+        "tail": "up_placement\", \"source_model\": \"pi05\", \"source_seed\": 993660, \"episode_id\": \"pi05-seed993660\", \"control_revision\": 2, \"seconds\": 0.36183302104473114, \"batch_size\": 4, \"learning_rate\": 1.25e-05, \"loss\": 0.008972504176199436, \"grad_norm\": 0.004964469000697136, \"canonicalized_zero_std_dims\": [10]}\n{\"step\": 48, \"model\": \"pi05\", \"skill\": \"cup_placement\", \"source_model\": \"pi05\", \"source_seed\": 993729, \"episode_id\": \"pi05-seed993729\", \"control_revision\": 2, \"seconds\": 0.3618032746016979, \"batch_size\": 4, \"learning_rate\": 1.25e-05, \"loss\": 0.04624464735388756, \"grad_norm\": 0.016653241589665413, \"canonicalized_zero_std_dims\": [10]}\n{\"step\": 49, \"model\": \"pi05\", \"skill\": \"cup_placement\", \"source_model\": \"pi05\", \"source_seed\": 993448, \"episode_id\": \"pi05-seed993448\", \"control_revision\": 2, \"seconds\": 0.36203840747475624, \"batch_size\": 4, \"learning_rate\": 1.25e-05, \"loss\": 0.07597606629133224, \"grad_norm\": 0.3363942503929138, \"canonicalized_zero_std_dims\": [10]}\n{\"step\": 50, \"model\": \"pi05\", \"skill\": \"cup_placement\", \"source_model\": \"pi05\", \"source_seed\": 993660, \"episode_id\": \"pi05-seed993660\", \"control_revision\": 2, \"seconds\": 0.3622078560292721, \"batch_size\": 4, \"learning_rate\": 1.25e-05, \"loss\": 0.02768774889409542, \"grad_norm\": 0.019949862733483315, \"canonicalized_zero_std_dims\": [10]}\n"
+      },
+      "free_/home/work/robot_aiden_260930/pi-cup-online-bc": 397927663009792,
+      "checkpoint8_files": {
+        "pi05-lora.npz": {
+          "bytes": 88476838,
+          "mtime": 1790897918.0799134
+        },
+        "metadata.json": {
+          "bytes": 7617,
+          "mtime": 1790897919.761777
+        },
+        "pi05-optimizer.pkl": {
+          "bytes": 176949619,
+          "mtime": 1790897918.264115
+        },
+        "updates.json": {
+          "bytes": 20330,
+          "mtime": 1790897919.761396
+        }
+      },
+      "active_workers": [],
+      "sim_pids": {},
+      "gpu": "0, 81920, [Not Found]"
+    }
+  },
+  "controls": {
+    "run": "pi05-cup-online-bc-20261001",
+    "revision": 2,
+    "excluded": {},
+    "paused": false,
+    "bootstrap_steps": 0,
+    "review_required": false,
+    "updated_at": 1790870638.0917895
+  },
+  "eval9": {
+    "at": 1790898843.219291,
+    "eval": {
+      "model": "pi05",
+      "policy_version": 9,
+      "attempts": 10,
+      "cup_successes": 1,
+      "cup_success_rate": 0.1,
+      "grasp_successes": 7,
+      "cup_given_grasp": 0.14285714285714285,
+      "seeds": [
+        992001,
+        992002,
+        992003,
+        992004,
+        992005,
+        992006,
+        992007,
+        992008,
+        992009,
+        992010
+      ],
+      "training_data": false,
+      "profiling": {
+        "profiled_episodes": 10,
+        "episode_mean_environment_create_seconds": 7.22948353944812,
+        "episode_mean_environment_reset_seconds": 5.509588369820267,
+        "episode_mean_environment_step_with_observations_seconds": 65.91826749383472,
+        "episode_mean_episode_before_result_write_seconds": 110.24918981159571,
+        "episode_mean_observation_capture_seconds": 6.04563146897126,
+        "episode_mean_observation_history_seconds": 0.089551068469882,
+        "episode_mean_policy_inference_seconds": 22.311112904548644,
+        "episode_mean_result_and_capture_storage_seconds": 0.028293115459382533,
+        "episode_mean_success_predicates_seconds": 1.106508881924674,
+        "episode_mean_video_encode_seconds": 1.8259114396059886,
+        "simulator_workers": 2,
+        "reused_completed_episodes": 0
+      },
+      "wall_seconds": 598.5276783790905,
+      "outcomes": [
+        {
+          "seed": 992001,
+          "cup_placed": false,
+          "grasped": true
+        },
+        {
+          "seed": 992002,
+          "cup_placed": false,
+          "grasped": false
+        },
+        {
+          "seed": 992003,
+          "cup_placed": false,
+          "grasped": true
+        },
+        {
+          "seed": 992004,
+          "cup_placed": false,
+          "grasped": false
+        },
+        {
+          "seed": 992005,
+          "cup_placed": false,
+          "grasped": true
+        },
+        {
+          "seed": 992006,
+          "cup_placed": false,
+          "grasped": true
+        },
+        {
+          "seed": 992007,
+          "cup_placed": false,
+          "grasped": true
+        },
+        {
+          "seed": 992008,
+          "cup_placed": false,
+          "grasped": false
+        },
+        {
+          "seed": 992009,
+          "cup_placed": true,
+          "grasped": true
+        },
+        {
+          "seed": 992010,
+          "cup_placed": false,
+          "grasped": true
+        }
+      ]
+    },
+    "paired_base_same10": {
+      "cup": {
+        "gained": [
+          992009
+        ],
+        "lost": [
+          992007,
+          992010
+        ],
+        "exact_two_sided_mcnemar_p": 1.0
+      },
+      "grasp": {
+        "gained": [],
+        "lost": [
+          992002,
+          992004,
+          992008
+        ],
+        "exact_two_sided_mcnemar_p": 0.25
+      }
+    },
+    "base_same10_cup": 2,
+    "base_same10_grasp": 10,
+    "all_unique_seeds_versions_standard_verified": true,
+    "all_initial_state_hashes_match_base": true,
+    "training_data": false,
+    "confirmed_gain": false,
+    "confirmed_regression": false,
+    "adaptation": {
+      "action": "reduce_learning_rate",
+      "learning_rate": 1e-05,
+      "best_version": 7,
+      "common_seed_successes": 1,
+      "common_seed_attempts": 10,
+      "best_successes": 3,
+      "statistically_confirmed": false,
+      "version": 9
+    },
+    "adaptation_applied_to_training": false,
+    "publication": {
+      "url": "http://100.86.183.64:8899/media/pi-cup-standard-eval-v9/index.html",
+      "videos": 10,
+      "all_video_head_200": true,
+      "total_video_bytes": 12621973
+    }
+  },
+  "wandb_summary": {
+    "train/global_step": 450,
+    "train/loss": 0.02768774889409542,
+    "train/grad_norm": 0.019949862733483315,
+    "train/learning_rate": 1.25e-05,
+    "eval/version": 9,
+    "eval/cup_success_rate": 0.1,
+    "eval/grasp_success_rate": 0.7,
+    "eval/cup_given_grasp": 0.14285714285714285,
+    "adaptation/learning_rate": 1e-05,
+    "pipeline/v4_workers4_provisionally_adopted": true
+  },
+  "history": [
+    {
+      "_step": 960,
+      "train/global_step": 449,
+      "train/loss": 0.07597606629133224,
+      "train/grad_norm": 0.3363942503929138,
+      "train/learning_rate": 1.25e-05
+    },
+    {
+      "train/global_step": 450,
+      "train/loss": 0.02768774889409542,
+      "train/grad_norm": 0.019949862733483315,
+      "train/learning_rate": 1.25e-05,
+      "_step": 961
+    }
+  ],
+  "hf": {
+    "evaluation/pi05/version-0009": [
+      [
+        "pi05-cup-online-bc-20261001/evaluation/pi05/version-0009/metrics.json",
+        2043
+      ]
+    ],
+    "data/pi05/amp/round-0010/batch-02": [
+      [
+        "pi05-cup-online-bc-20261001/data/pi05/amp/round-0010/batch-02/bc-shards.tar.gz",
+        60883914
+      ],
+      [
+        "pi05-cup-online-bc-20261001/data/pi05/amp/round-0010/batch-02/manifest.json",
+        137
+      ]
+    ],
+    "archives/pi05/amp/round-0007": [
+      [
+        "pi05-cup-online-bc-20261001/archives/pi05/amp/round-0007/SHA256.json",
+        363
+      ],
+      [
+        "pi05-cup-online-bc-20261001/archives/pi05/amp/round-0007/rollouts.tar.gz",
+        3687760638
+      ]
+    ]
+  },
+  "unresolved_publication_failures": [],
+  "central_processes": {
+    "coordinator": "PID     ELAPSED COMMAND\n2723301    04:01:18 python3",
+    "telemetry": "PID     ELAPSED COMMAND\n2728044    03:51:16 python",
+    "health": "PID     ELAPSED COMMAND\n2783968    02:04:25 python3"
+  },
+  "health_age": 19.09847927093506,
+  "changes": {
+    "eval9_videos_published": true,
+    "code_algorithm_flags_config_process_changes": false,
+    "v4_collect4_eval2_retained": true,
+    "job10_learning_rate_applied": false
+  },
+  "research": [
+    {
+      "url": "https://docs.jax.dev/en/latest/gpu_memory_allocation.html",
+      "finding": "Official allocation guide describes preallocation/fragmentation tradeoffs and slow platform allocator. Current v4 sampled21242MiB/24576 with4simulators; no OOM evidence. Allocator/flags unchanged; no speed gain claimed."
+    }
+  ],
+  "pending-round-0010.json": {
+    "batch": 4,
+    "plan": [
+      {
+        "node": "amp",
+        "episodes": 4,
+        "seed_offset": 24
+      },
+      {
+        "node": "v4",
+        "episodes": 4,
+        "seed_offset": 28
+      }
+    ],
+    "external_pids": {}
+  }
+}

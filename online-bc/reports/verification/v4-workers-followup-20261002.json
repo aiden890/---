@@ -1,0 +1,80 @@
+{
+  "at": 1790898972.793049,
+  "batches": [
+    {
+      "batch": 3,
+      "round": 10,
+      "policy_version": 9,
+      "workers": 4,
+      "episodes": [
+        {
+          "seed": 994021,
+          "policy_version": 9,
+          "status": "complete",
+          "control_steps": 1800
+        },
+        {
+          "seed": 994022,
+          "policy_version": 9,
+          "status": "complete",
+          "control_steps": 924
+        },
+        {
+          "seed": 994023,
+          "policy_version": 9,
+          "status": "complete",
+          "control_steps": 856
+        },
+        {
+          "seed": 994024,
+          "policy_version": 9,
+          "status": "complete",
+          "control_steps": 1350
+        }
+      ],
+      "total_control_steps": 4930,
+      "collection_seconds": 135.7191167580895,
+      "steps_per_second": 36.32502272165095,
+      "accepted": [
+        "pi05-seed994022",
+        "pi05-seed994023",
+        "pi05-seed994024"
+      ],
+      "errors": [],
+      "timings": {
+        "collection_seconds": 135.7191167580895,
+        "dataset_seconds": 1.0855224821716547,
+        "packing_seconds": 2.531894268002361,
+        "upload_seconds": 9.0996981728822,
+        "total_seconds": 148.43730547791347,
+        "profiled_episodes": 4,
+        "episode_mean_environment_create_seconds": 15.317814913229086,
+        "episode_mean_environment_reset_seconds": 7.484925022756215,
+        "episode_mean_environment_step_with_observations_seconds": 56.63104172615567,
+        "episode_mean_episode_before_result_write_seconds": 105.73040045320522,
+        "episode_mean_observation_capture_seconds": 4.398354494536761,
+        "episode_mean_observation_history_seconds": 0.06965539988595992,
+        "episode_mean_policy_inference_seconds": 19.919240295886993,
+        "episode_mean_result_and_capture_storage_seconds": 0.037377920700237155,
+        "episode_mean_success_predicates_seconds": 0.266578464419581,
+        "episode_mean_video_encode_seconds": 1.3784058193559758,
+        "simulator_workers": 4,
+        "reused_completed_episodes": 0
+      }
+    }
+  ],
+  "gpu_sample": "19441, 24576, 4",
+  "cpu_sample": [
+    "    PID %CPU %MEM COMMAND",
+    "3512315 85.8  2.6 python3",
+    "3512263 83.5  3.4 python3",
+    "3512285 77.0  3.4 python3",
+    "3327276 35.1  3.7 python",
+    "3513047  7.0  0.0 ffmpeg-linux-x8",
+    "3513231  5.8  0.0 ffmpeg-linux-x8",
+    "3513324  5.2  0.0 ffmpeg-linux-x8",
+    "    868  1.7  0.0 polkitd"
+  ],
+  "same_policy_two_worker_control_available": false,
+  "interpretation": "Observed follow-up under deployed collect4/eval2. Different policy/seed/lengths from policy8 trial; not a causal comparison or optimality proof. Original committed collection wall and actual saved action lengths used. No settings/restarts/algorithm changes."
+}
