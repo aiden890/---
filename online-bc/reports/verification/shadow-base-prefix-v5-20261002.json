@@ -1,0 +1,129 @@
+{
+  "policy_version": 5,
+  "variant": "base_prefix",
+  "attempts": 10,
+  "cup_successes": 3,
+  "grasp_successes": 9,
+  "cup_given_grasp": 0.3333333333333333,
+  "outcomes": [
+    {
+      "seed": 992001,
+      "cup_placed": false,
+      "grasped": true
+    },
+    {
+      "seed": 992002,
+      "cup_placed": false,
+      "grasped": true
+    },
+    {
+      "seed": 992003,
+      "cup_placed": true,
+      "grasped": true
+    },
+    {
+      "seed": 992004,
+      "cup_placed": false,
+      "grasped": true
+    },
+    {
+      "seed": 992005,
+      "cup_placed": false,
+      "grasped": true
+    },
+    {
+      "seed": 992006,
+      "cup_placed": false,
+      "grasped": false
+    },
+    {
+      "seed": 992007,
+      "cup_placed": false,
+      "grasped": true
+    },
+    {
+      "seed": 992008,
+      "cup_placed": false,
+      "grasped": true
+    },
+    {
+      "seed": 992009,
+      "cup_placed": true,
+      "grasped": true
+    },
+    {
+      "seed": 992010,
+      "cup_placed": true,
+      "grasped": true
+    }
+  ],
+  "standard_same10": [
+    {
+      "seed": 992001,
+      "cup_placed": false,
+      "grasped": true
+    },
+    {
+      "seed": 992002,
+      "cup_placed": false,
+      "grasped": false
+    },
+    {
+      "seed": 992003,
+      "cup_placed": false,
+      "grasped": true
+    },
+    {
+      "seed": 992004,
+      "cup_placed": false,
+      "grasped": true
+    },
+    {
+      "seed": 992005,
+      "cup_placed": false,
+      "grasped": true
+    },
+    {
+      "seed": 992006,
+      "cup_placed": false,
+      "grasped": true
+    },
+    {
+      "seed": 992007,
+      "cup_placed": false,
+      "grasped": true
+    },
+    {
+      "seed": 992008,
+      "cup_placed": false,
+      "grasped": false
+    },
+    {
+      "seed": 992009,
+      "cup_placed": false,
+      "grasped": true
+    },
+    {
+      "seed": 992010,
+      "cup_placed": false,
+      "grasped": true
+    }
+  ],
+  "wall_seconds": 586.0428471781779,
+  "profiling": {
+    "profiled_episodes": 10,
+    "episode_mean_environment_create_seconds": 7.202989968447946,
+    "episode_mean_environment_reset_seconds": 5.511847654613666,
+    "episode_mean_environment_step_with_observations_seconds": 60.00094750982244,
+    "episode_mean_episode_before_result_write_seconds": 105.09183330526575,
+    "episode_mean_observation_capture_seconds": 5.493682959605939,
+    "episode_mean_observation_history_seconds": 0.08039109804667532,
+    "episode_mean_policy_inference_seconds": 24.195997834205627,
+    "episode_mean_result_and_capture_storage_seconds": 0.02777865461539477,
+    "episode_mean_success_predicates_seconds": 0.7233820088440552,
+    "episode_mean_video_encode_seconds": 1.6323854682967067
+  },
+  "phase_alignment_verified": true,
+  "training_data": false,
+  "deployed_for_training": false
+}

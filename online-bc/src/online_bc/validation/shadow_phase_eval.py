@@ -22,11 +22,14 @@ def main():
     parser.add_argument("--version", type=int, required=True)
     parser.add_argument("--run", required=True)
     parser.add_argument("--wait-seconds", type=int, default=1800)
+    parser.add_argument(
+        "--variant", choices=["base_prefix", "standard_control"], default="base_prefix"
+    )
     args = parser.parse_args()
     config = json.loads(Path(args.config).read_text())
     assert config["model"] == "pi05"
     runtime = Path(config["output_root"]).parent
-    root = runtime / "shadow-evaluation/base_prefix" / f"version-{args.version:04d}"
+    root = runtime / "shadow-evaluation" / args.variant / f"version-{args.version:04d}"
     root.mkdir(parents=True, exist_ok=True)
     singleton = (root / "runner.lock").open("a")
     fcntl.flock(singleton, fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -52,13 +55,15 @@ def main():
         signal.setitimer(signal.ITIMER_REAL, max(0.001, deadline - time.monotonic()))
         try:
             # Queue the reservation rather than polling between fast batch handoffs.
-            fcntl.flock(lock, fcntl.LOCK_EX)
+            fcntl.flock(lock, fcntl.LOCK_EX if args.variant == "base_prefix" else fcntl.LOCK_SH)
         except TimeoutError:
             atomic_json(root / "status.json", dict(status="skipped_no_idle_window"))
             return
         finally:
             signal.setitimer(signal.ITIMER_REAL, 0)
-        while active_policy_readers(args.config, lock_path=lock_path):
+        while args.variant == "base_prefix" and active_policy_readers(
+            args.config, lock_path=lock_path
+        ):
             if time.monotonic() >= deadline:
                 atomic_json(root / "status.json", dict(status="skipped_no_idle_window"))
                 return
@@ -70,6 +75,9 @@ def main():
                 root / "status.json",
                 dict(status="skipped_policy_window_missed", observed=health["version"]),
             )
+            return
+        if args.variant == "standard_control" and not health.get("base_prefix_enabled"):
+            atomic_json(root / "status.json", dict(status="skipped_routing_server_unavailable"))
             return
         break
     else:
@@ -99,9 +107,7 @@ def main():
     children = []
     server_modified = False
     logs = []
-    output = (
-        f"/results/coffee-online-bc/shadow-evaluation/base_prefix/version-{args.version:04d}/pi05"
-    )
+    output = f"/results/coffee-online-bc/shadow-evaluation/{args.variant}/version-{args.version:04d}/pi05"
 
     def replace_server(enable_phase):
         nonlocal server_modified
@@ -130,11 +136,20 @@ def main():
         reference = json.loads(reference_path.read_text())
         assert reference["policy_version"] == args.version
         atomic_json(
-            root / "started.json", dict(version=args.version, at=time.time(), variant="base_prefix")
+            root / "started.json", dict(version=args.version, at=time.time(), variant=args.variant)
         )
-        replace_server(True)
+        if args.variant == "base_prefix":
+            replace_server(True)
         shadow = json.loads(Path(args.containers).read_text())
-        shadow[1]["Config"]["Env"].append("COFFEE_BC_VARIANT=base_prefix")
+        shadow[1]["Config"]["Env"] = [
+            x for x in shadow[1]["Config"]["Env"] if not x.startswith("COFFEE_BC_VARIANT=")
+        ]
+        shadow[1]["Config"]["Env"].append(
+            "COFFEE_BC_VARIANT=" + ("base_prefix" if args.variant == "base_prefix" else "standard")
+        )
+        container_id = subprocess.check_output(
+            ["docker", "inspect", "-f", "{{.Id}}", name], text=True
+        ).strip()
         shadow_config = root / "containers.json"
         atomic_json(shadow_config, shadow)
         seeds = list(range(992001, 992011))
@@ -175,7 +190,13 @@ def main():
         rows = [json.loads(p.read_text()) for p in sorted((root / "pi05").glob("*/result.json"))]
         assert {row["seed"] for row in rows} == set(seeds) and len(rows) == 10
         for row in rows:
-            assert row["policy_version"] == args.version and row["policy_variant"] == "base_prefix"
+            assert row["policy_version"] == args.version
+            assert row["policy_variant"] == (
+                "base_prefix" if args.variant == "base_prefix" else "standard"
+            )
+            if args.variant == "standard_control":
+                assert not row["policy_phases"]
+                continue
             assert row["policy_phases"]
             start = row["cup_skill_start"]
             for phase in row["policy_phases"]:
@@ -193,7 +214,8 @@ def main():
         assert len(standard) == 10
         report = dict(
             policy_version=args.version,
-            variant="base_prefix",
+            variant=args.variant,
+            server_container_id=container_id,
             attempts=10,
             cup_successes=sum(x["cup_placed"] for x in outcomes),
             grasp_successes=sum(x["grasped"] for x in outcomes),
@@ -202,7 +224,7 @@ def main():
             standard_same10=standard,
             wall_seconds=time.monotonic() - started,
             profiling=profile_summary(rows),
-            phase_alignment_verified=True,
+            phase_alignment_verified=args.variant == "base_prefix",
             training_data=False,
             deployed_for_training=False,
         )
@@ -210,7 +232,7 @@ def main():
         upload = root / "evaluation-upload"
         upload.mkdir(exist_ok=True)
         atomic_json(upload / "metrics.json", report)
-        prefix = f"{args.run}/shadow-evaluation/pi05/base_prefix/version-{args.version:04d}"
+        prefix = f"{args.run}/shadow-evaluation/pi05/{args.variant}/version-{args.version:04d}"
         fields = dict(
             round=args.version,
             batch=0,

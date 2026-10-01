@@ -1,0 +1,22 @@
+{
+  "official_sources": [
+    "https://openxla.org/xla/determinism",
+    "https://openxla.org/xla/persisted_autotuning",
+    "https://docs.jax.dev/en/latest/persistent_compilation_cache.html"
+  ],
+  "observations": {
+    "historic_prefix_first_chunk_deltas": [
+      0.0019252896308898926,
+      0.0014439821243286133,
+      0.0014440417289733887
+    ],
+    "initial_obs_equal": true,
+    "same_process_native_cache_references_max_abs_error": 0
+  },
+  "source_facts": [
+    "Persisted per-fusion autotuning can reuse tuning results across XLA runs; cache compatibility depends on GPU/XLA versions.",
+    "Determinism controls can alter compile/runtime choices and may reduce performance."
+  ],
+  "inference": "Autotuning or compilation differences are candidates for the small historical action delta, not an established cause.",
+  "action": "No production JAX/XLA flags changed. Compare standard and routed policy in same server process before adoption."
+}
