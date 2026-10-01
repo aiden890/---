@@ -60,23 +60,50 @@ def initial(tracking, rows):
     atomic_json(t / "reports/pi-cup-data-catalog.json", {"episodes": catalog})
 
 
-def publish_round(config, round_index):
+def publish_round(config, round_index, source=None):
     c = json.loads(Path(config).read_text())
     t = Path(c["tracking_root"])
-    w = json.loads(Path(c["review_worker_config"]).read_text())
-    host = c["review_worker_host"]
-    remote = Path(w["output_root"]) / f"round-{round_index:04d}"
+    worker = c["workers"][source["node"]] if source else None
+    w = json.loads(
+        Path(worker["worker_config"] if worker else c["review_worker_config"]).read_text()
+    )
+    host = worker["host"] if worker else c["review_worker_host"]
+    remote = (
+        Path(source["remote_root"])
+        if source
+        else Path(w["output_root"]) / f"round-{round_index:04d}"
+    )
     dest = t / "media/pi-cup-online-rollouts" / f"round-{round_index:04d}"
     dest.mkdir(parents=True, exist_ok=True)
     subprocess.run(
-        ["scp", f"{host}:{remote}/cup-dataset/pi05/dataset.json", str(dest / "dataset.json")],
+        [
+            "scp",
+            f"{host}:{remote}/cup-dataset/pi05/dataset.json",
+            str(dest / f"dataset-{source['node']}-{source['batch']:02d}.json")
+            if source
+            else str(dest / "dataset.json"),
+        ],
         check=True,
     )
     accepted = {
-        x["episode"]: x for x in json.loads((dest / "dataset.json").read_text())["accepted"]
+        x["episode"]: x
+        for x in json.loads(
+            (
+                dest
+                / (
+                    f"dataset-{source['node']}-{source['batch']:02d}.json"
+                    if source
+                    else "dataset.json"
+                )
+            ).read_text()
+        )["accepted"]
     }
     rows = []
-    for seed in [993000 + 100 * round_index + i for i in range(1, w["episodes_per_round"] + 1)]:
+    for seed in (
+        source["seeds"]
+        if source
+        else [993000 + 100 * round_index + i for i in range(1, w["episodes_per_round"] + 1)]
+    ):
         eid = f"pi05-seed{seed}"
         folder = dest / eid
         folder.mkdir(exist_ok=True)
@@ -116,10 +143,11 @@ if __name__ == "__main__":
     p.add_argument("--initial")
     p.add_argument("--config")
     p.add_argument("--round", type=int)
+    p.add_argument("--source-json")
     a = p.parse_args()
     if a.scan:
         print(json.dumps(scan(a.scan)))
     elif a.initial:
         initial(a.tracking, json.loads(Path(a.initial).read_text()))
     else:
-        publish_round(a.config, a.round)
+        publish_round(a.config, a.round, json.loads(a.source_json) if a.source_json else None)

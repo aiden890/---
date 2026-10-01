@@ -1,0 +1,60 @@
+{
+  "model": "pi05",
+  "policy_url": "http://127.0.0.1:18317",
+  "episodes_per_round": 8,
+  "workers": 2,
+  "output_root": "/home/v4/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts",
+  "adapter_root": "/home/v4/skku-vla-grasp-only-20260930/results/coffee-online-bc/adapters",
+  "adapter_container_root": "/results/coffee-online-bc/adapters",
+  "host_python": "python3",
+  "transport_argv": [
+    "/home/v4/skku-vla-grasp-only-20260930/transport/venv/bin/python",
+    "-m",
+    "online_bc.transport.hf_transfer",
+    "{direction}",
+    "{directory}",
+    "{prefix}",
+    "--token-file",
+    "/home/v4/skku-vla-grasp-only-20260930/secrets/hf-token"
+  ],
+  "ensure_policy_argv": [
+    "python3",
+    "-m",
+    "online_bc.rollout.docker_worker",
+    "--model",
+    "pi05",
+    "ensure",
+    "--containers",
+    "/home/v4/skku-vla-grasp-only-20260930/results/coffee-online-bc/configs/pi05-v4-containers.json"
+  ],
+  "collector_argv": [
+    "python3",
+    "-m",
+    "online_bc.rollout.docker_worker",
+    "--model",
+    "pi05",
+    "collect",
+    "--seeds",
+    "{seeds}",
+    "--out",
+    "/results/coffee-online-bc/rollouts/round-{round:04d}/batch-{batch:02d}/{model}",
+    "--containers",
+    "/home/v4/skku-vla-grasp-only-20260930/results/coffee-online-bc/configs/pi05-v4-containers.json"
+  ],
+  "skill": "cup_placement",
+  "build_dataset_argv": [
+    "python3",
+    "-m",
+    "online_bc.rollout.docker_worker",
+    "--model",
+    "pi05",
+    "dataset",
+    "--source",
+    "/results/coffee-online-bc/rollouts/round-{round:04d}/batch-{batch:02d}/{model}",
+    "--out",
+    "/results/coffee-online-bc/rollouts/round-{round:04d}/batch-{batch:02d}/cup-dataset/{model}",
+    "--containers",
+    "/home/v4/skku-vla-grasp-only-20260930/results/coffee-online-bc/configs/pi05-v4-containers.json"
+  ],
+  "node": "v4"
+}

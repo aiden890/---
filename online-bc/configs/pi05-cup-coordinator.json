@@ -5,16 +5,34 @@
   "transport_python": "/home/aiden/Desktop/lab/robot/skku-vla-20260930/transport-venv/bin/python",
   "token_file": "/home/aiden/Desktop/lab/robot/skku-vla-20260930/secrets/hf-token",
   "workers": {
-    "pi05": {
+    "amp": {
+      "model": "pi05",
+      "host": "amp_csi",
+      "worker_config": "/home/aiden/Desktop/lab/robot/robocasa-docker/online-bc/configs/pi05-amp-worker.json",
       "collect_argv": [
         "ssh",
         "amp_csi",
-        "PYTHONPATH=/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/src python3 -m online_bc.rollout.worker --config /home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/configs/pi05-worker.json --round {round} --run {run} collect"
+        "PYTHONPATH=/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/src python3 -m online_bc.rollout.worker --config /home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/configs/pi05-amp-worker.json --round {round} --run {run} --batch {batch} --episodes {episodes} --seed-offset {seed_offset} collect"
       ],
       "reload_argv": [
         "ssh",
         "amp_csi",
-        "PYTHONPATH=/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/src python3 -m online_bc.rollout.worker --config /home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/configs/pi05-worker.json --round {round} --run {run} reload"
+        "PYTHONPATH=/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/src python3 -m online_bc.rollout.worker --config /home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/configs/pi05-amp-worker.json --round {round} --run {run} reload"
+      ]
+    },
+    "v4": {
+      "model": "pi05",
+      "host": "v4@115.145.175.197",
+      "worker_config": "/home/aiden/Desktop/lab/robot/robocasa-docker/online-bc/configs/pi05-v4-worker.json",
+      "collect_argv": [
+        "ssh",
+        "v4@115.145.175.197",
+        "PYTHONPATH=/home/v4/skku-vla-grasp-only-20260930/results/coffee-online-bc/src python3 -m online_bc.rollout.worker --config /home/v4/skku-vla-grasp-only-20260930/results/coffee-online-bc/configs/pi05-v4-worker.json --round {round} --run {run} --batch {batch} --episodes {episodes} --seed-offset {seed_offset} collect"
+      ],
+      "reload_argv": [
+        "ssh",
+        "v4@115.145.175.197",
+        "PYTHONPATH=/home/v4/skku-vla-grasp-only-20260930/results/coffee-online-bc/src python3 -m online_bc.rollout.worker --config /home/v4/skku-vla-grasp-only-20260930/results/coffee-online-bc/configs/pi05-v4-worker.json --round {round} --run {run} reload"
       ]
     }
   },
@@ -25,6 +43,21 @@
   "bootstrap_steps": 0,
   "review_required": false,
   "tracking_root": "/home/aiden/Desktop/lab/robot/robocasa-docker/tracking",
-  "review_worker_host": "amp_csi",
-  "review_worker_config": "/home/aiden/Desktop/lab/robot/robocasa-docker/online-bc/configs/pi05-worker.json"
+  "first_round_attempts": 32,
+  "attempts_per_batch": 8,
+  "max_attempts_per_round": 32,
+  "target_new_successes": 8,
+  "controls_file": "/home/aiden/Desktop/lab/robot/pi-cup-data-review/controls.json",
+  "learner_models": [
+    "pi05"
+  ],
+  "evaluation_argv": [
+    "ssh",
+    "v4@115.145.175.197",
+    "PYTHONPATH=/home/v4/skku-vla-grasp-only-20260930/results/coffee-online-bc/src python3 -m online_bc.rollout.worker --config /home/v4/skku-vla-grasp-only-20260930/results/coffee-online-bc/configs/pi05-v4-worker.json --round {round} --run {run} eval"
+  ],
+  "evaluation_versions": [
+    0,
+    5
+  ]
 }

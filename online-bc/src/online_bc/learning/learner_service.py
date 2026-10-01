@@ -146,13 +146,14 @@ def main():
         assert job["model"] == args.model and job["round"] == index
         roots = []
         for source in job["data_prefixes"]:
-            folder = root / "incoming" / source["model"] / f"round-{source['round']:04d}"
+            source_key = f"round-{source['round']:04d}-{source.get('node', source['model'])}-batch-{source.get('batch', 1):02d}"
+            folder = root / "incoming" / source["model"] / source_key
             r = sync("download", folder, source["prefix"])
             if r.returncode:
                 raise RuntimeError(
                     f"Data download failed for {source['prefix']}: {r.stderr[-1000:]}"
                 )
-            data = root / "data" / source["model"] / f"round-{source['round']:04d}"
+            data = root / "data" / source["model"] / source_key
             unpack(folder, data)
             roots.append(str(data))
         # Include past rounds: Replay applies a bounded episode window.

@@ -65,7 +65,7 @@ SKKU: `bash scripts/start-pi-cup-learner.sh setup|check|download|validate|start`
 ## 실행 설정과 흐름
 
 1. 초기 BC는 생략한다 (`--bootstrap-steps 0`, coordinator `bootstrap_weights=false`). 기존 성공 데이터는 replay에 보존하지만 새 롤아웃을 먼저 수집한 뒤 온라인 업데이트에서 함께 사용한다.
-2. AMP의 π rollout server에서 새 장면 8개를 simulator worker 3개가 병렬 실행. 전체 태스크 명령으로 컵을 잡은 뒤 컵 놓기 지시문으로 전환하고 컵 놓기에 성공하면 종료한다.
+2. AMP·v4의 π rollout server가 각각 simulator worker 2개로 병렬 실행. 첫 수집은 16개씩 총 32회, 이후에는 4개씩 총 8회 단위로 수집한다. 유효 새 성공 8개에 도달하면 업데이트하며 라운드당 최대 32회 시도한다. 상한까지 부족하면 학습 job을 발행하지 않고 데이터를 보존한다. 첫 라운드는 32회 수집 후 성공 1개 이상이면 50 updates 파일럿을 진행한다. 전체 태스크 명령으로 컵을 잡은 뒤 컵 놓기 지시문으로 전환하고 컵 놓기에 성공하면 종료한다.
 3. 각 rollout 서버에서 성공한 컵 구간만 추출·검증·압축해 HF Bucket으로 직접 업로드한다. Lab은 job을 조정하며 rollout 데이터를 한 곳에 모아 다시 업로드하지 않는다.
 4. Learner가 새 데이터와 최근 replay를 사용해 컵 놓기 50 updates를 수행하고 LoRA 및 optimizer를 저장·업로드한다.
 5. 실행 중인 에피소드가 모두 끝난 다음 adapter를 명시적으로 교체한다. 다음 라운드는 새 버전만 사용한다.
@@ -134,3 +134,13 @@ Canonical code: existing GRPO repository, `online-bc/`, deployed at Lab `/home/a
 Bootstrap BC is skipped; initial success data remain available for later online updates. First pilot: five online rounds, fifty optimizer updates per round. Labels are successful executed actions, not expert corrections. Standard BC can also use correct expert actions collected during a failed episode; this pipeline has no correcting expert, so only successful skill segments are accepted.
 
 Dataset candidates and actual training usage are distinct. `data-usage.json` records sampled episodes; the UI shows learner-confirmed usage and the revision actually received. No production training runs until the learner GPU session is supplied. Review integration must pass its own tests in addition to previous native GPU verification.
+
+## SKKU 최초 연결
+
+`bash setup-skku-online-bc.sh --connect`로 Tailscale userspace와 SSH를 설정한다. 로그인 링크에서 기존 Lab과 동일한 계정으로 인증한 뒤 출력된 IP를 전달한다. Lab의 기존 HF 토큰을 세션의 `~/pi-cup-online-bc/secrets/hf-token`에 복사한 뒤 `bash setup-skku-online-bc.sh --install`로 코드를 받아 설치한다. 초기 BC와 학습 자동 시작은 하지 않는다.
+
+## 버전 확인 (2026-10-02)
+
+- RoboCasa OpenPI: `5a6beda9ff99da30b4e1b59320f6a32971d7c397` — 공식 main HEAD와 일치.
+- RLinf: `034579cbfc4643f72c184ffc06458f788c09b3e6` — 공식 main HEAD와 일치.
+- Physical Intelligence 원본 OpenPI main: `215abfb217dbac7d5f1273282331b9b1866c0479`. RoboCasa 포크와 별도 저장소이며 자동 교체하지 않는다. 학습 환경 의존성은 검증한 버전으로 고정한다.

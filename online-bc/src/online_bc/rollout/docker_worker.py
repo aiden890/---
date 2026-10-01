@@ -5,6 +5,7 @@ from online_bc.paths import PROJECT_ROOT
 import argparse
 import json
 import subprocess
+from pathlib import Path
 
 
 def run_args(t):
@@ -29,9 +30,14 @@ def main():
     p.add_argument("--seeds")
     p.add_argument("--out")
     p.add_argument("--source")
+    p.add_argument("--containers")
     a = p.parse_args()
     root = PROJECT_ROOT
-    t = json.loads((root / "configs" / f"{a.model}-containers.json").read_text())
+    t = json.loads(
+        (
+            Path(a.containers) if a.containers else root / "configs" / f"{a.model}-containers.json"
+        ).read_text()
+    )
     if a.action == "ensure":
         name = f"coffee-online-bc-policy-{a.model}"
         state = subprocess.run(
@@ -87,6 +93,7 @@ def main():
                 "online_bc.data.validate_dataset",
                 a.out,
                 "--source-required",
+                "--allow-empty",
                 "--out",
                 a.out + "/validation.json",
             ],

@@ -8,7 +8,7 @@ import numpy as np
 from online_bc.data.build_cup_dataset import INSTRUCTION
 
 
-def validate(root, source_required=False):
+def validate(root, source_required=False, allow_empty=False):
     episodes = samples = aligned = 0
     max_deadband = 0.0
     seeds = []
@@ -85,7 +85,7 @@ def validate(root, source_required=False):
             samples += 1
         episodes += 1
         seeds.append(m["seed"])
-    assert samples > 0 and max_deadband < 0.02
+    assert (samples > 0 or allow_empty) and max_deadband < 0.02
     return dict(
         passed=True,
         episodes=episodes,
@@ -100,9 +100,10 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument("root")
     p.add_argument("--source-required", action="store_true")
+    p.add_argument("--allow-empty", action="store_true")
     p.add_argument("--out")
     a = p.parse_args()
-    r = validate(a.root, a.source_required)
+    r = validate(a.root, a.source_required, a.allow_empty)
     if a.out:
         Path(a.out).write_text(json.dumps(r, indent=2))
     print(json.dumps(r))
