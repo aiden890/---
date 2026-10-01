@@ -1,0 +1,260 @@
+{
+  "at": 1790880572.2869155,
+  "complete": true,
+  "paired": false,
+  "rows": [
+    {
+      "round": 2,
+      "batch": 1,
+      "workers": 2,
+      "worker_count_inferred": true,
+      "episodes": 8,
+      "successes": 0,
+      "policy_versions": [
+        1
+      ],
+      "total_control_steps": 14400,
+      "collection_seconds": 559.402527121827,
+      "control_steps_per_second": 25.7417499954625,
+      "episode_mean_seconds": 121.1118765771389,
+      "timings": {
+        "collection_seconds": 559.402527121827,
+        "dataset_seconds": 2.063002534210682,
+        "packing_seconds": 0.07203653641045094,
+        "upload_seconds": 2.5857965126633644,
+        "total_seconds": 564.1238410286605
+      },
+      "seeds": [
+        993201,
+        993202,
+        993203,
+        993204,
+        993205,
+        993206,
+        993207,
+        993208
+      ]
+    },
+    {
+      "round": 2,
+      "batch": 2,
+      "workers": 2,
+      "worker_count_inferred": true,
+      "episodes": 8,
+      "successes": 2,
+      "policy_versions": [
+        1
+      ],
+      "total_control_steps": 12765,
+      "collection_seconds": 539.0849559884518,
+      "control_steps_per_second": 23.67901359182698,
+      "episode_mean_seconds": 113.09310048818588,
+      "timings": {
+        "collection_seconds": 539.0849559884518,
+        "dataset_seconds": 2.1643966361880302,
+        "packing_seconds": 0.9081155881285667,
+        "upload_seconds": 6.275167498737574,
+        "total_seconds": 548.4331769999117
+      },
+      "seeds": [
+        993209,
+        993210,
+        993211,
+        993212,
+        993213,
+        993214,
+        993215,
+        993216
+      ]
+    },
+    {
+      "round": 2,
+      "batch": 3,
+      "workers": 2,
+      "worker_count_inferred": true,
+      "episodes": 4,
+      "successes": 1,
+      "policy_versions": [
+        1
+      ],
+      "total_control_steps": 6990,
+      "collection_seconds": 315.6545102316886,
+      "control_steps_per_second": 22.144464195583264,
+      "episode_mean_seconds": 133.6730472445488,
+      "timings": {
+        "collection_seconds": 315.6545102316886,
+        "dataset_seconds": 2.286315079778433,
+        "packing_seconds": 1.94344144128263,
+        "upload_seconds": 9.09126185066998,
+        "total_seconds": 328.975966271013
+      },
+      "seeds": [
+        993217,
+        993218,
+        993219,
+        993220
+      ]
+    },
+    {
+      "round": 2,
+      "batch": 4,
+      "workers": 2,
+      "worker_count_inferred": true,
+      "episodes": 4,
+      "successes": 2,
+      "policy_versions": [
+        1
+      ],
+      "total_control_steps": 5709,
+      "collection_seconds": 236.3675611075014,
+      "control_steps_per_second": 24.153060484486332,
+      "episode_mean_seconds": 93.46929621696472,
+      "timings": {
+        "collection_seconds": 236.3675611075014,
+        "dataset_seconds": 2.2597751952707767,
+        "packing_seconds": 2.3185913916677237,
+        "upload_seconds": 8.672383731231093,
+        "total_seconds": 249.62000816687942,
+        "profiled_episodes": 4,
+        "episode_mean_environment_create_seconds": 11.416517567820847,
+        "episode_mean_environment_reset_seconds": 6.807022100780159,
+        "episode_mean_environment_step_with_observations_seconds": 66.03824858786538,
+        "episode_mean_episode_before_result_write_seconds": 111.94704441120848,
+        "episode_mean_observation_capture_seconds": 6.499576102476567,
+        "episode_mean_observation_history_seconds": 0.10955927986651659,
+        "episode_mean_policy_inference_seconds": 18.2533660531044,
+        "episode_mean_result_and_capture_storage_seconds": 0.06328430864959955,
+        "episode_mean_success_predicates_seconds": 0.5922195669263601,
+        "episode_mean_video_encode_seconds": 1.897774753626436
+      },
+      "seeds": [
+        993225,
+        993226,
+        993227,
+        993228
+      ]
+    },
+    {
+      "round": 2,
+      "batch": 5,
+      "workers": 2,
+      "worker_count_inferred": true,
+      "episodes": 4,
+      "successes": 0,
+      "policy_versions": [
+        1
+      ],
+      "total_control_steps": 7200,
+      "collection_seconds": 287.6523057911545,
+      "control_steps_per_second": 25.03021827062095,
+      "episode_mean_seconds": 123.46220970153809,
+      "timings": {
+        "collection_seconds": 287.6523057911545,
+        "dataset_seconds": 1.9690546579658985,
+        "packing_seconds": 0.04220840334892273,
+        "upload_seconds": 2.661526683717966,
+        "total_seconds": 292.326938835904,
+        "profiled_episodes": 4,
+        "episode_mean_environment_create_seconds": 10.052773215342313,
+        "episode_mean_environment_reset_seconds": 5.312286795582622,
+        "episode_mean_environment_step_with_observations_seconds": 88.37179060466588,
+        "episode_mean_episode_before_result_write_seconds": 139.08778394246474,
+        "episode_mean_observation_capture_seconds": 9.59607574250549,
+        "episode_mean_observation_history_seconds": 0.1365652927197516,
+        "episode_mean_policy_inference_seconds": 22.389791190624237,
+        "episode_mean_result_and_capture_storage_seconds": 0.05245104245841503,
+        "episode_mean_success_predicates_seconds": 0.552112870849669,
+        "episode_mean_video_encode_seconds": 2.333756574895233
+      },
+      "seeds": [
+        993233,
+        993234,
+        993235,
+        993236
+      ]
+    },
+    {
+      "round": 3,
+      "batch": 1,
+      "workers": 4,
+      "worker_count_inferred": false,
+      "episodes": 8,
+      "successes": 1,
+      "policy_versions": [
+        2
+      ],
+      "total_control_steps": 13263,
+      "collection_seconds": 316.5566268451512,
+      "control_steps_per_second": 41.8977171073023,
+      "episode_mean_seconds": 123.88490417599678,
+      "timings": {
+        "collection_seconds": 316.5566268451512,
+        "dataset_seconds": 2.0396972540766,
+        "packing_seconds": 0.5722974017262459,
+        "upload_seconds": 5.361224330961704,
+        "total_seconds": 324.53236010298133,
+        "profiled_episodes": 8,
+        "episode_mean_environment_create_seconds": 10.302323590964079,
+        "episode_mean_environment_reset_seconds": 5.01122679701075,
+        "episode_mean_environment_step_with_observations_seconds": 83.56780054164119,
+        "episode_mean_episode_before_result_write_seconds": 139.44805119838566,
+        "episode_mean_observation_capture_seconds": 7.243316354928538,
+        "episode_mean_observation_history_seconds": 0.13721172930672765,
+        "episode_mean_policy_inference_seconds": 29.7224278151989,
+        "episode_mean_result_and_capture_storage_seconds": 0.04371452494524419,
+        "episode_mean_success_predicates_seconds": 0.7384530892595649,
+        "episode_mean_video_encode_seconds": 2.40302878851071,
+        "simulator_workers": 4
+      },
+      "seeds": [
+        993301,
+        993302,
+        993303,
+        993304,
+        993305,
+        993306,
+        993307,
+        993308
+      ]
+    }
+  ],
+  "reference_round": 2,
+  "reference_batch": 1,
+  "trial_round": 3,
+  "trial_batch": 1,
+  "observed_control_step_throughput_ratio": 1.627617279893077,
+  "observed_batch_wall_ratio": 0.5658834408093607,
+  "configured_workers": 2,
+  "decision": "Keep two workers until a same-policy two-worker batch completes; four workers is a measured candidate. Seeds and policy versions differ.",
+  "sources": [
+    "https://docs.jax.dev/en/latest/benchmarking.html"
+  ],
+  "health_samples": [
+    [
+      8532,
+      0
+    ],
+    [
+      15119,
+      71
+    ],
+    [
+      13415,
+      100
+    ],
+    [
+      15000,
+      10
+    ],
+    [
+      13227,
+      3
+    ],
+    [
+      11177,
+      2
+    ]
+  ],
+  "observed_peak_gpu_memory_mib": 15119,
+  "cpu_profile_available": false
+}
