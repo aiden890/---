@@ -1,0 +1,77 @@
+{
+  "migration": {
+    "round": 4,
+    "file_count": 5596,
+    "bytes": 5540127200,
+    "sha256_all_files_verified": true,
+    "source": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0004",
+    "destination": "/mnt/data/guest/online-bc-archives/rollouts/round-0004",
+    "root_free_bytes": 11239919616,
+    "data_free_bytes": 29062496256,
+    "active_round5_unchanged": true,
+    "at": 1790885914.0714524
+  },
+  "future_storage": {
+    "future_rounds": [
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20
+    ],
+    "live_root": "/mnt/data/guest/online-bc-live/rollouts",
+    "symlinks_preserve_paths": true,
+    "simulator_data_mount_rw": true,
+    "actual_container_write_probe_passed": true,
+    "active_round5_unchanged": true,
+    "at": 1790885855.983314
+  },
+  "verified_at": 1790885943.9789472,
+  "status": {
+    "next_round": 5,
+    "status": "collecting",
+    "attempts": 16,
+    "successes": 3,
+    "batch": 3
+  },
+  "training": {
+    "cumulative_updates": 200,
+    "learning_rate": 5e-05,
+    "wandb_history_verified_step": 200,
+    "last_loss": 0.012962582521140575,
+    "last_grad_norm": 0.007805314380675554
+  },
+  "evaluation": {
+    "version": 4,
+    "full30_pending": true,
+    "no_partial_success_comparison": true
+  },
+  "controls": {
+    "revision": 2,
+    "paused": false,
+    "excluded": {}
+  },
+  "publication_failures": [],
+  "processes": {
+    "coordinator": 2723301,
+    "telemetry": 2728044,
+    "health": 2654776,
+    "learner": 26119,
+    "archiver": 3322201
+  },
+  "v4_free_bytes": 58538156032,
+  "source_tests_unchanged": true,
+  "research": [
+    "https://docs.docker.com/engine/storage/bind-mounts/"
+  ]
+}
