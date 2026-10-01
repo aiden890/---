@@ -1,0 +1,273 @@
+{
+  "base_prefix": {
+    "policy_version": 5,
+    "variant": "base_prefix",
+    "attempts": 10,
+    "cup_successes": 3,
+    "grasp_successes": 9,
+    "cup_given_grasp": 0.3333333333333333,
+    "outcomes": [
+      {
+        "seed": 992001,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992002,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992003,
+        "cup_placed": true,
+        "grasped": true
+      },
+      {
+        "seed": 992004,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992005,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992006,
+        "cup_placed": false,
+        "grasped": false
+      },
+      {
+        "seed": 992007,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992008,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992009,
+        "cup_placed": true,
+        "grasped": true
+      },
+      {
+        "seed": 992010,
+        "cup_placed": true,
+        "grasped": true
+      }
+    ],
+    "standard_same10": [
+      {
+        "seed": 992001,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992002,
+        "cup_placed": false,
+        "grasped": false
+      },
+      {
+        "seed": 992003,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992004,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992005,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992006,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992007,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992008,
+        "cup_placed": false,
+        "grasped": false
+      },
+      {
+        "seed": 992009,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992010,
+        "cup_placed": false,
+        "grasped": true
+      }
+    ],
+    "wall_seconds": 586.0428471781779,
+    "profiling": {
+      "profiled_episodes": 10,
+      "episode_mean_environment_create_seconds": 7.202989968447946,
+      "episode_mean_environment_reset_seconds": 5.511847654613666,
+      "episode_mean_environment_step_with_observations_seconds": 60.00094750982244,
+      "episode_mean_episode_before_result_write_seconds": 105.09183330526575,
+      "episode_mean_observation_capture_seconds": 5.493682959605939,
+      "episode_mean_observation_history_seconds": 0.08039109804667532,
+      "episode_mean_policy_inference_seconds": 24.195997834205627,
+      "episode_mean_result_and_capture_storage_seconds": 0.02777865461539477,
+      "episode_mean_success_predicates_seconds": 0.7233820088440552,
+      "episode_mean_video_encode_seconds": 1.6323854682967067
+    },
+    "phase_alignment_verified": true,
+    "training_data": false,
+    "deployed_for_training": false
+  },
+  "standard_control": {
+    "policy_version": 5,
+    "variant": "standard_control",
+    "server_container_id": "1b3cc570b9876c9ba38751c853f466939bfe1eb78d173619400bd6cb1053e4c2",
+    "attempts": 10,
+    "cup_successes": 1,
+    "grasp_successes": 7,
+    "cup_given_grasp": 0.14285714285714285,
+    "outcomes": [
+      {
+        "seed": 992001,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992002,
+        "cup_placed": false,
+        "grasped": false
+      },
+      {
+        "seed": 992003,
+        "cup_placed": false,
+        "grasped": false
+      },
+      {
+        "seed": 992004,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992005,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992006,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992007,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992008,
+        "cup_placed": false,
+        "grasped": false
+      },
+      {
+        "seed": 992009,
+        "cup_placed": true,
+        "grasped": true
+      },
+      {
+        "seed": 992010,
+        "cup_placed": false,
+        "grasped": true
+      }
+    ],
+    "standard_same10": [
+      {
+        "seed": 992001,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992002,
+        "cup_placed": false,
+        "grasped": false
+      },
+      {
+        "seed": 992003,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992004,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992005,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992006,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992007,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992008,
+        "cup_placed": false,
+        "grasped": false
+      },
+      {
+        "seed": 992009,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992010,
+        "cup_placed": false,
+        "grasped": true
+      }
+    ],
+    "wall_seconds": 630.0406603291631,
+    "profiling": {
+      "profiled_episodes": 10,
+      "episode_mean_environment_create_seconds": 7.491498259175569,
+      "episode_mean_environment_reset_seconds": 5.680575382825919,
+      "episode_mean_environment_step_with_observations_seconds": 69.75261200536042,
+      "episode_mean_episode_before_result_write_seconds": 117.19278630390764,
+      "episode_mean_observation_capture_seconds": 6.264169783517718,
+      "episode_mean_observation_history_seconds": 0.09469427606090904,
+      "episode_mean_policy_inference_seconds": 24.702869606018066,
+      "episode_mean_result_and_capture_storage_seconds": 0.029521365906111895,
+      "episode_mean_success_predicates_seconds": 1.097782199899666,
+      "episode_mean_video_encode_seconds": 1.8814206258393824
+    },
+    "phase_alignment_verified": false,
+    "training_data": false,
+    "deployed_for_training": false
+  },
+  "paired": {
+    "gained": 2,
+    "lost": 0,
+    "exact_mcnemar_two_sided_p": 0.5
+  },
+  "same_checkpoint": 5,
+  "same_server_container": "1b3cc570b9876c9ba38751c853f466939bfe1eb78d173619400bd6cb1053e4c2",
+  "control_phase_switch_applicable": false,
+  "control_payload_standard_and_phase_records_empty_verified": true,
+  "confirmed_improvement": false,
+  "training_routing_adopted": false,
+  "next": "Full30 standard-vs-base-prefix comparison on policy6 same running server, after native evaluation6 completes"
+}

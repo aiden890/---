@@ -1,4 +1,4 @@
-"""Reserve an idle policy server for one isolated, success-unfiltered shadow eval."""
+"""Keep a policy version stable for separately recorded evaluation variants."""
 
 import argparse
 import fcntl
@@ -22,10 +22,13 @@ def main():
     parser.add_argument("--version", type=int, required=True)
     parser.add_argument("--run", required=True)
     parser.add_argument("--wait-seconds", type=int, default=1800)
+    parser.add_argument("--eval-episodes", type=int, choices=[10, 30], default=10)
+    parser.add_argument("--reuse-server", action="store_true")
     parser.add_argument(
         "--variant", choices=["base_prefix", "standard_control"], default="base_prefix"
     )
     args = parser.parse_args()
+    exclusive = args.variant == "base_prefix" and not args.reuse_server
     config = json.loads(Path(args.config).read_text())
     assert config["model"] == "pi05"
     runtime = Path(config["output_root"]).parent
@@ -55,15 +58,13 @@ def main():
         signal.setitimer(signal.ITIMER_REAL, max(0.001, deadline - time.monotonic()))
         try:
             # Queue the reservation rather than polling between fast batch handoffs.
-            fcntl.flock(lock, fcntl.LOCK_EX if args.variant == "base_prefix" else fcntl.LOCK_SH)
+            fcntl.flock(lock, fcntl.LOCK_EX if exclusive else fcntl.LOCK_SH)
         except TimeoutError:
             atomic_json(root / "status.json", dict(status="skipped_no_idle_window"))
             return
         finally:
             signal.setitimer(signal.ITIMER_REAL, 0)
-        while args.variant == "base_prefix" and active_policy_readers(
-            args.config, lock_path=lock_path
-        ):
+        while exclusive and active_policy_readers(args.config, lock_path=lock_path):
             if time.monotonic() >= deadline:
                 atomic_json(root / "status.json", dict(status="skipped_no_idle_window"))
                 return
@@ -76,7 +77,9 @@ def main():
                 dict(status="skipped_policy_window_missed", observed=health["version"]),
             )
             return
-        if args.variant == "standard_control" and not health.get("base_prefix_enabled"):
+        if (args.variant == "standard_control" or args.reuse_server) and not health.get(
+            "base_prefix_enabled"
+        ):
             atomic_json(root / "status.json", dict(status="skipped_routing_server_unavailable"))
             return
         break
@@ -138,7 +141,7 @@ def main():
         atomic_json(
             root / "started.json", dict(version=args.version, at=time.time(), variant=args.variant)
         )
-        if args.variant == "base_prefix":
+        if args.variant == "base_prefix" and not args.reuse_server:
             replace_server(True)
         shadow = json.loads(Path(args.containers).read_text())
         shadow[1]["Config"]["Env"] = [
@@ -152,10 +155,11 @@ def main():
         ).strip()
         shadow_config = root / "containers.json"
         atomic_json(shadow_config, shadow)
-        seeds = list(range(992001, 992011))
+        seeds = list(range(992001, 992001 + args.eval_episodes))
         started = time.monotonic()
         atomic_json(
-            root / "status.json", dict(status="evaluating", version=args.version, episodes=10)
+            root / "status.json",
+            dict(status="evaluating", version=args.version, episodes=args.eval_episodes),
         )
         for index in range(2):
             log = (root / f"worker-{index}.log").open("w")
@@ -181,14 +185,14 @@ def main():
             )
             children.append(child)
         while any(child.poll() is None for child in children):
-            if time.monotonic() - started > 1800:
-                raise TimeoutError("Shadow simulation exceeded 30 minutes")
+            if time.monotonic() - started > (1800 if args.eval_episodes == 10 else 2700):
+                raise TimeoutError("Shadow simulation exceeded its evaluation deadline")
             if any(child.poll() not in (None, 0) for child in children):
                 raise RuntimeError("Shadow simulator failed")
             time.sleep(2)
         assert all(child.returncode == 0 for child in children), "Shadow simulator failed"
         rows = [json.loads(p.read_text()) for p in sorted((root / "pi05").glob("*/result.json"))]
-        assert {row["seed"] for row in rows} == set(seeds) and len(rows) == 10
+        assert {row["seed"] for row in rows} == set(seeds) and len(rows) == args.eval_episodes
         for row in rows:
             assert row["policy_version"] == args.version
             assert row["policy_variant"] == (
@@ -211,17 +215,20 @@ def main():
             for x in rows
         ]
         standard = [x for x in reference["outcomes"] if x["seed"] in seeds]
-        assert len(standard) == 10
+        assert len(standard) == args.eval_episodes
         report = dict(
             policy_version=args.version,
             variant=args.variant,
             server_container_id=container_id,
-            attempts=10,
+            attempts=args.eval_episodes,
             cup_successes=sum(x["cup_placed"] for x in outcomes),
             grasp_successes=sum(x["grasped"] for x in outcomes),
             cup_given_grasp=conditional_cup_rate(outcomes),
             outcomes=outcomes,
-            standard_same10=standard,
+            standard_same10=standard[:10],
+            standard_same_seeds=standard,
+            server_reused=args.reuse_server or args.variant == "standard_control",
+            policy_lock_mode="exclusive" if exclusive else "shared",
             wall_seconds=time.monotonic() - started,
             profiling=profile_summary(rows),
             phase_alignment_verified=args.variant == "base_prefix",

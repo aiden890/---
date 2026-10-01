@@ -1,0 +1,11 @@
+{
+  "policy_version": 6,
+  "requests": 5,
+  "concurrent_clients": 3,
+  "standard_before_after_max_error": 0.0,
+  "cup_route_vs_standard_max_error": 0.0,
+  "base_vs_adapter_max_delta": 0.11509612202644348,
+  "response_phase_versions_verified": true,
+  "gradient_updates": 0,
+  "simulator_changes": false
+}
