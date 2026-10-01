@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-02",
+  "scope": "online-bc only",
+  "production_training_started": false,
+  "bootstrap_steps": 0,
+  "optional_review": true,
+  "review_api_tests": 3,
+  "pipeline_tests": 11,
+  "real_scene_reset_seed": 993101,
+  "ui_exclude_restore": true,
+  "hf_exclusion_transfer_verified": true,
+  "initial_eligible_episodes": 11,
+  "initial_chunks": 235,
+  "limitations": [
+    "New SKKU session startup validation is still required.",
+    "A completed optimizer update cannot be undone by excluding its source episode.",
+    "Real full online collection-to-gradient cycle has not run yet."
+  ]
+}

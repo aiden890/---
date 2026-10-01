@@ -4,7 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 import os
-os.environ.setdefault("HF_HOME", str(Path(__file__).resolve().parent/"transport-cache"))
+os.environ.setdefault("HF_HOME", str(Path.home()/".cache/pi-cup-hf-transport"))
 from huggingface_hub import sync_bucket
 
 p = argparse.ArgumentParser()

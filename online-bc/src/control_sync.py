@@ -6,8 +6,10 @@ from data_control import atomic_json
 class ControlSync:
     def __init__(self,root,run,sync,interval=10):
         self.root=Path(root);self.run=run;self.sync=sync;self.interval=interval
-        self.path=self.root/'controls.json';self.health=self.root/'control-health.json';self.stop_event=threading.Event()
+        self.path=self.root/'controls.json';self.health=self.root/'control-health.json';self.stop_event=threading.Event();self.lock=threading.Lock()
     def once(self):
+        with self.lock:return self._once()
+    def _once(self):
         folder=self.root/'incoming-controls';r=self.sync('download',folder,f'{self.run}/controls')
         if r.returncode:raise RuntimeError('Review control download failed')
         incoming=json.loads((folder/'controls.json').read_text());old=json.loads(self.path.read_text()) if self.path.exists() else {'revision':-1}

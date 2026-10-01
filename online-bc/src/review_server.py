@@ -1,5 +1,5 @@
 """Tailscale-local review UI with durable optional exclusions and HF sync."""
-import argparse,json,re,subprocess,threading,time
+import argparse,json,re,subprocess,threading,time,os
 from http.server import BaseHTTPRequestHandler,ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -33,7 +33,8 @@ class ReviewServer(ThreadingHTTPServer):
             with (self.root/'review-audit.jsonl').open('a') as f:f.write(json.dumps({'at':time.time(),'revision':d['revision'],**value},ensure_ascii=False)+'\n')
             return d
     def transport(self,direction,folder,prefix):
-        return subprocess.run([self.args.transport_python,str(Path(__file__).with_name('hf_transfer.py')),direction,str(folder),prefix,'--token-file',self.args.token_file],capture_output=True,text=True,timeout=45)
+        env=os.environ.copy();env['HF_HOME']=str(self.root/'hf-cache')
+        return subprocess.run([self.args.transport_python,str(Path(__file__).with_name('hf_transfer.py')),direction,str(folder),prefix,'--token-file',self.args.token_file],capture_output=True,text=True,timeout=45,env=env)
     def sync_loop(self):
         last=-1;pull_at=0
         while not self.stop_event.is_set():
@@ -56,7 +57,7 @@ class Handler(BaseHTTPRequestHandler):
         path=urlsplit(self.path).path
         if path=='/api/state':return self.json(200,self.server.state())
         if path not in ('/','/index.html'):return self.json(404,{'error':'Not found'})
-        b=Path(__file__).with_name('review.html').read_bytes();self.send_response(200);self.send_header('Content-Type','text/html; charset=utf-8');self.send_header('Cache-Control','no-store');self.send_header('Content-Length',str(len(b)));self.end_headers();self.wfile.write(b)
+        b=(Path(__file__).resolve().parents[1]/'web/index.html').read_bytes();self.send_response(200);self.send_header('Content-Type','text/html; charset=utf-8');self.send_header('Cache-Control','no-store');self.send_header('Content-Length',str(len(b)));self.end_headers();self.wfile.write(b)
     def do_POST(self):
         if self.path!='/api/control':return self.json(404,{'error':'Not found'})
         if self.headers.get('Origin')!=self.server.origin or 'http://'+self.headers.get('Host','')!=self.server.origin:return self.json(403,{'error':'Same-origin required'})

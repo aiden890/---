@@ -25,7 +25,7 @@ def main():
         req=urllib.request.Request(c['policy_url'],data=pickle.dumps(dict(op='load',path=c['adapter_container_root']+f'/round-{args.round:04d}'),protocol=4))
         with urllib.request.urlopen(req,timeout=180) as r:result=pickle.loads(r.read())
         assert result['version']==args.round
-        (here/'current-adapter.json').write_text(json.dumps(dict(version=args.round,container_path=c['adapter_container_root']+f'/round-{args.round:04d}')))
+        (here.parent/'current-adapter.json').write_text(json.dumps(dict(version=args.round,container_path=c['adapter_container_root']+f'/round-{args.round:04d}')))
         print(json.dumps(dict(model=model,reloaded=args.round)));return
     subprocess.run(render(c['ensure_policy_argv']),check=True)
     for _ in range(120):

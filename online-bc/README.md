@@ -1,5 +1,27 @@
 # π₀.₅ · PrepareCoffee 컵 놓기 Online BC
 
+## Directory map
+
+```
+online-bc/
+  README.md              # Start here: scope, flow, operational commands
+  scripts/               # Lab management / SKKU learner entry points
+  configs/               # Host and rollout settings
+  src/                   # Dataset extraction, learner, rollout, review backend
+  web/                   # Interactive review page
+  tests/                 # Replay, exclusions, API, transfer, success criteria
+  requirements/          # Pinned learner dependencies
+  vendor/openpi/         # Pinned original OpenPI source archive
+  reports/verification/  # Previous validation results
+```
+
+Lab: `bash scripts/manage.sh status` / `review` / `collect 5` / `test-review`.
+SKKU: `bash scripts/start-pi-cup-learner.sh setup|check|download|validate|start`.
+
+Read the data flow in order: `src/build_cup_dataset.py` → `src/replay.py` → `src/train_online_bc.py` → `src/pi05_backend.py`.
+Review and exclusions: `src/review_server.py` → `src/control_sync.py` → `src/data_control.py` / `src/replay.py`.
+Generated state, tokens, checkpoints and datasets stay outside this code directory. `src/vendor/` contains the unchanged RLinf replay cache and its license.
+
 현재 본 학습은 시작하지 않았다. 사용자가 지정할 SKKU GPU 세션 또는 AMP learner에서 아래 검증을 마친 뒤 시작한다. 다른 두 모델의 backend는 보존하며 이번 학습은 π₀.₅의 컵 놓기만 수행한다.
 
 ## 지시문과 데이터
@@ -25,7 +47,7 @@
 
 ## 실행 설정과 흐름
 
-1. 위 성공 데이터로 bootstrap 50 optimizer updates.
+1. 초기 BC는 생략한다 (`--bootstrap-steps 0`, coordinator `bootstrap_weights=false`). 기존 성공 데이터는 replay에 보존하지만 새 롤아웃을 먼저 수집한 뒤 온라인 업데이트에서 함께 사용한다.
 2. AMP의 π rollout server에서 새 장면 8개를 simulator worker 3개가 병렬 실행. 전체 태스크 명령으로 컵을 잡은 뒤 컵 놓기 지시문으로 전환하고 컵 놓기에 성공하면 종료한다.
 3. 각 rollout 서버에서 성공한 컵 구간만 추출·검증·압축해 HF Bucket으로 직접 업로드한다. Lab은 job을 조정하며 rollout 데이터를 한 곳에 모아 다시 업로드하지 않는다.
 4. Learner가 새 데이터와 최근 replay를 사용해 컵 놓기 50 updates를 수행하고 LoRA 및 optimizer를 저장·업로드한다.
@@ -60,12 +82,12 @@ Jobs: `jobs/pi05/round-NNNN`; weights: `weights/pi05/round-NNNN`; 새 수집: `d
 Kit을 세션에 복사한 뒤:
 
 ```bash
-bash start-pi-cup-learner.sh setup
-bash start-pi-cup-learner.sh check
-bash start-pi-cup-learner.sh download
+bash scripts/start-pi-cup-learner.sh setup
+bash scripts/start-pi-cup-learner.sh check
+bash scripts/start-pi-cup-learner.sh download
 export HF_TOKEN_FILE=/path/to/existing/private/hf-token
-bash start-pi-cup-learner.sh validate
-bash start-pi-cup-learner.sh start
+bash scripts/start-pi-cup-learner.sh validate
+bash scripts/start-pi-cup-learner.sh start
 ```
 
 본 학습용 새 가중치는 기본 RoboCasa π₀.₅ + zero-B LoRA에서 시작한다. 검증용으로 갱신한 adapter는 본 학습 초기값에 사용하지 않는다. 세션 환경의 CUDA_VISIBLE_DEVICES를 유지한다. Learner는 HF로 outbound 통신하므로 데이터 전달을 위한 inbound 서비스 프록시는 필요하지 않다.
@@ -73,7 +95,25 @@ bash start-pi-cup-learner.sh start
 Lab coordinator:
 
 ```bash
-python3 online_rounds.py --config configs/pi05-cup-coordinator.json --rounds 100
+python3 src/online_rounds.py --config configs/pi05-cup-coordinator.json --rounds 5
 ```
 
 사용자 서버 정보가 들어오면 연결 후 새 세션 검증을 실행하고 learner와 coordinator를 함께 시작한다. 세션 종료 시 checkpoint와 HF 자료로 재개한다.
+
+## Lab control and optional review
+
+Canonical code: existing GRPO repository, `online-bc/`, deployed at Lab `/home/aiden/Desktop/lab/robot/robocasa-docker/online-bc/`.
+
+- `build_cup_dataset.py`: extract successful cup placement segments after the held-mug precondition.
+- `replay.py`: sample initial and online success episodes together; apply current exclusions before every sample. Maximum 256 episodes.
+- `train_online_bc.py`: native updates; record exact episode IDs, exclusion revision, and sample usage.
+- `pi05_backend.py`: native OpenPI flow matching, action-expert LoRA, frozen backbone, optimizer resume.
+- `worker.py`, `docker_worker.py`: eight attempts per round, three simulator workers. Only successful validated segments are packed and uploaded directly to HF.
+- `online_rounds.py`: Lab collection coordination, video publication, learner jobs, adapter reload.
+- `review_server.py`, `review.html`: optional interactive review. Unreviewed successes are accepted automatically. Exclude, restore, or pause through durable controls.
+- `control_sync.py`, `data_control.py`: learner polls HF controls every ten seconds. A control channel older than 45 seconds pauses sampling. An in-flight or previously completed update is not undone by an exclusion.
+- `review_catalog.py`: initial 90 videos / 11 eligible segments and subsequent online round videos. Only videos and small metadata come to Lab; action/observation arrays go directly from workers to HF.
+
+Bootstrap BC is skipped; initial success data remain available for later online updates. First pilot: five online rounds, fifty optimizer updates per round. Labels are successful executed actions, not expert corrections. Standard BC can also use correct expert actions collected during a failed episode; this pipeline has no correcting expert, so only successful skill segments are accepted.
+
+Dataset candidates and actual training usage are distinct. `data-usage.json` records sampled episodes; the UI shows learner-confirmed usage and the revision actually received. No production training runs until the learner GPU session is supplied. Review integration must pass its own tests in addition to previous native GPU verification.

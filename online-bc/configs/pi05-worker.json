@@ -9,7 +9,7 @@
   "host_python": "python3",
   "transport_argv": [
     "/home/guest/skku-vla-grasp-only-20260930/transport/venv/bin/python",
-    "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/hf_transfer.py",
+    "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/src/hf_transfer.py",
     "{direction}",
     "{directory}",
     "{prefix}",
@@ -18,14 +18,14 @@
   ],
   "ensure_policy_argv": [
     "python3",
-    "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/docker_worker.py",
+    "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/src/docker_worker.py",
     "--model",
     "pi05",
     "ensure"
   ],
   "collector_argv": [
     "python3",
-    "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/docker_worker.py",
+    "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/src/docker_worker.py",
     "--model",
     "pi05",
     "collect",
@@ -37,7 +37,7 @@
   "skill": "cup_placement",
   "build_dataset_argv": [
     "python3",
-    "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/docker_worker.py",
+    "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/src/docker_worker.py",
     "--model",
     "pi05",
     "dataset",

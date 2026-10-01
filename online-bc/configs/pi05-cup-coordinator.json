@@ -9,12 +9,12 @@
       "collect_argv": [
         "ssh",
         "amp_csi",
-        "python3 /home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/worker.py --config /home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/configs/pi05-worker.json --round {round} --run {run} collect"
+        "python3 /home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/src/worker.py --config /home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/configs/pi05-worker.json --round {round} --run {run} collect"
       ],
       "reload_argv": [
         "ssh",
         "amp_csi",
-        "python3 /home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/worker.py --config /home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/configs/pi05-worker.json --round {round} --run {run} reload"
+        "python3 /home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/src/worker.py --config /home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/configs/pi05-worker.json --round {round} --run {run} reload"
       ]
     }
   },
@@ -26,5 +26,5 @@
   "review_required": false,
   "tracking_root": "/home/aiden/Desktop/lab/robot/robocasa-docker/tracking",
   "review_worker_host": "amp_csi",
-  "review_worker_config": "/home/aiden/Desktop/lab/robot/pan-skill-models-20261001/coffee-online-bc/configs/pi05-worker.json"
+  "review_worker_config": "/home/aiden/Desktop/lab/robot/robocasa-docker/online-bc/configs/pi05-worker.json"
 }

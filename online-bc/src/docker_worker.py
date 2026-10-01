@@ -12,7 +12,7 @@ def run_args(t):
 
 def main():
     p=argparse.ArgumentParser();p.add_argument('--model',required=True);p.add_argument('action',choices=['ensure','collect','preflight','dataset']);p.add_argument('--seeds');p.add_argument('--out');p.add_argument('--source');a=p.parse_args()
-    root=Path(__file__).resolve().parent;t=json.loads((root/'configs'/f'{a.model}-containers.json').read_text())
+    root=Path(__file__).resolve().parents[1];t=json.loads((root/'configs'/f'{a.model}-containers.json').read_text())
     if a.action=='ensure':
         name=f'coffee-online-bc-policy-{a.model}'
         state=subprocess.run(['docker','inspect','-f','{{.State.Running}}',name],capture_output=True,text=True)
@@ -21,14 +21,14 @@ def main():
         python=t[0]['Config']['Cmd'][0];cmd=t[0]['Config']['Cmd'];checkpoint=cmd[cmd.index('--checkpoint')+1]
         adapter=[];current=root/'current-adapter.json'
         if current.exists():adapter=['--adapter',json.loads(current.read_text())['container_path']]
-        subprocess.run(run_args(t[0])+['-d','--name',name,'-w','/results/coffee-online-bc',t[0]['Config']['Image'],python,'serve_bc_policy.py','--model',a.model,'--checkpoint',checkpoint,*adapter],check=True)
+        subprocess.run(run_args(t[0])+['-d','--name',name,'-w','/results/coffee-online-bc/src',t[0]['Config']['Image'],python,'serve_bc_policy.py','--model',a.model,'--checkpoint',checkpoint,*adapter],check=True)
     elif a.action=='dataset':
-        argv=run_args(t[1])+['--rm','-w','/results/coffee-online-bc',t[1]['Config']['Image']]
+        argv=run_args(t[1])+['--rm','-w','/results/coffee-online-bc/src',t[1]['Config']['Image']]
         subprocess.run(argv+['python3','build_cup_dataset.py',a.source,a.out],check=True)
         subprocess.run(argv+['python3','validate_dataset.py',a.out,'--source-required','--out',a.out+'/validation.json'],check=True)
     else:
         argv=run_args(t[1])+['--rm','-e','COFFEE_BC_POLICY_URL=http://127.0.0.1:18317']
-        script='/results/coffee-online-bc/preflight_scenes.py' if a.action=='preflight' else '/results/run_coffee.py'
+        script='/results/coffee-online-bc/src/preflight_scenes.py' if a.action=='preflight' else '/results/coffee-online-bc/src/run_coffee.py'
         tail=['--seeds',a.seeds or ','.join(str(993101+i) for i in range(8))]
         if a.action=='collect':tail+=['--model',a.model,'--out',a.out,'--skill','cup_placement'] if a.model=='pi05' else ['--model',a.model,'--out',a.out]
         subprocess.run(argv+[t[1]['Config']['Image'],'python3',script,*tail],check=True)
