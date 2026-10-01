@@ -27,3 +27,4 @@ filelock==3.18.0
 tensorstore==0.1.74
 ml-dtypes==0.4.1
 huggingface_hub>=0.34,<1
+pytest==8.3.5
