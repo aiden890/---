@@ -133,6 +133,7 @@ def main():
         json.loads(path.read_text()) for path in sorted((root / model).glob("*/result.json"))
     ]
     profile = profile_summary(results)
+    profile["simulator_workers"] = sum(bool(shard) for shard in shards)
     if args.action == "eval":
         assert len(results) == len(seeds) and {row["seed"] for row in results} == set(seeds)
         assert all(row["policy_version"] == args.round for row in results)

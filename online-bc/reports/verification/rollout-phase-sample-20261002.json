@@ -1,0 +1,90 @@
+{
+  "at": 1790879606.490312,
+  "episodes": 4,
+  "rows": [
+    {
+      "node": "amp",
+      "seed": 993225,
+      "steps": 1800,
+      "phase_seconds": {
+        "environment_create": 15.721316702663898,
+        "environment_reset": 7.278310213238001,
+        "observation_capture": 7.721206473186612,
+        "environment_step_with_observations": 74.61643408983946,
+        "observation_history": 0.1353856362402439,
+        "success_predicates": 0.8335856627672911,
+        "video_encode": 2.3793991282582283,
+        "result_and_capture_storage": 0.06457556784152985,
+        "policy_inference": 24.315618753433228,
+        "episode_before_result_write": 133.3613697066903
+      }
+    },
+    {
+      "node": "amp",
+      "seed": 993226,
+      "steps": 891,
+      "phase_seconds": {
+        "environment_create": 13.612728044390678,
+        "environment_reset": 4.89582228846848,
+        "observation_capture": 3.798720173537731,
+        "environment_step_with_observations": 43.338756285607815,
+        "observation_history": 0.06784629076719284,
+        "success_predicates": 0.21562952548265457,
+        "video_encode": 1.1851257048547268,
+        "result_and_capture_storage": 0.04855995625257492,
+        "policy_inference": 11.19533085823059,
+        "episode_before_result_write": 78.70861733146012
+      }
+    },
+    {
+      "node": "v4",
+      "seed": 993230,
+      "steps": 1800,
+      "phase_seconds": {
+        "environment_create": 11.487603321904317,
+        "environment_reset": 4.024598331889138,
+        "observation_capture": 8.86609798669815,
+        "environment_step_with_observations": 74.81435923278332,
+        "observation_history": 0.09786439640447497,
+        "success_predicates": 2.0707613937556744,
+        "video_encode": 1.9642916473094374,
+        "result_and_capture_storage": 0.028156509157270193,
+        "policy_inference": 23.366195678710938,
+        "episode_before_result_write": 126.94722372409888
+      }
+    },
+    {
+      "node": "v4",
+      "seed": 993229,
+      "steps": 1800,
+      "phase_seconds": {
+        "environment_create": 11.103030998026952,
+        "environment_reset": 3.6549643941689283,
+        "observation_capture": 7.5645514209754765,
+        "environment_step_with_observations": 57.2277230725158,
+        "observation_history": 0.0948375768493861,
+        "success_predicates": 0.46759694372303784,
+        "video_encode": 1.9141984151210636,
+        "result_and_capture_storage": 0.027694570133462548,
+        "policy_inference": 22.350719690322876,
+        "episode_before_result_write": 104.6392876910977
+      }
+    }
+  ],
+  "mean_phase_seconds": {
+    "environment_create": 12.981169766746461,
+    "environment_reset": 4.963423806941137,
+    "observation_capture": 6.987644013599493,
+    "environment_step_with_observations": 62.4993181701866,
+    "observation_history": 0.09898347506532446,
+    "success_predicates": 0.8968933814321645,
+    "video_encode": 1.860753723885864,
+    "result_and_capture_storage": 0.04224665084620938,
+    "policy_inference": 20.306966245174408,
+    "episode_before_result_write": 110.91412461333675
+  },
+  "environment_step_share": 0.5634928679108147,
+  "partial_batch_sample": true,
+  "physics_and_render_not_separated": true,
+  "observations_and_actions_unchanged": true
+}
