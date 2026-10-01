@@ -1,0 +1,32 @@
+{
+  "verified_at_unix": 1790881672.9606788,
+  "problem": "Coordinator could reload v4 before awaiting previous asynchronous evaluation.",
+  "repair": {
+    "coordinator": "Await evaluation before v4 reload.",
+    "worker": "Shared collection/evaluation locks, exclusive reload lock; active legacy readers identified by same config and PID. New readers with open lock fd excluded from legacy wait.",
+    "hot_deployed": [
+      "lab",
+      "amp",
+      "v4",
+      "skku-kit"
+    ],
+    "restarted_active_jobs": false
+  },
+  "verification": {
+    "unit_tests": 3,
+    "ruff": "E4,E7,E9,F passed",
+    "actual_legacy_eval_pid_detected": 3183397,
+    "exclusive_blocked_during_shared_reader": true,
+    "exclusive_acquired_after_release": true,
+    "v4_policy_version": 2,
+    "all_28_partial_eval_episodes_policy_version": 2
+  },
+  "training_state": {
+    "completed_updates": 100,
+    "round3_attempts": 24,
+    "round3_successes": 6,
+    "amp_batch4_workers": 4,
+    "v4_workers": 2
+  },
+  "partial_eval_not_final": true
+}

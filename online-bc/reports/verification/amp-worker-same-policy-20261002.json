@@ -1,0 +1,60 @@
+{
+  "at": 1790881059.5980208,
+  "same_policy_version": true,
+  "paired_seeds": false,
+  "rows": [
+    {
+      "batch": 1,
+      "workers": 4,
+      "policy_versions": [
+        2
+      ],
+      "episodes": 8,
+      "steps": 13263,
+      "seconds": 316.5566268451512,
+      "steps_per_second": 41.8977171073023,
+      "mean_episode_seconds": 123.88490417599678,
+      "mean_infer_seconds": 29.7224278151989,
+      "seeds": [
+        993301,
+        993302,
+        993303,
+        993304,
+        993305,
+        993306,
+        993307,
+        993308
+      ]
+    },
+    {
+      "batch": 2,
+      "workers": 2,
+      "policy_versions": [
+        2
+      ],
+      "episodes": 8,
+      "steps": 10408,
+      "seconds": 440.67254596576095,
+      "steps_per_second": 23.618444342136698,
+      "mean_episode_seconds": 83.41719698905945,
+      "mean_infer_seconds": 17.036659240722656,
+      "seeds": [
+        993309,
+        993310,
+        993311,
+        993312,
+        993313,
+        993314,
+        993315,
+        993316
+      ]
+    }
+  ],
+  "throughput_ratio": 1.7739405906829477,
+  "decision": "Provisionally use four AMP workers for future collectors, leave the current two-worker batch running; continue checking throughput, GPU memory and upload failures.",
+  "deployment": {
+    "configured_workers": 4,
+    "applied_at": 1790881106.6125717,
+    "scope": "future collectors only"
+  }
+}

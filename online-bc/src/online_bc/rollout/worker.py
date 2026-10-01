@@ -8,8 +8,41 @@ import pickle
 import subprocess
 import time
 import urllib.request
+import os
+import fcntl
+import atexit
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
+
+
+def active_policy_readers(config_path, proc_root="/proc", lock_path=None):
+    """Find legacy collectors/evaluators that started before policy locks existed."""
+    readers = []
+    for folder in Path(proc_root).iterdir():
+        if not folder.name.isdigit() or int(folder.name) == os.getpid():
+            continue
+        try:
+            argv = (folder / "cmdline").read_bytes().decode().strip("\0").split("\0")
+            if argv[1:3] != ["-m", "online_bc.rollout.worker"]:
+                continue
+            if not ({"collect", "eval"} & set(argv)) or "--config" not in argv:
+                continue
+            candidate = Path(argv[argv.index("--config") + 1])
+            if candidate.is_absolute() and candidate.resolve() == Path(config_path).resolve():
+                # New readers open the lock before waiting for it. Never wait
+                # for those while holding EX: a reader blocked on SH would
+                # otherwise deadlock reload. Only legacy readers need scanning.
+                if lock_path is not None:
+                    try:
+                        if any(fd.resolve() == Path(lock_path).resolve()
+                               for fd in (folder / "fd").iterdir()):
+                            continue
+                    except OSError:
+                        pass
+                readers.append(int(folder.name))
+        except (OSError, UnicodeError, IndexError):
+            continue
+    return readers
 
 
 def profile_summary(results):
@@ -54,7 +87,19 @@ def main():
     if args.dry_run:
         print(json.dumps(dict(model=model, action=args.action, round=args.round, root=str(root))))
         return
+    # Hold a shared lock throughout collection/evaluation, exclusive for reload.
+    # atexit also retains the handle until this one-shot worker process exits.
+    lock_path = Path(c["adapter_root"]).parent / f"policy-{model}.lock"
+    policy_lock = lock_path.open("a")
+    atexit.register(policy_lock.close)
+    fcntl.flock(policy_lock, fcntl.LOCK_EX if args.action == "reload" else fcntl.LOCK_SH)
     if args.action == "reload":
+        readers = active_policy_readers(args.config, lock_path=lock_path)
+        if readers:
+            print(json.dumps(dict(event="waiting_for_policy_readers", pids=readers)), flush=True)
+        while readers:
+            time.sleep(2)
+            readers = active_policy_readers(args.config, lock_path=lock_path)
         dest = Path(c["adapter_root"]) / f"round-{args.round:04d}"
         sync("download", dest, f"{args.run}/weights/{model}/round-{args.round:04d}")
         subprocess.run(render(c["ensure_policy_argv"]), check=True)

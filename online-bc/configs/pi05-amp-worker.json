@@ -2,7 +2,7 @@
   "model": "pi05",
   "policy_url": "http://127.0.0.1:18317",
   "episodes_per_round": 8,
-  "workers": 2,
+  "workers": 4,
   "output_root": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts",
   "adapter_root": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/adapters",
   "adapter_container_root": "/results/coffee-online-bc/adapters",

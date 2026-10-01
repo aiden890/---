@@ -417,6 +417,12 @@ def main():
         )
         resume_best = None
         for node, w in c["workers"].items():
+            if node == c.get("evaluation_node", "v4") and evaluation is not None:
+                atomic_json(
+                    status,
+                    dict(next_round=round_index, status="waiting_for_evaluation"),
+                )
+                finish_evaluation()
             model = w.get("model", node)
             adapter = root / f"adapters/{node}/round-{round_index:04d}"
             while True:
