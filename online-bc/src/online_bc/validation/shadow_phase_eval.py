@@ -44,15 +44,25 @@ def main():
         if not reference_path.exists():
             time.sleep(2)
             continue
+
+        def wait_expired(signum, frame):
+            raise TimeoutError("No idle policy window before deadline")
+
+        signal.signal(signal.SIGALRM, wait_expired)
+        signal.setitimer(signal.ITIMER_REAL, max(0.001, deadline - time.monotonic()))
         try:
-            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except BlockingIOError:
+            # Queue the reservation rather than polling between fast batch handoffs.
+            fcntl.flock(lock, fcntl.LOCK_EX)
+        except TimeoutError:
+            atomic_json(root / "status.json", dict(status="skipped_no_idle_window"))
+            return
+        finally:
+            signal.setitimer(signal.ITIMER_REAL, 0)
+        while active_policy_readers(args.config, lock_path=lock_path):
+            if time.monotonic() >= deadline:
+                atomic_json(root / "status.json", dict(status="skipped_no_idle_window"))
+                return
             time.sleep(2)
-            continue
-        if active_policy_readers(args.config, lock_path=lock_path):
-            fcntl.flock(lock, fcntl.LOCK_UN)
-            time.sleep(2)
-            continue
         with urllib.request.urlopen(config["policy_url"], timeout=3) as response:
             health = json.load(response)
         if health["version"] != args.version:
