@@ -56,5 +56,6 @@
     "--containers",
     "/home/v4/skku-vla-grasp-only-20260930/results/coffee-online-bc/configs/pi05-v4-containers.json"
   ],
-  "node": "v4"
+  "node": "v4",
+  "collection_workers": 4
 }
