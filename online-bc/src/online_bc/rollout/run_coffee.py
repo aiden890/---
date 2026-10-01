@@ -50,10 +50,14 @@ args = ap.parse_args()
 root = Path(args.out)
 root.mkdir(parents=True, exist_ok=True)
 policy = Policy(args.model)
+if policy.variant == "base_prefix" and args.skill != "cup_placement":
+    raise ValueError("base_prefix requires the cup placement skill boundary")
 horizon = int(get_task_horizon("PrepareCoffee"))
 for seed in map(int, args.seeds.split(",")):
     out = root / f"{args.model}-seed{seed}"
     if (out / "result.json").exists():
+        existing = json.loads((out / "result.json").read_text())
+        assert existing.get("policy_variant", "standard") == policy.variant
         continue
     if out.exists():
         out.rename(root / (out.name + "-incomplete-" + str(int(time.time()))))
@@ -99,6 +103,7 @@ for seed in map(int, args.seeds.split(",")):
         success = False
         capture = Capture(out)
         cup_skill_start = None
+        policy_phases = []
         placement_streak = 0
         cup_instruction = "Place the mug you are holding upright on the coffee machine tray directly under the dispenser, then release the mug."
         try:
@@ -121,7 +126,20 @@ for seed in map(int, args.seeds.split(",")):
                     capture.observation(step - 1, obs, images, states, rollout)
                     phase_seconds["observation_capture"] += time.monotonic() - phase_started
                     t = time.time()
-                    plan.extend(policy.infer(obs, images, states, policy_instruction, seed, calls))
+                    skill_phase = "cup_placement" if cup_skill_start is not None else "prefix"
+                    plan.extend(
+                        policy.infer(
+                            obs, images, states, policy_instruction, seed, calls, skill_phase
+                        )
+                    )
+                    if policy.variant != "standard":
+                        policy_phases.append(
+                            dict(
+                                step=step - 1,
+                                phase=skill_phase,
+                                effective_policy_version=policy.effective_version,
+                            )
+                        )
                     times.append(time.time() - t)
                     calls += 1
                 action = np.asarray(plan.popleft(), np.float32)
@@ -231,6 +249,8 @@ for seed in map(int, args.seeds.split(",")):
             skill=args.skill,
             cup_skill_start=cup_skill_start,
             policy_version=getattr(policy, "version", 0),
+            policy_variant=policy.variant,
+            policy_phases=policy_phases,
             official_task_success=p["official_success"],
         )
         result.update(score(trace))

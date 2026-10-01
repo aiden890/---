@@ -10,6 +10,11 @@ class Policy:
     def __init__(self, model):
         self.model = model
         self.bc_url = os.environ.get("COFFEE_BC_POLICY_URL")
+        self.variant = os.environ.get("COFFEE_BC_VARIANT", "standard")
+        if self.variant not in ("standard", "base_prefix"):
+            raise ValueError("Unknown COFFEE_BC_VARIANT")
+        if self.variant == "base_prefix" and (model != "pi05" or not self.bc_url):
+            raise ValueError("base_prefix requires the enabled pi05 BC server")
         if self.bc_url:
             return
         if model == "xiaomi":
@@ -25,7 +30,7 @@ class Policy:
             self.client = websocket_client_policy.WebsocketClientPolicy("127.0.0.1", 18205)
             self.image_tools = image_tools
 
-    def infer(self, obs, images, states, instruction, seed, chunk):
+    def infer(self, obs, images, states, instruction, seed, chunk, skill_phase=None):
         if self.bc_url:
             sample = {
                 "obs": {
@@ -38,15 +43,24 @@ class Policy:
             sample["obs"]["xiaomi/state_history"] = rollout.sample_history(states, 4, 2)
             for key, q in images.items():
                 sample["obs"]["xiaomi/" + key] = rollout.sample_history(q, 4, 2)
+            payload = dict(sample=sample, seed=seed * 131 + chunk)
+            if self.variant != "standard":
+                payload.update(variant=self.variant, skill_phase=skill_phase)
             req = urllib.request.Request(
                 self.bc_url,
-                data=pickle.dumps(dict(sample=sample, seed=seed * 131 + chunk), protocol=4),
+                data=pickle.dumps(payload, protocol=4),
                 headers={"Content-Type": "application/octet-stream"},
             )
             with urllib.request.urlopen(req, timeout=180) as response:
                 reply = pickle.loads(response.read())
             actions = reply["actions"]
             self.version = reply["version"]
+            if self.variant != "standard":
+                assert reply.get("variant") == self.variant
+                assert reply.get("skill_phase") == skill_phase
+                expected = 0 if skill_phase == "prefix" else self.version
+                assert reply.get("effective_policy_version") == expected
+                self.effective_version = expected
         elif self.model == "xiaomi":
             actions, _ = self.client.infer(
                 rollout.sample_history(states, 4, 2),
