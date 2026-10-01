@@ -22,7 +22,9 @@ def main():
     ap.add_argument("--batch", type=int, default=1)
     ap.add_argument("--episodes", type=int)
     ap.add_argument("--seed-offset", type=int, default=0)
+    ap.add_argument("--eval-episodes", type=int, default=30)
     args = ap.parse_args()
+    began = time.monotonic()
     c = json.loads(Path(args.config).read_text())
     model = c["model"]
     fields = dict(
@@ -94,7 +96,8 @@ def main():
         for i in range(1, (args.episodes or c.get("episodes_per_round", 8)) + 1)
     ]
     if args.action == "eval":
-        seeds = list(range(992001, 992031))
+        assert 1 <= args.eval_episodes <= 30
+        seeds = list(range(992001, 992001 + args.eval_episodes))
     shards = [seeds[i :: c.get("workers", 3)] for i in range(c.get("workers", 3))]
 
     def collect(pair):
@@ -116,24 +119,34 @@ def main():
 
     with ThreadPoolExecutor(max_workers=c.get("workers", 3)) as pool:
         list(pool.map(collect, enumerate(shards)))
+    collection_seconds = time.monotonic() - began
     if args.action == "eval":
         results = [
             json.loads(path.read_text()) for path in sorted((root / model).glob("*/result.json"))
         ]
-        assert len(results) == 30 and {row["seed"] for row in results} == set(seeds)
+        assert len(results) == len(seeds) and {row["seed"] for row in results} == set(seeds)
         assert all(row["policy_version"] == args.round for row in results)
         successes = sum(row["cup_placed"] for row in results)
         grasped = sum("mug_grasped" in row["milestones"] for row in results)
         report = dict(
             model=model,
             policy_version=args.round,
-            attempts=30,
+            attempts=len(seeds),
             cup_successes=successes,
-            cup_success_rate=successes / 30,
+            cup_success_rate=successes / len(seeds),
             grasp_successes=grasped,
             cup_given_grasp=successes / grasped if grasped else None,
             seeds=seeds,
             training_data=False,
+            wall_seconds=collection_seconds,
+            outcomes=[
+                dict(
+                    seed=row["seed"],
+                    cup_placed=row["cup_placed"],
+                    grasped="mug_grasped" in row["milestones"],
+                )
+                for row in results
+            ],
         )
         evaluation_upload = root / "evaluation-upload"
         evaluation_upload.mkdir(exist_ok=True)
@@ -144,8 +157,13 @@ def main():
     upload = root / "upload"
     shard_root = root / model
     if c.get("skill") == "cup_placement":
+        stage = time.monotonic()
         subprocess.run(render(c["build_dataset_argv"]), check=True)
+        dataset_seconds = time.monotonic() - stage
         shard_root = root / "cup-dataset" / model
+    else:
+        dataset_seconds = 0
+    stage = time.monotonic()
     subprocess.run(
         [
             c.get("host_python", "python3"),
@@ -157,8 +175,11 @@ def main():
         ],
         check=True,
     )
+    packing_seconds = time.monotonic() - stage
     prefix = f"{args.run}/data/{model}/{c.get('node', model)}/round-{args.round:04d}/batch-{args.batch:02d}"
+    stage = time.monotonic()
     sync("upload", upload, prefix)
+    upload_seconds = time.monotonic() - stage
     dataset = json.loads((root / "cup-dataset" / model / "dataset.json").read_text())
     print(
         json.dumps(
@@ -171,6 +192,13 @@ def main():
                 seeds=seeds,
                 accepted=[x["episode"] for x in dataset["accepted"]],
                 remote_root=str(root),
+                timings=dict(
+                    collection_seconds=collection_seconds,
+                    dataset_seconds=dataset_seconds,
+                    packing_seconds=packing_seconds,
+                    upload_seconds=upload_seconds,
+                    total_seconds=time.monotonic() - began,
+                ),
             )
         ),
         flush=True,

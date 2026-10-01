@@ -186,6 +186,11 @@ def main():
             "--save-every",
             str(job.get("steps", 50)),
         ]
+        cmd += ["--lr", str(job.get("lr", 1e-4))]
+        cmd += [
+            "--batch-size",
+            str(job.get("batch_size", int(os.environ.get("PI_CUP_BATCH_SIZE", "1")))),
+        ]
         cmd += [
             "--skills",
             *job.get("skills", ["cup_placement", "button_press"]),
@@ -195,7 +200,18 @@ def main():
             str(control.health),
         ]
         if resume:
-            cmd += ["--resume", resume]
+            training_resume = resume
+        else:
+            training_resume = None
+        if job.get("resume_round") is not None:
+            best = int(job["resume_round"])
+            training_resume = (
+                (root / "training" / f"round-{best:04d}" / "latest").read_text().strip()
+                if best
+                else None
+            )
+        if training_resume:
+            cmd += ["--resume", training_resume]
         locks = Path(args.gpu_lock_root)
         locks.mkdir(parents=True, exist_ok=True)
         with (locks / f"gpu-{hashlib.sha256(args.gpu_slot.encode()).hexdigest()[:16]}.lock").open(
@@ -211,6 +227,7 @@ def main():
         meta = json.loads((adapter / "metadata.json").read_text())
         meta["step"] = index
         meta["optimizer_steps_this_round"] = job.get("steps", 50)
+        meta["resumed_from_round"] = job.get("resume_round")
         (adapter / "updates.json").write_bytes((out / "updates.json").read_bytes())
         (adapter / "metadata.json").write_text(json.dumps(meta, indent=2))
         r = sync("upload", adapter, f"{args.run}/weights/{args.model}/round-{index:04d}")

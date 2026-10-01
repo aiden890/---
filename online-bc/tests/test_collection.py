@@ -31,11 +31,16 @@ class CollectionTests(unittest.TestCase):
         self.assertEqual([x["episodes"] for x in batch_plan(self.config, 2, 0)], [4, 4])
         self.assertEqual(sum(x["episodes"] for x in batch_plan(self.config, 2, 30)), 2)
         self.assertEqual(batch_plan(self.config, 2, 32), [])
+        self.assertEqual(batch_plan(self.config, 2, 48), [])
         self.assertFalse(ready_to_train(self.config, 2, 32, 7))
         self.assertTrue(ready_to_train(self.config, 2, 16, 8))
         self.assertFalse(ready_to_train(self.config, 1, 32, 0))
         self.assertFalse(ready_to_train(self.config, 1, 16, 8))
         self.assertTrue(ready_to_train(self.config, 1, 32, 1))
+
+    def test_busy_eval_host_leaves_the_whole_batch_on_amp(self):
+        config = dict(self.config, workers={"amp": {}})
+        self.assertEqual(batch_plan(config, 2, 0), [dict(node="amp", episodes=8, seed_offset=0)])
 
     def test_success_count_deduplicates_and_respects_review_exclusions(self):
         with tempfile.TemporaryDirectory() as directory:

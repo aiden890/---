@@ -59,5 +59,15 @@
   "evaluation_versions": [
     0,
     5
-  ]
+  ],
+  "async_evaluation": true,
+  "evaluation_node": "v4",
+  "eval_every_round": true,
+  "full_eval_every": 2,
+  "quick_eval_episodes": 10,
+  "learning_rate": 0.0001,
+  "learner_host": "work@100.97.200.125",
+  "learner_root": "/home/work/robot_aiden_260930/pi-cup-online-bc",
+  "wandb_entity": "aiden-lab-desktop",
+  "batch_size": 4
 }

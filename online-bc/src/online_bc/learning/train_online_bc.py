@@ -23,6 +23,7 @@ def main():
     ap.add_argument("--out", required=True)
     ap.add_argument("--steps", type=int, default=1000)
     ap.add_argument("--lr", type=float, default=1e-4)
+    ap.add_argument("--batch-size", type=int, default=1)
     ap.add_argument("--save-every", type=int, default=50)
     ap.add_argument(
         "--skills",
@@ -37,6 +38,8 @@ def main():
     ap.add_argument("--controls")
     ap.add_argument("--control-health")
     args = ap.parse_args()
+    assert args.batch_size >= 1
+    assert args.model == "pi05" or args.batch_size == 1
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     if args.smoke:
@@ -87,7 +90,8 @@ def main():
             ready, reason = control_ready(control, args.control_health)
             if ready:
                 try:
-                    sample = replay.sample(skill)
+                    samples = [replay.sample(skill) for _ in range(args.batch_size)]
+                    sample = samples[0]
                     break
                 except RuntimeError:
                     reason = "no_eligible_success_data"
@@ -95,8 +99,13 @@ def main():
             time.sleep(2)
         usage("training")
         t = time.monotonic()
-        result = backend.update(sample, seed=991000 + step)
-        used[sample["episode_id"]] = used.get(sample["episode_id"], 0) + 1
+        result = (
+            backend.update_batch(samples, seed=991000 + step)
+            if args.batch_size > 1
+            else backend.update(sample, seed=991000 + step)
+        )
+        for item in samples:
+            used[item["episode_id"]] = used.get(item["episode_id"], 0) + 1
         assert math.isfinite(result["loss"]) and math.isfinite(result["grad_norm"])
         record = dict(
             step=step,
@@ -107,6 +116,8 @@ def main():
             episode_id=sample["episode_id"],
             control_revision=sample["control_revision"],
             seconds=time.monotonic() - t,
+            batch_size=args.batch_size,
+            learning_rate=args.lr,
             **result,
         )
         log.append(record)
@@ -125,6 +136,8 @@ def main():
                 objective="native flow-matching supervised loss",
                 data_roots=args.data,
                 skills=args.skills,
+                batch_size=args.batch_size,
+                learning_rate=args.lr,
                 heldout_eval_seed_start=992001,
             )
             (dest / "metadata.json").write_text(json.dumps(metadata, indent=2))

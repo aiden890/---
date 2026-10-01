@@ -8,7 +8,7 @@
   "adapter_container_root": "/results/coffee-online-bc/adapters",
   "host_python": "python3",
   "transport_argv": [
-    "/home/v4/skku-vla-grasp-only-20260930/transport/venv/bin/python",
+    "/home/v4/skku-vla-grasp-only-20260930/transport/bc-venv/bin/python",
     "-m",
     "online_bc.transport.hf_transfer",
     "{direction}",

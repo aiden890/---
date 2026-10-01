@@ -4,7 +4,7 @@ from online_bc.data.data_control import read_controls
 
 
 def batch_plan(config, round_index, attempted):
-    remaining = config.get("max_attempts_per_round", 32) - attempted
+    remaining = max(0, config.get("max_attempts_per_round", 32) - attempted)
     requested = (
         config.get("first_round_attempts", 32)
         if round_index == 1

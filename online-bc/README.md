@@ -146,3 +146,27 @@ Dataset candidates and actual training usage are distinct. `data-usage.json` rec
 - Physical Intelligence 원본 OpenPI main: `215abfb217dbac7d5f1273282331b9b1866c0479`. RoboCasa 포크와 별도 저장소이며 자동 교체하지 않는다. 학습 환경 의존성은 검증한 버전으로 고정한다.
 
 고정 30개 평가 시드(992001~992030)는 학습 replay에 넣지 않는다. 기본 모델(version 0)과 파일럿 마지막 체크포인트(version 5)를 v4에서 평가해 HF evaluation 경로에 metrics를 저장한다. 초기 수집 32회와 평가 30회는 별도 집계다.
+
+## 야간 운영 변경 (2026-10-02)
+
+사용자가 평가·성능 정체 대응·속도 최적화·계속 학습을 승인했다. 초기 BC 생략은 유지한다.
+
+- 현재 서비스는 최대 20 rounds / 1,000 updates까지 실행한다. 완료 시 자동 점검에서 평가를 보고 계속 실행 여부와 다음 실험을 결정한다. 사용자 수동 선별은 선택이고 exclusions/pause는 항상 반영한다.
+- 매 50 updates 후 v4에서 고정 시드의 첫 10개 quick eval. 매 100 updates 및 마지막에는 고정 30개 full eval. 같은 10개 시드의 결과를 비교하므로 10회·30회 전체 평균을 직접 비교하지 않는다.
+- v4 eval 동안 AMP는 다음 라운드의 8회 수집을 전부 맡는다. eval 후에는 두 서버로 다시 분배한다. 영상 게시도 학습 job 제출과 별도 background 작업으로 실행한다. v4는 eval이 끝나야 같은 정책 서버에서 수집하며, 실행 도중 weights를 바꾸지 않는다. SKKU는 별도 GPU learner다. 정상 단계의 병렬화이며 '항상 최적'이라는 보장은 하지 않는다.
+- `orchestration/adaptation.py`: 연속 두 체크포인트가 개선하지 않으면 작은 학습률 반감 실험(하한 1e-5, 두 버전 cooldown). Full 30회에서 best 대비 6회 이상 성공 감소 시 다음 learner job은 best checkpoint/optimizer에서 재개한다. Version 0이면 zero-B LoRA로 복원한다. 소규모 평가를 통계적 확증으로 표현하지 않는다. `adaptation-version-*.json`, job, weights metadata에 변경을 남긴다.
+- `validation/benchmark_pi05.py`: 임시 adapter로 A100 batch 1/2/4 각 6 native updates를 비교했다. 워밍업 후 중간값 0.132/0.218/0.365 s/update, 7.56/9.18/10.95 samples/s. Batch 4를 적용했다. 실제 업데이트 수는 라운드마다 50회이고 sample 수는 200개다. 검증/benchmark adapter는 본 학습 초기값에 쓰지 않는다.
+- JAX persistent compilation cache를 세션 개인 디렉토리에 두어 라운드별 process restart의 재컴파일을 줄인다. GPU 선점은 physical 80GB 기준 35%(약28GB)로 설정했고 fractional 할당의 전체 VRAM과 동일하다고 해석하지 않는다.
+- `orchestration/health.py`: 60초마다 AMP/v4 policy health, GPU 메모리·사용률, 최근 rollout log, SKKU learner PID/status, Lab coordinator/telemetry PID를 기록한다. `health.json`, `health-history.jsonl`을 확인한다.
+- `orchestration/telemetry.py`: Lab self-hosted W&B 한 run에 loss/grad/batch/lr/속도·수집·eval·정책 변경·host health를 보낸다. 기존 Lab netrc 인증을 메모리에서 재사용한다. W&B SDK 0.30.0(기존 긴 API 키 지원). URL: http://100.86.183.64:8080/aiden-lab-desktop/coffee-online-bc/runs/03a19d3315a4 . SKKU→HF→Lab로 작은 업데이트 상태를 보내므로 SKKU의 userspace Tailscale outbound HTTP에 의존하지 않는다.
+- 이 대화의 10분 heartbeat `preparecoffee-online-bc`가 실제 상태를 읽고 문제 원인을 찾고 고치며 공식 문서를 조사한다. 변화 없는 경우 알림을 만들지 않는다. Lab의 실제 학습/평가/health/W&B 프로세스는 데스크톱 대화와 별도로 실행된다.
+
+복구 시 주의:
+
+1. SKKU `/home/work/robot_aiden_260930/pi-cup-online-bc/learner.pid`, `learner.log`, `run/service-status.json` 및 실제 child train process를 먼저 확인한다. 설치 스크립트 start는 `verification.json` 통과를 요구한다. 재개 환경: `PI_CUP_ROOT=/home/work/robot_aiden_260930/pi-cup-online-bc`, 같은 루트의 `secrets/hf-token`, `XLA_PYTHON_CLIENT_MEM_FRACTION=0.35`, `PI_CUP_BATCH_SIZE=4`, `PI_CUP_ROUNDS=20`.
+2. Lab runtime `/home/aiden/Desktop/lab/robot/pan-skill-models-20261001/coffee-online-bc/pi-cup-run`의 `coordinator-night-active.log`, pending/collection/status를 확인한다. 초기 인계 시 AMP collector PID2650016을 기존 로그로 join했다. 현재 PID는 pid 파일과 실제 ps로 다시 확인한다. 완료 summary가 있는 파일을 덮어쓰지 않는다. `pending-round-*`의 external PID는 실행 당시 정보를 보존하는 용도다.
+3. v4 전송 Python은 `/home/v4/skku-vla-grasp-only-20260930/transport/bc-venv/bin/python`(Python3.11/Hub2.1.1). 이전 root-owned venv는 Python3.8이고 HF 라이브러리가 없어 baseline 업로드에 실패했다. 결과를 보존한 채 환경을 새로 만들고 upload만 재시도해서 복구했다. Baseline: 컵6/30, 잡기27/30, 컵|잡기6/27. 평가 duration은 기존 프로세스 시작을 관측하지 못해 unknown이며 coordinator adoption 시간과 혼동하지 않는다.
+4. 새 성공8개를 max32 시도에서 확보하지 못하면 정상 data gate가 learner job을 만들지 않는다. 자동 점검은 보존된 shards를 먼저 확인하고 시도 상한을 64 또는96까지 늘리는 수집 실험을 할 수 있다. 현재 seed stride100이므로 상한100 미만을 유지해 라운드 간 중복을 막는다. 현재 코드는 수집 부족 시 32→64→96 상한 확장을 자동으로 기록한다. 실패 action을 성공으로 처리하거나 official success 조건을 약화하지 않는다. 초기 BC 생략 상태에서 첫 라운드도 새 성공이 최소1개 필요하다.
+5. Best weights 경로는 HF `weights/pi05/round-XXXX`와 SKKU training/round-XXXX에 보존한다. Eval은 `evaluation/pi05/version-XXXX`, 학습 데이터는 `data/pi05/<node>/round-XXXX/batch-XX`. 두 경로를 합치지 않는다.
+
+확인한 공식 자료: [JAX compilation cache](https://docs.jax.dev/en/latest/persistent_compilation_cache.html), [W&B SDK](https://github.com/wandb/wandb), [W&B long-key issue](https://github.com/wandb/wandb/issues/11614), [RLinf](https://github.com/RLinf/RLinf). 추가 조사는 실제 bottleneck/failure에 맞춰 진행하고 변경 전후의 측정값을 보존한다.

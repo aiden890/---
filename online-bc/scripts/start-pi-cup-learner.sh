@@ -8,6 +8,9 @@ mkdir -p "$work_dir"
 export HF_HOME="$work_dir/hf-cache"
 export OPENPI_DATA_HOME="$work_dir/openpi-cache"
 export XLA_PYTHON_CLIENT_MEM_FRACTION="${XLA_PYTHON_CLIENT_MEM_FRACTION:-0.6}"
+export JAX_COMPILATION_CACHE_DIR="${JAX_COMPILATION_CACHE_DIR:-$work_dir/jax-cache}"
+mkdir -p "$JAX_COMPILATION_CACHE_DIR"
+chmod 700 "$JAX_COMPILATION_CACHE_DIR"
 export PYTHONPATH="$kit_dir/native-openpi/src:$kit_dir/native-openpi/packages/openpi-client/src:$kit_dir/src${PYTHONPATH:+:$PYTHONPATH}"
 case "$mode" in
   setup)
@@ -41,7 +44,7 @@ case "$mode" in
     : "${HF_TOKEN_FILE:?Set HF_TOKEN_FILE to the existing private token file, without pasting it into chat}"
     checkpoint="${PI_CUP_CHECKPOINT:-$work_dir/checkpoints/pi05_pretrain_human300/multitask_learning/75000}"
     test -d "$checkpoint/params"; test -d "$checkpoint/assets"; test -f "$HF_TOKEN_FILE"
-    nohup "$work_dir/pi05-venv/bin/python" -m online_bc.learning.learner_service --model pi05 --checkpoint "$checkpoint" --root "$work_dir/run" --run pi05-cup-online-bc-20261001 --transport-python "$work_dir/transport-venv/bin/python" --token-file "$HF_TOKEN_FILE" --bootstrap-models xiaomi pi05 --skills cup_placement --bootstrap-steps 0 --rounds 5 > "$work_dir/learner.log" 2>&1 < /dev/null &
+    nohup "$work_dir/pi05-venv/bin/python" -m online_bc.learning.learner_service --model pi05 --checkpoint "$checkpoint" --root "$work_dir/run" --run pi05-cup-online-bc-20261001 --transport-python "$work_dir/transport-venv/bin/python" --token-file "$HF_TOKEN_FILE" --bootstrap-models xiaomi pi05 --skills cup_placement --bootstrap-steps 0 --rounds "${PI_CUP_ROUNDS:-5}" > "$work_dir/learner.log" 2>&1 < /dev/null &
     echo "$!" > "$work_dir/learner.pid"; printf 'LEARNER_PID=%s\nLOG=%s\n' "$(cat "$work_dir/learner.pid")" "$work_dir/learner.log"
     ;; 
   *) printf 'Usage: bash start-pi-cup-learner.sh setup|check|download|validate|start\n' >&2;exit 2;;

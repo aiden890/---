@@ -49,7 +49,14 @@ class ControlSync:
                 state["rounds"].append({"round": folder.name, **d})
                 for eid, count in d.get("used", {}).items():
                     state["used"][eid] = state["used"].get(eid, 0) + count
-                state["status"] = d.get("status", state["status"])
+                state["training_status"] = d.get("status")
+                if d.get("status") != "completed":
+                    state["status"] = d.get("status", state["status"])
+            updates = folder / "updates.json"
+            if updates.exists():
+                state.setdefault("updates", []).extend(
+                    dict(round=folder.name, **row) for row in json.loads(updates.read_text())
+                )
         state_dir = self.root / "published-state"
         atomic_json(state_dir / "state.json", state)
         self.sync("upload", state_dir, f"{self.run}/learner-state/pi05")

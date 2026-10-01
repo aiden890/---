@@ -85,7 +85,7 @@ class Backend:
         # after loading the adapter, and invalidate after every update/reload.
         self.infer_fn = None
 
-    def update(self, sample, seed=0):
+    def prepare(self, sample):
         from openpi_client import image_tools
 
         o = sample["obs"]
@@ -120,15 +120,21 @@ class Backend:
             raw[key] = image_tools.convert_to_uint8(
                 image_tools.resize_with_pad(o[obskey], 224, 224)
             )
-        data = self.transform(raw)
-        data = self.jax.tree.map(lambda x: self.jnp.asarray(x)[None], data)
+        return self.transform(raw)
+
+    def update(self, sample, seed=0):
+        return self.update_batch([sample], seed=seed)
+
+    def update_batch(self, samples, seed=0):
+        prepared = [self.prepare(sample) for sample in samples]
+        data = self.jax.tree.map(lambda *items: self.jnp.asarray(np.stack(items)), *prepared)
         obs = self.base.Observation.from_dict(data)
         loss, gn, self.opt_state = self.step(
             self.model,
             self.opt_state,
             obs,
             data["actions"],
-            self.jnp.asarray(sample["valid"])[None],
+            self.jnp.asarray(np.stack([sample["valid"] for sample in samples])),
             self.jax.random.key(seed),
         )
         self.infer_fn = None
