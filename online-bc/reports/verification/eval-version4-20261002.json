@@ -1,0 +1,246 @@
+{
+  "verified_at": 1790887365.4790149,
+  "evaluation": {
+    "model": "pi05",
+    "policy_version": 4,
+    "attempts": 30,
+    "cup_successes": 4,
+    "cup_success_rate": 0.13333333333333333,
+    "grasp_successes": 25,
+    "cup_given_grasp": 0.16,
+    "seeds": [
+      992001,
+      992002,
+      992003,
+      992004,
+      992005,
+      992006,
+      992007,
+      992008,
+      992009,
+      992010,
+      992011,
+      992012,
+      992013,
+      992014,
+      992015,
+      992016,
+      992017,
+      992018,
+      992019,
+      992020,
+      992021,
+      992022,
+      992023,
+      992024,
+      992025,
+      992026,
+      992027,
+      992028,
+      992029,
+      992030
+    ],
+    "training_data": false,
+    "profiling": {
+      "profiled_episodes": 30,
+      "episode_mean_environment_create_seconds": 6.371077059962166,
+      "episode_mean_environment_reset_seconds": 5.786916422230813,
+      "episode_mean_environment_step_with_observations_seconds": 61.853463769727384,
+      "episode_mean_episode_before_result_write_seconds": 105.15034313804935,
+      "episode_mean_observation_capture_seconds": 6.5246454680959385,
+      "episode_mean_observation_history_seconds": 0.09190331327263265,
+      "episode_mean_policy_inference_seconds": 21.548139897982278,
+      "episode_mean_result_and_capture_storage_seconds": 0.02969090696424246,
+      "episode_mean_success_predicates_seconds": 0.9403272600844502,
+      "episode_mean_video_encode_seconds": 1.8259657464766255,
+      "simulator_workers": 2,
+      "reused_completed_episodes": 0
+    },
+    "wall_seconds": 1584.7680522049777,
+    "outcomes": [
+      {
+        "seed": 992001,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992002,
+        "cup_placed": false,
+        "grasped": false
+      },
+      {
+        "seed": 992003,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992004,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992005,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992006,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992007,
+        "cup_placed": true,
+        "grasped": true
+      },
+      {
+        "seed": 992008,
+        "cup_placed": false,
+        "grasped": false
+      },
+      {
+        "seed": 992009,
+        "cup_placed": true,
+        "grasped": true
+      },
+      {
+        "seed": 992010,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992011,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992012,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992013,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992014,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992015,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992016,
+        "cup_placed": true,
+        "grasped": true
+      },
+      {
+        "seed": 992017,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992018,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992019,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992020,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992021,
+        "cup_placed": false,
+        "grasped": false
+      },
+      {
+        "seed": 992022,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992023,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992024,
+        "cup_placed": false,
+        "grasped": false
+      },
+      {
+        "seed": 992025,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992026,
+        "cup_placed": true,
+        "grasped": true
+      },
+      {
+        "seed": 992027,
+        "cup_placed": false,
+        "grasped": false
+      },
+      {
+        "seed": 992028,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992029,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992030,
+        "cup_placed": false,
+        "grasped": true
+      }
+    ],
+    "controller_wall_seconds": 1590.1363888955675,
+    "adopted_external": false
+  },
+  "baseline": {
+    "cup": 6,
+    "grasp": 27,
+    "attempts": 30
+  },
+  "paired": {
+    "lost": 4,
+    "gained": 2,
+    "same_first10_cup": 2,
+    "same_first10_grasp": 8
+  },
+  "conclusion": "Observed drop6to4, no established improvement; small paired sample not confirmed regression.",
+  "adaptation": {
+    "action": "reduce_learning_rate",
+    "learning_rate": 2.5e-05,
+    "best_version": 0,
+    "common_seed_successes": 2,
+    "common_seed_attempts": 10,
+    "best_successes": 2,
+    "statistically_confirmed": false,
+    "version": 4
+  },
+  "round5": {
+    "cumulative_updates": 250,
+    "new_successes": 9,
+    "attempts": 48,
+    "learning_rate": 2.5e-05,
+    "all50_updates_finite": true,
+    "warm_median_seconds": 0.36305394722148776
+  },
+  "hypothesis": "Base policy prefix plus adapted cup skill; frozen-cache equivalence only validated, routing/performance still untested."
+}

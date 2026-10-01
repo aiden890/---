@@ -1,0 +1,43 @@
+{
+  "status": "passed",
+  "deployed": false,
+  "checkpoint": "/home/work/robot_aiden_260930/pi-cup-online-bc/checkpoints/pi05_pretrain_human300/multitask_learning/75000",
+  "adapter": "/home/work/robot_aiden_260930/pi-cup-online-bc/run/training/round-0004/update-000050",
+  "samples": [
+    {
+      "episode_id": "pi05-seed981018",
+      "step": 416,
+      "rng_seed": 533501,
+      "base_max_abs_error": 0.0,
+      "adapter_max_abs_error": 0.0,
+      "adapter_base_max_abs_difference": 0.11936042286818146,
+      "base_warm_seconds": 0.097313167527318,
+      "adapter_warm_seconds": 0.09659300465136766
+    },
+    {
+      "episode_id": "pi05-seed981014",
+      "step": 624,
+      "rng_seed": 533502,
+      "base_max_abs_error": 0.0,
+      "adapter_max_abs_error": 0.0,
+      "adapter_base_max_abs_difference": 0.07490613849625093,
+      "base_warm_seconds": 0.09618163015693426,
+      "adapter_warm_seconds": 0.09628232941031456
+    },
+    {
+      "episode_id": "pi05-seed981017",
+      "step": 656,
+      "rng_seed": 533503,
+      "base_max_abs_error": 0.0,
+      "adapter_max_abs_error": 0.0,
+      "adapter_base_max_abs_difference": 0.0964930370979525,
+      "base_warm_seconds": 0.09637384116649628,
+      "adapter_warm_seconds": 0.0965132424607873
+    }
+  ],
+  "wall_seconds": 29.337710418738425,
+  "production_updates": 0,
+  "simulator_changes": false,
+  "scope": "Frozen inference snapshot equivalence only; skill routing and rollout performance remain untested.",
+  "source": "https://github.com/Physical-Intelligence/openpi/blob/main/src/openpi/shared/nnx_utils.py"
+}
