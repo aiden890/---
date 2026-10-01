@@ -60,9 +60,15 @@ for seed in map(int, args.seeds.split(",")):
     out.mkdir(exist_ok=False)
     np.random.seed(seed)
     random.seed(seed)
+    episode_started = time.monotonic()
+    phase_seconds = collections.defaultdict(float)
+    phase_started = time.monotonic()
     env = gym.make("robocasa/PrepareCoffee", split="pretrain", seed=seed)
+    phase_seconds["environment_create"] = time.monotonic() - phase_started
     try:
+        phase_started = time.monotonic()
         obs, _ = rollout.reset_env(env, seed)
+        phase_seconds["environment_reset"] = time.monotonic() - phase_started
         k = env.unwrapped.env
         instruction = str(obs["annotation.human.task_description"])
         rest_pos = np.array(k.sim.data.body_xpos[k.obj_body_id["obj"]], copy=True)
@@ -111,16 +117,27 @@ for seed in map(int, args.seeds.split(",")):
                         if args.skill and cup_skill_start is not None
                         else instruction
                     )
+                    phase_started = time.monotonic()
                     capture.observation(step - 1, obs, images, states, rollout)
+                    phase_seconds["observation_capture"] += time.monotonic() - phase_started
                     t = time.time()
                     plan.extend(policy.infer(obs, images, states, policy_instruction, seed, calls))
                     times.append(time.time() - t)
                     calls += 1
                 action = np.asarray(plan.popleft(), np.float32)
                 actions.append(action.copy())
+                phase_started = time.monotonic()
                 obs, _, done, trunc, info = env.step(convert_action(action))
+                # env.step includes observation rendering; this is not physics-only time.
+                phase_seconds["environment_step_with_observations"] += (
+                    time.monotonic() - phase_started
+                )
+                phase_started = time.monotonic()
                 append(obs, images, states)
+                phase_seconds["observation_history"] += time.monotonic() - phase_started
+                phase_started = time.monotonic()
                 p = predicates(k, rest_pos)
+                phase_seconds["success_predicates"] += time.monotonic() - phase_started
                 success = p["official_success"]
                 assert success == bool(info["success"])
                 trace.append(dict(step=step, **p))
@@ -135,12 +152,14 @@ for seed in map(int, args.seeds.split(",")):
                     if p[key] and key not in milestones:
                         milestones[key] = step
                 if step % 2 == 0 or success:
+                    phase_started = time.monotonic()
                     writer.append_data(
                         overlay(
                             obs,
                             f"{args.model} | step {step} | lifted {int(p['mug_lifted'])} | dispenser {int(p['mug_under_dispenser'])} | on {int(p['coffee_machine_on'])}",
                         )
                     )
+                    phase_seconds["video_encode"] += time.monotonic() - phase_started
                 if step % 160 == 0:
                     print(
                         json.dumps(
@@ -168,8 +187,11 @@ for seed in map(int, args.seeds.split(",")):
                 if success or done or trunc:
                     break
         finally:
+            phase_started = time.monotonic()
             writer.close()
+            phase_seconds["video_encode"] += time.monotonic() - phase_started
         (out / "video.partial.mp4").replace(out / "video.mp4")
+        storage_started = time.monotonic()
         np.save(out / "actions.npy", np.asarray(actions))
         write(out / "trace.json", trace)
         if success:
@@ -213,6 +235,10 @@ for seed in map(int, args.seeds.split(",")):
         )
         result.update(score(trace))
         capture.finalize(np.asarray(actions), trace, args.model, seed, instruction)
+        phase_seconds["result_and_capture_storage"] = time.monotonic() - storage_started
+        phase_seconds["policy_inference"] = sum(times)
+        phase_seconds["episode_before_result_write"] = time.monotonic() - episode_started
+        result["phase_seconds"] = dict(phase_seconds)
         write(out / "result.json", result)
         print(json.dumps(dict(event="VIDEO_READY", **result)), flush=True)
     finally:

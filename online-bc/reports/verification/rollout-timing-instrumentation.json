@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "check": "AST identical after stripping measurement-only statements",
+  "observation_action_order_unchanged": true,
+  "success_logic_unchanged": true,
+  "mixed_legacy_new_profile_summary_checked": true,
+  "sources": [
+    "https://github.com/ARISE-Initiative/robosuite/blob/master/robosuite/environments/base.py",
+    "https://robosuite.ai/docs/modules/sensors.html"
+  ]
+}

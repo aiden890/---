@@ -12,6 +12,15 @@ from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 
 
+def profile_summary(results):
+    profiles = [row["phase_seconds"] for row in results if row.get("phase_seconds")]
+    summary = {"profiled_episodes": len(profiles)}
+    for key in sorted({key for row in profiles for key in row}):
+        values = [row[key] for row in profiles if key in row]
+        summary[f"episode_mean_{key}_seconds"] = sum(values) / len(values)
+    return summary
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--config", required=True)
@@ -120,10 +129,11 @@ def main():
     with ThreadPoolExecutor(max_workers=c.get("workers", 3)) as pool:
         list(pool.map(collect, enumerate(shards)))
     collection_seconds = time.monotonic() - began
+    results = [
+        json.loads(path.read_text()) for path in sorted((root / model).glob("*/result.json"))
+    ]
+    profile = profile_summary(results)
     if args.action == "eval":
-        results = [
-            json.loads(path.read_text()) for path in sorted((root / model).glob("*/result.json"))
-        ]
         assert len(results) == len(seeds) and {row["seed"] for row in results} == set(seeds)
         assert all(row["policy_version"] == args.round for row in results)
         successes = sum(row["cup_placed"] for row in results)
@@ -138,6 +148,7 @@ def main():
             cup_given_grasp=successes / grasped if grasped else None,
             seeds=seeds,
             training_data=False,
+            profiling=profile,
             wall_seconds=collection_seconds,
             outcomes=[
                 dict(
@@ -198,6 +209,7 @@ def main():
                     packing_seconds=packing_seconds,
                     upload_seconds=upload_seconds,
                     total_seconds=time.monotonic() - began,
+                    **profile,
                 ),
             )
         ),
