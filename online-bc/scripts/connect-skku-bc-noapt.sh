@@ -87,37 +87,5 @@ PY_CHECKSUM
   --install) ;;
   *) printf 'Usage: bash setup-skku-online-bc.sh --connect|--install|--install-tailscale\n' >&2; exit 2 ;;
 esac
-export HF_TOKEN_FILE="${HF_TOKEN_FILE:-$work_dir/secrets/hf-token}"
-if ! test -s "$HF_TOKEN_FILE"; then
-  mkdir -p "$(dirname "$HF_TOKEN_FILE")"
-  read -r -s -p 'HF token (hidden): ' task_hf_token
-  printf '\n'
-  (umask 077; printf '%s' "$task_hf_token" > "$HF_TOKEN_FILE")
-  unset task_hf_token
-fi
-if ! command -v uv >/dev/null; then python3 -m pip install --user uv; fi
-export PATH="$HOME/.local/bin:$PATH"
-test -x "$work_dir/transport-venv/bin/python" || uv venv --python 3.11 "$work_dir/transport-venv"
-uv pip install --python "$work_dir/transport-venv/bin/python" 'huggingface_hub>=2,<3'
-export PI_BOOTSTRAP_DIR="$kit_dir"
-"$work_dir/transport-venv/bin/python" - <<'PY'
-import hashlib, json, os, tarfile
-from pathlib import Path
-from huggingface_hub import sync_bucket
-kit=Path(os.environ['PI_BOOTSTRAP_DIR'])
-incoming=kit/'download'
-sync_bucket('hf://buckets/khmin101/vla-rollout-transfer/pi05-cup-online-bc-20261001/code',str(incoming),token=Path(os.environ['HF_TOKEN_FILE']).read_text().strip(),quiet=True)
-archive=incoming/'pi05-cup-online-bc-kit.tar.gz'
-expected=json.loads((incoming/'SHA256.json').read_text())['sha256']
-assert hashlib.sha256(archive.read_bytes()).hexdigest()==expected, 'Kit checksum mismatch'
-with tarfile.open(archive) as tar:
-    for member in tar.getmembers():
-        name=Path(member.name)
-        if name.is_absolute() or '..' in name.parts or not member.isfile():raise ValueError('Unsafe kit member')
-    tar.extractall(kit,filter='data')
-PY
-bash "$kit_dir/scripts/start-pi-cup-learner.sh" setup
-bash "$kit_dir/scripts/start-pi-cup-learner.sh" check
-bash "$kit_dir/scripts/start-pi-cup-learner.sh" download
-printf '\nSetup complete. Learner has not started.\nKIT_DIR=%s\nHF_TOKEN_FILE=%s\n' "$kit_dir" "$HF_TOKEN_FILE"
-printf 'Next: export HF_TOKEN_FILE="%s"\nbash "%s/scripts/start-pi-cup-learner.sh" validate\n' "$HF_TOKEN_FILE" "$kit_dir"
+printf "Use this file with --connect.\n" >&2
+exit 2
