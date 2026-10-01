@@ -134,11 +134,16 @@ class ReviewServer(ThreadingHTTPServer):
                         dict(published_revision=last, status="synced", at=time.time()),
                     )
                 if time.time() - pull_at >= 15:
-                    self.transport(
+                    incoming = self.root / "incoming-learner-state"
+                    result = self.transport(
                         "download",
-                        self.root / "learner-state",
+                        incoming,
                         f"{self.args.run}/learner-state/pi05",
                     )
+                    if result.returncode == 0 and (incoming / "state.json").exists():
+                        state = json.loads((incoming / "state.json").read_text())
+                        with self.lock:
+                            atomic_json(self.learner_path, state)
                     pull_at = time.time()
             except (OSError, ValueError, subprocess.TimeoutExpired, RuntimeError):
                 atomic_json(
