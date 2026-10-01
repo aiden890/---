@@ -656,6 +656,12 @@
         "Mode": "ro",
         "RW": false,
         "Propagation": "rprivate"
+      },
+      {
+        "Type": "bind",
+        "Source": "/mnt/data/guest/online-bc-archives",
+        "Destination": "/mnt/data/guest/online-bc-archives",
+        "RW": false
       }
     ],
     "Config": {

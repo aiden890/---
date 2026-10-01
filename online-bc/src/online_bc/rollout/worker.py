@@ -60,6 +60,17 @@ def conditional_cup_rate(outcomes):
     return sum(row["cup_placed"] for row in grasped) / len(grasped) if grasped else None
 
 
+def reused_rollouts(root, model, seeds, version):
+    count = 0
+    for seed in seeds:
+        path = root / model / f"{model}-seed{seed}" / "result.json"
+        if path.exists():
+            row = json.loads(path.read_text())
+            assert (row["model"], row["seed"], row["policy_version"]) == (model, seed, version)
+            count += 1
+    return count
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--config", required=True)
@@ -158,6 +169,9 @@ def main():
     if args.action == "eval":
         assert 1 <= args.eval_episodes <= 30
         seeds = list(range(992001, 992001 + args.eval_episodes))
+    reused = reused_rollouts(
+        root, model, seeds, args.round if args.action == "eval" else args.round - 1
+    )
     shards = [seeds[i :: c.get("workers", 3)] for i in range(c.get("workers", 3))]
 
     def collect(pair):
@@ -179,12 +193,15 @@ def main():
 
     with ThreadPoolExecutor(max_workers=c.get("workers", 3)) as pool:
         list(pool.map(collect, enumerate(shards)))
-    collection_seconds = time.monotonic() - began
+    # A retry may skip completed episodes in run_coffee. Its recovery wall time
+    # must not masquerade as the original simulator throughput measurement.
+    collection_seconds = None if reused else time.monotonic() - began
     results = [
         json.loads(path.read_text()) for path in sorted((root / model).glob("*/result.json"))
     ]
     profile = profile_summary(results)
     profile["simulator_workers"] = sum(bool(shard) for shard in shards)
+    profile["reused_completed_episodes"] = reused
     if args.action == "eval":
         assert len(results) == len(seeds) and {row["seed"] for row in results} == set(seeds)
         assert all(row["policy_version"] == args.round for row in results)

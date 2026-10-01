@@ -3,10 +3,22 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from online_bc.rollout.worker import active_policy_readers, conditional_cup_rate
+from online_bc.rollout.worker import active_policy_readers, conditional_cup_rate, reused_rollouts
 
 
 class PolicyCoordination(unittest.TestCase):
+    def test_recovery_rejects_a_result_from_another_policy_version(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            folder = root / "pi05/pi05-seed993441"
+            folder.mkdir(parents=True)
+            (folder / "result.json").write_text(
+                json.dumps(dict(model="pi05", seed=993441, policy_version=3))
+            )
+            self.assertEqual(reused_rollouts(root, "pi05", [993441, 993442], 3), 1)
+            with self.assertRaises(AssertionError):
+                reused_rollouts(root, "pi05", [993441], 4)
+
     def test_conditional_success_excludes_placement_without_grasp(self):
         rows = [dict(grasped=True, cup_placed=True),
                 dict(grasped=True, cup_placed=False),

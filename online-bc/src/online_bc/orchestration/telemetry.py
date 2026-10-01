@@ -53,12 +53,15 @@ def events(root, learner, steps=50):
         version = int(path.stem.split("-")[-1])
         for source in row["sources"]:
             yield (
-                f"collection/{version}/{source['batch']}/{source['node']}",
+                f"collection/{version}/{source['batch']}/{source['node']}"
+                + (f"/revision-{source['metrics_revision']}"
+                   if source.get("metrics_revision") else ""),
                 {
                     "collection/version": version,
                     "collection/node": source["node"],
                     "collection/attempts": len(source["seeds"]),
                     "collection/valid_successes": len(source["accepted"]),
+                    "collection/metrics_revision": source.get("metrics_revision", 0),
                     **{
                         f"collection/{key}": value
                         for key, value in source.get("timings", {}).items()

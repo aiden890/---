@@ -1,0 +1,111 @@
+{
+  "verified_at": 1790885486.8647842,
+  "cause": "AMP root filesystem full; completed result files preserved; worker exit120 after log truncation at8192bytes",
+  "recovery": {
+    "coordinator_pid": 2723301,
+    "telemetry_pid": 2728044,
+    "learner_pid": 26119,
+    "health_pid": 2654776,
+    "archiver_pid": 3322201,
+    "resumed_pending_round": 4,
+    "resumed_pending_batch": 6,
+    "rerolled_completed_episodes": 0,
+    "preserved_failed_log": "amp-round-0004-batch-06.failed-20261002.log"
+  },
+  "storage": {
+    "migrated_rounds": [
+      1,
+      2,
+      3
+    ],
+    "file_sha256_verified": true,
+    "original_paths_preserved_as_symlinks": true,
+    "archive_mount_read_only": true,
+    "root_free_bytes": 7371034624,
+    "data_free_bytes": 34614480896,
+    "v4_free_bytes": 59345072128,
+    "cloud_archived_rounds": [
+      1,
+      2
+    ],
+    "remote_size_verified": true,
+    "round1_sha256": "f2d564ad2d9f1127fbb473da7da4abd972ec945dc4ef650ad740947a87eecac4",
+    "round2_sha256": "6fc08e3f3f6ced13ad4aff3024c6498940ac7b8699afb28165f3548abe06ea90",
+    "retained": [
+      "videos",
+      "actions.npy",
+      "trace",
+      "JSON manifests",
+      "successful shard archives",
+      "recent two rounds raw"
+    ],
+    "remote_full_tar_before_npz_pruning": true
+  },
+  "round4": {
+    "cumulative_updates": 200,
+    "updates": 50,
+    "batch_size": 4,
+    "learning_rates": [
+      5e-05
+    ],
+    "all_loss_grad_finite": true,
+    "first_two_update_seconds": [
+      30.084634036757052,
+      29.539008081890643
+    ],
+    "warm_update_median_seconds": 0.3630162184126675,
+    "native_update_seconds_sum": 77.0631098356098,
+    "attempts": 64,
+    "valid_new_successes": 10
+  },
+  "reused_collection_metric": {
+    "model": "pi05",
+    "node": "amp",
+    "batch": 6,
+    "round": 4,
+    "prefix": "pi05-cup-online-bc-20261001/data/pi05/amp/round-0004/batch-06",
+    "seeds": [
+      993441,
+      993442,
+      993443,
+      993444
+    ],
+    "accepted": [],
+    "remote_root": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0004/batch-06",
+    "timings": {
+      "collection_seconds": null,
+      "dataset_seconds": 1.947033679112792,
+      "packing_seconds": 0.07173603028059006,
+      "upload_seconds": 2.6788550782948732,
+      "total_seconds": 14.573336282745004,
+      "profiled_episodes": 4,
+      "episode_mean_environment_create_seconds": 15.18033490050584,
+      "episode_mean_environment_reset_seconds": 6.0060341861099005,
+      "episode_mean_environment_step_with_observations_seconds": 96.88883468043059,
+      "episode_mean_episode_before_result_write_seconds": 160.31493857316673,
+      "episode_mean_observation_capture_seconds": 10.536446787416935,
+      "episode_mean_observation_history_seconds": 0.1533820671029389,
+      "episode_mean_policy_inference_seconds": 27.958154678344727,
+      "episode_mean_result_and_capture_storage_seconds": 0.058946194127202034,
+      "episode_mean_success_predicates_seconds": 0.6632784036919475,
+      "episode_mean_video_encode_seconds": 2.510667108464986,
+      "simulator_workers": 4,
+      "recovery_collection_seconds": 9.874306188896298,
+      "reused_completed_episodes": 4
+    },
+    "metrics_revision": 1
+  },
+  "tests": {
+    "unit_tests_passed": 29,
+    "ruff_check": "passed"
+  },
+  "state": "v4 full30 version4 evaluation and AMP round5 collection overlap; full30 pending",
+  "research": [
+    "https://docs.jax.dev/en/latest/persistent_compilation_cache.html"
+  ],
+  "limits": [
+    "No established performance gain yet",
+    "Warm update time excludes model/data/save/transfer and cold LR compile",
+    "Remote backup verified by SDK success and size, not full remote download digest"
+  ]
+}
