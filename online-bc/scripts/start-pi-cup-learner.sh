@@ -23,17 +23,17 @@ case "$mode" in
     "$work_dir/pi05-venv/bin/python" -c 'import jax,torch,flax; from openpi.models.pi0_config import Pi0Config; print({"jax":jax.__version__,"flax":flax.__version__,"devices":[str(d) for d in jax.devices()]}); assert any(d.platform=="gpu" for d in jax.devices())'
     ;; 
   download)
-    "$work_dir/pi05-venv/bin/python" "$kit_dir/src/download_pi_checkpoint.py" "$work_dir/checkpoints"
+    "$work_dir/pi05-venv/bin/python" -m online_bc.models.download_pi_checkpoint "$work_dir/checkpoints"
     ;; 
   validate)
     : "${HF_TOKEN_FILE:?Set HF_TOKEN_FILE to the private token file}"
     checkpoint="${PI_CUP_CHECKPOINT:-$work_dir/checkpoints/pi05_pretrain_human300/multitask_learning/75000}"
-    "$work_dir/pi05-venv/bin/python" "$kit_dir/src/prepare_bootstrap.py" --root "$work_dir/validation-data" --transport-python "$work_dir/transport-venv/bin/python" --token-file "$HF_TOKEN_FILE"
+    "$work_dir/pi05-venv/bin/python" -m online_bc.data.prepare_bootstrap --root "$work_dir/validation-data" --transport-python "$work_dir/transport-venv/bin/python" --token-file "$HF_TOKEN_FILE"
     "$work_dir/pi05-venv/bin/python" "$kit_dir/tests/test_pipeline.py"
-    "$work_dir/pi05-venv/bin/python" "$kit_dir/src/validate_dataset.py" "$work_dir/validation-data/data/pi05"
-    "$work_dir/pi05-venv/bin/python" "$kit_dir/src/validate_dataset.py" "$work_dir/validation-data/data/xiaomi"
-    "$work_dir/pi05-venv/bin/python" "$kit_dir/src/train_online_bc.py" --model pi05 --checkpoint "$checkpoint" --data "$work_dir/validation-data/data/pi05" "$work_dir/validation-data/data/xiaomi" --out "$work_dir/verification" --skills cup_placement --smoke --defer-inference
-    "$work_dir/pi05-venv/bin/python" "$kit_dir/src/verify_inference.py" --model pi05 --checkpoint "$checkpoint" --data "$work_dir/validation-data/data/pi05" "$work_dir/validation-data/data/xiaomi" --out "$work_dir/verification"
+    "$work_dir/pi05-venv/bin/python" -m online_bc.data.validate_dataset "$work_dir/validation-data/data/pi05"
+    "$work_dir/pi05-venv/bin/python" -m online_bc.data.validate_dataset "$work_dir/validation-data/data/xiaomi"
+    "$work_dir/pi05-venv/bin/python" -m online_bc.learning.train_online_bc --model pi05 --checkpoint "$checkpoint" --data "$work_dir/validation-data/data/pi05" "$work_dir/validation-data/data/xiaomi" --out "$work_dir/verification" --skills cup_placement --smoke --defer-inference
+    "$work_dir/pi05-venv/bin/python" -m online_bc.validation.verify_inference --model pi05 --checkpoint "$checkpoint" --data "$work_dir/validation-data/data/pi05" "$work_dir/validation-data/data/xiaomi" --out "$work_dir/verification"
     ;;
   start)
     "$work_dir/pi05-venv/bin/python" -c 'import json,sys; r=json.load(open(sys.argv[1])); assert r["passed"] and r["frozen_backbone_unchanged"] and r["optimizer_resume_equal"]' "$work_dir/verification/verification.json"
@@ -41,7 +41,7 @@ case "$mode" in
     : "${HF_TOKEN_FILE:?Set HF_TOKEN_FILE to the existing private token file, without pasting it into chat}"
     checkpoint="${PI_CUP_CHECKPOINT:-$work_dir/checkpoints/pi05_pretrain_human300/multitask_learning/75000}"
     test -d "$checkpoint/params"; test -d "$checkpoint/assets"; test -f "$HF_TOKEN_FILE"
-    nohup "$work_dir/pi05-venv/bin/python" "$kit_dir/src/learner_service.py" --model pi05 --checkpoint "$checkpoint" --root "$work_dir/run" --run pi05-cup-online-bc-20261001 --transport-python "$work_dir/transport-venv/bin/python" --token-file "$HF_TOKEN_FILE" --bootstrap-models xiaomi pi05 --skills cup_placement --bootstrap-steps 0 --rounds 5 > "$work_dir/learner.log" 2>&1 < /dev/null &
+    nohup "$work_dir/pi05-venv/bin/python" -m online_bc.learning.learner_service --model pi05 --checkpoint "$checkpoint" --root "$work_dir/run" --run pi05-cup-online-bc-20261001 --transport-python "$work_dir/transport-venv/bin/python" --token-file "$HF_TOKEN_FILE" --bootstrap-models xiaomi pi05 --skills cup_placement --bootstrap-steps 0 --rounds 5 > "$work_dir/learner.log" 2>&1 < /dev/null &
     echo "$!" > "$work_dir/learner.pid"; printf 'LEARNER_PID=%s\nLOG=%s\n' "$(cat "$work_dir/learner.pid")" "$work_dir/learner.log"
     ;; 
   *) printf 'Usage: bash start-pi-cup-learner.sh setup|check|download|validate|start\n' >&2;exit 2;;

@@ -9,12 +9,12 @@
       "collect_argv": [
         "ssh",
         "amp_csi",
-        "python3 /home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/src/worker.py --config /home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/configs/pi05-worker.json --round {round} --run {run} collect"
+        "PYTHONPATH=/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/src python3 -m online_bc.rollout.worker --config /home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/configs/pi05-worker.json --round {round} --run {run} collect"
       ],
       "reload_argv": [
         "ssh",
         "amp_csi",
-        "python3 /home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/src/worker.py --config /home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/configs/pi05-worker.json --round {round} --run {run} reload"
+        "PYTHONPATH=/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/src python3 -m online_bc.rollout.worker --config /home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/configs/pi05-worker.json --round {round} --run {run} reload"
       ]
     }
   },

@@ -3,7 +3,7 @@ __pycache__/
 *-cache/
 secrets/
 *-venv/
-transport/
+/transport/
 cup-dataset/
 smoke-data.tar
 *.npz
@@ -17,3 +17,6 @@ native-openpi/
 initial-catalog.json
 review-server.log
 review-server.pid
+*.egg-info/
+build/
+dist/

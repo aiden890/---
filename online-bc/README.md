@@ -1,26 +1,43 @@
 # π₀.₅ · PrepareCoffee 컵 놓기 Online BC
 
-## Directory map
+## 폴더와 코딩 규칙
+
+Python의 일반적인 src layout을 사용한다. 코드 읽기를 시작할 곳은 `src/online_bc/`다.
 
 ```
 online-bc/
-  README.md              # Start here: scope, flow, operational commands
-  scripts/               # Lab management / SKKU learner entry points
-  configs/               # Host and rollout settings
-  src/                   # Dataset extraction, learner, rollout, review backend
-  web/                   # Interactive review page
-  tests/                 # Replay, exclusions, API, transfer, success criteria
-  requirements/          # Pinned learner dependencies
-  vendor/openpi/         # Pinned original OpenPI source archive
-  reports/verification/  # Previous validation results
+  pyproject.toml            # 패키지 정의, 공통 서식 규칙
+  src/online_bc/
+    data/                  # 성공 구간 추출, 검증, replay 샘플링
+    learning/              # gradient 업데이트와 learner 서비스
+    models/                # π, Xiaomi, GR00T 모델 연결
+    rollout/               # 시뮬레이터 실행과 워커
+    orchestration/         # 수집 → 학습 → 가중치 교체 조정
+    transport/             # HF 데이터 및 관리 설정 동기화
+    review/                # 영상 목록과 제외/재포함 API
+    validation/            # 모델 추론·HTTP 연결 검증
+    _vendor/               # 재사용한 원본 RLinf 코드와 라이선스
+  configs/                 # 서버별 설정; 알고리즘 코드와 분리
+  scripts/                 # Lab / SKKU 실행 진입점
+  web/                     # 관리 화면
+  tests/                   # 자동 검증
+  reports/verification/    # 실제 검증 기록
+  requirements/            # 모델별 학습 환경 의존성
+  vendor/openpi/           # 고정한 OpenPI 원본 소스 압축 파일
 ```
+
+- 파일 하나는 한 역할을 맡는다. 모델마다 다른 라이브러리는 `models/`에 두고, UI에서 모델을 직접 호출하지 않는다.
+- 의존성은 절대 import(`from online_bc.data.replay import Replay`)로 명시한다. 같은 이름의 외부 파일을 잘못 불러오는 일을 방지한다.
+- 일반 환경에서는 `python -m pip install -e . --no-deps`로 개발용 설치 후 `python -m online_bc.learning.train_online_bc ...`처럼 실행한다. 모델 라이브러리는 해당 환경에 별도로 설치한다.
+- GPU 이미지와 호스트 도구는 소스 마운트와 `PYTHONPATH`를 실행 스크립트에서 지정한다. 개별 파일을 직접 실행하는 방식은 쓰지 않는다.
+- 들여쓰기는 4칸, 함수·파일 이름은 `snake_case`, 클래스는 `PascalCase`, 한 줄에 한 문장으로 작성한다. `ruff format src/online_bc tests`로 서식을 통일한다. `_vendor` 원본은 자동 수정하지 않는다.
+- 데이터·체크포인트·로그·인증 토큰은 코드 폴더 밖에 저장한다.
+- 변경한 기능의 동작을 `tests/`에서 검증한다. 폴더를 더 나누는 것은 역할이 실제로 늘어날 때만 한다.
 
 Lab: `bash scripts/manage.sh status` / `review` / `collect 5` / `test-review`.
 SKKU: `bash scripts/start-pi-cup-learner.sh setup|check|download|validate|start`.
 
-Read the data flow in order: `src/build_cup_dataset.py` → `src/replay.py` → `src/train_online_bc.py` → `src/pi05_backend.py`.
-Review and exclusions: `src/review_server.py` → `src/control_sync.py` → `src/data_control.py` / `src/replay.py`.
-Generated state, tokens, checkpoints and datasets stay outside this code directory. `src/vendor/` contains the unchanged RLinf replay cache and its license.
+처음에는 `data/build_cup_dataset.py` → `data/replay.py` → `learning/train_online_bc.py` → `models/pi05_backend.py` 순서로 읽으면 된다. 관리 기능은 `review/review_server.py` → `transport/control_sync.py` → `data/data_control.py`에서 이어진다.
 
 현재 본 학습은 시작하지 않았다. 사용자가 지정할 SKKU GPU 세션 또는 AMP learner에서 아래 검증을 마친 뒤 시작한다. 다른 두 모델의 backend는 보존하며 이번 학습은 π₀.₅의 컵 놓기만 수행한다.
 
@@ -61,7 +78,7 @@ HF Bucket: `khmin101/vla-rollout-transfer`
 실험 prefix: `pi05-cup-online-bc-20261001`
 초기 데이터: `bootstrap/pi05`, `bootstrap/xiaomi`
 Jobs: `jobs/pi05/round-NNNN`; weights: `weights/pi05/round-NNNN`; 새 수집: `data/pi05/round-NNNN`.
-`round-0000` weights는 초기 50회 BC 이후의 bootstrap adapter다.
+`round-0000` weights는 초기 BC를 명시적으로 활성화했을 때만 생성한다. 현재는 초기 BC를 생략하므로 사용하지 않는다.
 
 ## 완료한 검증
 
@@ -95,7 +112,7 @@ bash scripts/start-pi-cup-learner.sh start
 Lab coordinator:
 
 ```bash
-python3 src/online_rounds.py --config configs/pi05-cup-coordinator.json --rounds 5
+python3 -m online_bc.orchestration.online_rounds --config configs/pi05-cup-coordinator.json --rounds 5
 ```
 
 사용자 서버 정보가 들어오면 연결 후 새 세션 검증을 실행하고 learner와 coordinator를 함께 시작한다. 세션 종료 시 checkpoint와 HF 자료로 재개한다.

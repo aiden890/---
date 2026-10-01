@@ -1,0 +1,13 @@
+{
+  "date": "2026-10-02",
+  "scope": "Online BC only",
+  "review_tests": 3,
+  "pipeline_tests": 11,
+  "editable_install_outside_project": "passed on AMP simulator image",
+  "simulator_reset": {
+    "seed": 993101,
+    "passed": true
+  },
+  "ruff": "passed",
+  "training_started": false
+}

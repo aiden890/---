@@ -9,7 +9,8 @@
   "host_python": "python3",
   "transport_argv": [
     "/home/v4/skku-vla-grasp-only-20260930/transport/venv/bin/python",
-    "/home/v4/skku-vla-grasp-only-20260930/results/coffee-online-bc/src/hf_transfer.py",
+    "-m",
+    "online_bc.transport.hf_transfer",
     "{direction}",
     "{directory}",
     "{prefix}",
@@ -18,14 +19,16 @@
   ],
   "ensure_policy_argv": [
     "python3",
-    "/home/v4/skku-vla-grasp-only-20260930/results/coffee-online-bc/src/docker_worker.py",
+    "-m",
+    "online_bc.rollout.docker_worker",
     "--model",
     "groot",
     "ensure"
   ],
   "collector_argv": [
     "python3",
-    "/home/v4/skku-vla-grasp-only-20260930/results/coffee-online-bc/src/docker_worker.py",
+    "-m",
+    "online_bc.rollout.docker_worker",
     "--model",
     "groot",
     "collect",
