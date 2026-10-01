@@ -7,7 +7,7 @@ mkdir -p "$work_dir" "$kit_dir"
 mode="${1:---connect}"
 case "$mode" in
   --connect)
-    if test "$(id -u)" -eq 0; then root_cmd=(); else
+    if test "$(id -u)" -eq 0; then root_cmd=(env); else
       command -v sudo >/dev/null || { printf 'sudo is required for Tailscale SSH.\n' >&2; exit 1; }
       sudo -v
       root_cmd=(sudo)

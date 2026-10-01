@@ -144,3 +144,5 @@ Dataset candidates and actual training usage are distinct. `data-usage.json` rec
 - RoboCasa OpenPI: `5a6beda9ff99da30b4e1b59320f6a32971d7c397` — 공식 main HEAD와 일치.
 - RLinf: `034579cbfc4643f72c184ffc06458f788c09b3e6` — 공식 main HEAD와 일치.
 - Physical Intelligence 원본 OpenPI main: `215abfb217dbac7d5f1273282331b9b1866c0479`. RoboCasa 포크와 별도 저장소이며 자동 교체하지 않는다. 학습 환경 의존성은 검증한 버전으로 고정한다.
+
+고정 30개 평가 시드(992001~992030)는 학습 replay에 넣지 않는다. 기본 모델(version 0)과 파일럿 마지막 체크포인트(version 5)를 v4에서 평가해 HF evaluation 경로에 metrics를 저장한다. 초기 수집 32회와 평가 30회는 별도 집계다.
