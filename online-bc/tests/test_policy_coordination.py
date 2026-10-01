@@ -3,10 +3,17 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from online_bc.rollout.worker import active_policy_readers
+from online_bc.rollout.worker import active_policy_readers, conditional_cup_rate
 
 
 class PolicyCoordination(unittest.TestCase):
+    def test_conditional_success_excludes_placement_without_grasp(self):
+        rows = [dict(grasped=True, cup_placed=True),
+                dict(grasped=True, cup_placed=False),
+                dict(grasped=False, cup_placed=True)]
+        self.assertEqual(conditional_cup_rate(rows), 0.5)
+        self.assertIsNone(conditional_cup_rate([rows[-1]]))
+
     def test_legacy_readers_match_only_the_same_policy(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

@@ -32,7 +32,8 @@ def events(root, learner, steps=50):
     for path in sorted(root.glob("evaluation/version-*/done.json")):
         row = json.loads(path.read_text())
         yield (
-            f"eval/{row['policy_version']}",
+            f"eval/{row['policy_version']}"
+            + (f"/revision-{row['metrics_revision']}" if row.get("metrics_revision") else ""),
             {
                 "eval/version": row["policy_version"],
                 "eval/attempts": row["attempts"],

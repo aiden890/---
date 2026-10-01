@@ -1,0 +1,15 @@
+{
+  "problem": "cup_given_grasp used all cup successes instead of their intersection with grasp.",
+  "version": 2,
+  "cup_successes": 6,
+  "grasp_successes": 25,
+  "joint_successes": 5,
+  "corrected_conditional_rate": 0.2,
+  "original_conditional_rate": 0.24,
+  "metrics_revision": 1,
+  "raw_report_preserved": true,
+  "hf_corrected": true,
+  "wandb_revision_event_confirmed": true,
+  "changed_training_data": false,
+  "tests_passed": 4
+}

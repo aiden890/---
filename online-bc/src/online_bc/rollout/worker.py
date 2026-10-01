@@ -54,6 +54,12 @@ def profile_summary(results):
     return summary
 
 
+def conditional_cup_rate(outcomes):
+    """Condition on grasp, excluding placements without a recorded grasp."""
+    grasped = [row for row in outcomes if row["grasped"]]
+    return sum(row["cup_placed"] for row in grasped) / len(grasped) if grasped else None
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--config", required=True)
@@ -184,6 +190,11 @@ def main():
         assert all(row["policy_version"] == args.round for row in results)
         successes = sum(row["cup_placed"] for row in results)
         grasped = sum("mug_grasped" in row["milestones"] for row in results)
+        outcomes = [
+            dict(seed=row["seed"], cup_placed=row["cup_placed"],
+                 grasped="mug_grasped" in row["milestones"])
+            for row in results
+        ]
         report = dict(
             model=model,
             policy_version=args.round,
@@ -191,19 +202,12 @@ def main():
             cup_successes=successes,
             cup_success_rate=successes / len(seeds),
             grasp_successes=grasped,
-            cup_given_grasp=successes / grasped if grasped else None,
+            cup_given_grasp=conditional_cup_rate(outcomes),
             seeds=seeds,
             training_data=False,
             profiling=profile,
             wall_seconds=collection_seconds,
-            outcomes=[
-                dict(
-                    seed=row["seed"],
-                    cup_placed=row["cup_placed"],
-                    grasped="mug_grasped" in row["milestones"],
-                )
-                for row in results
-            ],
+            outcomes=outcomes,
         )
         evaluation_upload = root / "evaluation-upload"
         evaluation_upload.mkdir(exist_ok=True)
