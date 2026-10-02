@@ -1,0 +1,167 @@
+{
+  "at": "2026-10-02T04:43:19.408540+00:00",
+  "status": "official_legacy_raw_inventory_complete_not_imported",
+  "sources": {
+    "CoffeeSetupMug": {
+      "url": "https://utexas.box.com/shared/static/zxytzos86xes7jo8z0gp7lklawbiyo8g.hdf5",
+      "bytes": 50768972,
+      "sha256": "93f315f283d2af946d91bd3ce54458db7cc7dfc9b2787a0f26711f5c8934f91e",
+      "episodes": 55,
+      "frames": 15342,
+      "env_name": "CoffeeSetupMug",
+      "env_version": "1.4.1",
+      "env_kwargs": {
+        "robots": "PandaMobile",
+        "control_freq": null,
+        "controller_configs": {
+          "type": "OSC_POSE",
+          "input_max": 1,
+          "input_min": -1,
+          "output_max": [
+            0.05,
+            0.05,
+            0.05,
+            0.5,
+            0.5,
+            0.5
+          ],
+          "output_min": [
+            -0.05,
+            -0.05,
+            -0.05,
+            -0.5,
+            -0.5,
+            -0.5
+          ],
+          "kp": 150,
+          "damping_ratio": 1,
+          "impedance_mode": "fixed",
+          "kp_limits": [
+            0,
+            300
+          ],
+          "damping_ratio_limits": [
+            0,
+            10
+          ],
+          "position_limits": null,
+          "orientation_limits": null,
+          "uncouple_pos_ori": true,
+          "control_delta": true,
+          "interpolation": null,
+          "ramp_ratio": 0.2
+        }
+      }
+    },
+    "PrepareCoffee": {
+      "url": "https://utexas.box.com/shared/static/qhtle2ccvm17g65ecg2vrudpkl9v5wkk.hdf5",
+      "bytes": 67566864,
+      "sha256": "a8cb6cf11da91479af7a4ede7a6ce09c7ded0606aa9607ad048788d95d56ca63",
+      "episodes": 55,
+      "frames": 32737,
+      "env_name": "PrepareCoffee",
+      "env_version": "1.4.1",
+      "env_kwargs": {
+        "robots": "PandaMobile",
+        "control_freq": null,
+        "controller_configs": {
+          "type": "OSC_POSE",
+          "input_max": 1,
+          "input_min": -1,
+          "output_max": [
+            0.05,
+            0.05,
+            0.05,
+            0.5,
+            0.5,
+            0.5
+          ],
+          "output_min": [
+            -0.05,
+            -0.05,
+            -0.05,
+            -0.5,
+            -0.5,
+            -0.5
+          ],
+          "kp": 150,
+          "damping_ratio": 1,
+          "impedance_mode": "fixed",
+          "kp_limits": [
+            0,
+            300
+          ],
+          "damping_ratio_limits": [
+            0,
+            10
+          ],
+          "position_limits": null,
+          "orientation_limits": null,
+          "uncouple_pos_ori": true,
+          "control_delta": true,
+          "interpolation": null,
+          "ramp_ratio": 0.2
+        }
+      }
+    }
+  },
+  "total_episodes": 110,
+  "total_frames": 48079,
+  "all_action_dims": 12,
+  "all_recorded_xml_present": true,
+  "all_recorded_states_present": true,
+  "raw_image_observations_present": false,
+  "raw_rewards_present": false,
+  "source_robot": "PandaMobile",
+  "production_robot": "PandaOmron",
+  "native_compatibility_proven": false,
+  "accepted_new_episodes": 0,
+  "production_training_changes": false,
+  "production_base_episodes": 1124,
+  "large_legacy_synthetic_downloaded": false,
+  "legacy_synthetic_candidate_bytes": 34942774543,
+  "completed_cpu_inventory_pid": 204453,
+  "completed_cpu_inventory_root": "/home/work/robot_aiden_260930/pi-cup-online-bc/run/expert-sources/legacy-raw-coffee-20261002",
+  "repeat_completed_inventory": false,
+  "availability_checks": [
+    {
+      "task": "CoffeeSetupMug",
+      "kind": "legacy_human_raw",
+      "url": "https://utexas.box.com/shared/static/zxytzos86xes7jo8z0gp7lklawbiyo8g.hdf5",
+      "method": "GET",
+      "range": "bytes=0-7",
+      "http_status": 206,
+      "bytes": 50768972
+    },
+    {
+      "task": "PrepareCoffee",
+      "kind": "legacy_human_raw",
+      "url": "https://utexas.box.com/shared/static/qhtle2ccvm17g65ecg2vrudpkl9v5wkk.hdf5",
+      "method": "GET",
+      "range": "bytes=0-7",
+      "http_status": 206,
+      "bytes": 67566864
+    },
+    {
+      "task": "CoffeeSetupMug",
+      "kind": "legacy_synthetic_image",
+      "url": "https://utexas.box.com/shared/static/uagjbu3y2ds0hzm7789nuj0ppxp9dxxl.hdf5",
+      "method": "GET",
+      "range": "bytes=0-7",
+      "http_status": 206,
+      "bytes": 34942774543
+    }
+  ],
+  "head_get_discrepancy": "HEAD returned 404; ranged GET returns 206 and valid HDF5. Do not classify availability from HEAD alone.",
+  "official_sources": [
+    "https://raw.githubusercontent.com/robocasa/robocasa/v0.2/robocasa/utils/dataset_registry.py",
+    "https://robocasa.ai/docs/build/html/v0.2/use_cases/using_datasets.html"
+  ],
+  "next_requirements": [
+    "Verify robot/base/controller/action semantics and named observation alignment; matching 12-dimensional shapes is insufficient.",
+    "Validate native recorded-state bilateral contacts plus mug motion and original task success, preserving native eligibility.",
+    "Deduplicate against existing current public base and preserve exclusions/heldout integrity.",
+    "Obtain matching official image observations or validate faithful recorded-state rendering before building native shards."
+  ],
+  "native_pilot": "Round12 complete600 batch96; round13 collecting on AMP while v4 full30 eval12 runs. Do not interrupt active readers, resubmit job12, or rerun prior validators."
+}
