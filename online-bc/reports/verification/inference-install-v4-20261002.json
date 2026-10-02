@@ -1,0 +1,239 @@
+{
+  "at": 1790903223.6815472,
+  "installation": {
+    "launch.json": {
+      "pid": 3590210,
+      "wait_seconds": 900,
+      "stage": "validated_source_52287d2_plus_guarded_installer",
+      "production_changed_at_launch": false
+    },
+    "started.json": {
+      "at": 1790902920.0372233,
+      "pid": 3590210,
+      "version": 11,
+      "old_container_id": "1b3cc570b9876c9ba38751c853f466939bfe1eb78d173619400bd6cb1053e4c2"
+    },
+    "before.json": {
+      "requests": 12,
+      "version": 11,
+      "receipts_verified": true,
+      "samples": [
+        {
+          "seed": 533701,
+          "source": "/results/coffee-online-bc/rollouts/round-0012/batch-03/cup-dataset/pi05/pi05-seed994224/bc/obs-000480.npz",
+          "step": 480
+        },
+        {
+          "seed": 533702,
+          "source": "/results/coffee-online-bc/rollouts/round-0010/batch-04/cup-dataset/pi05/pi05-seed994029/bc/obs-000624.npz",
+          "step": 624
+        },
+        {
+          "seed": 533703,
+          "source": "/results/coffee-online-bc/rollouts/round-0010/batch-03/cup-dataset/pi05/pi05-seed994024/bc/obs-000448.npz",
+          "step": 448
+        }
+      ],
+      "request_sha256": "e5489c8f2b693aebf29da32d81f1d8b48893f20d7f6d9281fc144bcb1f5d7a24"
+    },
+    "after.json": {
+      "requests": 12,
+      "version": 11,
+      "receipts_verified": true,
+      "samples": [
+        {
+          "seed": 533701,
+          "source": "/results/coffee-online-bc/rollouts/round-0012/batch-03/cup-dataset/pi05/pi05-seed994224/bc/obs-000480.npz",
+          "step": 480
+        },
+        {
+          "seed": 533702,
+          "source": "/results/coffee-online-bc/rollouts/round-0010/batch-04/cup-dataset/pi05/pi05-seed994029/bc/obs-000624.npz",
+          "step": 624
+        },
+        {
+          "seed": 533703,
+          "source": "/results/coffee-online-bc/rollouts/round-0010/batch-03/cup-dataset/pi05/pi05-seed994024/bc/obs-000448.npz",
+          "step": 448
+        }
+      ],
+      "request_sha256": "e5489c8f2b693aebf29da32d81f1d8b48893f20d7f6d9281fc144bcb1f5d7a24",
+      "max_action_error": 0.0038506388664245605,
+      "bitwise_equal": false
+    },
+    "restored.json": {
+      "requests": 12,
+      "version": 11,
+      "receipts_verified": true,
+      "samples": [
+        {
+          "seed": 533701,
+          "source": "/results/coffee-online-bc/rollouts/round-0012/batch-03/cup-dataset/pi05/pi05-seed994224/bc/obs-000480.npz",
+          "step": 480
+        },
+        {
+          "seed": 533702,
+          "source": "/results/coffee-online-bc/rollouts/round-0010/batch-04/cup-dataset/pi05/pi05-seed994029/bc/obs-000624.npz",
+          "step": 624
+        },
+        {
+          "seed": 533703,
+          "source": "/results/coffee-online-bc/rollouts/round-0010/batch-03/cup-dataset/pi05/pi05-seed994024/bc/obs-000448.npz",
+          "step": 448
+        }
+      ],
+      "request_sha256": "e5489c8f2b693aebf29da32d81f1d8b48893f20d7f6d9281fc144bcb1f5d7a24",
+      "max_action_error": 0.003850579261779785,
+      "bitwise_equal": false
+    },
+    "report.json": {
+      "status": "failed_restored",
+      "at": 1790903072.7269785,
+      "policy_version": 11,
+      "health": {
+        "model": "pi05",
+        "version": 11,
+        "ready": true,
+        "base_prefix_enabled": true
+      },
+      "future_filtered_downloads_enabled": false,
+      "full_optimizer_retained": true,
+      "failure_preserved": true
+    },
+    "failure.json": {
+      "at": 1790902999.9993298,
+      "type": "AssertionError",
+      "reason": "",
+      "policy_version": 11
+    },
+    "action-differences.json": {
+      "rows": [
+        {
+          "sample": 0,
+          "variant": "standard",
+          "new_vs_before": 0.001925349235534668,
+          "restored_vs_before": 0.001925349235534668,
+          "new_vs_restored": 0.0019252300262451172
+        },
+        {
+          "sample": 0,
+          "variant": "prefix",
+          "new_vs_before": 0.001925349235534668,
+          "restored_vs_before": 0.0033693313598632812,
+          "new_vs_restored": 0.0028879642486572266
+        },
+        {
+          "sample": 0,
+          "variant": "cup_placement",
+          "new_vs_before": 0.001925349235534668,
+          "restored_vs_before": 0.001925349235534668,
+          "new_vs_restored": 0.0019252300262451172
+        },
+        {
+          "sample": 0,
+          "variant": "standard_after",
+          "new_vs_before": 0.001925349235534668,
+          "restored_vs_before": 0.001925349235534668,
+          "new_vs_restored": 0.0019252300262451172
+        },
+        {
+          "sample": 1,
+          "variant": "standard",
+          "new_vs_before": 0.0023764967918395996,
+          "restored_vs_before": 0.002887904644012451,
+          "new_vs_restored": 0.001925349235534668
+        },
+        {
+          "sample": 1,
+          "variant": "prefix",
+          "new_vs_before": 0.0038506388664245605,
+          "restored_vs_before": 0.003850579261779785,
+          "new_vs_restored": 0.003850579261779785
+        },
+        {
+          "sample": 1,
+          "variant": "cup_placement",
+          "new_vs_before": 0.0023764967918395996,
+          "restored_vs_before": 0.002887904644012451,
+          "new_vs_restored": 0.001925349235534668
+        },
+        {
+          "sample": 1,
+          "variant": "standard_after",
+          "new_vs_before": 0.0023764967918395996,
+          "restored_vs_before": 0.002887904644012451,
+          "new_vs_restored": 0.001925349235534668
+        },
+        {
+          "sample": 2,
+          "variant": "standard",
+          "new_vs_before": 0.001925349235534668,
+          "restored_vs_before": 0.001925349235534668,
+          "new_vs_restored": 0.00216597318649292
+        },
+        {
+          "sample": 2,
+          "variant": "prefix",
+          "new_vs_before": 0.002406597137451172,
+          "restored_vs_before": 0.003850579261779785,
+          "new_vs_restored": 0.0019252896308898926
+        },
+        {
+          "sample": 2,
+          "variant": "cup_placement",
+          "new_vs_before": 0.001925349235534668,
+          "restored_vs_before": 0.001925349235534668,
+          "new_vs_restored": 0.00216597318649292
+        },
+        {
+          "sample": 2,
+          "variant": "standard_after",
+          "new_vs_before": 0.001925349235534668,
+          "restored_vs_before": 0.001925349235534668,
+          "new_vs_restored": 0.00216597318649292
+        }
+      ],
+      "new_vs_restored_max": 0.003850579261779785,
+      "cause": "unproved",
+      "restarted_original_also_differs": true,
+      "production_filter_enabled": false
+    },
+    "restoration-verification.json": {
+      "all_source_and_config_restored": true,
+      "restored_files": {
+        "src/online_bc/models/pi05_backend.py": true,
+        "src/online_bc/models/phase_policy.py": true,
+        "src/online_bc/models/serve_bc_policy.py": true,
+        "src/online_bc/rollout/worker.py": true,
+        "src/online_bc/rollout/docker_worker.py": true,
+        "src/online_bc/transport/hf_transfer.py": true,
+        "configs/pi05-v4-worker.json": true,
+        "configs/pi05-v4-containers.json": true
+      },
+      "checkpoint_files": {
+        "pi05-optimizer.pkl": 176949619,
+        "pi05-lora.npz": 88476838,
+        "updates.json": 20184,
+        "metadata.json": 8441
+      },
+      "current_adapter": {
+        "version": 11,
+        "container_path": "/results/coffee-online-bc/adapters/round-0011"
+      },
+      "container_id": "1b3cc570b9876c9ba38751c853f466939bfe1eb78d173619400bd6cb1053e4c2"
+    }
+  },
+  "installer_guard_tests_passed": 5,
+  "project_ruff_passed": true,
+  "production_inference_only_deployed": false,
+  "filtered_downloads_enabled": false,
+  "native_training_changes": false,
+  "only_policy_container_restarted_under_ex_lock": true,
+  "completed_attempt_do_not_rerun": true,
+  "checkpoint_and_optimizer_preserved": true,
+  "cause_of_cross_process_delta": "unproved",
+  "official_sources": [
+    "https://docs.docker.com/engine/containers/start-containers-automatically/",
+    "https://huggingface.co/docs/huggingface_hub/guides/buckets#filtering"
+  ]
+}

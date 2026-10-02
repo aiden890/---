@@ -1,0 +1,662 @@
+{
+  "at": 1790903329.5297127,
+  "status": {
+    "next_round": 12,
+    "status": "collecting",
+    "attempts": 80,
+    "successes": 3,
+    "batch": 11
+  },
+  "cumulative_updates": 550,
+  "eligible_success_episodes": 103,
+  "hosts": {
+    "amp": {
+      "time": 1790903270.9976413,
+      "storage-archiver_process": "PID     ELAPSED COMMAND\n3322201    05:02:44 python",
+      "storage-archiver.log": {
+        "age": 2568.8002965450287,
+        "tail": "ts/round-0007\", \"remote_size_verified\": true, \"removed_npz\": 4782, \"pruned_npz_bytes\": 3647396521, \"archived_at\": 1790898185.7669423, \"videos_actions_traces_manifests_retained\": true}\n{\"event\": \"round_observations_archived\", \"round\": 8, \"bytes\": 4577142548, \"sha256\": \"dc29411b0411b4ef356fb7041f69a15416d364477ef8086ad7c0eb1f8d886262\", \"bucket\": \"khmin101/vla-rollout-transfer\", \"remote_path\": \"pi05-cup-online-bc-20261001/archives/pi05/amp/round-0008/rollouts.tar.gz\", \"local_round\": \"/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0008\", \"remote_size_verified\": true, \"removed_npz\": 5006, \"pruned_npz_bytes\": 4525000488, \"archived_at\": 1790899488.2419648, \"videos_actions_traces_manifests_retained\": true}\n{\"event\": \"round_observations_archived\", \"round\": 9, \"bytes\": 6027549626, \"sha256\": \"d2dbdc9973b68eb55f49f0e39b70f7968cad940f45e6661382c5c0a3530e580d\", \"bucket\": \"khmin101/vla-rollout-transfer\", \"remote_path\": \"pi05-cup-online-bc-20261001/archives/pi05/amp/round-0009/rollouts.tar.gz\", \"local_round\": \"/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0009\", \"remote_size_verified\": true, \"removed_npz\": 6440, \"pruned_npz_bytes\": 5917718207, \"archived_at\": 1790900701.5079985, \"videos_actions_traces_manifests_retained\": true}\n"
+      },
+      "free_/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc": 10956632064,
+      "free_/mnt/data/guest": 25369845760,
+      "rollouts/round-0012": {
+        "results": 48,
+        "versions": [
+          11
+        ],
+        "logs": [
+          {
+            "path": "rollouts/round-0012/batch-11/worker-3.log",
+            "age": 5.678280353546143,
+            "tail": ", \"mug_lift\": 5.039041985899217e-07, \"mug_lifted\": false, \"mug_moved_while_held\": false, \"mug_motion\": 1.917353096423831e-06, \"mug_under_dispenser\": false, \"coffee_machine_on\": false, \"gripper_mug_far\": true, \"gripper_button_far\": false, \"official_success\": false, \"mug_world_position\": [0.21878551656859135, -4.831141464335652, 1.4580455126242575]}\n"
+          },
+          {
+            "path": "rollouts/round-0012/batch-11/worker-1.log",
+            "age": 9.903230428695679,
+            "tail": "se, \"mug_lift\": 7.137472919360732e-07, \"mug_lifted\": false, \"mug_moved_while_held\": false, \"mug_motion\": 2.911586745594852e-06, \"mug_under_dispenser\": false, \"coffee_machine_on\": false, \"gripper_mug_far\": true, \"gripper_button_far\": true, \"official_success\": false, \"mug_world_position\": [1.4417262677924703, -0.228931931716354, 1.4583401742427886]}\n"
+          },
+          {
+            "path": "rollouts/round-0012/batch-11/worker-0.log",
+            "age": 11.054233074188232,
+            "tail": "lse, \"mug_lift\": -4.598378557707505e-06, \"mug_lifted\": false, \"mug_moved_while_held\": false, \"mug_motion\": 8.55081434033095e-06, \"mug_under_dispenser\": false, \"coffee_machine_on\": false, \"gripper_mug_far\": true, \"gripper_button_far\": true, \"official_success\": false, \"mug_world_position\": [6.415733217542018, -2.392912702592901, 1.4556154142691764]}\n"
+          },
+          {
+            "path": "rollouts/round-0012/batch-11/worker-2.log",
+            "age": 11.154258012771606,
+            "tail": "false, \"mug_lift\": 4.40747435659361e-06, \"mug_lifted\": false, \"mug_moved_while_held\": false, \"mug_motion\": 1.76672348536052e-05, \"mug_under_dispenser\": false, \"coffee_machine_on\": false, \"gripper_mug_far\": true, \"gripper_button_far\": true, \"official_success\": false, \"mug_world_position\": [5.416139731344679, -2.8863162783247978, 1.457555370123659]}\n"
+          }
+        ]
+      },
+      "policy": {
+        "model": "pi05",
+        "version": 11,
+        "ready": true
+      },
+      "active_workers": [],
+      "sim_pids": {
+        "7e1c0f6e1cbb rlinf-mibot:t_43b4edc9 stupefied_burnell": [
+          "3467366             python3             python3 -m online_bc.rollout.run_coffee --seeds 994282 --model pi05 --out /results/coffee-online-bc/rollouts/round-0012/batch-11/pi05 --skill cup_placement"
+        ],
+        "bd5a2cca9c59 rlinf-mibot:t_43b4edc9 musing_saha": [
+          "3467353             python3             python3 -m online_bc.rollout.run_coffee --seeds 994284 --model pi05 --out /results/coffee-online-bc/rollouts/round-0012/batch-11/pi05 --skill cup_placement"
+        ],
+        "5ad1caadf7c9 rlinf-mibot:t_43b4edc9 naughty_bouman": [
+          "3467373             python3             python3 -m online_bc.rollout.run_coffee --seeds 994283 --model pi05 --out /results/coffee-online-bc/rollouts/round-0012/batch-11/pi05 --skill cup_placement"
+        ],
+        "e2bef5a75444 rlinf-mibot:t_43b4edc9 vibrant_kapitsa": [
+          "3467334             python3             python3 -m online_bc.rollout.run_coffee --seeds 994281 --model pi05 --out /results/coffee-online-bc/rollouts/round-0012/batch-11/pi05 --skill cup_placement"
+        ]
+      },
+      "gpu": "14603, 24576, 67",
+      "archives": {
+        "round-0005": {
+          "round": 5,
+          "bytes": 5281461360,
+          "sha256": "f0501fd12c91a1228068c2941f9b64f98235a7a192c9915ad04d14958ed993f4",
+          "bucket": "khmin101/vla-rollout-transfer",
+          "remote_path": "pi05-cup-online-bc-20261001/archives/pi05/amp/round-0005/rollouts.tar.gz",
+          "local_round": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0005",
+          "remote_size_verified": true,
+          "removed_npz": 5590,
+          "pruned_npz_bytes": 5174303761,
+          "archived_at": 1790892163.3911543,
+          "videos_actions_traces_manifests_retained": true
+        },
+        "round-0007": {
+          "round": 7,
+          "bytes": 3687760638,
+          "sha256": "67028343f330d2d107db433988d182b82734f337e4534ff07050635e09ceccd8",
+          "bucket": "khmin101/vla-rollout-transfer",
+          "remote_path": "pi05-cup-online-bc-20261001/archives/pi05/amp/round-0007/rollouts.tar.gz",
+          "local_round": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0007",
+          "remote_size_verified": true,
+          "removed_npz": 4782,
+          "pruned_npz_bytes": 3647396521,
+          "archived_at": 1790898185.7669423,
+          "videos_actions_traces_manifests_retained": true
+        },
+        "round-0006": {
+          "round": 6,
+          "bytes": 4482227645,
+          "sha256": "f67f896c9b2714fdf25b5d79108617820527c83668afe33c54997d553e2d4c4c",
+          "bucket": "khmin101/vla-rollout-transfer",
+          "remote_path": "pi05-cup-online-bc-20261001/archives/pi05/amp/round-0006/rollouts.tar.gz",
+          "local_round": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0006",
+          "remote_size_verified": true,
+          "removed_npz": 4766,
+          "pruned_npz_bytes": 4382515091,
+          "archived_at": 1790895670.3324718,
+          "videos_actions_traces_manifests_retained": true
+        },
+        "round-0003": {
+          "round": 3,
+          "bytes": 4257633638,
+          "sha256": "77b727a269b47daf2a58b790389a2d82b11744ae6345f69243360eff2bebd812",
+          "bucket": "khmin101/vla-rollout-transfer",
+          "remote_path": "pi05-cup-online-bc-20261001/archives/pi05/amp/round-0003/rollouts.tar.gz",
+          "local_round": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0003",
+          "remote_size_verified": true,
+          "removed_npz": 4680,
+          "pruned_npz_bytes": 3962323934,
+          "archived_at": 1790887502.4689784,
+          "videos_actions_traces_manifests_retained": true
+        },
+        "round-0004": {
+          "round": 4,
+          "bytes": 5492333896,
+          "sha256": "e769832231f522bc10c5408cbb325a1f31b27558098be8e0bd055e415deb3326",
+          "bucket": "khmin101/vla-rollout-transfer",
+          "remote_path": "pi05-cup-online-bc-20261001/archives/pi05/amp/round-0004/rollouts.tar.gz",
+          "local_round": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0004",
+          "remote_size_verified": true,
+          "removed_npz": 5233,
+          "pruned_npz_bytes": 5091699238,
+          "archived_at": 1790890497.220903,
+          "videos_actions_traces_manifests_retained": true
+        },
+        "round-0001": {
+          "round": 1,
+          "bytes": 2356353408,
+          "sha256": "f2d564ad2d9f1127fbb473da7da4abd972ec945dc4ef650ad740947a87eecac4",
+          "bucket": "khmin101/vla-rollout-transfer",
+          "remote_path": "pi05-cup-online-bc-20261001/archives/pi05/amp/round-0001/rollouts.tar.gz",
+          "local_round": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0001",
+          "remote_size_verified": true,
+          "removed_npz": 2116,
+          "archived_at": 1790884874.398507,
+          "videos_actions_traces_manifests_retained": true,
+          "pruned_npz_bytes": 2184887998
+        },
+        "round-0002": {
+          "round": 2,
+          "bytes": 3296418730,
+          "sha256": "6fc08e3f3f6ced13ad4aff3024c6498940ac7b8699afb28165f3548abe06ea90",
+          "bucket": "khmin101/vla-rollout-transfer",
+          "remote_path": "pi05-cup-online-bc-20261001/archives/pi05/amp/round-0002/rollouts.tar.gz",
+          "local_round": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0002",
+          "remote_size_verified": true,
+          "removed_npz": 3727,
+          "pruned_npz_bytes": 3075421321,
+          "archived_at": 1790885323.820529,
+          "videos_actions_traces_manifests_retained": true
+        },
+        "round-0008": {
+          "round": 8,
+          "bytes": 4577142548,
+          "sha256": "dc29411b0411b4ef356fb7041f69a15416d364477ef8086ad7c0eb1f8d886262",
+          "bucket": "khmin101/vla-rollout-transfer",
+          "remote_path": "pi05-cup-online-bc-20261001/archives/pi05/amp/round-0008/rollouts.tar.gz",
+          "local_round": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0008",
+          "remote_size_verified": true,
+          "removed_npz": 5006,
+          "pruned_npz_bytes": 4525000488,
+          "archived_at": 1790899488.2419648,
+          "videos_actions_traces_manifests_retained": true
+        },
+        "round-0009": {
+          "round": 9,
+          "bytes": 6027549626,
+          "sha256": "d2dbdc9973b68eb55f49f0e39b70f7968cad940f45e6661382c5c0a3530e580d",
+          "bucket": "khmin101/vla-rollout-transfer",
+          "remote_path": "pi05-cup-online-bc-20261001/archives/pi05/amp/round-0009/rollouts.tar.gz",
+          "local_round": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0009",
+          "remote_size_verified": true,
+          "removed_npz": 6440,
+          "pruned_npz_bytes": 5917718207,
+          "archived_at": 1790900701.5079985,
+          "videos_actions_traces_manifests_retained": true
+        }
+      }
+    },
+    "v4": {
+      "time": 1790903270.8682725,
+      "benchmarks/v4-worker-trial/status.json": {
+        "status": "episodes_complete_pending_metrics",
+        "armed_at": 1790895444.501215,
+        "eval_workers": 2,
+        "trial_collection_workers": 4,
+        "training_algorithm_changed": false,
+        "policy_restarted": false,
+        "batch_root": "/home/v4/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0009/batch-06",
+        "restored_at": 1790897156.5049982,
+        "policy": {
+          "model": "pi05",
+          "version": 8,
+          "ready": true,
+          "base_prefix_enabled": true
+        },
+        "gpu_peak_mib": 21503,
+        "completed_at": 1790897282.5300596,
+        "seeds": [
+          993945,
+          993946,
+          993947,
+          993948
+        ],
+        "versions": [
+          8
+        ],
+        "cups": 0
+      },
+      "benchmarks/v4-worker-trial/watch.log": {
+        "age": 7826.399604320526,
+        "tail": ""
+      },
+      "watch_ps": "PID     ELAPSED COMMAND",
+      "workers": {
+        "workers": 2,
+        "collection_workers": 4
+      },
+      "free_/home/v4/skku-vla-grasp-only-20260930/results/coffee-online-bc": 23606317056,
+      "rollouts/round-0012": {
+        "results": 32,
+        "versions": [
+          11
+        ],
+        "logs": [
+          {
+            "path": "rollouts/round-0012/batch-11/worker-2.log",
+            "age": 3.101240634918213,
+            "tail": "rue, \"mug_lift\": 3.1912606992312575e-05, \"mug_lifted\": false, \"mug_moved_while_held\": true, \"mug_motion\": 0.19217492221728924, \"mug_under_dispenser\": false, \"coffee_machine_on\": false, \"gripper_mug_far\": false, \"gripper_button_far\": true, \"official_success\": false, \"mug_world_position\": [1.7890929288547464, -2.8949407441449844, 1.278105703114451]}\n"
+          },
+          {
+            "path": "rollouts/round-0012/batch-11/worker-1.log",
+            "age": 3.6012778282165527,
+            "tail": "rue, \"mug_lift\": 0.002737773830844503, \"mug_lifted\": false, \"mug_moved_while_held\": false, \"mug_motion\": 0.03981259783011425, \"mug_under_dispenser\": false, \"coffee_machine_on\": false, \"gripper_mug_far\": false, \"gripper_button_far\": true, \"official_success\": false, \"mug_world_position\": [0.41496302938006924, -6.048173161792142, 1.4414823636968501]}\n"
+          },
+          {
+            "path": "rollouts/round-0012/batch-11/worker-0.log",
+            "age": 6.797261714935303,
+            "tail": " \"mug_lift\": 3.279159064728532e-05, \"mug_lifted\": false, \"mug_moved_while_held\": false, \"mug_motion\": 7.467021378203137e-05, \"mug_under_dispenser\": false, \"coffee_machine_on\": false, \"gripper_mug_far\": false, \"gripper_button_far\": true, \"official_success\": false, \"mug_world_position\": [0.24472066075818907, -2.1200182307204534, 1.5146206267936502]}\n"
+          },
+          {
+            "path": "rollouts/round-0012/batch-11/worker-3.log",
+            "age": 9.98124623298645,
+            "tail": "e, \"mug_lift\": -0.0007275655452116947, \"mug_lifted\": false, \"mug_moved_while_held\": false, \"mug_motion\": 0.016293860838044315, \"mug_under_dispenser\": false, \"coffee_machine_on\": false, \"gripper_mug_far\": false, \"gripper_button_far\": true, \"official_success\": false, \"mug_world_position\": [2.426003186289257, -0.2598256577283422, 1.4548924470299802]}\n"
+          }
+        ]
+      },
+      "evaluation/version-0011": {
+        "results": 10,
+        "versions": [
+          11
+        ],
+        "logs": [
+          {
+            "path": "evaluation/version-0011/worker-1.log",
+            "age": 1763.8180449008942,
+            "tail": "pture\": 5.6325194865930825, \"environment_step_with_observations\": 60.768875053850934, \"observation_history\": 0.0918883285485208, \"success_predicates\": 0.5629560223314911, \"video_encode\": 1.9033740165177733, \"result_and_capture_storage\": 0.02929855906404555, \"policy_inference\": 19.573441743850708, \"episode_before_result_write\": 108.54422279284336}}\n"
+          },
+          {
+            "path": "evaluation/version-0011/worker-0.log",
+            "age": 1838.7727885246277,
+            "tail": "pture\": 3.3044556817039847, \"environment_step_with_observations\": 29.534202771028504, \"observation_history\": 0.04638561233878136, \"success_predicates\": 0.16124131716787815, \"video_encode\": 1.0045720448251814, \"result_and_capture_storage\": 0.03112657996825874, \"policy_inference\": 9.952709674835205, \"episode_before_result_write\": 58.66097284317948}}\n"
+          }
+        ]
+      },
+      "shadow-evaluation/base_prefix/version-0006": {
+        "results": 30,
+        "versions": [
+          6
+        ],
+        "logs": [
+          {
+            "path": "shadow-evaluation/base_prefix/version-0006/worker-1.log",
+            "age": 9633.52709388733,
+            "tail": "ture\": 9.628922485047951, \"environment_step_with_observations\": 64.18450127961114, \"observation_history\": 0.09143873956054449, \"success_predicates\": 0.32521624490618706, \"video_encode\": 1.8845870953518897, \"result_and_capture_storage\": 0.028922950848937035, \"policy_inference\": 19.550601482391357, \"episode_before_result_write\": 108.46059256303124}}\n"
+          },
+          {
+            "path": "shadow-evaluation/base_prefix/version-0006/worker-0.log",
+            "age": 9718.845822095871,
+            "tail": "apture\": 7.266301703406498, \"environment_step_with_observations\": 53.42965311463922, \"observation_history\": 0.09542294847778976, \"success_predicates\": 0.24558253004215658, \"video_encode\": 2.0070634211879224, \"result_and_capture_storage\": 0.029884841991588473, \"policy_inference\": 22.60042142868042, \"episode_before_result_write\": 99.52119339886121}}\n"
+          }
+        ]
+      },
+      "policy": {
+        "model": "pi05",
+        "version": 11,
+        "ready": true,
+        "base_prefix_enabled": true
+      },
+      "active_workers": [],
+      "sim_pids": {
+        "3caf6f6beff4 rlinf-mibot-eval:v4 ecstatic_archimedes": [
+          "3596523             python3             python3 -m online_bc.rollout.run_coffee --seeds 994287 --model pi05 --out /results/coffee-online-bc/rollouts/round-0012/batch-11/pi05 --skill cup_placement"
+        ],
+        "6af3ef17c676 rlinf-mibot-eval:v4 great_davinci": [
+          "3596550             python3             python3 -m online_bc.rollout.run_coffee --seeds 994286 --model pi05 --out /results/coffee-online-bc/rollouts/round-0012/batch-11/pi05 --skill cup_placement"
+        ],
+        "caca4dec277e rlinf-mibot-eval:v4 agitated_napier": [
+          "3596552             python3             python3 -m online_bc.rollout.run_coffee --seeds 994288 --model pi05 --out /results/coffee-online-bc/rollouts/round-0012/batch-11/pi05 --skill cup_placement"
+        ],
+        "4c621efc882c rlinf-mibot-eval:v4 hardcore_moser": [
+          "3596551             python3             python3 -m online_bc.rollout.run_coffee --seeds 994285 --model pi05 --out /results/coffee-online-bc/rollouts/round-0012/batch-11/pi05 --skill cup_placement"
+        ]
+      },
+      "gpu": "20813, 24576, 85"
+    },
+    "learner": {
+      "time": 1790903271.3506,
+      "learner_process": "PID     ELAPSED COMMAND\n  26119    07:00:23 python",
+      "run/service-status.json": {
+        "model": "pi05",
+        "completed_round": 11,
+        "checkpoint": "/home/work/robot_aiden_260930/pi-cup-online-bc/run/training/round-0011/update-000050",
+        "status": "waiting_for_rollouts"
+      },
+      "learner.log": {
+        "age": 2894.0015971660614,
+        "tail": "kill\": \"cup_placement\", \"source_model\": \"pi05\", \"source_seed\": 994103, \"episode_id\": \"pi05-seed994103\", \"control_revision\": 2, \"seconds\": 0.36511943954974413, \"batch_size\": 4, \"learning_rate\": 1e-05, \"loss\": 0.02603856474161148, \"grad_norm\": 0.012013483792543411, \"canonicalized_zero_std_dims\": [10]}\n{\"step\": 48, \"model\": \"pi05\", \"skill\": \"cup_placement\", \"source_model\": \"pi05\", \"source_seed\": 994029, \"episode_id\": \"pi05-seed994029\", \"control_revision\": 2, \"seconds\": 0.3634105995297432, \"batch_size\": 4, \"learning_rate\": 1e-05, \"loss\": 0.021213823929429054, \"grad_norm\": 0.010996884666383266, \"canonicalized_zero_std_dims\": [10]}\n{\"step\": 49, \"model\": \"pi05\", \"skill\": \"cup_placement\", \"source_model\": \"pi05\", \"source_seed\": 993523, \"episode_id\": \"pi05-seed993523\", \"control_revision\": 2, \"seconds\": 0.3624892756342888, \"batch_size\": 4, \"learning_rate\": 1e-05, \"loss\": 0.009719403460621834, \"grad_norm\": 0.005692171864211559, \"canonicalized_zero_std_dims\": [10]}\n{\"step\": 50, \"model\": \"pi05\", \"skill\": \"cup_placement\", \"source_model\": \"pi05\", \"source_seed\": 993713, \"episode_id\": \"pi05-seed993713\", \"control_revision\": 2, \"seconds\": 0.3674461906775832, \"batch_size\": 4, \"learning_rate\": 1e-05, \"loss\": 0.026763131842017174, \"grad_norm\": 0.011829162947833538, \"canonicalized_zero_std_dims\": [10]}\n"
+      },
+      "free_/home/work/robot_aiden_260930/pi-cup-online-bc": 397900165152768,
+      "checkpoint11_files": {
+        "pi05-lora.npz": {
+          "bytes": 88476838,
+          "mtime": 1790900377.65403
+        },
+        "metadata.json": {
+          "bytes": 8441,
+          "mtime": 1790900379.307172
+        },
+        "pi05-optimizer.pkl": {
+          "bytes": 176949619,
+          "mtime": 1790900377.8553114
+        },
+        "updates.json": {
+          "bytes": 20184,
+          "mtime": 1790900379.306878
+        }
+      },
+      "active_workers": [],
+      "sim_pids": {},
+      "gpu": "0, 81920, [Not Found]"
+    }
+  },
+  "installation": {
+    "at": 1790903223.6815472,
+    "installation": {
+      "launch.json": {
+        "pid": 3590210,
+        "wait_seconds": 900,
+        "stage": "validated_source_52287d2_plus_guarded_installer",
+        "production_changed_at_launch": false
+      },
+      "started.json": {
+        "at": 1790902920.0372233,
+        "pid": 3590210,
+        "version": 11,
+        "old_container_id": "1b3cc570b9876c9ba38751c853f466939bfe1eb78d173619400bd6cb1053e4c2"
+      },
+      "before.json": {
+        "requests": 12,
+        "version": 11,
+        "receipts_verified": true,
+        "samples": [
+          {
+            "seed": 533701,
+            "source": "/results/coffee-online-bc/rollouts/round-0012/batch-03/cup-dataset/pi05/pi05-seed994224/bc/obs-000480.npz",
+            "step": 480
+          },
+          {
+            "seed": 533702,
+            "source": "/results/coffee-online-bc/rollouts/round-0010/batch-04/cup-dataset/pi05/pi05-seed994029/bc/obs-000624.npz",
+            "step": 624
+          },
+          {
+            "seed": 533703,
+            "source": "/results/coffee-online-bc/rollouts/round-0010/batch-03/cup-dataset/pi05/pi05-seed994024/bc/obs-000448.npz",
+            "step": 448
+          }
+        ],
+        "request_sha256": "e5489c8f2b693aebf29da32d81f1d8b48893f20d7f6d9281fc144bcb1f5d7a24"
+      },
+      "after.json": {
+        "requests": 12,
+        "version": 11,
+        "receipts_verified": true,
+        "samples": [
+          {
+            "seed": 533701,
+            "source": "/results/coffee-online-bc/rollouts/round-0012/batch-03/cup-dataset/pi05/pi05-seed994224/bc/obs-000480.npz",
+            "step": 480
+          },
+          {
+            "seed": 533702,
+            "source": "/results/coffee-online-bc/rollouts/round-0010/batch-04/cup-dataset/pi05/pi05-seed994029/bc/obs-000624.npz",
+            "step": 624
+          },
+          {
+            "seed": 533703,
+            "source": "/results/coffee-online-bc/rollouts/round-0010/batch-03/cup-dataset/pi05/pi05-seed994024/bc/obs-000448.npz",
+            "step": 448
+          }
+        ],
+        "request_sha256": "e5489c8f2b693aebf29da32d81f1d8b48893f20d7f6d9281fc144bcb1f5d7a24",
+        "max_action_error": 0.0038506388664245605,
+        "bitwise_equal": false
+      },
+      "restored.json": {
+        "requests": 12,
+        "version": 11,
+        "receipts_verified": true,
+        "samples": [
+          {
+            "seed": 533701,
+            "source": "/results/coffee-online-bc/rollouts/round-0012/batch-03/cup-dataset/pi05/pi05-seed994224/bc/obs-000480.npz",
+            "step": 480
+          },
+          {
+            "seed": 533702,
+            "source": "/results/coffee-online-bc/rollouts/round-0010/batch-04/cup-dataset/pi05/pi05-seed994029/bc/obs-000624.npz",
+            "step": 624
+          },
+          {
+            "seed": 533703,
+            "source": "/results/coffee-online-bc/rollouts/round-0010/batch-03/cup-dataset/pi05/pi05-seed994024/bc/obs-000448.npz",
+            "step": 448
+          }
+        ],
+        "request_sha256": "e5489c8f2b693aebf29da32d81f1d8b48893f20d7f6d9281fc144bcb1f5d7a24",
+        "max_action_error": 0.003850579261779785,
+        "bitwise_equal": false
+      },
+      "report.json": {
+        "status": "failed_restored",
+        "at": 1790903072.7269785,
+        "policy_version": 11,
+        "health": {
+          "model": "pi05",
+          "version": 11,
+          "ready": true,
+          "base_prefix_enabled": true
+        },
+        "future_filtered_downloads_enabled": false,
+        "full_optimizer_retained": true,
+        "failure_preserved": true
+      },
+      "failure.json": {
+        "at": 1790902999.9993298,
+        "type": "AssertionError",
+        "reason": "",
+        "policy_version": 11
+      },
+      "action-differences.json": {
+        "rows": [
+          {
+            "sample": 0,
+            "variant": "standard",
+            "new_vs_before": 0.001925349235534668,
+            "restored_vs_before": 0.001925349235534668,
+            "new_vs_restored": 0.0019252300262451172
+          },
+          {
+            "sample": 0,
+            "variant": "prefix",
+            "new_vs_before": 0.001925349235534668,
+            "restored_vs_before": 0.0033693313598632812,
+            "new_vs_restored": 0.0028879642486572266
+          },
+          {
+            "sample": 0,
+            "variant": "cup_placement",
+            "new_vs_before": 0.001925349235534668,
+            "restored_vs_before": 0.001925349235534668,
+            "new_vs_restored": 0.0019252300262451172
+          },
+          {
+            "sample": 0,
+            "variant": "standard_after",
+            "new_vs_before": 0.001925349235534668,
+            "restored_vs_before": 0.001925349235534668,
+            "new_vs_restored": 0.0019252300262451172
+          },
+          {
+            "sample": 1,
+            "variant": "standard",
+            "new_vs_before": 0.0023764967918395996,
+            "restored_vs_before": 0.002887904644012451,
+            "new_vs_restored": 0.001925349235534668
+          },
+          {
+            "sample": 1,
+            "variant": "prefix",
+            "new_vs_before": 0.0038506388664245605,
+            "restored_vs_before": 0.003850579261779785,
+            "new_vs_restored": 0.003850579261779785
+          },
+          {
+            "sample": 1,
+            "variant": "cup_placement",
+            "new_vs_before": 0.0023764967918395996,
+            "restored_vs_before": 0.002887904644012451,
+            "new_vs_restored": 0.001925349235534668
+          },
+          {
+            "sample": 1,
+            "variant": "standard_after",
+            "new_vs_before": 0.0023764967918395996,
+            "restored_vs_before": 0.002887904644012451,
+            "new_vs_restored": 0.001925349235534668
+          },
+          {
+            "sample": 2,
+            "variant": "standard",
+            "new_vs_before": 0.001925349235534668,
+            "restored_vs_before": 0.001925349235534668,
+            "new_vs_restored": 0.00216597318649292
+          },
+          {
+            "sample": 2,
+            "variant": "prefix",
+            "new_vs_before": 0.002406597137451172,
+            "restored_vs_before": 0.003850579261779785,
+            "new_vs_restored": 0.0019252896308898926
+          },
+          {
+            "sample": 2,
+            "variant": "cup_placement",
+            "new_vs_before": 0.001925349235534668,
+            "restored_vs_before": 0.001925349235534668,
+            "new_vs_restored": 0.00216597318649292
+          },
+          {
+            "sample": 2,
+            "variant": "standard_after",
+            "new_vs_before": 0.001925349235534668,
+            "restored_vs_before": 0.001925349235534668,
+            "new_vs_restored": 0.00216597318649292
+          }
+        ],
+        "new_vs_restored_max": 0.003850579261779785,
+        "cause": "unproved",
+        "restarted_original_also_differs": true,
+        "production_filter_enabled": false
+      },
+      "restoration-verification.json": {
+        "all_source_and_config_restored": true,
+        "restored_files": {
+          "src/online_bc/models/pi05_backend.py": true,
+          "src/online_bc/models/phase_policy.py": true,
+          "src/online_bc/models/serve_bc_policy.py": true,
+          "src/online_bc/rollout/worker.py": true,
+          "src/online_bc/rollout/docker_worker.py": true,
+          "src/online_bc/transport/hf_transfer.py": true,
+          "configs/pi05-v4-worker.json": true,
+          "configs/pi05-v4-containers.json": true
+        },
+        "checkpoint_files": {
+          "pi05-optimizer.pkl": 176949619,
+          "pi05-lora.npz": 88476838,
+          "updates.json": 20184,
+          "metadata.json": 8441
+        },
+        "current_adapter": {
+          "version": 11,
+          "container_path": "/results/coffee-online-bc/adapters/round-0011"
+        },
+        "container_id": "1b3cc570b9876c9ba38751c853f466939bfe1eb78d173619400bd6cb1053e4c2"
+      }
+    },
+    "installer_guard_tests_passed": 5,
+    "project_ruff_passed": true,
+    "production_inference_only_deployed": false,
+    "filtered_downloads_enabled": false,
+    "native_training_changes": false,
+    "only_policy_container_restarted_under_ex_lock": true,
+    "completed_attempt_do_not_rerun": true,
+    "checkpoint_and_optimizer_preserved": true,
+    "cause_of_cross_process_delta": "unproved",
+    "official_sources": [
+      "https://docs.docker.com/engine/containers/start-containers-automatically/",
+      "https://huggingface.co/docs/huggingface_hub/guides/buckets#filtering"
+    ]
+  },
+  "wandb_hf": {
+    "summary": {
+      "train/global_step": 550,
+      "train/loss": 0.026763131842017177,
+      "train/grad_norm": 0.011829162947833538,
+      "train/learning_rate": 1e-05,
+      "pipeline/inference_v4_install_passed": false,
+      "pipeline/inference_v4_install_max_action_error": 0.003850638866424561,
+      "pipeline/inference_v4_original_source_config_restored": true,
+      "pipeline/inference_filtered_download_production_deployed": false
+    },
+    "event_cursor_present": false,
+    "hf": {
+      "amp": [
+        [
+          "pi05-cup-online-bc-20261001/data/pi05/amp/round-0012/batch-10/bc-shards.tar.gz",
+          59
+        ],
+        [
+          "pi05-cup-online-bc-20261001/data/pi05/amp/round-0012/batch-10/manifest.json",
+          130
+        ]
+      ],
+      "v4": [
+        [
+          "pi05-cup-online-bc-20261001/data/pi05/v4/round-0012/batch-10/bc-shards.tar.gz",
+          59
+        ],
+        [
+          "pi05-cup-online-bc-20261001/data/pi05/v4/round-0012/batch-10/manifest.json",
+          130
+        ]
+      ]
+    }
+  },
+  "central_pids": {
+    "coordinator": "PID     ELAPSED COMMAND\n2723301    05:15:05 python3",
+    "telemetry": "PID     ELAPSED COMMAND\n2728044    05:05:03 python",
+    "health": "PID     ELAPSED COMMAND\n2783968    03:18:12 python3"
+  },
+  "unresolved_publication": [],
+  "controls": {
+    "run": "pi05-cup-online-bc-20261001",
+    "revision": 2,
+    "excluded": {},
+    "paused": false,
+    "bootstrap_steps": 0,
+    "review_required": false,
+    "updated_at": 1790870638.0917895
+  },
+  "pending": {
+    "pending-round-0012.json": {
+      "batch": 11,
+      "plan": [
+        {
+          "node": "amp",
+          "episodes": 4,
+          "seed_offset": 80
+        },
+        {
+          "node": "v4",
+          "episodes": 4,
+          "seed_offset": 84
+        }
+      ],
+      "external_pids": {}
+    }
+  }
+}
