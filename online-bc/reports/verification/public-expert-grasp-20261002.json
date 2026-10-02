@@ -1,0 +1,121 @@
+{
+  "checked_at": 1790913650.874215,
+  "human_sources": {
+    "creators": "RoboCasa Team (Soroush Nasiriany, Sepehr Nasiriany, Abhiram Maddukuri, Yuke Zhu)",
+    "license": "CC-BY-4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "license_source": "https://github.com/robocasa/robocasa#license",
+    "official_sources": [
+      {
+        "key": "pretrain/atomic/CoffeeSetupMug/20250819/lerobot.tar",
+        "source_url": "https://utexas.box.com/s/0mka48bl1kornjb9osxotmb10535cojv",
+        "bytes": 89405952,
+        "sha256": "7ca9e658f72b930455f2a75ec8d4dc27cd254c090f36c06b4cd4c196aafe9d14"
+      },
+      {
+        "key": "pretrain/composite/PrepareCoffee/20250716/lerobot.tar",
+        "source_url": "https://utexas.box.com/s/beg5nc516vyihz0gt0zwtn78zncmgt68",
+        "bytes": 232806400,
+        "sha256": "d140b24618542291a2662269eb05ec2fc2919959ba3ea73fce51d1c867cdfd93"
+      },
+      {
+        "key": "target/atomic/CoffeeSetupMug/20250813/lerobot.tar",
+        "source_url": "https://utexas.box.com/s/rhrr67a994a16o25iprsfec07a1wmwm2",
+        "bytes": 476948480,
+        "sha256": "33b63f30c9052b7466509fb030ff72bc4005b3fe4d0e7c2931ded4bf1b859935"
+      },
+      {
+        "key": "target/composite/PrepareCoffee/20250812/lerobot.tar",
+        "source_url": "https://utexas.box.com/s/6h5x8zxnzdd20h9kz7h85mz1bfo3u1lv",
+        "bytes": 943380480,
+        "sha256": "9f20689281eb1737f12c086d08d751a23098b57043b60fcd6d7e367f3d574680"
+      }
+    ],
+    "modifications": "Native grasp crop; three RGB cameras decoded; native action ordering [5..11,0..4]; named state fields; stride16/50-step masked targets. No placement/button targets. 99 failed native grasp checks excluded.",
+    "mirror_duplicate_imported": false
+  },
+  "native_validation": {
+    "complete": true,
+    "attempted": 1223,
+    "accepted": 1124,
+    "rejected": 99,
+    "reasons": {
+      "No validated grasp boundary": 42,
+      "Annotated cut failed native bilateral-grasp and motion predicate": 57
+    },
+    "gpu": false,
+    "simulator_steps": 0,
+    "production_updates": 0
+  },
+  "audit": {
+    "passed": true,
+    "episodes": 1124,
+    "samples": 11811,
+    "datasets": {
+      "pretrain_atomic_CoffeeSetupMug_20250819_lerobot": 95,
+      "pretrain_composite_PrepareCoffee_20250716_lerobot": 90,
+      "target_atomic_CoffeeSetupMug_20250813_lerobot": 470,
+      "target_composite_PrepareCoffee_20250812_lerobot": 469
+    },
+    "all_action_state_mask_alignment_verified": true,
+    "zero_std_dim10_max_abs": 0.0,
+    "heldout_seed_collision": false
+  },
+  "transfer_bundle": {
+    "sha256": "9a6bf447bc1672c54d69fe289da286d3b6d47b337c543edd72b7db90c5d10b70",
+    "bytes": 2518915471,
+    "episodes": 1124,
+    "samples": 11811,
+    "dataset_role": "expert_grasp_base",
+    "license": "CC-BY-4.0",
+    "online_success_target_contribution": 0
+  },
+  "browser_playback_regression": {
+    "passed": true,
+    "checks": [
+      "one_based_numbers",
+      "exclude_same_video_and_card",
+      "playback_time_continues",
+      "scroll_preserved",
+      "open_card_retained_in_included_filter",
+      "unsaved_reason_preserved",
+      "reinclude_uses_current_controls",
+      "external_revision_refresh"
+    ],
+    "mock_posts": 2,
+    "mock_gets": 4,
+    "after": {
+      "same": true,
+      "card": true,
+      "open": true,
+      "paused": false,
+      "time": 3.34874,
+      "scroll": 1780,
+      "reason": "검토 메모"
+    }
+  },
+  "videos": {
+    "complete": true,
+    "videos": 1124,
+    "bytes": 1083121207
+  },
+  "training_design": {
+    "batch_size": 96,
+    "skills": [
+      "grasp",
+      "cup_placement"
+    ],
+    "samples_per_update": {
+      "grasp": 48,
+      "cup_placement": 48
+    },
+    "steps": 50,
+    "lr": 1e-05,
+    "resume_round": 11,
+    "original_optimizer_preserved": true,
+    "initial_bc_only_updates": 0,
+    "cup_target_still8": true,
+    "expert_success_target_contribution": 0
+  },
+  "raw_report_relative_path": "benchmarks/public-coffee-official-20261002/native-grasp-validation.json"
+}

@@ -5,6 +5,17 @@ from online_bc.data.data_control import read_controls
 
 def batch_plan(config, round_index, attempted):
     remaining = max(0, config.get("max_attempts_per_round", 32) - attempted)
+    offset = attempted
+    # Explicit extra windows use a disjoint namespace instead of spilling
+    # across the native 100-seed round stride. Original assignments stay intact.
+    for window in config.get("additional_windows", {}).get(str(round_index), []):
+        start, count = window["attempt_start"], window["attempts"]
+        if not 1 <= count <= 96 or start < 96:
+            raise ValueError("Invalid additional collection window")
+        if start <= attempted < start + count:
+            remaining = start + count - attempted
+            offset = window["seed_start"] - (993000 + round_index * 100 + 1) + attempted - start
+            break
     requested = (
         config.get("first_round_attempts", 32)
         if round_index == 1
@@ -13,7 +24,6 @@ def batch_plan(config, round_index, attempted):
     total = min(requested, remaining)
     nodes = list(config["workers"])
     plan = []
-    offset = attempted
     for index, node in enumerate(nodes):
         count = total // len(nodes) + (index < total % len(nodes))
         if count:

@@ -383,6 +383,26 @@ def main():
             attempted = sum(len(source["seeds"]) for source in sources)
             successes = eligible_successes(sources, c.get("controls_file"))
         prefixes = sources
+        setup_path = c.get("training_setup_file")
+        if setup_path:
+            # Collection can proceed while the new expert base and batch are
+            # validated, but no training job may bypass that validation.
+            while not Path(setup_path).exists():
+                atomic_json(
+                    status,
+                    dict(
+                        next_round=round_index,
+                        status="waiting_for_training_setup",
+                        attempts=attempted,
+                        successes=successes,
+                    ),
+                )
+                time.sleep(5)
+            setup = json.loads(Path(setup_path).read_text())
+            if setup.get("validated") is not True or setup.get("expert_ready") is not True:
+                raise RuntimeError("Training setup has not passed validation")
+            c.update(batch_size=setup["batch_size"], skills=setup["skills"])
+            prefixes = sources + setup.get("expert_data_prefixes", [])
         for model in c.get("learner_models", c["workers"]):
             folder = root / f"jobs/{model}/round-{round_index:04d}"
             folder.mkdir(parents=True, exist_ok=True)

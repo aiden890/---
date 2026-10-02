@@ -1,0 +1,180 @@
+{
+  "batch_initial": {
+    "rows": [
+      {
+        "batch_size": 32,
+        "passed": true,
+        "returncode": 0,
+        "wall_seconds": 129.0614954289049,
+        "gpu_peak_used_mib": 28875,
+        "production_updates": 0,
+        "finite": true,
+        "warm_median_seconds": 2.3502629627473652,
+        "samples_per_second": 13.615497715452765,
+        "losses": [
+          0.02590729296207428,
+          0.026840200647711754,
+          0.02567753940820694,
+          0.026573173701763153,
+          0.024129077792167664,
+          0.03560912609100342
+        ]
+      },
+      {
+        "batch_size": 64,
+        "passed": true,
+        "returncode": 0,
+        "wall_seconds": 161.22704365383834,
+        "gpu_peak_used_mib": 28877,
+        "production_updates": 0,
+        "finite": true,
+        "warm_median_seconds": 4.66187377134338,
+        "samples_per_second": 13.728385438792685,
+        "losses": [
+          0.02218359336256981,
+          0.02578345127403736,
+          0.028935402631759644,
+          0.032820992171764374,
+          0.0225727129727602,
+          0.023212475702166557
+        ]
+      },
+      {
+        "batch_size": 128,
+        "passed": false,
+        "returncode": 1,
+        "wall_seconds": 125.9993583727628,
+        "gpu_peak_used_mib": 28877,
+        "production_updates": 0,
+        "error_tail": " 12:18:30.868311: W external/xla/xla/tsl/framework/bfc_allocator.cc:512] *************************___________________________________________________________________________\nE1002 12:18:30.868376  171767 pjrt_stream_executor_client.cc:3077] Execution of replica 0 failed: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 32082370656 bytes. [tf-allocator-allocation-error='']\nTraceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"/home/work/robot_aiden_260930/online-bc-kit/src/online_bc/learning/train_online_bc.py\", line 204, in <module>\n    main()\n  File \"/home/work/robot_aiden_260930/online-bc-kit/src/online_bc/learning/train_online_bc.py\", line 103, in main\n    backend.update_batch(samples, seed=991000 + step)\n  File \"/home/work/robot_aiden_260930/online-bc-kit/src/online_bc/models/pi05_backend.py\", line 132, in update_batch\n    loss, gn, self.opt_state = self.step(\n                               ^^^^^^^^^^\n  File \"/home/work/robot_aiden_260930/pi-cup-online-bc/pi05-venv/lib/python3.11/site-packages/flax/nnx/graph.py\", line 1081, in update_context_manager_wrapper\n    return f(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^\n  File \"/home/work/robot_aiden_260930/pi-cup-online-bc/pi05-venv/lib/python3.11/site-packages/flax/nnx/transforms/compilation.py\", line 345, in jit_wrapper\n    pure_args_out, pure_kwargs_out, pure_out = jitted_fn(\n                                               ^^^^^^^^^^\njaxlib.xla_extension.XlaRuntimeError: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 32082370656 bytes.\n--------------------\nFor simplicity, JAX has removed its internal frames from the traceback of the following exception. Set JAX_TRACEBACK_FILTERING=off to include these.\n"
+      }
+    ],
+    "complete": true,
+    "largest_tested_safe_batch": 64,
+    "deployed": false
+  },
+  "batch_refine": {
+    "rows": [
+      {
+        "batch_size": 80,
+        "passed": true,
+        "returncode": 0,
+        "wall_seconds": 177.16455845721066,
+        "gpu_peak_used_mib": 28877,
+        "production_updates": 0,
+        "finite": true,
+        "warm_median_seconds": 5.816560539416969,
+        "samples_per_second": 13.753832605689498,
+        "losses": [
+          0.022081788629293442,
+          0.025175396353006363,
+          0.0272727832198143,
+          0.027247373014688492,
+          0.024571994319558144,
+          0.02290467359125614
+        ]
+      },
+      {
+        "batch_size": 96,
+        "passed": true,
+        "returncode": 0,
+        "wall_seconds": 192.6436313977465,
+        "gpu_peak_used_mib": 28879,
+        "production_updates": 0,
+        "finite": true,
+        "warm_median_seconds": 7.031109617557377,
+        "samples_per_second": 13.653605934442908,
+        "losses": [
+          0.021701721474528313,
+          0.028742510825395584,
+          0.03229999542236328,
+          0.024126136675477028,
+          0.02785390242934227,
+          0.032629627734422684
+        ]
+      },
+      {
+        "batch_size": 112,
+        "passed": false,
+        "returncode": 1,
+        "wall_seconds": 122.00824939645827,
+        "gpu_peak_used_mib": 28877,
+        "production_updates": 0,
+        "error_tail": " 12:28:48.053264: W external/xla/xla/tsl/framework/bfc_allocator.cc:512] *************************___________________________________________________________________________\nE1002 12:28:48.053322  182573 pjrt_stream_executor_client.cc:3077] Execution of replica 0 failed: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 28089737824 bytes. [tf-allocator-allocation-error='']\nTraceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"/home/work/robot_aiden_260930/online-bc-kit/src/online_bc/learning/train_online_bc.py\", line 204, in <module>\n    main()\n  File \"/home/work/robot_aiden_260930/online-bc-kit/src/online_bc/learning/train_online_bc.py\", line 103, in main\n    backend.update_batch(samples, seed=991000 + step)\n  File \"/home/work/robot_aiden_260930/online-bc-kit/src/online_bc/models/pi05_backend.py\", line 132, in update_batch\n    loss, gn, self.opt_state = self.step(\n                               ^^^^^^^^^^\n  File \"/home/work/robot_aiden_260930/pi-cup-online-bc/pi05-venv/lib/python3.11/site-packages/flax/nnx/graph.py\", line 1081, in update_context_manager_wrapper\n    return f(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^\n  File \"/home/work/robot_aiden_260930/pi-cup-online-bc/pi05-venv/lib/python3.11/site-packages/flax/nnx/transforms/compilation.py\", line 345, in jit_wrapper\n    pure_args_out, pure_kwargs_out, pure_out = jitted_fn(\n                                               ^^^^^^^^^^\njaxlib.xla_extension.XlaRuntimeError: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 28089737824 bytes.\n--------------------\nFor simplicity, JAX has removed its internal frames from the traceback of the following exception. Set JAX_TRACEBACK_FILTERING=off to include these.\n"
+      }
+    ],
+    "complete": true,
+    "largest_tested_safe_batch": 96,
+    "deployed": false
+  },
+  "mixed_validation": {
+    "model": "pi05",
+    "passed": true,
+    "status": "passed",
+    "native_optimizer_updates": 2,
+    "skills_tested": [
+      "grasp",
+      "cup_placement"
+    ],
+    "finite_loss_and_grad": true,
+    "adapter_changed": true,
+    "checkpoint_reload_equal": true,
+    "inference_after_reload": true,
+    "inference_action_shape": [
+      50,
+      12
+    ],
+    "trainable_parameters": 22118400,
+    "frozen_backbone_unchanged": true,
+    "optimizer_resume_equal": true,
+    "updates": [
+      {
+        "step": 1,
+        "model": "pi05",
+        "skill": "grasp",
+        "source_model": "expert-human",
+        "source_seed": 10000011,
+        "episode_id": "expert-human-pretrain_atomic_CoffeeSetupMug_20250819_lerobot-episode000011",
+        "control_revision": 0,
+        "seconds": 41.91725074592978,
+        "batch_size": 96,
+        "skill_sample_counts": {
+          "grasp": 48,
+          "cup_placement": 48
+        },
+        "learning_rate": 1e-05,
+        "loss": 0.04649752005934715,
+        "grad_norm": 0.008734782226383686,
+        "canonicalized_zero_std_dims": [
+          10
+        ]
+      },
+      {
+        "step": 2,
+        "model": "pi05",
+        "skill": "cup_placement",
+        "source_model": "pi05",
+        "source_seed": 993501,
+        "episode_id": "pi05-seed993501",
+        "control_revision": 0,
+        "seconds": 41.53570683952421,
+        "batch_size": 96,
+        "skill_sample_counts": {
+          "grasp": 48,
+          "cup_placement": 48
+        },
+        "learning_rate": 1e-05,
+        "loss": 0.05411655083298683,
+        "grad_norm": 0.010962538421154022,
+        "canonicalized_zero_std_dims": [
+          10
+        ]
+      }
+    ]
+  },
+  "mixed_completion": {
+    "returncode": 0,
+    "time": 1790912872.3097315,
+    "production_updates": 0
+  }
+}

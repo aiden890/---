@@ -14,7 +14,7 @@ def atomic_json(path, value):
 
 
 def episode_id(manifest):
-    return f"{manifest['model']}-seed{int(manifest['seed'])}"
+    return manifest.get("episode_id") or f"{manifest['model']}-seed{int(manifest['seed'])}"
 
 
 def read_controls(path):

@@ -147,6 +147,19 @@ Dataset candidates and actual training usage are distinct. `data-usage.json` rec
 
 고정 30개 평가 시드(992001~992030)는 학습 replay에 넣지 않는다. 기본 모델(version 0)과 파일럿 마지막 체크포인트(version 5)를 v4에서 평가해 HF evaluation 경로에 metrics를 저장한다. 초기 수집 32회와 평가 30회는 별도 집계다.
 
+## 공개 잡기 기본 세트와 학습 재개 (2026-10-02)
+
+사용자의 공개 expert 최대 활용·큰 배치·추가 지시 없이 계속 학습 지시에 따라 기존 컵 놓기 Online BC에 공개 잡기 기본 세트를 추가한다. 별도 초기 BC-only 단계는 실행하지 않고 기존 checkpoint11의 전체 optimizer를 이어받는다.
+
+- 공식 Human 원본 네 개에서 PrepareCoffee616개와 CoffeeSetupMug607개를 받았다. PrepareCoffee는 동일한 전체 task이고 CoffeeSetupMug는 컵을 커피머신에 놓는 관련 하위 task다. 환경·배치는 다양하다. Mirror의514개는 공식 target PrepareCoffee 중복이므로 재집계하거나 다시 넣지 않았다.
+- 전체1223개를 원본 저장 상태로 검사해1124개 잡기 구간을 채택하고99개를 제외했다. 실제 양쪽 fingerpad 접촉과 컵 이동>10cm, 원본 성공 reward, composite의 공식 pick→place 주석을 요구한다. 검사에는 GPU·simulator step·학습 update가 없다. Collision-only 판독은 full XML과8개 사례에서 결과가 같았다.
+- 1124개·11811개 청크의 원본 action/state/50-step valid mask 정렬·RGB3개·SHA·정규화 상수 차원 검사를 전수 통과했다. Action order는 공식 LeRobot `[5..11,0..4]`→native12D이며 placement/button 타깃은 제외한다. 공개 grasp pool은 온라인256episode window와 별도로 보존하고 사용자 exclusions/pause를 매 샘플 적용한다. 데이터·영상은 RoboCasa Team의 CC BY4.0 출처와 변환 기록을 유지한다.
+- A10080GB, 기존 XLA memory fraction0.35에서32·64·80·96 실제 native updates가 유한한 loss/gradient 검사를 통과했고112·128은 OOM 기록을 보존했다. Batch96은 검증된 최대값이며 모든 가능한 설정의 최적성이나 학습 성능 향상을 뜻하지 않는다. Checkpoint11 전체 optimizer 복원 후48grasp+48cup 혼합 업데이트2회·adapter저장/재로드·optimizerresume·frozenbackbone·유한추론을 별도 GPU에서 통과했다. 완료 benchmark/validation을 반복하지 않는다.
+- 기존 round12의96회/유효성공4개를 보존하고, 사용자 계속 지시에 따라 충돌 없는 추가 seed2012001..2012096 창을 열었다. 추가32회 후 전체128회/유효성공9개로 목표8개를 충족했다. 공개 잡기 데이터는 온라인 컵 성공 목표에 가산하지 않는다. 정상96회 native namespace는 round stride100을 유지한다.
+- 실제 learner job은 검증된 공개 shard의 HF 업로드/원격 크기/SHA, 혼합 GPU 검증 및 소스 설치가 완료된 `training-setup-public-grasp.json` receipt를 확인한 뒤 생성한다. Job은 batch96, skills grasp/cup_placement,48:48새 샘플,LR1e-5,50optimizerupdates이며 learner/policy/collector/telemetry는 재시작하지 않는다. 완료 coordinator2947840은 setup gate에서 최종 expert prefix 소스를 읽는2964134로 안전하게 인계했다. 원본 로그·128회 결과는 보존했다.
+- 공개 잡기1124개 영상은 `/media/public-expert-grasp-20261002/index.html`, 검토/제외는 `http://100.86.183.64:8897`에서 제공한다. 번호1부터·제외 후 재생/스크롤 유지 검사도 통과했다. 공식 CoffeeSetupMug MimicGen 원본은 별도 source staging에 받으며 Human과 구분하고 동일한 변환·잡기 검증을 통과한 후 다음 정상 job에 추가한다. 검증 전 synthetic 데이터는 사용하지 않는다.
+- Main routing은 standard, inference-only filter는 OFF이다. 기존 실패 설치/완료 GPU validation/shadow는 반복하지 않는다. 정상 EX reload/SH reader drain, heldout992001..30 replay금지, 전체 optimizer 보존, native eval10/30 동일분모 비교 및 보관 규칙은 유지한다.
+
 ## 야간 운영 변경 (2026-10-02)
 
 - v4 추론 전용 설치 시도는 idle 경계의 EX lock과 legacy/simulator reader 종료 확인 후 checkpoint11에서 진행했다. 실제 저장 관측3개·같은 RNG의 standard/prefix/cup 요청12개를 교체 전후 비교했으나 최대 액션 차이0.00385064로 검사를 통과하지 못했다. 기존 컨테이너와 여섯 source 파일·두 config를 원본대로 복원하고 checkpoint11 ready 및176949619-byte optimizer 보존을 확인했다. 기존 서버를 재시작한 결과도 원래 프로세스 대비 최대0.00385058의 차이가 있었다. 재시작 간 차이의 원인은 미확인이고 optimizer 생략 때문에 발생했다고 단정하지 않는다. 다운로드 필터는 꺼져 있으며 native 수집은 standard로 계속된다. 설치 PID3590210은 종료됐고 runtime `installation/inference-only-v4-20261002-0951`의 started/report guard와 원본 requests/actions/로그를 보존한다. 재실행하지 않는다. 설치기 guard5개 unit과 프로젝트 Ruff 통과. 보고서: `reports/verification/inference-install-v4-20261002.json`.

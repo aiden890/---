@@ -8,7 +8,13 @@ import time
 from pathlib import Path
 import numpy as np
 from online_bc.data.replay import Replay
-from online_bc.data.data_control import read_controls, control_ready, atomic_json, select_candidates
+from online_bc.data.data_control import (
+    read_controls,
+    control_ready,
+    atomic_json,
+    select_candidates,
+    episode_id,
+)
 
 
 def arrays(params):
@@ -28,7 +34,7 @@ def main():
     ap.add_argument(
         "--skills",
         nargs="+",
-        choices=["cup_placement", "button_press"],
+        choices=["grasp", "cup_placement", "button_press"],
         default=["cup_placement", "button_press"],
     )
     ap.add_argument("--smoke", action="store_true")
@@ -65,17 +71,25 @@ def main():
 
     def usage(status):
         c = read_controls(args.controls)
-        candidates = select_candidates(replay.episodes, c, args.skills[0])
+        candidates = [
+            item
+            for item in select_candidates(replay.episodes, c)
+            if any(m["skill"] in args.skills for m in item[2]["samples"])
+        ]
         atomic_json(
             out / "data-usage.json",
             dict(
                 status=status,
                 completed_updates=len(log),
                 planned_updates=steps,
+                batch_size=args.batch_size,
+                skills=args.skills,
+                skill_sampling="balanced_batch"
+                if "grasp" in args.skills
+                else "alternating_updates",
+                expert_pool_episodes=len(replay.expert_cache),
                 control_revision=c["revision"],
-                eligible_episodes=[
-                    m["model"] + "-seed" + str(m["seed"]) for _, _, m, _ in candidates
-                ],
+                eligible_episodes=[episode_id(m) for _, _, m, _ in candidates],
                 excluded=list(c["excluded"]),
                 used=used,
                 updated_at=time.time(),
@@ -90,7 +104,15 @@ def main():
             ready, reason = control_ready(control, args.control_health)
             if ready:
                 try:
-                    samples = [replay.sample(skill) for _ in range(args.batch_size)]
+                    batch_skills = (
+                        [
+                            args.skills[(step - 1 + index) % len(args.skills)]
+                            for index in range(args.batch_size)
+                        ]
+                        if "grasp" in args.skills
+                        else [skill] * args.batch_size
+                    )
+                    samples = [replay.sample(item) for item in batch_skills]
                     sample = samples[0]
                     break
                 except RuntimeError:
@@ -117,6 +139,7 @@ def main():
             control_revision=sample["control_revision"],
             seconds=time.monotonic() - t,
             batch_size=args.batch_size,
+            skill_sample_counts={name: batch_skills.count(name) for name in set(batch_skills)},
             learning_rate=args.lr,
             **result,
         )
