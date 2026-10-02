@@ -1,0 +1,49 @@
+{
+  "validated": true,
+  "expert_ready": true,
+  "batch_size": 96,
+  "skills": [
+    "grasp",
+    "cup_placement"
+  ],
+  "expert_data_prefixes": [
+    {
+      "model": "expert-human",
+      "round": 0,
+      "node": "public-grasp",
+      "batch": 1,
+      "prefix": "pi05-cup-online-bc-20261001/data/expert-human/public-grasp-v1",
+      "dataset_role": "expert_grasp_base",
+      "sha256": "9a6bf447bc1672c54d69fe289da286d3b6d47b337c543edd72b7db90c5d10b70",
+      "episodes": 1124,
+      "samples": 11811,
+      "native_cup_target_contribution": 0
+    }
+  ],
+  "native_attempts": 128,
+  "native_new_successes": 9,
+  "learning_rate": 1e-05,
+  "updates_per_round": 50,
+  "mixed_skill_counts": {
+    "grasp": 48,
+    "cup_placement": 48
+  },
+  "source_validation_report_sha256": "40600dad2bc7db831291f9893f8253c3bb71f4bec00912774e469435003a7e03",
+  "gpu_validation_report_sha256": "d1a92921a7beb9bd0755906bac6a40e4ccb3465364bac526965ab07aa99bc4f9",
+  "cloud_verification": {
+    "passed": true,
+    "remote_sizes": {
+      "bc-shards.tar.gz": 2518915471,
+      "manifest.json": 253
+    },
+    "archive_sha256": "9a6bf447bc1672c54d69fe289da286d3b6d47b337c543edd72b7db90c5d10b70",
+    "archive_bytes": 2518915471,
+    "seconds": 361.49641123972833,
+    "episodes": 1124,
+    "samples": 11811,
+    "at": 1790913669.1600103
+  },
+  "controls_revision_at_setup": 6,
+  "optimizer_resume_round": 11,
+  "at": 1790913771.9232786
+}

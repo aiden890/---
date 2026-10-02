@@ -1,0 +1,10 @@
+{
+  "actual_episodes": 9550,
+  "frames": 2230260,
+  "bytes": 6502737920,
+  "sha256": "54ed4ab9ecb8d64bbb290e018c005856b802b100b91f4cd8aac7d3f4870fdb37",
+  "source_url": "https://utexas.box.com/s/362x0ibs6m0fsrlaet3p3l1gvfsy2u3o",
+  "imported": false,
+  "native_contact_validation_possible_from_current_release": false,
+  "limitation": "LeRobot synthetic release lacks original MuJoCo states/XML and subtask annotations; source inventory preserved. No native contact proof or accepted cuts claimed."
+}
