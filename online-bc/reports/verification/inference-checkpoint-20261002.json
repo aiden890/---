@@ -1,0 +1,48 @@
+{
+  "status": "passed",
+  "deployed": false,
+  "production_updates": 0,
+  "checkpoint": "/home/work/robot_aiden_260930/pi-cup-online-bc/checkpoints/pi05_pretrain_human300/multitask_learning/75000",
+  "adapter": "/home/work/robot_aiden_260930/pi-cup-online-bc/run/training/round-0010/update-000050",
+  "samples": [
+    {
+      "episode_id": "pi05-seed981026",
+      "step": 784,
+      "rng_seed": 533501,
+      "max_abs_error": 0.0,
+      "inference_seconds": 3.006498012691736
+    },
+    {
+      "episode_id": "pi05-seed981018",
+      "step": 352,
+      "rng_seed": 533502,
+      "max_abs_error": 0.0,
+      "inference_seconds": 0.1063308184966445
+    },
+    {
+      "episode_id": "xiaomi-seed981014",
+      "step": 272,
+      "rng_seed": 533503,
+      "max_abs_error": 0.0,
+      "inference_seconds": 0.09675151575356722
+    }
+  ],
+  "full_load_seconds": 0.22237072326242924,
+  "adapter_only_load_seconds": 0.07547894958406687,
+  "optimizer_object_preserved": true,
+  "training_and_save_blocked": true,
+  "default_restore_requires_optimizer": true,
+  "optimizer_bytes": 176949619,
+  "wall_seconds": 20.68632845580578,
+  "scope": "Same-process fixed-RNG equivalence; no network transfer or rollout speed measurement",
+  "filtered_downloads_deployed": false,
+  "live_policy_changes": false,
+  "unit_tests_passed": 34,
+  "ruff_passed": true,
+  "validation_pid": 126276,
+  "source_deployment": "isolated staging only; no live process changes",
+  "sources": [
+    "https://github.com/Physical-Intelligence/openpi/blob/main/src/openpi/policies/policy_config.py",
+    "https://huggingface.co/docs/huggingface_hub/guides/buckets#filtering"
+  ]
+}

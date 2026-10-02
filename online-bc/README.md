@@ -149,6 +149,8 @@ Dataset candidates and actual training usage are distinct. `data-usage.json` rec
 
 ## 야간 운영 변경 (2026-10-02)
 
+- `Backend.load(path, load_optimizer=False)`는 추론용 adapter-only 로드를 명시적으로 허용한다. 기본값은 optimizer까지 복원하며 파일이 없으면 실패한다. 추론용 로드 후에는 gradient update와 training checkpoint 저장을 차단하고, 전체 optimizer 복원으로만 해제한다. Checkpoint10의 실제 관측3개·같은 RNG를 사용한 별도 SKKU GPU 검증에서 optimizer 파일이 없는 임시 checkpoint의 액션이 전체 로드와 bit-for-bit 같았다(최대 오차0). 전체34개 unit과 프로젝트 Ruff도 통과했다. 검증 PID126276은 완료됐으므로 재실행하지 않는다. Learner 및 운영 정책 프로세스는 변경하지 않았고 서버/worker/전송은 아직 전체 checkpoint를 사용한다. HF dry-run의 생략 가능 파일은176949619bytes이며 실제 filtered download·네트워크 지연·rollout 속도 개선을 측정하지 않았다. 다음 적용은 서버의 명시적 추론용 옵션과 download-only 필터를 함께 구현·검증하고 reader가 없는 정상 reload 경계에서 설치해야 한다. Learner 전송/optimizer는 유지한다. 보고서: `reports/verification/inference-checkpoint-20261002.json`. 참고: [OpenPI inference loading](https://github.com/Physical-Intelligence/openpi/blob/main/src/openpi/policies/policy_config.py), [HF bucket filtering](https://huggingface.co/docs/huggingface_hub/guides/buckets#filtering).
+
 사용자가 평가·성능 정체 대응·속도 최적화·계속 학습을 승인했다. 초기 BC 생략은 유지한다.
 
 - 현재 서비스는 최대 20 rounds / 1,000 updates까지 실행한다. 완료 시 자동 점검에서 평가를 보고 계속 실행 여부와 다음 실험을 결정한다. 사용자 수동 선별은 선택이고 exclusions/pause는 항상 반영한다.

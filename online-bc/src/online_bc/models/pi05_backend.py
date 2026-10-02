@@ -84,6 +84,7 @@ class Backend:
         # Native module_jit freezes weights when constructed. Build it only
         # after loading the adapter, and invalidate after every update/reload.
         self.infer_fn = None
+        self.inference_only = False
 
     def prepare(self, sample):
         from openpi_client import image_tools
@@ -126,6 +127,8 @@ class Backend:
         return self.update_batch([sample], seed=seed)
 
     def update_batch(self, samples, seed=0):
+        if self.inference_only:
+            raise RuntimeError("Restore the optimizer before training this inference-only checkpoint")
         prepared = [self.prepare(sample) for sample in samples]
         data = self.jax.tree.map(lambda *items: self.jnp.asarray(np.stack(items)), *prepared)
         obs = self.base.Observation.from_dict(data)
@@ -146,6 +149,8 @@ class Backend:
         )
 
     def save(self, path, step):
+        if self.inference_only:
+            raise RuntimeError("Cannot save a training checkpoint after an inference-only load")
         state = self.nnx.state(self.model, self.filter).to_pure_dict()
         import flax.traverse_util
 
@@ -154,16 +159,21 @@ class Backend:
         with open(Path(path) / "pi05-optimizer.pkl", "wb") as f:
             pickle.dump(dict(optimizer=self.jax.device_get(self.opt_state), step=step), f)
 
-    def load(self, path):
+    def load(self, path, *, load_optimizer=True):
+        """Restore training state by default; explicitly allow adapter-only inference."""
         import flax.traverse_util
 
+        if load_optimizer:
+            with open(Path(path) / "pi05-optimizer.pkl", "rb") as f:
+                optimizer = self.jax.tree.map(self.jnp.asarray, pickle.load(f)["optimizer"])
         with np.load(Path(path) / "pi05-lora.npz", allow_pickle=False) as f:
             flat = {k: self.jnp.asarray(f[k]) for k in f.files}
         s = self.nnx.state(self.model, self.filter)
         s.replace_by_pure_dict(flax.traverse_util.unflatten_dict(flat, sep="/"))
         self.nnx.update(self.model, s)
-        with open(Path(path) / "pi05-optimizer.pkl", "rb") as f:
-            self.opt_state = self.jax.tree.map(self.jnp.asarray, pickle.load(f)["optimizer"])
+        if load_optimizer:
+            self.opt_state = optimizer
+        self.inference_only = not load_optimizer
         self.infer_fn = None
 
     def parameters(self):
