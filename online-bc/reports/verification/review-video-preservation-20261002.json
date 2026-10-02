@@ -1,0 +1,32 @@
+{
+  "passed": true,
+  "checks": [
+    "one_based_numbers",
+    "exclude_same_video_and_card",
+    "playback_time_continues",
+    "scroll_preserved",
+    "open_card_retained_in_included_filter",
+    "unsaved_reason_preserved",
+    "reinclude_uses_current_controls",
+    "external_revision_refresh"
+  ],
+  "mock_posts": 2,
+  "mock_gets": 4,
+  "after": {
+    "same": true,
+    "card": true,
+    "open": true,
+    "paused": false,
+    "time": 3.358767,
+    "scroll": 1780,
+    "reason": "\uac80\ud1a0 \uba54\ubaa8"
+  },
+  "before": {
+    "time": 3.039101,
+    "scroll": 1779
+  },
+  "date": "2026-10-02",
+  "tested_with": "headless Chrome / Playwright; isolated mock controls; byte-range-capable generated MP4",
+  "live_controls_mutated": false,
+  "source_sha256": "3f3c826a0e99555519eb507d1ef23c769d36cf07bd7554a024d9f28a526ea6c6"
+}

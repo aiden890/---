@@ -1,0 +1,72 @@
+{
+  "date": "2026-10-02",
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "best_measured_batch": 16,
+  "production_batch": 4,
+  "optimality_established": false,
+  "benchmark": "a100-batch-throughput-20261002.json",
+  "research_scope": "PrepareCoffee and CoffeeSetupMug expert demonstration availability; metadata only, no replay import",
+  "official_human_nominal": {
+    "PrepareCoffee": {
+      "pretrain": 100,
+      "target": 500
+    },
+    "CoffeeSetupMug": {
+      "pretrain": 100,
+      "target": 500
+    }
+  },
+  "official_synthetic_nominal": {
+    "CoffeeSetupMug_MimicGen": 10000
+  },
+  "official_all_tasks_human": {
+    "nominal_demonstrations": 55000,
+    "hours": 675
+  },
+  "prepare_coffee_target_mirror": {
+    "repo": "jellyho/robocasa365-PrepareCoffee",
+    "episodes": 514,
+    "frames": 279534,
+    "action_dimension": 12,
+    "state_dimension": 16,
+    "cameras": 3,
+    "fps": 20,
+    "deduplicate_against_official_target": true
+  },
+  "sources": [
+    "https://robocasa.ai/docs/build/html/datasets/datasets_overview.html",
+    "https://github.com/robocasa/robocasa/blob/main/robocasa/utils/dataset_registry.py",
+    "https://github.com/robocasa/robocasa/blob/main/robocasa/models/assets/box_links/box_links_ds.json",
+    "https://huggingface.co/datasets/jellyho/robocasa365-PrepareCoffee/blob/main/meta/info.json"
+  ],
+  "requirements_before_training": [
+    "verify simulator and controller version/action conventions/camera/state transform",
+    "extract cup placement phase excluding button actions",
+    "episode success and label alignment validation",
+    "deduplicate copies and reject heldout seed/initial-state overlap",
+    "separate human and synthetic sources"
+  ],
+  "production_settings_changed": false,
+  "datasets_imported": false,
+  "broader_robot_demonstrations": {
+    "DROID": {
+      "demonstrations": 76000,
+      "hours": 350,
+      "source": "https://droid-dataset.github.io/"
+    },
+    "Open_X_Embodiment": {
+      "trajectories_lower_bound": 1000000,
+      "robot_embodiments": 22,
+      "source": "https://robotics-transformer-x.github.io/",
+      "overlap_possible_do_not_sum": true
+    }
+  },
+  "official_download_links": {
+    "PrepareCoffee_pretrain": "https://utexas.box.com/s/beg5nc516vyihz0gt0zwtn78zncmgt68",
+    "PrepareCoffee_target": "https://utexas.box.com/s/6h5x8zxnzdd20h9kz7h85mz1bfo3u1lv",
+    "CoffeeSetupMug_pretrain": "https://utexas.box.com/s/0mka48bl1kornjb9osxotmb10535cojv",
+    "CoffeeSetupMug_target": "https://utexas.box.com/s/rhrr67a994a16o25iprsfec07a1wmwm2",
+    "CoffeeSetupMug_MimicGen": "https://utexas.box.com/s/362x0ibs6m0fsrlaet3p3l1gvfsy2u3o"
+  },
+  "counts_are_advertised_nominal_not_validated_accepted_cup_segments": true
+}

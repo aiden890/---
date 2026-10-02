@@ -1,28 +1,53 @@
 <!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>π 컵 놓기 · Online BC 데이터 관리</title>
 <style>body{background:#f5f4ef;color:#252e2b;font:16px/1.6 system-ui;margin:0}main{max-width:1280px;margin:auto;padding:28px}h1{font-size:27px}a{color:#166854}.panel,.episode{background:white;border:1px solid #deded6;border-radius:14px;padding:20px;margin:16px 0}.stats{display:flex;gap:20px;flex-wrap:wrap}.stat b{display:block;font-size:27px}.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}button,select,input{font:inherit;padding:8px 12px;border:1px solid #b9c8bf;border-radius:7px;background:white}button{cursor:pointer}button:disabled{opacity:.5;cursor:wait}.exclude{color:#aa3927}.muted{color:#68736e;font-size:14px}.tag{padding:3px 9px;border-radius:20px;background:#e8f2ec}.out{background:#f8e8e4}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.episode{margin:0;min-width:0}.episode video{width:100%;max-height:340px;background:#17221e;border-radius:9px}.notice{background:#fff4d8;padding:12px;border-radius:8px}details{margin-top:10px}summary{cursor:pointer}#message{min-height:25px;color:#166854}textarea{width:100%;box-sizing:border-box;font:inherit;border:1px solid #ccd1cb;border-radius:6px;padding:8px}@media(max-width:750px){main{padding:15px}.grid{grid-template-columns:1fr}h1{font-size:23px}}</style>
 <main><a href="http://100.86.183.64:8899/#videos">← RoboCasa 영상 탭</a><h1>π₀.₅ · 컵 놓기 Online BC 데이터 관리</h1><p>성공 구간을 자동 채택합니다. 영상 검토는 선택 사항이며, 제외한 에피소드의 모든 청크가 이후 학습에서 빠집니다.</p>
-<section class="panel"><div class="stats" id="stats"></div><p id="runstate"></p><p class="muted" id="syncstate"></p><div class="toolbar"><button id="pause">학습 일시 정지</button><button id="refresh">새로고침</button></div><p id="message" role="status" aria-live="polite"></p><p class="notice">초기 BC는 생략합니다. 라운드당 8회 시도 중 성공한 구간만 추가하며, 기존 성공 구간과 함께 학습합니다. 제외는 제어 정보 전달 후 다음 샘플부터 적용됩니다. 실행 중인 업데이트와 이미 완료한 업데이트를 되돌리지는 않습니다.</p></section>
+<section class="panel"><div class="stats" id="stats"></div><p id="runstate"></p><p class="muted" id="syncstate"></p><div class="toolbar"><button id="pause">학습 일시 정지</button><button id="refresh">새로고침</button></div><p id="message" role="status" aria-live="polite"></p><p class="notice">초기 BC는 생략합니다. 라운드당 새로운 유효 성공 구간 8개를 목표로 수집하며, 기존 성공 구간과 함께 학습합니다. 제외는 제어 정보 전달 후 다음 샘플부터 적용됩니다. 실행 중인 업데이트와 이미 완료한 업데이트를 되돌리지는 않습니다.</p></section>
 <section class="panel toolbar"><label>목록 <select id="filter"><option value="eligible">학습 후보 전체</option><option value="included">사용 가능</option><option value="excluded">내가 제외한 데이터</option><option value="used">실제로 사용된 데이터</option><option value="all">전체 롤아웃 (미채택 포함)</option></select></label><label>모델 <select id="model"><option value="all">전체</option><option value="pi05">π₀.₅</option><option value="xiaomi">Xiaomi</option><option value="groot">GR00T</option></select></label><input id="search" placeholder="seed 검색" aria-label="seed 검색"><span id="count"></span></section><div id="list" class="grid"></div>
-<details class="panel"><summary>데이터와 학습 코드</summary><p>입력: 행동 직전 카메라 3개 + 로봇 상태 + 컵 놓기 지시문. 타깃: 성공 구간에서 실제 실행한 12D 액션, 50-step 청크와 유효 구간 마스크. 버튼 동작과 실패 실행은 학습 타깃에서 제외합니다.</p><p>학습: OpenPI native flow matching · action expert LoRA rank 32 · AdamW 1e-4 · batch 1 · 라운드당 50 optimizer updates · 성공 에피소드 최대 256개. 데이터 목록은 후보 전체를 보여주고, learner가 보고한 현재 eligible 목록과 실제 사용 횟수는 별도로 표시합니다.</p></details></main>
+<details class="panel"><summary>데이터와 학습 코드</summary><p>입력: 행동 직전 카메라 3개 + 로봇 상태 + 컵 놓기 지시문. 타깃: 성공 구간에서 실제 실행한 12D 액션, 50-step 청크와 유효 구간 마스크. 버튼 동작과 실패 실행은 학습 타깃에서 제외합니다.</p><p>학습: OpenPI native flow matching · action expert LoRA rank 32 · AdamW · 현재 batch 4 / 학습률 1e-5 · 라운드당 50 optimizer updates · 성공 에피소드 최대 256개. 데이터 목록은 후보 전체를 보여주고, learner가 보고한 현재 eligible 목록과 실제 사용 횟수는 별도로 표시합니다.</p></details></main>
 <script>
 let state, busy=false;const $=id=>document.getElementById(id);const names={pi05:'π₀.₅',xiaomi:'Xiaomi',groot:'GR00T N1.5'};
 const label={waiting_for_rollouts:'새 롤아웃 대기',training:'학습 중',completed:'라운드 학습 완료',user_paused:'사용자 일시 정지',control_sync_stale:'제외 정보 연결 지연 · 학습 일시 정지',no_eligible_success_data:'사용 가능한 성공 데이터 대기'};
 function safeUrl(value){try{let u=new URL(value);return u.origin==='http://100.86.183.64:8899'?u.href:null}catch{return null}}
 function elem(tag,text,cls){let e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e}
-function renderCards(){if(!state)return;const c=state.controls,used=state.learner?.used||{},rounds=state.learner?.rounds||[],active=rounds.length?rounds[rounds.length-1].eligible_episodes||[]:[];
-let rows=state.episodes.filter(e=>{let x=Boolean(c.excluded[e.id]);let f=$('filter').value;return(f==='all'||f==='eligible'&&e.eligible||f==='included'&&e.eligible&&!x||f==='excluded'&&x||f==='used'&&(used[e.id]||0)>0)&&($('model').value==='all'||e.model===$('model').value)&&String(e.seed).includes($('search').value)});
-$('count').textContent=rows.length+'개';$('list').replaceChildren();for(let e of rows){let x=c.excluded[e.id];let card=elem('article',undefined,'episode');card.append(elem('h3',names[e.model]+' · Seed '+e.seed));card.append(elem('span',!e.eligible?'학습 미채택':x?'사용자 제외':'자동 채택 · 사용 가능','tag'+(x?' out':'')));
-card.append(elem('p',(e.round?'온라인 라운드 '+e.round:'초기 평가')+' · 정책 v'+e.policy_version+' · '+e.samples+'개 청크','muted'));
-let usage=elem('p','실제 학습 사용 '+(used[e.id]||0)+'회'+(active.includes(e.id)?' · learner 현재 후보':''),'muted');usage.id='usage-'+e.id;card.append(usage);
-if(e.start!=null)card.append(elem('p','컵 놓기 구간: '+e.start+'–'+e.end+' step','muted'));
-let details=elem('details'),summary=elem('summary','영상 확인');details.append(summary);let source=e.clip||e.video;
-if(safeUrl(source)){let v=elem('video');v.controls=true;v.preload='none';v.playsInline=true;details.addEventListener('toggle',()=>{if(details.open&&!v.src)v.src=safeUrl(source);if(!details.open)v.pause()});details.append(v)}
-let a=elem('a','전체 롤아웃 열기');if(safeUrl(e.video)){a.href=safeUrl(e.video);a.target='_blank';a.rel='noopener';details.append(a)}card.append(details);
-if(e.eligible){let reason=elem('textarea');reason.placeholder='제외 사유 (선택)';reason.setAttribute('aria-label',e.id+' 제외 사유');reason.value=x?.reason||'';card.append(reason);let b=elem('button',x?'다시 사용':'학습에서 제외',x?'':'exclude');b.disabled=busy;b.addEventListener('click',()=>change({action:'exclude',id:e.id,excluded:!Boolean(x),reason:reason.value}));card.append(b);if(x)card.append(elem('p','다음 샘플부터 제외. 과거 사용 이력은 유지됩니다.','muted'))}else card.append(elem('p',e.cup_success?'컵 성공은 있으나 학습 데이터 저장·구간 검증을 통과한 후보가 아닙니다.':'컵 놓기 성공 구간이 없어 학습하지 않습니다.','muted'));
-$('list').append(card)} }
-function render(keepCards=false){let candidates=state.episodes.filter(e=>e.eligible&&!state.controls.excluded[e.id]);let excluded=state.episodes.filter(e=>state.controls.excluded[e.id]);let used=state.learner?.used||{};$('stats').replaceChildren();for(let [n,v] of [['사용 가능 에피소드',candidates.length],['사용 가능 청크',candidates.reduce((n,e)=>n+e.samples,0)],['사용자 제외',excluded.length],['실제 사용 에피소드',Object.keys(used).length]]){let box=elem('div',n,'stat');box.append(elem('b',String(v)));$('stats').append(box)}
-$('runstate').textContent=state.learner?(label[state.learner.status]||state.learner.status)+' · 완료 라운드 '+(state.learner.completed_round||0):'학습 서버 연결 대기 · 아직 본학습 사용 기록 없음';let learnerRev=state.learner?.control_revision;$('syncstate').textContent='저장된 제외 설정 v'+state.controls.revision+' · HF 전달 v'+state.sync.published_revision+' · learner 확인 '+(learnerRev==null?'대기':'v'+learnerRev)+(state.sync.status==='retrying'?' · 전송 재시도 중':'')+' · 5초마다 상태 갱신';$('pause').textContent=state.controls.paused?'학습 재개':'학습 일시 정지';if(!keepCards)renderCards()}
-async function refresh(){if(busy)return;try{let r=await fetch('/api/state',{cache:'no-store'});if(!r.ok)throw Error('상태를 가져오지 못했습니다.');let previousRevision=state?.controls.revision;state=await r.json();render(Boolean(previousRevision===state.controls.revision&&(document.querySelector('textarea:focus')||document.querySelector('details[open] video'))));for(let e of state.episodes){let usage=$('usage-'+e.id);if(usage)usage.textContent='실제 학습 사용 '+(state.learner?.used?.[e.id]||0)+'회'}}catch(e){$('message').textContent=e.message}}
-async function change(value){if(busy)return;busy=true;try{let r=await fetch('/api/control',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...value,revision:state.controls.revision})});let d=await r.json();if(!r.ok)throw Error(d.error);$('message').textContent='저장 완료. HF 전달 및 learner 확인 상태를 위에서 확인하세요.'}catch(e){$('message').textContent=e.message}finally{busy=false;await refresh()}}
-$('pause').onclick=()=>change({action:'pause',paused:!state.controls.paused});$('refresh').onclick=refresh;for(let id of ['filter','model'])$(id).onchange=renderCards;$('search').oninput=renderCards;refresh();setInterval(refresh,5000);
+const cards=new Map();
+function makeCard(e){
+ const card=elem('article',undefined,'episode');card.dataset.episodeId=e.id;
+ const title=elem('h3'),tag=elem('span'),meta=elem('p',undefined,'muted'),usage=elem('p',undefined,'muted');
+ usage.id='usage-'+e.id;card.append(title,tag,meta,usage);
+ if(e.start!=null)card.append(elem('p','컵 놓기 구간: '+e.start+'–'+e.end+' step','muted'));
+ const details=elem('details');details.append(elem('summary','영상 확인'));
+ const source=safeUrl(e.clip||e.video);
+ if(source){const v=elem('video');v.controls=true;v.preload='none';v.playsInline=true;
+ details.addEventListener('toggle',()=>{if(details.open&&!v.src)v.src=source;if(!details.open)v.pause()});details.append(v)}
+ if(safeUrl(e.video)){const a=elem('a','전체 롤아웃 열기');a.href=safeUrl(e.video);a.target='_blank';a.rel='noopener';details.append(a)}
+ card.append(details);let reason,button,note;
+ if(e.eligible){reason=elem('textarea');reason.placeholder='제외 사유 (선택)';reason.setAttribute('aria-label',e.id+' 제외 사유');reason.value=state.controls.excluded[e.id]?.reason||'';
+ button=elem('button');button.addEventListener('click',()=>change({action:'exclude',id:e.id,excluded:!Boolean(state.controls.excluded[e.id]),reason:reason.value}));
+ note=elem('p','다음 샘플부터 제외. 과거 사용 이력은 유지됩니다.','muted');card.append(reason,button,note)
+ }else card.append(elem('p',e.cup_success?'컵 성공은 있으나 학습 데이터 저장·구간 검증을 통과한 후보가 아닙니다.':'컵 놓기 성공 구간이 없어 학습하지 않습니다.','muted'));
+ return {card,title,tag,meta,usage,details,reason,button,note};
+}
+function renderCards(preserveViewing=false){if(!state)return;
+ const c=state.controls,used=state.learner?.used||{},rounds=state.learner?.rounds||[],active=new Set(rounds.at(-1)?.eligible_episodes||[]);
+ const rows=state.episodes.filter(e=>{const x=Boolean(c.excluded[e.id]),f=$('filter').value;
+ const matches=(f==='all'||f==='eligible'&&e.eligible||f==='included'&&e.eligible&&!x||f==='excluded'&&x||f==='used'&&(used[e.id]||0)>0)&&($('model').value==='all'||e.model===$('model').value)&&String(e.seed).includes($('search').value);
+ return matches||preserveViewing&&cards.get(e.id)?.details.open;
+ });
+ $('count').textContent=rows.length+'개';const visible=new Set(rows.map(e=>e.id)),list=$('list');
+ for(const [id,view] of cards)if(!visible.has(id)){view.card.querySelector('video')?.pause();view.card.remove();cards.delete(id)}
+ rows.forEach((e,index)=>{let view=cards.get(e.id);if(!view){view=makeCard(e);cards.set(e.id,view)}
+ const x=c.excluded[e.id];view.title.textContent=(index+1)+'. '+names[e.model]+' · Seed '+e.seed;
+ view.tag.textContent=!e.eligible?'학습 미채택':x?'사용자 제외':'자동 채택 · 사용 가능';view.tag.className='tag'+(x?' out':'');
+ view.meta.textContent=(e.round?'온라인 라운드 '+e.round:'초기 평가')+' · 정책 v'+e.policy_version+' · '+e.samples+'개 청크';
+ view.usage.textContent='실제 학습 사용 '+(used[e.id]||0)+'회'+(active.has(e.id)?' · learner 현재 후보':'');
+ if(view.button){view.button.textContent=x?'다시 사용':'학습에서 제외';view.button.className=x?'':'exclude';view.button.disabled=busy;view.note.hidden=!x}
+ // Leave existing video nodes in place when only controls or usage change.
+ const at=list.children[index];if(at!==view.card)list.insertBefore(view.card,at||null);
+ });
+}
+function render(){let candidates=state.episodes.filter(e=>e.eligible&&!state.controls.excluded[e.id]);let excluded=state.episodes.filter(e=>state.controls.excluded[e.id]);let used=state.learner?.used||{};$('stats').replaceChildren();for(let [n,v] of [['사용 가능 에피소드',candidates.length],['사용 가능 청크',candidates.reduce((n,e)=>n+e.samples,0)],['사용자 제외',excluded.length],['실제 사용 에피소드',Object.keys(used).length]]){let box=elem('div',n,'stat');box.append(elem('b',String(v)));$('stats').append(box)}
+$('runstate').textContent=state.learner?(label[state.learner.status]||state.learner.status)+' · 완료 라운드 '+(state.learner.completed_round||0):'학습 서버 연결 대기 · 아직 본학습 사용 기록 없음';let learnerRev=state.learner?.control_revision;$('syncstate').textContent='저장된 제외 설정 v'+state.controls.revision+' · HF 전달 v'+state.sync.published_revision+' · learner 확인 '+(learnerRev==null?'대기':'v'+learnerRev)+(state.sync.status==='retrying'?' · 전송 재시도 중':'')+' · 5초마다 상태 갱신';$('pause').textContent=state.controls.paused?'학습 재개':'학습 일시 정지';renderCards(true)}
+async function refresh(){if(busy)return;try{let r=await fetch('/api/state',{cache:'no-store'});if(!r.ok)throw Error('상태를 가져오지 못했습니다.');let next=await r.json();if(busy)return;if(state&&next.controls.revision<state.controls.revision)next.controls=state.controls;state=next;render()}catch(e){$('message').textContent=e.message}}
+async function change(value){if(busy)return;busy=true;renderCards(true);$('pause').disabled=true;try{let r=await fetch('/api/control',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...value,revision:state.controls.revision})});let d=await r.json();if(!r.ok)throw Error(d.error);state.controls=d.controls;render();$('message').textContent='저장 완료. HF 전달 및 learner 확인 상태를 위에서 확인하세요.'}catch(e){$('message').textContent=e.message}finally{busy=false;$('pause').disabled=false;renderCards(true);await refresh()}}
+$('pause').onclick=()=>change({action:'pause',paused:!state.controls.paused});$('refresh').onclick=refresh;for(let id of ['filter','model'])$(id).onchange=()=>renderCards();$('search').oninput=()=>renderCards();refresh();setInterval(refresh,5000);
 </script></html>
