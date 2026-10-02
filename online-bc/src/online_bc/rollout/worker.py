@@ -15,6 +15,16 @@ from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 
 
+def inference_checkpoint_download(config, health):
+    """Fail before filtering if the running server cannot load an optimizerless adapter."""
+    if not config.get("inference_only_download", False):
+        return False
+    if (config["model"] != "pi05" or health.get("model") != "pi05"
+            or health.get("ready") is not True or health.get("inference_only") is not True):
+        raise RuntimeError("Inference-only download requires a capable pi05 policy server")
+    return True
+
+
 def active_policy_readers(config_path, proc_root="/proc", lock_path=None):
     """Find legacy collectors/evaluators that started before policy locks existed."""
     readers = []
@@ -107,8 +117,11 @@ def main():
     def render(argv, **extra):
         return [x.format(**fields, **extra) for x in argv]
 
-    def sync(direction, folder, prefix):
+    def sync(direction, folder, prefix, inference_only=False):
         cmd = render(c["transport_argv"], direction=direction, directory=str(folder), prefix=prefix)
+        if inference_only:
+            assert direction == "download"
+            cmd.append("--inference-only")
         subprocess.run(cmd, check=True)
 
     if args.dry_run:
@@ -128,7 +141,20 @@ def main():
             time.sleep(2)
             readers = active_policy_readers(args.config, lock_path=lock_path)
         dest = Path(c["adapter_root"]) / f"round-{args.round:04d}"
-        sync("download", dest, f"{args.run}/weights/{model}/round-{args.round:04d}")
+        filtered = False
+        if c.get("inference_only_download", False):
+            subprocess.run(render(c["ensure_policy_argv"]), check=True)
+            for _ in range(120):
+                try:
+                    with urllib.request.urlopen(c["policy_url"], timeout=2) as response:
+                        capability = json.load(response)
+                    filtered = inference_checkpoint_download(c, capability)
+                    break
+                except OSError:
+                    time.sleep(2)
+            else:
+                raise RuntimeError("Policy server did not become ready for filtered download")
+        sync("download", dest, f"{args.run}/weights/{model}/round-{args.round:04d}", filtered)
         subprocess.run(render(c["ensure_policy_argv"]), check=True)
         for _ in range(120):
             try:
@@ -149,6 +175,8 @@ def main():
         with urllib.request.urlopen(req, timeout=180) as r:
             result = pickle.loads(r.read())
         assert result["version"] == args.round
+        if filtered:
+            assert result.get("inference_only") is True
         (PROJECT_ROOT / "current-adapter.json").write_text(
             json.dumps(
                 dict(

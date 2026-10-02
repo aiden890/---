@@ -1,0 +1,138 @@
+{
+  "at": 1790901754.3036685,
+  "eval": {
+    "model": "pi05",
+    "policy_version": 11,
+    "attempts": 10,
+    "cup_successes": 1,
+    "cup_success_rate": 0.1,
+    "grasp_successes": 7,
+    "cup_given_grasp": 0.14285714285714285,
+    "seeds": [
+      992001,
+      992002,
+      992003,
+      992004,
+      992005,
+      992006,
+      992007,
+      992008,
+      992009,
+      992010
+    ],
+    "training_data": false,
+    "profiling": {
+      "profiled_episodes": 10,
+      "episode_mean_environment_create_seconds": 7.216882087336853,
+      "episode_mean_environment_reset_seconds": 5.4928639335092155,
+      "episode_mean_environment_step_with_observations_seconds": 66.3147353076376,
+      "episode_mean_episode_before_result_write_seconds": 110.98370028778444,
+      "episode_mean_observation_capture_seconds": 6.0586634409381075,
+      "episode_mean_observation_history_seconds": 0.09081768449395895,
+      "episode_mean_policy_inference_seconds": 22.543242120742796,
+      "episode_mean_result_and_capture_storage_seconds": 0.029312865482643245,
+      "episode_mean_success_predicates_seconds": 1.187433698377572,
+      "episode_mean_video_encode_seconds": 1.8538217920577154,
+      "simulator_workers": 2,
+      "reused_completed_episodes": 0
+    },
+    "wall_seconds": 597.9940043820534,
+    "outcomes": [
+      {
+        "seed": 992001,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992002,
+        "cup_placed": false,
+        "grasped": false
+      },
+      {
+        "seed": 992003,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992004,
+        "cup_placed": false,
+        "grasped": false
+      },
+      {
+        "seed": 992005,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992006,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992007,
+        "cup_placed": false,
+        "grasped": true
+      },
+      {
+        "seed": 992008,
+        "cup_placed": false,
+        "grasped": false
+      },
+      {
+        "seed": 992009,
+        "cup_placed": true,
+        "grasped": true
+      },
+      {
+        "seed": 992010,
+        "cup_placed": false,
+        "grasped": true
+      }
+    ]
+  },
+  "paired_base_same10": {
+    "cup": {
+      "gained": [
+        992009
+      ],
+      "lost": [
+        992007,
+        992010
+      ],
+      "exact_two_sided_mcnemar_p": 1.0
+    },
+    "grasp": {
+      "gained": [],
+      "lost": [
+        992002,
+        992004,
+        992008
+      ],
+      "exact_two_sided_mcnemar_p": 0.25
+    }
+  },
+  "base_same10_cup": 2,
+  "base_same10_grasp": 10,
+  "all_unique_seeds_versions_standard_verified": true,
+  "all_initial_state_hashes_match_base": true,
+  "training_data": false,
+  "confirmed_gain": false,
+  "confirmed_regression": false,
+  "adaptation": {
+    "action": "reduce_learning_rate",
+    "learning_rate": 1e-05,
+    "best_version": 7,
+    "common_seed_successes": 1,
+    "common_seed_attempts": 10,
+    "best_successes": 3,
+    "statistically_confirmed": false,
+    "version": 11
+  },
+  "adaptation_applied_to_training": false,
+  "publication": {
+    "url": "http://100.86.183.64:8899/media/pi-cup-standard-eval-v11/index.html",
+    "videos": 10,
+    "all_video_head_200": true,
+    "total_video_bytes": 12598126
+  }
+}

@@ -23,6 +23,16 @@ def run_args(t):
     return argv
 
 
+def policy_options(template, model):
+    options = template.get("OnlineBCPolicy", {})
+    allowed = {"inference_only": "--inference-only", "enable_base_prefix": "--enable-base-prefix"}
+    assert set(options) <= set(allowed)
+    assert all(isinstance(value, bool) for value in options.values())
+    if model != "pi05" and any(options.values()):
+        raise ValueError("Optional pi05 policy capabilities are unavailable for this model")
+    return [flag for key, flag in allowed.items() if options.get(key, False)]
+
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--model", required=True)
@@ -71,6 +81,7 @@ def main():
                 "--checkpoint",
                 checkpoint,
                 *adapter,
+                *policy_options(t[0], a.model),
             ],
             check=True,
         )

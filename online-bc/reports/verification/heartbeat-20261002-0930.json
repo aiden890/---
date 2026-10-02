@@ -1,0 +1,1369 @@
+{
+  "at": 1790901870.2251475,
+  "current_status": {
+    "next_round": 12,
+    "status": "collecting",
+    "attempts": 24,
+    "successes": 2,
+    "batch": 4
+  },
+  "cumulative_native_updates": 550,
+  "eligible_success_episodes": 103,
+  "native_round11": {
+    "status": {
+      "model": "pi05",
+      "completed_round": 11,
+      "checkpoint": "/home/work/robot_aiden_260930/pi-cup-online-bc/run/training/round-0011/update-000050",
+      "status": "waiting_for_rollouts"
+    },
+    "learner_actual": "PID     ELAPSED COMMAND\n  26119    06:15:59 python",
+    "log_age": 230.12360620498657,
+    "metadata": {
+      "model": "pi05",
+      "base_checkpoint": "/home/work/robot_aiden_260930/pi-cup-online-bc/checkpoints/pi05_pretrain_human300/multitask_learning/75000",
+      "step": 11,
+      "algorithm": "success-filtered online behavior cloning",
+      "objective": "native flow-matching supervised loss",
+      "data_roots": [
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/xiaomi/bootstrap",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0004-amp-batch-06",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0004-amp-batch-01",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0004-amp-batch-03",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0006-v4-batch-03",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0010-v4-batch-03",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0004-v4-batch-08",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/bootstrap",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0011-amp-batch-02",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0005-amp-batch-05",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0006-v4-batch-07",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0010-amp-batch-01",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0009-v4-batch-08",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0011-amp-batch-01",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0006-v4-batch-04",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0009-amp-batch-06",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0009-amp-batch-07",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0007-amp-batch-03",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0005-amp-batch-01",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0007-amp-batch-02",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0004-amp-batch-07",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0001-amp-batch-01",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0011-amp-batch-03",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0010-amp-batch-02",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0006-v4-batch-05",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0004-v4-batch-07",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0006-amp-batch-01",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0002-v4-batch-04",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0004-amp-batch-02",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0002-amp-batch-05",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0002-v4-batch-03",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0005-v4-batch-06",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0002-amp-batch-04",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0008-amp-batch-03",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0009-amp-batch-02",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0003-amp-batch-04",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0004-v4-batch-05",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0004-v4-batch-06",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0003-amp-batch-03",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0003-amp-batch-05",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0009-amp-batch-08",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0008-amp-batch-01",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0002-v4-batch-05",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0005-amp-batch-03",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0006-amp-batch-05",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0008-v4-batch-06",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0008-amp-batch-07",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0008-amp-batch-04",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0006-amp-batch-06",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0009-amp-batch-03",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0008-v4-batch-04",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0009-amp-batch-01",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0008-amp-batch-05",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0006-amp-batch-02",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0006-amp-batch-03",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0001-v4-batch-01",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0004-amp-batch-05",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0006-amp-batch-07",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0008-v4-batch-07",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0002-amp-batch-02",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0005-amp-batch-02",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0002-amp-batch-03",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0006-amp-batch-04",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0008-amp-batch-02",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0009-v4-batch-06",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0004-amp-batch-04",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0009-amp-batch-05",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0003-amp-batch-02",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0006-amp-batch-08",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0006-v4-batch-08",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0008-v4-batch-05",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0002-amp-batch-01",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0010-v4-batch-04",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0007-amp-batch-01",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0010-amp-batch-03",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0005-amp-batch-06",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0009-v4-batch-07",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0004-v4-batch-04",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0004-amp-batch-08",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0006-v4-batch-06",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0007-amp-batch-04",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0009-amp-batch-04",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0010-amp-batch-04",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0008-amp-batch-06",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0004-v4-batch-03",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0005-amp-batch-04",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0003-amp-batch-01"
+      ],
+      "skills": [
+        "cup_placement"
+      ],
+      "batch_size": 4,
+      "learning_rate": 1e-05,
+      "heldout_eval_seed_start": 992001,
+      "optimizer_steps_this_round": 50,
+      "resumed_from_round": null
+    },
+    "updates_type": "list",
+    "updates_count": 50,
+    "learning_rates": [
+      1e-05
+    ],
+    "batch_sizes": [
+      4
+    ],
+    "all_finite": true,
+    "warm_median": 0.36290824646130204,
+    "sum_seconds": 32.5174534637481,
+    "last_update": {
+      "step": 50,
+      "model": "pi05",
+      "skill": "cup_placement",
+      "source_model": "pi05",
+      "source_seed": 993713,
+      "episode_id": "pi05-seed993713",
+      "control_revision": 2,
+      "seconds": 0.3674461906775832,
+      "batch_size": 4,
+      "learning_rate": 1e-05,
+      "loss": 0.026763131842017174,
+      "grad_norm": 0.011829162947833538,
+      "canonicalized_zero_std_dims": [
+        10
+      ]
+    },
+    "files": {
+      "pi05-lora.npz": {
+        "bytes": 88476838,
+        "mtime": 1790900377.65403
+      },
+      "metadata.json": {
+        "bytes": 8441,
+        "mtime": 1790900379.307172
+      },
+      "pi05-optimizer.pkl": {
+        "bytes": 176949619,
+        "mtime": 1790900377.8553114
+      },
+      "updates.json": {
+        "bytes": 20184,
+        "mtime": 1790900379.306878
+      }
+    }
+  },
+  "hosts": {
+    "amp": {
+      "time": 1790901533.1692247,
+      "storage-archiver_process": "PID     ELAPSED COMMAND\n3322201    04:33:46 python",
+      "storage-archiver.log": {
+        "age": 830.983314037323,
+        "tail": "ts/round-0007\", \"remote_size_verified\": true, \"removed_npz\": 4782, \"pruned_npz_bytes\": 3647396521, \"archived_at\": 1790898185.7669423, \"videos_actions_traces_manifests_retained\": true}\n{\"event\": \"round_observations_archived\", \"round\": 8, \"bytes\": 4577142548, \"sha256\": \"dc29411b0411b4ef356fb7041f69a15416d364477ef8086ad7c0eb1f8d886262\", \"bucket\": \"khmin101/vla-rollout-transfer\", \"remote_path\": \"pi05-cup-online-bc-20261001/archives/pi05/amp/round-0008/rollouts.tar.gz\", \"local_round\": \"/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0008\", \"remote_size_verified\": true, \"removed_npz\": 5006, \"pruned_npz_bytes\": 4525000488, \"archived_at\": 1790899488.2419648, \"videos_actions_traces_manifests_retained\": true}\n{\"event\": \"round_observations_archived\", \"round\": 9, \"bytes\": 6027549626, \"sha256\": \"d2dbdc9973b68eb55f49f0e39b70f7968cad940f45e6661382c5c0a3530e580d\", \"bucket\": \"khmin101/vla-rollout-transfer\", \"remote_path\": \"pi05-cup-online-bc-20261001/archives/pi05/amp/round-0009/rollouts.tar.gz\", \"local_round\": \"/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0009\", \"remote_size_verified\": true, \"removed_npz\": 6440, \"pruned_npz_bytes\": 5917718207, \"archived_at\": 1790900701.5079985, \"videos_actions_traces_manifests_retained\": true}\n"
+      },
+      "free_/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc": 10966155264,
+      "free_/mnt/data/guest": 29158449152,
+      "rollouts/round-0012": {
+        "results": 12,
+        "versions": [
+          11
+        ],
+        "logs": [
+          {
+            "path": "rollouts/round-0012/batch-02/worker-0.log",
+            "age": 1.4413189888000488,
+            "tail": "false, \"mug_lift\": -0.5484370223709786, \"mug_lifted\": false, \"mug_moved_while_held\": false, \"mug_motion\": 0.6124880488902004, \"mug_under_dispenser\": false, \"coffee_machine_on\": false, \"gripper_mug_far\": false, \"gripper_button_far\": false, \"official_success\": false, \"mug_world_position\": [3.6416261599625033, -0.551234628535956, 0.9494826982239563]}\n"
+          },
+          {
+            "path": "rollouts/round-0012/batch-02/worker-3.log",
+            "age": 5.028320789337158,
+            "tail": "e, \"mug_lift\": 1.9391429367354718e-05, \"mug_lifted\": false, \"mug_moved_while_held\": false, \"mug_motion\": 8.759210490047622e-05, \"mug_under_dispenser\": false, \"coffee_machine_on\": false, \"gripper_mug_far\": true, \"gripper_button_far\": true, \"official_success\": false, \"mug_world_position\": [3.977490426100992, -0.1995207292809282, 1.5082559927855737]}\n"
+          },
+          {
+            "path": "rollouts/round-0012/batch-02/worker-2.log",
+            "age": 6.534345626831055,
+            "tail": "rue, \"mug_lift\": 0.0026901825445337924, \"mug_lifted\": false, \"mug_moved_while_held\": false, \"mug_motion\": 0.06622885470085037, \"mug_under_dispenser\": false, \"coffee_machine_on\": false, \"gripper_mug_far\": false, \"gripper_button_far\": true, \"official_success\": false, \"mug_world_position\": [1.694504409558022, -0.2791897801955269, 1.4940951676666088]}\n"
+          },
+          {
+            "path": "rollouts/round-0012/batch-02/worker-1.log",
+            "age": 9.032341003417969,
+            "tail": " false, \"mug_lift\": -0.4962463866451866, \"mug_lifted\": false, \"mug_moved_while_held\": false, \"mug_motion\": 0.5475597714696162, \"mug_under_dispenser\": false, \"coffee_machine_on\": false, \"gripper_mug_far\": false, \"gripper_button_far\": true, \"official_success\": false, \"mug_world_position\": [1.687325419882902, -0.4516111813968607, 0.9935293970966245]}\n"
+          }
+        ]
+      },
+      "policy": {
+        "model": "pi05",
+        "version": 11,
+        "ready": true
+      },
+      "active_workers": [],
+      "sim_pids": {
+        "969969525bdb rlinf-mibot:t_43b4edc9 vigorous_satoshi": [
+          "3446891             python3             python3 -m online_bc.rollout.run_coffee --seeds 994211,994215 --model pi05 --out /results/coffee-online-bc/rollouts/round-0012/batch-02/pi05 --skill cup_placement"
+        ],
+        "e74fbc8f2f2c rlinf-mibot:t_43b4edc9 trusting_shirley": [
+          "3446898             python3             python3 -m online_bc.rollout.run_coffee --seeds 994210,994214 --model pi05 --out /results/coffee-online-bc/rollouts/round-0012/batch-02/pi05 --skill cup_placement"
+        ],
+        "f9d4bbbf2a7f rlinf-mibot:t_43b4edc9 strange_stonebraker": [
+          "3446882             python3             python3 -m online_bc.rollout.run_coffee --seeds 994212,994216 --model pi05 --out /results/coffee-online-bc/rollouts/round-0012/batch-02/pi05 --skill cup_placement"
+        ],
+        "546b3eead397 rlinf-mibot:t_43b4edc9 admiring_khayyam": [
+          "3446863             python3             python3 -m online_bc.rollout.run_coffee --seeds 994209,994213 --model pi05 --out /results/coffee-online-bc/rollouts/round-0012/batch-02/pi05 --skill cup_placement"
+        ]
+      },
+      "gpu": "14824, 24576, 4",
+      "archives": {
+        "round-0005": {
+          "round": 5,
+          "bytes": 5281461360,
+          "sha256": "f0501fd12c91a1228068c2941f9b64f98235a7a192c9915ad04d14958ed993f4",
+          "bucket": "khmin101/vla-rollout-transfer",
+          "remote_path": "pi05-cup-online-bc-20261001/archives/pi05/amp/round-0005/rollouts.tar.gz",
+          "local_round": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0005",
+          "remote_size_verified": true,
+          "removed_npz": 5590,
+          "pruned_npz_bytes": 5174303761,
+          "archived_at": 1790892163.3911543,
+          "videos_actions_traces_manifests_retained": true
+        },
+        "round-0007": {
+          "round": 7,
+          "bytes": 3687760638,
+          "sha256": "67028343f330d2d107db433988d182b82734f337e4534ff07050635e09ceccd8",
+          "bucket": "khmin101/vla-rollout-transfer",
+          "remote_path": "pi05-cup-online-bc-20261001/archives/pi05/amp/round-0007/rollouts.tar.gz",
+          "local_round": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0007",
+          "remote_size_verified": true,
+          "removed_npz": 4782,
+          "pruned_npz_bytes": 3647396521,
+          "archived_at": 1790898185.7669423,
+          "videos_actions_traces_manifests_retained": true
+        },
+        "round-0006": {
+          "round": 6,
+          "bytes": 4482227645,
+          "sha256": "f67f896c9b2714fdf25b5d79108617820527c83668afe33c54997d553e2d4c4c",
+          "bucket": "khmin101/vla-rollout-transfer",
+          "remote_path": "pi05-cup-online-bc-20261001/archives/pi05/amp/round-0006/rollouts.tar.gz",
+          "local_round": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0006",
+          "remote_size_verified": true,
+          "removed_npz": 4766,
+          "pruned_npz_bytes": 4382515091,
+          "archived_at": 1790895670.3324718,
+          "videos_actions_traces_manifests_retained": true
+        },
+        "round-0003": {
+          "round": 3,
+          "bytes": 4257633638,
+          "sha256": "77b727a269b47daf2a58b790389a2d82b11744ae6345f69243360eff2bebd812",
+          "bucket": "khmin101/vla-rollout-transfer",
+          "remote_path": "pi05-cup-online-bc-20261001/archives/pi05/amp/round-0003/rollouts.tar.gz",
+          "local_round": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0003",
+          "remote_size_verified": true,
+          "removed_npz": 4680,
+          "pruned_npz_bytes": 3962323934,
+          "archived_at": 1790887502.4689784,
+          "videos_actions_traces_manifests_retained": true
+        },
+        "round-0004": {
+          "round": 4,
+          "bytes": 5492333896,
+          "sha256": "e769832231f522bc10c5408cbb325a1f31b27558098be8e0bd055e415deb3326",
+          "bucket": "khmin101/vla-rollout-transfer",
+          "remote_path": "pi05-cup-online-bc-20261001/archives/pi05/amp/round-0004/rollouts.tar.gz",
+          "local_round": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0004",
+          "remote_size_verified": true,
+          "removed_npz": 5233,
+          "pruned_npz_bytes": 5091699238,
+          "archived_at": 1790890497.220903,
+          "videos_actions_traces_manifests_retained": true
+        },
+        "round-0001": {
+          "round": 1,
+          "bytes": 2356353408,
+          "sha256": "f2d564ad2d9f1127fbb473da7da4abd972ec945dc4ef650ad740947a87eecac4",
+          "bucket": "khmin101/vla-rollout-transfer",
+          "remote_path": "pi05-cup-online-bc-20261001/archives/pi05/amp/round-0001/rollouts.tar.gz",
+          "local_round": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0001",
+          "remote_size_verified": true,
+          "removed_npz": 2116,
+          "archived_at": 1790884874.398507,
+          "videos_actions_traces_manifests_retained": true,
+          "pruned_npz_bytes": 2184887998
+        },
+        "round-0002": {
+          "round": 2,
+          "bytes": 3296418730,
+          "sha256": "6fc08e3f3f6ced13ad4aff3024c6498940ac7b8699afb28165f3548abe06ea90",
+          "bucket": "khmin101/vla-rollout-transfer",
+          "remote_path": "pi05-cup-online-bc-20261001/archives/pi05/amp/round-0002/rollouts.tar.gz",
+          "local_round": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0002",
+          "remote_size_verified": true,
+          "removed_npz": 3727,
+          "pruned_npz_bytes": 3075421321,
+          "archived_at": 1790885323.820529,
+          "videos_actions_traces_manifests_retained": true
+        },
+        "round-0008": {
+          "round": 8,
+          "bytes": 4577142548,
+          "sha256": "dc29411b0411b4ef356fb7041f69a15416d364477ef8086ad7c0eb1f8d886262",
+          "bucket": "khmin101/vla-rollout-transfer",
+          "remote_path": "pi05-cup-online-bc-20261001/archives/pi05/amp/round-0008/rollouts.tar.gz",
+          "local_round": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0008",
+          "remote_size_verified": true,
+          "removed_npz": 5006,
+          "pruned_npz_bytes": 4525000488,
+          "archived_at": 1790899488.2419648,
+          "videos_actions_traces_manifests_retained": true
+        },
+        "round-0009": {
+          "round": 9,
+          "bytes": 6027549626,
+          "sha256": "d2dbdc9973b68eb55f49f0e39b70f7968cad940f45e6661382c5c0a3530e580d",
+          "bucket": "khmin101/vla-rollout-transfer",
+          "remote_path": "pi05-cup-online-bc-20261001/archives/pi05/amp/round-0009/rollouts.tar.gz",
+          "local_round": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0009",
+          "remote_size_verified": true,
+          "removed_npz": 6440,
+          "pruned_npz_bytes": 5917718207,
+          "archived_at": 1790900701.5079985,
+          "videos_actions_traces_manifests_retained": true
+        }
+      }
+    },
+    "v4": {
+      "time": 1790901533.062967,
+      "benchmarks/v4-worker-trial/status.json": {
+        "status": "episodes_complete_pending_metrics",
+        "armed_at": 1790895444.501215,
+        "eval_workers": 2,
+        "trial_collection_workers": 4,
+        "training_algorithm_changed": false,
+        "policy_restarted": false,
+        "batch_root": "/home/v4/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0009/batch-06",
+        "restored_at": 1790897156.5049982,
+        "policy": {
+          "model": "pi05",
+          "version": 8,
+          "ready": true,
+          "base_prefix_enabled": true
+        },
+        "gpu_peak_mib": 21503,
+        "completed_at": 1790897282.5300596,
+        "seeds": [
+          993945,
+          993946,
+          993947,
+          993948
+        ],
+        "versions": [
+          8
+        ],
+        "cups": 0
+      },
+      "benchmarks/v4-worker-trial/watch.log": {
+        "age": 6088.594263315201,
+        "tail": ""
+      },
+      "watch_ps": "PID     ELAPSED COMMAND",
+      "workers": {
+        "workers": 2,
+        "collection_workers": 4
+      },
+      "free_/home/v4/skku-vla-grasp-only-20260930/results/coffee-online-bc": 27550494720,
+      "evaluation/version-0011": {
+        "results": 10,
+        "versions": [
+          11
+        ],
+        "logs": [
+          {
+            "path": "evaluation/version-0011/worker-1.log",
+            "age": 25.99872136116028,
+            "tail": "pture\": 5.6325194865930825, \"environment_step_with_observations\": 60.768875053850934, \"observation_history\": 0.0918883285485208, \"success_predicates\": 0.5629560223314911, \"video_encode\": 1.9033740165177733, \"result_and_capture_storage\": 0.02929855906404555, \"policy_inference\": 19.573441743850708, \"episode_before_result_write\": 108.54422279284336}}\n"
+          },
+          {
+            "path": "evaluation/version-0011/worker-0.log",
+            "age": 100.95345783233643,
+            "tail": "pture\": 3.3044556817039847, \"environment_step_with_observations\": 29.534202771028504, \"observation_history\": 0.04638561233878136, \"success_predicates\": 0.16124131716787815, \"video_encode\": 1.0045720448251814, \"result_and_capture_storage\": 0.03112657996825874, \"policy_inference\": 9.952709674835205, \"episode_before_result_write\": 58.66097284317948}}\n"
+          }
+        ]
+      },
+      "shadow-evaluation/base_prefix/version-0006": {
+        "results": 30,
+        "versions": [
+          6
+        ],
+        "logs": [
+          {
+            "path": "shadow-evaluation/base_prefix/version-0006/worker-1.log",
+            "age": 7895.707164525986,
+            "tail": "ture\": 9.628922485047951, \"environment_step_with_observations\": 64.18450127961114, \"observation_history\": 0.09143873956054449, \"success_predicates\": 0.32521624490618706, \"video_encode\": 1.8845870953518897, \"result_and_capture_storage\": 0.028922950848937035, \"policy_inference\": 19.550601482391357, \"episode_before_result_write\": 108.46059256303124}}\n"
+          },
+          {
+            "path": "shadow-evaluation/base_prefix/version-0006/worker-0.log",
+            "age": 7981.025876522064,
+            "tail": "apture\": 7.266301703406498, \"environment_step_with_observations\": 53.42965311463922, \"observation_history\": 0.09542294847778976, \"success_predicates\": 0.24558253004215658, \"video_encode\": 2.0070634211879224, \"result_and_capture_storage\": 0.029884841991588473, \"policy_inference\": 22.60042142868042, \"episode_before_result_write\": 99.52119339886121}}\n"
+          }
+        ]
+      },
+      "policy": {
+        "model": "pi05",
+        "version": 11,
+        "ready": true,
+        "base_prefix_enabled": true
+      },
+      "active_workers": [],
+      "sim_pids": {},
+      "gpu": "14892, 24576, 0"
+    },
+    "learner": {
+      "time": 1790901533.517135,
+      "learner_process": "PID     ELAPSED COMMAND\n  26119    06:31:25 python",
+      "run/service-status.json": {
+        "model": "pi05",
+        "completed_round": 11,
+        "checkpoint": "/home/work/robot_aiden_260930/pi-cup-online-bc/run/training/round-0011/update-000050",
+        "status": "waiting_for_rollouts"
+      },
+      "learner.log": {
+        "age": 1156.1683206558228,
+        "tail": "kill\": \"cup_placement\", \"source_model\": \"pi05\", \"source_seed\": 994103, \"episode_id\": \"pi05-seed994103\", \"control_revision\": 2, \"seconds\": 0.36511943954974413, \"batch_size\": 4, \"learning_rate\": 1e-05, \"loss\": 0.02603856474161148, \"grad_norm\": 0.012013483792543411, \"canonicalized_zero_std_dims\": [10]}\n{\"step\": 48, \"model\": \"pi05\", \"skill\": \"cup_placement\", \"source_model\": \"pi05\", \"source_seed\": 994029, \"episode_id\": \"pi05-seed994029\", \"control_revision\": 2, \"seconds\": 0.3634105995297432, \"batch_size\": 4, \"learning_rate\": 1e-05, \"loss\": 0.021213823929429054, \"grad_norm\": 0.010996884666383266, \"canonicalized_zero_std_dims\": [10]}\n{\"step\": 49, \"model\": \"pi05\", \"skill\": \"cup_placement\", \"source_model\": \"pi05\", \"source_seed\": 993523, \"episode_id\": \"pi05-seed993523\", \"control_revision\": 2, \"seconds\": 0.3624892756342888, \"batch_size\": 4, \"learning_rate\": 1e-05, \"loss\": 0.009719403460621834, \"grad_norm\": 0.005692171864211559, \"canonicalized_zero_std_dims\": [10]}\n{\"step\": 50, \"model\": \"pi05\", \"skill\": \"cup_placement\", \"source_model\": \"pi05\", \"source_seed\": 993713, \"episode_id\": \"pi05-seed993713\", \"control_revision\": 2, \"seconds\": 0.3674461906775832, \"batch_size\": 4, \"learning_rate\": 1e-05, \"loss\": 0.026763131842017174, \"grad_norm\": 0.011829162947833538, \"canonicalized_zero_std_dims\": [10]}\n"
+      },
+      "free_/home/work/robot_aiden_260930/pi-cup-online-bc": 397919458951168,
+      "checkpoint11_files": {
+        "pi05-lora.npz": {
+          "bytes": 88476838,
+          "mtime": 1790900377.65403
+        },
+        "metadata.json": {
+          "bytes": 8441,
+          "mtime": 1790900379.307172
+        },
+        "pi05-optimizer.pkl": {
+          "bytes": 176949619,
+          "mtime": 1790900377.8553114
+        },
+        "updates.json": {
+          "bytes": 20184,
+          "mtime": 1790900379.306878
+        }
+      },
+      "active_workers": [],
+      "sim_pids": {},
+      "gpu": "28861, 81920, 1"
+    }
+  },
+  "central": {
+    "at": 1790901696.279704,
+    "status": {
+      "next_round": 12,
+      "status": "collecting",
+      "attempts": 16,
+      "successes": 1,
+      "batch": 3
+    },
+    "controls": {
+      "run": "pi05-cup-online-bc-20261001",
+      "revision": 2,
+      "excluded": {},
+      "paused": false,
+      "bootstrap_steps": 0,
+      "review_required": false,
+      "updated_at": 1790870638.0917895
+    },
+    "pids": {
+      "health.pid": "PID     ELAPSED COMMAND\n2783968    02:50:59 python3",
+      "coordinator.pid": "PID     ELAPSED COMMAND\n2723301    04:47:52 python3",
+      "telemetry.pid": "PID     ELAPSED COMMAND\n2728044    04:37:50 python"
+    },
+    "publication_failures": [],
+    "pending-round-0012.json": {
+      "batch": 3,
+      "plan": [
+        {
+          "node": "amp",
+          "episodes": 4,
+          "seed_offset": 16
+        },
+        {
+          "node": "v4",
+          "episodes": 4,
+          "seed_offset": 20
+        }
+      ],
+      "external_pids": {}
+    },
+    "pending-round-0012.json_age": 80.4031252861023,
+    "collection-round-0012.json": {
+      "sources": [
+        {
+          "model": "pi05",
+          "node": "amp",
+          "batch": 1,
+          "round": 12,
+          "prefix": "pi05-cup-online-bc-20261001/data/pi05/amp/round-0012/batch-01",
+          "seeds": [
+            994201,
+            994202,
+            994203,
+            994204,
+            994205,
+            994206,
+            994207,
+            994208
+          ],
+          "accepted": [
+            "pi05-seed994208"
+          ],
+          "remote_root": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0012/batch-01",
+          "timings": {
+            "collection_seconds": 332.876259688288,
+            "dataset_seconds": 2.098039925098419,
+            "packing_seconds": 0.6776072718203068,
+            "upload_seconds": 5.352175086736679,
+            "total_seconds": 341.0064841620624,
+            "profiled_episodes": 8,
+            "episode_mean_environment_create_seconds": 11.322348206071183,
+            "episode_mean_environment_reset_seconds": 6.246925729094073,
+            "episode_mean_environment_step_with_observations_seconds": 90.77338525746018,
+            "episode_mean_episode_before_result_write_seconds": 148.17725870455615,
+            "episode_mean_observation_capture_seconds": 9.205287402728572,
+            "episode_mean_observation_history_seconds": 0.13642596872523427,
+            "episode_mean_policy_inference_seconds": 27.322464495897293,
+            "episode_mean_result_and_capture_storage_seconds": 0.04917903942987323,
+            "episode_mean_success_predicates_seconds": 0.5200163186527789,
+            "episode_mean_video_encode_seconds": 2.273611922515556,
+            "simulator_workers": 4,
+            "reused_completed_episodes": 0
+          }
+        },
+        {
+          "model": "pi05",
+          "node": "amp",
+          "batch": 2,
+          "round": 12,
+          "prefix": "pi05-cup-online-bc-20261001/data/pi05/amp/round-0012/batch-02",
+          "seeds": [
+            994209,
+            994210,
+            994211,
+            994212,
+            994213,
+            994214,
+            994215,
+            994216
+          ],
+          "accepted": [],
+          "remote_root": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0012/batch-02",
+          "timings": {
+            "collection_seconds": 359.51934919320047,
+            "dataset_seconds": 2.0010207444429398,
+            "packing_seconds": 0.05124257318675518,
+            "upload_seconds": 2.658315557986498,
+            "total_seconds": 364.23231956362724,
+            "profiled_episodes": 8,
+            "episode_mean_environment_create_seconds": 12.233439849223942,
+            "episode_mean_environment_reset_seconds": 6.999683584552258,
+            "episode_mean_environment_step_with_observations_seconds": 100.26343740941957,
+            "episode_mean_episode_before_result_write_seconds": 163.54783225129358,
+            "episode_mean_observation_capture_seconds": 9.641407588962466,
+            "episode_mean_observation_history_seconds": 0.1501490145456046,
+            "episode_mean_policy_inference_seconds": 29.88532543182373,
+            "episode_mean_result_and_capture_storage_seconds": 0.05002395831979811,
+            "episode_mean_success_predicates_seconds": 1.5602275670971721,
+            "episode_mean_video_encode_seconds": 2.441648802254349,
+            "simulator_workers": 4,
+            "reused_completed_episodes": 0
+          }
+        }
+      ]
+    },
+    "collection-round-0012.json_age": 80.40318155288696,
+    "adaptation-version-0010.json": {
+      "action": "continue",
+      "learning_rate": 1e-05,
+      "best_version": 7,
+      "common_seed_successes": 2,
+      "common_seed_attempts": 10,
+      "best_successes": 3,
+      "statistically_confirmed": false,
+      "reason": "adjustment_cooldown",
+      "version": 10
+    },
+    "adaptation-version-0010.json_age": 814.8463063240051,
+    "evaluation/version-0011/metrics.json": {
+      "model": "pi05",
+      "policy_version": 11,
+      "attempts": 10,
+      "cup_successes": 1,
+      "cup_success_rate": 0.1,
+      "grasp_successes": 7,
+      "cup_given_grasp": 0.14285714285714285,
+      "seeds": [
+        992001,
+        992002,
+        992003,
+        992004,
+        992005,
+        992006,
+        992007,
+        992008,
+        992009,
+        992010
+      ],
+      "training_data": false,
+      "profiling": {
+        "profiled_episodes": 10,
+        "episode_mean_environment_create_seconds": 7.216882087336853,
+        "episode_mean_environment_reset_seconds": 5.4928639335092155,
+        "episode_mean_environment_step_with_observations_seconds": 66.3147353076376,
+        "episode_mean_episode_before_result_write_seconds": 110.98370028778444,
+        "episode_mean_observation_capture_seconds": 6.0586634409381075,
+        "episode_mean_observation_history_seconds": 0.09081768449395895,
+        "episode_mean_policy_inference_seconds": 22.543242120742796,
+        "episode_mean_result_and_capture_storage_seconds": 0.029312865482643245,
+        "episode_mean_success_predicates_seconds": 1.187433698377572,
+        "episode_mean_video_encode_seconds": 1.8538217920577154,
+        "simulator_workers": 2,
+        "reused_completed_episodes": 0
+      },
+      "wall_seconds": 597.9940043820534,
+      "outcomes": [
+        {
+          "seed": 992001,
+          "cup_placed": false,
+          "grasped": true
+        },
+        {
+          "seed": 992002,
+          "cup_placed": false,
+          "grasped": false
+        },
+        {
+          "seed": 992003,
+          "cup_placed": false,
+          "grasped": true
+        },
+        {
+          "seed": 992004,
+          "cup_placed": false,
+          "grasped": false
+        },
+        {
+          "seed": 992005,
+          "cup_placed": false,
+          "grasped": true
+        },
+        {
+          "seed": 992006,
+          "cup_placed": false,
+          "grasped": true
+        },
+        {
+          "seed": 992007,
+          "cup_placed": false,
+          "grasped": true
+        },
+        {
+          "seed": 992008,
+          "cup_placed": false,
+          "grasped": false
+        },
+        {
+          "seed": 992009,
+          "cup_placed": true,
+          "grasped": true
+        },
+        {
+          "seed": 992010,
+          "cup_placed": false,
+          "grasped": true
+        }
+      ]
+    },
+    "evaluation/version-0011/metrics.json_age": 183.08026123046875,
+    "health.json": {
+      "at": 1790901652.862964,
+      "hosts": {
+        "amp": {
+          "ok": true,
+          "policy": {
+            "model": "pi05",
+            "version": 11,
+            "ready": true
+          },
+          "logs": [
+            {
+              "path": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0012/batch-03/worker-2.log",
+              "age_seconds": 3.61812424659729,
+              "tail": "le found! (macros.py:28)\n[robosuite WARNING] It is recommended to use a private macro file (macros.py:29)\n[robosuite WARNING] To setup, run: python /opt/robocasa/robocasa/scripts/setup_macros.py (macros.py:30)\nWARNING: mimicgen environments not imported since mimicgen is not installed!\nCreating PrepareCoffee with split=pretrain\n[robosuite INFO] Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json (composite_controller_factory.py:121)\n/usr/local/lib/python3.10/dist-packages/gymnasium/utils/passive_env_checker.py:158: UserWarning: \u001b[33mWARN: The obs returned by the `reset()` method is not within the observation space.\u001b[0m\n  logger.warn(f\"{pre} is not within the observation space.\")\n/usr/local/lib/python3.10/dist-packages/gymnasium/utils/passive_env_checker.py:158: UserWarning: \u001b[33mWARN: The obs returned by the `step()` method is not within the observation space.\u001b[0m\n  logger.warn(f\"{pre} is not within the observation space.\")\n"
+            },
+            {
+              "path": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0012/batch-03/worker-0.log",
+              "age_seconds": 5.938189744949341,
+              "tail": "le found! (macros.py:28)\n[robosuite WARNING] It is recommended to use a private macro file (macros.py:29)\n[robosuite WARNING] To setup, run: python /opt/robocasa/robocasa/scripts/setup_macros.py (macros.py:30)\nWARNING: mimicgen environments not imported since mimicgen is not installed!\nCreating PrepareCoffee with split=pretrain\n[robosuite INFO] Loading controller configuration from: /opt/robosuite/robosuite/controllers/config/robots/default_pandaomron.json (composite_controller_factory.py:121)\n/usr/local/lib/python3.10/dist-packages/gymnasium/utils/passive_env_checker.py:158: UserWarning: \u001b[33mWARN: The obs returned by the `reset()` method is not within the observation space.\u001b[0m\n  logger.warn(f\"{pre} is not within the observation space.\")\n/usr/local/lib/python3.10/dist-packages/gymnasium/utils/passive_env_checker.py:158: UserWarning: \u001b[33mWARN: The obs returned by the `step()` method is not within the observation space.\u001b[0m\n  logger.warn(f\"{pre} is not within the observation space.\")\n"
+            }
+          ],
+          "gpu": "14818, 3"
+        },
+        "v4": {
+          "ok": true,
+          "policy": {
+            "model": "pi05",
+            "version": 11,
+            "ready": true,
+            "base_prefix_enabled": true
+          },
+          "logs": [
+            {
+              "path": "/home/v4/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0012/batch-03/worker-0.log",
+              "age_seconds": 0.816248893737793,
+              "tail": "oller_factory.py:121)\n/usr/local/lib/python3.11/site-packages/gymnasium/utils/passive_env_checker.py:158: UserWarning: \u001b[33mWARN: The obs returned by the `reset()` method is not within the observation space.\u001b[0m\n  logger.warn(f\"{pre} is not within the observation space.\")\n/usr/local/lib/python3.11/site-packages/gymnasium/utils/passive_env_checker.py:158: UserWarning: \u001b[33mWARN: The obs returned by the `step()` method is not within the observation space.\u001b[0m\n  logger.warn(f\"{pre} is not within the observation space.\")\n{\"event\": \"PROGRESS\", \"model\": \"pi05\", \"seed\": 994221, \"step\": 160, \"milestones\": {}, \"mug_grasped\": false, \"mug_contact\": false, \"mug_lift\": 1.284817906732627e-06, \"mug_lifted\": false, \"mug_moved_while_held\": false, \"mug_motion\": 7.320099521744374e-06, \"mug_under_dispenser\": false, \"coffee_machine_on\": false, \"gripper_mug_far\": true, \"gripper_button_far\": true, \"official_success\": false, \"mug_world_position\": [5.114123193772328, -0.33209484481122054, 1.4556212954361027]}\n"
+            },
+            {
+              "path": "/home/v4/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0012/batch-03/worker-3.log",
+              "age_seconds": 2.6963400840759277,
+              "tail": "ller_factory.py:121)\n/usr/local/lib/python3.11/site-packages/gymnasium/utils/passive_env_checker.py:158: UserWarning: \u001b[33mWARN: The obs returned by the `reset()` method is not within the observation space.\u001b[0m\n  logger.warn(f\"{pre} is not within the observation space.\")\n/usr/local/lib/python3.11/site-packages/gymnasium/utils/passive_env_checker.py:158: UserWarning: \u001b[33mWARN: The obs returned by the `step()` method is not within the observation space.\u001b[0m\n  logger.warn(f\"{pre} is not within the observation space.\")\n{\"event\": \"PROGRESS\", \"model\": \"pi05\", \"seed\": 994224, \"step\": 160, \"milestones\": {}, \"mug_grasped\": false, \"mug_contact\": false, \"mug_lift\": -2.569538079644218e-06, \"mug_lifted\": false, \"mug_moved_while_held\": false, \"mug_motion\": 1.4449667577781993e-05, \"mug_under_dispenser\": false, \"coffee_machine_on\": false, \"gripper_mug_far\": true, \"gripper_button_far\": true, \"official_success\": false, \"mug_world_position\": [1.046801706860542, -0.22558241354467348, 1.454623833198519]}\n"
+            }
+          ],
+          "gpu": "20964, 41"
+        },
+        "learner": {
+          "ok": true,
+          "alive": true,
+          "pid": 26119,
+          "status": {
+            "model": "pi05",
+            "completed_round": 11,
+            "checkpoint": "/home/work/robot_aiden_260930/pi-cup-online-bc/run/training/round-0011/update-000050",
+            "status": "waiting_for_rollouts"
+          },
+          "gpu": "0, [Not Found]",
+          "log_tail": "ds\": 0.3682086877524853, \"batch_size\": 4, \"learning_rate\": 1e-05, \"loss\": 0.009932205080986023, \"grad_norm\": 0.006401488557457924, \"canonicalized_zero_std_dims\": [10]}\n{\"step\": 47, \"model\": \"pi05\", \"skill\": \"cup_placement\", \"source_model\": \"pi05\", \"source_seed\": 994103, \"episode_id\": \"pi05-seed994103\", \"control_revision\": 2, \"seconds\": 0.36511943954974413, \"batch_size\": 4, \"learning_rate\": 1e-05, \"loss\": 0.02603856474161148, \"grad_norm\": 0.012013483792543411, \"canonicalized_zero_std_dims\": [10]}\n{\"step\": 48, \"model\": \"pi05\", \"skill\": \"cup_placement\", \"source_model\": \"pi05\", \"source_seed\": 994029, \"episode_id\": \"pi05-seed994029\", \"control_revision\": 2, \"seconds\": 0.3634105995297432, \"batch_size\": 4, \"learning_rate\": 1e-05, \"loss\": 0.021213823929429054, \"grad_norm\": 0.010996884666383266, \"canonicalized_zero_std_dims\": [10]}\n{\"step\": 49, \"model\": \"pi05\", \"skill\": \"cup_placement\", \"source_model\": \"pi05\", \"source_seed\": 993523, \"episode_id\": \"pi05-seed993523\", \"control_revision\": 2, \"seconds\": 0.3624892756342888, \"batch_size\": 4, \"learning_rate\": 1e-05, \"loss\": 0.009719403460621834, \"grad_norm\": 0.005692171864211559, \"canonicalized_zero_std_dims\": [10]}\n{\"step\": 50, \"model\": \"pi05\", \"skill\": \"cup_placement\", \"source_model\": \"pi05\", \"source_seed\": 993713, \"episode_id\": \"pi05-seed993713\", \"control_revision\": 2, \"seconds\": 0.3674461906775832, \"batch_size\": 4, \"learning_rate\": 1e-05, \"loss\": 0.026763131842017174, \"grad_norm\": 0.011829162947833538, \"canonicalized_zero_std_dims\": [10]}\n"
+        }
+      },
+      "coordinator": {
+        "alive": true,
+        "pid": 2723301
+      },
+      "telemetry": {
+        "alive": true,
+        "pid": 2728044
+      }
+    },
+    "health.json_age": 41.905832052230835,
+    "telemetry/status.json": {
+      "url": "http://localhost:8080/aiden-lab-desktop/coffee-online-bc/runs/03a19d3315a4",
+      "status": "online",
+      "at": 1790901690.1804404,
+      "logged_events": 1155
+    },
+    "telemetry/status.json_age": 6.142225027084351
+  },
+  "wandb_and_hf": {
+    "at": 1790901698.848857,
+    "wandb": {
+      "train/global_step": 550,
+      "train/loss": 0.026763131842017177,
+      "train/grad_norm": 0.011829162947833538,
+      "train/learning_rate": 1e-05,
+      "eval/version": 11,
+      "eval/cup_success_rate": 0.1,
+      "adaptation/learning_rate": 1e-05
+    },
+    "history": [
+      {
+        "_step": 1121,
+        "train/global_step": 549,
+        "train/loss": 0.009719403460621834,
+        "train/grad_norm": 0.005692171864211559,
+        "train/learning_rate": 1e-05
+      },
+      {
+        "_step": 1122,
+        "train/global_step": 550,
+        "train/loss": 0.026763131842017177,
+        "train/grad_norm": 0.011829162947833538,
+        "train/learning_rate": 1e-05
+      }
+    ],
+    "hf": {
+      "weights/pi05/round-0011": [
+        [
+          "pi05-cup-online-bc-20261001/weights/pi05/round-0011/metadata.json",
+          8441
+        ],
+        [
+          "pi05-cup-online-bc-20261001/weights/pi05/round-0011/pi05-lora.npz",
+          88476838
+        ],
+        [
+          "pi05-cup-online-bc-20261001/weights/pi05/round-0011/pi05-optimizer.pkl",
+          176949619
+        ],
+        [
+          "pi05-cup-online-bc-20261001/weights/pi05/round-0011/updates.json",
+          20184
+        ]
+      ],
+      "evaluation/pi05/version-0010": [
+        [
+          "pi05-cup-online-bc-20261001/evaluation/pi05/version-0010/metrics.json",
+          3984
+        ]
+      ],
+      "archives/pi05/amp/round-0009": [
+        [
+          "pi05-cup-online-bc-20261001/archives/pi05/amp/round-0009/SHA256.json",
+          363
+        ],
+        [
+          "pi05-cup-online-bc-20261001/archives/pi05/amp/round-0009/rollouts.tar.gz",
+          6027549626
+        ]
+      ]
+    }
+  },
+  "additional_hf": {
+    "evaluation/pi05/version-0011": [
+      [
+        "pi05-cup-online-bc-20261001/evaluation/pi05/version-0011/metrics.json",
+        2049
+      ]
+    ],
+    "data/pi05/amp/round-0012/batch-02": [
+      [
+        "pi05-cup-online-bc-20261001/data/pi05/amp/round-0012/batch-02/bc-shards.tar.gz",
+        59
+      ],
+      [
+        "pi05-cup-online-bc-20261001/data/pi05/amp/round-0012/batch-02/manifest.json",
+        130
+      ]
+    ]
+  },
+  "inference_validation": {
+    "gpu": {
+      "status": "passed",
+      "deployed": false,
+      "samples": [
+        {
+          "version": 10,
+          "episode_id": "pi05-seed981026",
+          "step": 784,
+          "rng_seed": 533501,
+          "max_abs_error": 0.0
+        },
+        {
+          "version": 10,
+          "episode_id": "pi05-seed981018",
+          "step": 352,
+          "rng_seed": 533502,
+          "max_abs_error": 0.0
+        },
+        {
+          "version": 10,
+          "episode_id": "xiaomi-seed981014",
+          "step": 272,
+          "rng_seed": 533503,
+          "max_abs_error": 0.0
+        },
+        {
+          "version": 11,
+          "episode_id": "pi05-seed981026",
+          "step": 784,
+          "rng_seed": 533501,
+          "max_abs_error": 0.0
+        },
+        {
+          "version": 11,
+          "episode_id": "pi05-seed981018",
+          "step": 352,
+          "rng_seed": 533502,
+          "max_abs_error": 0.0
+        },
+        {
+          "version": 11,
+          "episode_id": "xiaomi-seed981014",
+          "step": 272,
+          "rng_seed": 533503,
+          "max_abs_error": 0.0
+        }
+      ],
+      "inference_requests": 24,
+      "load_requests": 2,
+      "optimizer_missing": true,
+      "initial_and_reload_verified": true,
+      "base_prefix_cache_and_interleaving_verified": true,
+      "production_updates": 0,
+      "live_policy_changes": false,
+      "wall_seconds": 34.20237417239696,
+      "scope": "Same-process HTTP action/receipt equivalence; no rollout or network speed claim"
+    },
+    "download": {
+      "status": "passed",
+      "actual_filtered_download": true,
+      "download_seconds": 4.336351998150349,
+      "downloaded_files": {
+        "metadata.json": {
+          "bytes": 8165,
+          "sha256": "27af58ea39d75af6dacf0dfa25cae7c49720959a9a3dcb2f6f259316045424d3"
+        },
+        "pi05-lora.npz": {
+          "bytes": 88476838,
+          "sha256": "291c1961ba41b4a461cb177f951e55cade7f30416424e2db7a9cd076b0995054"
+        },
+        "updates.json": {
+          "bytes": 20185,
+          "sha256": "875f562b1dbd6fc420287eaf0e60ec4de66f61587b6ce2049e857fe0d23a20cc"
+        }
+      },
+      "downloaded_bytes": 88505188,
+      "excluded_optimizer_bytes": 176949619,
+      "optimizer_missing": true,
+      "source_full_optimizer_preserved": true,
+      "deployed": false,
+      "scope": "One filtered transfer including subprocess/hash overhead; no paired full transfer latency comparison"
+    },
+    "unit_tests_passed": 38,
+    "ruff_passed": true,
+    "validation_pid": 130734,
+    "server_worker_transport_defaults_unchanged": true,
+    "production_installation": false,
+    "sources": [
+      "https://huggingface.co/docs/huggingface_hub/guides/buckets#filtering"
+    ]
+  },
+  "changes": {
+    "server_phase_reload_and_filter_implemented": true,
+    "production_installation": false,
+    "native_training_or_simulator_changes": false,
+    "processes_restarted": false,
+    "learner_optimizer_preserved": true
+  },
+  "eval10": {
+    "at": 1790901120.0982459,
+    "eval": {
+      "model": "pi05",
+      "policy_version": 10,
+      "attempts": 30,
+      "cup_successes": 4,
+      "cup_success_rate": 0.13333333333333333,
+      "grasp_successes": 24,
+      "cup_given_grasp": 0.16666666666666666,
+      "seeds": [
+        992001,
+        992002,
+        992003,
+        992004,
+        992005,
+        992006,
+        992007,
+        992008,
+        992009,
+        992010,
+        992011,
+        992012,
+        992013,
+        992014,
+        992015,
+        992016,
+        992017,
+        992018,
+        992019,
+        992020,
+        992021,
+        992022,
+        992023,
+        992024,
+        992025,
+        992026,
+        992027,
+        992028,
+        992029,
+        992030
+      ],
+      "training_data": false,
+      "profiling": {
+        "profiled_episodes": 30,
+        "episode_mean_environment_create_seconds": 6.383276005733448,
+        "episode_mean_environment_reset_seconds": 5.786602435967264,
+        "episode_mean_environment_step_with_observations_seconds": 61.78442924707197,
+        "episode_mean_episode_before_result_write_seconds": 105.0700872041285,
+        "episode_mean_observation_capture_seconds": 6.408674789732322,
+        "episode_mean_observation_history_seconds": 0.0905868712424611,
+        "episode_mean_policy_inference_seconds": 21.719461607933045,
+        "episode_mean_result_and_capture_storage_seconds": 0.029516607942059635,
+        "episode_mean_success_predicates_seconds": 0.8313873299397528,
+        "episode_mean_video_encode_seconds": 1.839142984081991,
+        "simulator_workers": 2,
+        "reused_completed_episodes": 0
+      },
+      "wall_seconds": 1586.1979248328134,
+      "outcomes": [
+        {
+          "seed": 992001,
+          "cup_placed": false,
+          "grasped": true
+        },
+        {
+          "seed": 992002,
+          "cup_placed": false,
+          "grasped": false
+        },
+        {
+          "seed": 992003,
+          "cup_placed": false,
+          "grasped": true
+        },
+        {
+          "seed": 992004,
+          "cup_placed": false,
+          "grasped": false
+        },
+        {
+          "seed": 992005,
+          "cup_placed": false,
+          "grasped": true
+        },
+        {
+          "seed": 992006,
+          "cup_placed": false,
+          "grasped": true
+        },
+        {
+          "seed": 992007,
+          "cup_placed": true,
+          "grasped": true
+        },
+        {
+          "seed": 992008,
+          "cup_placed": false,
+          "grasped": false
+        },
+        {
+          "seed": 992009,
+          "cup_placed": true,
+          "grasped": true
+        },
+        {
+          "seed": 992010,
+          "cup_placed": false,
+          "grasped": true
+        },
+        {
+          "seed": 992011,
+          "cup_placed": false,
+          "grasped": true
+        },
+        {
+          "seed": 992012,
+          "cup_placed": false,
+          "grasped": true
+        },
+        {
+          "seed": 992013,
+          "cup_placed": false,
+          "grasped": true
+        },
+        {
+          "seed": 992014,
+          "cup_placed": false,
+          "grasped": true
+        },
+        {
+          "seed": 992015,
+          "cup_placed": false,
+          "grasped": true
+        },
+        {
+          "seed": 992016,
+          "cup_placed": true,
+          "grasped": true
+        },
+        {
+          "seed": 992017,
+          "cup_placed": false,
+          "grasped": true
+        },
+        {
+          "seed": 992018,
+          "cup_placed": true,
+          "grasped": true
+        },
+        {
+          "seed": 992019,
+          "cup_placed": false,
+          "grasped": true
+        },
+        {
+          "seed": 992020,
+          "cup_placed": false,
+          "grasped": true
+        },
+        {
+          "seed": 992021,
+          "cup_placed": false,
+          "grasped": true
+        },
+        {
+          "seed": 992022,
+          "cup_placed": false,
+          "grasped": true
+        },
+        {
+          "seed": 992023,
+          "cup_placed": false,
+          "grasped": true
+        },
+        {
+          "seed": 992024,
+          "cup_placed": false,
+          "grasped": false
+        },
+        {
+          "seed": 992025,
+          "cup_placed": false,
+          "grasped": true
+        },
+        {
+          "seed": 992026,
+          "cup_placed": false,
+          "grasped": false
+        },
+        {
+          "seed": 992027,
+          "cup_placed": false,
+          "grasped": false
+        },
+        {
+          "seed": 992028,
+          "cup_placed": false,
+          "grasped": true
+        },
+        {
+          "seed": 992029,
+          "cup_placed": false,
+          "grasped": true
+        },
+        {
+          "seed": 992030,
+          "cup_placed": false,
+          "grasped": true
+        }
+      ]
+    },
+    "paired_base_same30": {
+      "cup": {
+        "gained": [
+          992009,
+          992016
+        ],
+        "lost": [
+          992010,
+          992022,
+          992023,
+          992026
+        ],
+        "exact_two_sided_mcnemar_p": 0.6875
+      },
+      "grasp": {
+        "gained": [
+          992011,
+          992014,
+          992021
+        ],
+        "lost": [
+          992002,
+          992004,
+          992008,
+          992024,
+          992026,
+          992027
+        ],
+        "exact_two_sided_mcnemar_p": 0.5078125
+      }
+    },
+    "base_same30_cup": 6,
+    "base_same30_grasp": 27,
+    "all_unique_seeds_versions_standard_verified": true,
+    "all_initial_state_hashes_match_base": true,
+    "training_data": false,
+    "confirmed_gain": false,
+    "confirmed_regression": false,
+    "adaptation": {
+      "action": "continue",
+      "learning_rate": 1e-05,
+      "best_version": 7,
+      "common_seed_successes": 2,
+      "common_seed_attempts": 10,
+      "best_successes": 3,
+      "statistically_confirmed": false,
+      "reason": "adjustment_cooldown",
+      "version": 10
+    },
+    "adaptation_applied_to_training": false,
+    "publication": {
+      "url": "http://100.86.183.64:8899/media/pi-cup-standard-eval-v10/index.html",
+      "videos": 30,
+      "all_video_head_200": true,
+      "total_video_bytes": 38612632
+    }
+  },
+  "eval11": {
+    "at": 1790901754.3036685,
+    "eval": {
+      "model": "pi05",
+      "policy_version": 11,
+      "attempts": 10,
+      "cup_successes": 1,
+      "cup_success_rate": 0.1,
+      "grasp_successes": 7,
+      "cup_given_grasp": 0.14285714285714285,
+      "seeds": [
+        992001,
+        992002,
+        992003,
+        992004,
+        992005,
+        992006,
+        992007,
+        992008,
+        992009,
+        992010
+      ],
+      "training_data": false,
+      "profiling": {
+        "profiled_episodes": 10,
+        "episode_mean_environment_create_seconds": 7.216882087336853,
+        "episode_mean_environment_reset_seconds": 5.4928639335092155,
+        "episode_mean_environment_step_with_observations_seconds": 66.3147353076376,
+        "episode_mean_episode_before_result_write_seconds": 110.98370028778444,
+        "episode_mean_observation_capture_seconds": 6.0586634409381075,
+        "episode_mean_observation_history_seconds": 0.09081768449395895,
+        "episode_mean_policy_inference_seconds": 22.543242120742796,
+        "episode_mean_result_and_capture_storage_seconds": 0.029312865482643245,
+        "episode_mean_success_predicates_seconds": 1.187433698377572,
+        "episode_mean_video_encode_seconds": 1.8538217920577154,
+        "simulator_workers": 2,
+        "reused_completed_episodes": 0
+      },
+      "wall_seconds": 597.9940043820534,
+      "outcomes": [
+        {
+          "seed": 992001,
+          "cup_placed": false,
+          "grasped": true
+        },
+        {
+          "seed": 992002,
+          "cup_placed": false,
+          "grasped": false
+        },
+        {
+          "seed": 992003,
+          "cup_placed": false,
+          "grasped": true
+        },
+        {
+          "seed": 992004,
+          "cup_placed": false,
+          "grasped": false
+        },
+        {
+          "seed": 992005,
+          "cup_placed": false,
+          "grasped": true
+        },
+        {
+          "seed": 992006,
+          "cup_placed": false,
+          "grasped": true
+        },
+        {
+          "seed": 992007,
+          "cup_placed": false,
+          "grasped": true
+        },
+        {
+          "seed": 992008,
+          "cup_placed": false,
+          "grasped": false
+        },
+        {
+          "seed": 992009,
+          "cup_placed": true,
+          "grasped": true
+        },
+        {
+          "seed": 992010,
+          "cup_placed": false,
+          "grasped": true
+        }
+      ]
+    },
+    "paired_base_same10": {
+      "cup": {
+        "gained": [
+          992009
+        ],
+        "lost": [
+          992007,
+          992010
+        ],
+        "exact_two_sided_mcnemar_p": 1.0
+      },
+      "grasp": {
+        "gained": [],
+        "lost": [
+          992002,
+          992004,
+          992008
+        ],
+        "exact_two_sided_mcnemar_p": 0.25
+      }
+    },
+    "base_same10_cup": 2,
+    "base_same10_grasp": 10,
+    "all_unique_seeds_versions_standard_verified": true,
+    "all_initial_state_hashes_match_base": true,
+    "training_data": false,
+    "confirmed_gain": false,
+    "confirmed_regression": false,
+    "adaptation": {
+      "action": "reduce_learning_rate",
+      "learning_rate": 1e-05,
+      "best_version": 7,
+      "common_seed_successes": 1,
+      "common_seed_attempts": 10,
+      "best_successes": 3,
+      "statistically_confirmed": false,
+      "version": 11
+    },
+    "adaptation_applied_to_training": false,
+    "publication": {
+      "url": "http://100.86.183.64:8899/media/pi-cup-standard-eval-v11/index.html",
+      "videos": 10,
+      "all_video_head_200": true,
+      "total_video_bytes": 12598126
+    }
+  }
+}

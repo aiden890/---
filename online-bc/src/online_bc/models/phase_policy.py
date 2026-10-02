@@ -7,8 +7,11 @@ class PhasePolicy:
         self.base_snapshot = base_snapshot
         self.adapter_snapshot = None
 
-    def load(self, path):
-        self.backend.load(path)
+    def load(self, path, *, load_optimizer=True):
+        if load_optimizer:
+            self.backend.load(path)
+        else:
+            self.backend.load(path, load_optimizer=False)
         self.adapter_snapshot = None
 
     def infer(self, sample, seed=0, variant="standard", phase=None):
