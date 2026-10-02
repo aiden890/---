@@ -1,0 +1,22 @@
+{
+  "at": 1790899474.0150137,
+  "dry_run_only": true,
+  "downloaded_files": false,
+  "production_load_changed": false,
+  "learner_optimizer_retained": true,
+  "source": "hf://buckets/khmin101/vla-rollout-transfer/pi05-cup-online-bc-20261001/weights/pi05/round-0010",
+  "full": {
+    "uploads": 0,
+    "downloads": 4,
+    "deletes": 0,
+    "skips": 0,
+    "total_size": 265454807
+  },
+  "candidate_inference_only": {
+    "uploads": 0,
+    "downloads": 3,
+    "deletes": 0,
+    "skips": 0,
+    "total_size": 88505188
+  }
+}

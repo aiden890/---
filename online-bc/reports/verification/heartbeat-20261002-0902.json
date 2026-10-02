@@ -1,0 +1,577 @@
+{
+  "at": 1790899539.8973067,
+  "current_status": {
+    "next_round": 11,
+    "status": "collecting",
+    "attempts": 0,
+    "successes": 0,
+    "batch": 1
+  },
+  "cumulative_native_updates": 500,
+  "eligible_success_episodes": 95,
+  "native_round10": {
+    "status": {
+      "model": "pi05",
+      "completed_round": 10,
+      "checkpoint": "/home/work/robot_aiden_260930/pi-cup-online-bc/run/training/round-0010/update-000050",
+      "status": "waiting_for_rollouts"
+    },
+    "learner_actual": "PID     ELAPSED COMMAND\n  26119    05:55:09 python",
+    "log_age": 147.68417716026306,
+    "metadata": {
+      "model": "pi05",
+      "base_checkpoint": "/home/work/robot_aiden_260930/pi-cup-online-bc/checkpoints/pi05_pretrain_human300/multitask_learning/75000",
+      "step": 10,
+      "algorithm": "success-filtered online behavior cloning",
+      "objective": "native flow-matching supervised loss",
+      "data_roots": [
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/xiaomi/bootstrap",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0004-amp-batch-06",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0004-amp-batch-01",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0004-amp-batch-03",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0006-v4-batch-03",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0010-v4-batch-03",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0004-v4-batch-08",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/bootstrap",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0005-amp-batch-05",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0006-v4-batch-07",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0010-amp-batch-01",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0009-v4-batch-08",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0006-v4-batch-04",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0009-amp-batch-06",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0009-amp-batch-07",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0007-amp-batch-03",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0005-amp-batch-01",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0007-amp-batch-02",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0004-amp-batch-07",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0001-amp-batch-01",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0010-amp-batch-02",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0006-v4-batch-05",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0004-v4-batch-07",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0006-amp-batch-01",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0002-v4-batch-04",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0004-amp-batch-02",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0002-amp-batch-05",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0002-v4-batch-03",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0005-v4-batch-06",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0002-amp-batch-04",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0008-amp-batch-03",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0009-amp-batch-02",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0003-amp-batch-04",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0004-v4-batch-05",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0004-v4-batch-06",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0003-amp-batch-03",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0003-amp-batch-05",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0009-amp-batch-08",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0008-amp-batch-01",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0002-v4-batch-05",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0005-amp-batch-03",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0006-amp-batch-05",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0008-v4-batch-06",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0008-amp-batch-07",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0008-amp-batch-04",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0006-amp-batch-06",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0009-amp-batch-03",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0008-v4-batch-04",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0009-amp-batch-01",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0008-amp-batch-05",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0006-amp-batch-02",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0006-amp-batch-03",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0001-v4-batch-01",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0004-amp-batch-05",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0006-amp-batch-07",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0008-v4-batch-07",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0002-amp-batch-02",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0005-amp-batch-02",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0002-amp-batch-03",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0006-amp-batch-04",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0008-amp-batch-02",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0009-v4-batch-06",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0004-amp-batch-04",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0009-amp-batch-05",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0003-amp-batch-02",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0006-amp-batch-08",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0006-v4-batch-08",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0008-v4-batch-05",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0002-amp-batch-01",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0010-v4-batch-04",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0007-amp-batch-01",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0010-amp-batch-03",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0005-amp-batch-06",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0009-v4-batch-07",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0004-v4-batch-04",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0004-amp-batch-08",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0006-v4-batch-06",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0007-amp-batch-04",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0009-amp-batch-04",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0010-amp-batch-04",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0008-amp-batch-06",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0004-v4-batch-03",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0005-amp-batch-04",
+        "/home/work/robot_aiden_260930/pi-cup-online-bc/run/data/pi05/round-0003-amp-batch-01"
+      ],
+      "skills": [
+        "cup_placement"
+      ],
+      "batch_size": 4,
+      "learning_rate": 1e-05,
+      "heldout_eval_seed_start": 992001,
+      "optimizer_steps_this_round": 50,
+      "resumed_from_round": null
+    },
+    "updates_type": "list",
+    "updates_count": 50,
+    "learning_rates": [
+      1e-05
+    ],
+    "batch_sizes": [
+      4
+    ],
+    "all_finite": true,
+    "warm_median": 0.3634164244867861,
+    "sum_seconds": 77.04042885545641,
+    "last_update": {
+      "step": 50,
+      "model": "pi05",
+      "skill": "cup_placement",
+      "source_model": "pi05",
+      "source_seed": 993708,
+      "episode_id": "pi05-seed993708",
+      "control_revision": 2,
+      "seconds": 0.3631160659715533,
+      "batch_size": 4,
+      "learning_rate": 1e-05,
+      "loss": 0.027613377198576927,
+      "grad_norm": 0.010484977625310421,
+      "canonicalized_zero_std_dims": [
+        10
+      ]
+    },
+    "files": {
+      "pi05-lora.npz": {
+        "bytes": 88476838,
+        "mtime": 1790899210.4329052
+      },
+      "metadata.json": {
+        "bytes": 8165,
+        "mtime": 1790899212.143282
+      },
+      "pi05-optimizer.pkl": {
+        "bytes": 176949619,
+        "mtime": 1790899210.621883
+      },
+      "updates.json": {
+        "bytes": 20185,
+        "mtime": 1790899212.142928
+      }
+    }
+  },
+  "hosts": {
+    "amp": {
+      "time": 1790899358.5395818,
+      "storage-archiver_process": "PID     ELAPSED COMMAND\n3322201    03:57:31 python",
+      "storage-archiver.log": {
+        "age": 1172.4216892719269,
+        "tail": "ts/round-0005\", \"remote_size_verified\": true, \"removed_npz\": 5590, \"pruned_npz_bytes\": 5174303761, \"archived_at\": 1790892163.3911543, \"videos_actions_traces_manifests_retained\": true}\n{\"event\": \"round_observations_archived\", \"round\": 6, \"bytes\": 4482227645, \"sha256\": \"f67f896c9b2714fdf25b5d79108617820527c83668afe33c54997d553e2d4c4c\", \"bucket\": \"khmin101/vla-rollout-transfer\", \"remote_path\": \"pi05-cup-online-bc-20261001/archives/pi05/amp/round-0006/rollouts.tar.gz\", \"local_round\": \"/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0006\", \"remote_size_verified\": true, \"removed_npz\": 4766, \"pruned_npz_bytes\": 4382515091, \"archived_at\": 1790895670.3324718, \"videos_actions_traces_manifests_retained\": true}\n{\"event\": \"round_observations_archived\", \"round\": 7, \"bytes\": 3687760638, \"sha256\": \"67028343f330d2d107db433988d182b82734f337e4534ff07050635e09ceccd8\", \"bucket\": \"khmin101/vla-rollout-transfer\", \"remote_path\": \"pi05-cup-online-bc-20261001/archives/pi05/amp/round-0007/rollouts.tar.gz\", \"local_round\": \"/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0007\", \"remote_size_verified\": true, \"removed_npz\": 4782, \"pruned_npz_bytes\": 3647396521, \"archived_at\": 1790898185.7669423, \"videos_actions_traces_manifests_retained\": true}\n"
+      },
+      "free_/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc": 11233062912,
+      "free_/mnt/data/guest": 20197625856,
+      "rollouts/round-0011": {
+        "results": 0,
+        "versions": [],
+        "logs": [
+          {
+            "path": "rollouts/round-0011/batch-01/worker-1.log",
+            "age": 0.03297924995422363,
+            "tail": "e, \"mug_lift\": -8.501832346463623e-06, \"mug_lifted\": false, \"mug_moved_while_held\": false, \"mug_motion\": 1.8782612447058248e-05, \"mug_under_dispenser\": false, \"coffee_machine_on\": false, \"gripper_mug_far\": true, \"gripper_button_far\": true, \"official_success\": false, \"mug_world_position\": [1.708861048397773, -2.7269997779572734, 0.998260597670783]}\n"
+          },
+          {
+            "path": "rollouts/round-0011/batch-01/worker-0.log",
+            "age": 0.346088171005249,
+            "tail": "ue, \"mug_lift\": 0.004267573344918452, \"mug_lifted\": false, \"mug_moved_while_held\": false, \"mug_motion\": 0.009771897259327004, \"mug_under_dispenser\": false, \"coffee_machine_on\": false, \"gripper_mug_far\": false, \"gripper_button_far\": true, \"official_success\": false, \"mug_world_position\": [2.5310298501337933, -0.2385464138404535, 1.4563893887334745]}\n"
+          },
+          {
+            "path": "rollouts/round-0011/batch-01/worker-3.log",
+            "age": 0.39115476608276367,
+            "tail": "lse, \"mug_lift\": 2.025106936476284e-05, \"mug_lifted\": false, \"mug_moved_while_held\": false, \"mug_motion\": 8.614594214305176e-05, \"mug_under_dispenser\": false, \"coffee_machine_on\": false, \"gripper_mug_far\": false, \"gripper_button_far\": true, \"official_success\": false, \"mug_world_position\": [6.4145945446465, -2.5200574968112934, 1.4582835660509137]}\n"
+          },
+          {
+            "path": "rollouts/round-0011/batch-01/worker-2.log",
+            "age": 8.438036680221558,
+            "tail": " \"mug_lift\": 5.042072639627193e-06, \"mug_lifted\": false, \"mug_moved_while_held\": false, \"mug_motion\": 3.7787490096909456e-05, \"mug_under_dispenser\": false, \"coffee_machine_on\": false, \"gripper_mug_far\": false, \"gripper_button_far\": true, \"official_success\": false, \"mug_world_position\": [1.6740325417958766, -0.2474978323909221, 1.5079210911751528]}\n"
+          }
+        ]
+      },
+      "policy": {
+        "model": "pi05",
+        "version": 10,
+        "ready": true
+      },
+      "active_workers": [],
+      "sim_pids": {
+        "280e67fe1db0 rlinf-mibot:t_43b4edc9 cool_sammet": [
+          "3432916             python3             python3 -m online_bc.rollout.run_coffee --seeds 994102,994106 --model pi05 --out /results/coffee-online-bc/rollouts/round-0011/batch-01/pi05 --skill cup_placement"
+        ],
+        "50f3d830ded7 rlinf-mibot:t_43b4edc9 angry_austin": [
+          "3432934             python3             python3 -m online_bc.rollout.run_coffee --seeds 994104,994108 --model pi05 --out /results/coffee-online-bc/rollouts/round-0011/batch-01/pi05 --skill cup_placement"
+        ],
+        "ce3070ac8f28 rlinf-mibot:t_43b4edc9 competent_booth": [
+          "3432948             python3             python3 -m online_bc.rollout.run_coffee --seeds 994103,994107 --model pi05 --out /results/coffee-online-bc/rollouts/round-0011/batch-01/pi05 --skill cup_placement"
+        ],
+        "82dbb2868698 rlinf-mibot:t_43b4edc9 recursing_heyrovsky": [
+          "3432956             python3             python3 -m online_bc.rollout.run_coffee --seeds 994101,994105 --model pi05 --out /results/coffee-online-bc/rollouts/round-0011/batch-01/pi05 --skill cup_placement"
+        ]
+      },
+      "gpu": "13825, 24576, 100",
+      "archives": {
+        "round-0005": {
+          "round": 5,
+          "bytes": 5281461360,
+          "sha256": "f0501fd12c91a1228068c2941f9b64f98235a7a192c9915ad04d14958ed993f4",
+          "bucket": "khmin101/vla-rollout-transfer",
+          "remote_path": "pi05-cup-online-bc-20261001/archives/pi05/amp/round-0005/rollouts.tar.gz",
+          "local_round": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0005",
+          "remote_size_verified": true,
+          "removed_npz": 5590,
+          "pruned_npz_bytes": 5174303761,
+          "archived_at": 1790892163.3911543,
+          "videos_actions_traces_manifests_retained": true
+        },
+        "round-0007": {
+          "round": 7,
+          "bytes": 3687760638,
+          "sha256": "67028343f330d2d107db433988d182b82734f337e4534ff07050635e09ceccd8",
+          "bucket": "khmin101/vla-rollout-transfer",
+          "remote_path": "pi05-cup-online-bc-20261001/archives/pi05/amp/round-0007/rollouts.tar.gz",
+          "local_round": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0007",
+          "remote_size_verified": true,
+          "removed_npz": 4782,
+          "pruned_npz_bytes": 3647396521,
+          "archived_at": 1790898185.7669423,
+          "videos_actions_traces_manifests_retained": true
+        },
+        "round-0006": {
+          "round": 6,
+          "bytes": 4482227645,
+          "sha256": "f67f896c9b2714fdf25b5d79108617820527c83668afe33c54997d553e2d4c4c",
+          "bucket": "khmin101/vla-rollout-transfer",
+          "remote_path": "pi05-cup-online-bc-20261001/archives/pi05/amp/round-0006/rollouts.tar.gz",
+          "local_round": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0006",
+          "remote_size_verified": true,
+          "removed_npz": 4766,
+          "pruned_npz_bytes": 4382515091,
+          "archived_at": 1790895670.3324718,
+          "videos_actions_traces_manifests_retained": true
+        },
+        "round-0003": {
+          "round": 3,
+          "bytes": 4257633638,
+          "sha256": "77b727a269b47daf2a58b790389a2d82b11744ae6345f69243360eff2bebd812",
+          "bucket": "khmin101/vla-rollout-transfer",
+          "remote_path": "pi05-cup-online-bc-20261001/archives/pi05/amp/round-0003/rollouts.tar.gz",
+          "local_round": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0003",
+          "remote_size_verified": true,
+          "removed_npz": 4680,
+          "pruned_npz_bytes": 3962323934,
+          "archived_at": 1790887502.4689784,
+          "videos_actions_traces_manifests_retained": true
+        },
+        "round-0004": {
+          "round": 4,
+          "bytes": 5492333896,
+          "sha256": "e769832231f522bc10c5408cbb325a1f31b27558098be8e0bd055e415deb3326",
+          "bucket": "khmin101/vla-rollout-transfer",
+          "remote_path": "pi05-cup-online-bc-20261001/archives/pi05/amp/round-0004/rollouts.tar.gz",
+          "local_round": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0004",
+          "remote_size_verified": true,
+          "removed_npz": 5233,
+          "pruned_npz_bytes": 5091699238,
+          "archived_at": 1790890497.220903,
+          "videos_actions_traces_manifests_retained": true
+        },
+        "round-0001": {
+          "round": 1,
+          "bytes": 2356353408,
+          "sha256": "f2d564ad2d9f1127fbb473da7da4abd972ec945dc4ef650ad740947a87eecac4",
+          "bucket": "khmin101/vla-rollout-transfer",
+          "remote_path": "pi05-cup-online-bc-20261001/archives/pi05/amp/round-0001/rollouts.tar.gz",
+          "local_round": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0001",
+          "remote_size_verified": true,
+          "removed_npz": 2116,
+          "archived_at": 1790884874.398507,
+          "videos_actions_traces_manifests_retained": true,
+          "pruned_npz_bytes": 2184887998
+        },
+        "round-0002": {
+          "round": 2,
+          "bytes": 3296418730,
+          "sha256": "6fc08e3f3f6ced13ad4aff3024c6498940ac7b8699afb28165f3548abe06ea90",
+          "bucket": "khmin101/vla-rollout-transfer",
+          "remote_path": "pi05-cup-online-bc-20261001/archives/pi05/amp/round-0002/rollouts.tar.gz",
+          "local_round": "/home/guest/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0002",
+          "remote_size_verified": true,
+          "removed_npz": 3727,
+          "pruned_npz_bytes": 3075421321,
+          "archived_at": 1790885323.820529,
+          "videos_actions_traces_manifests_retained": true
+        }
+      }
+    },
+    "v4": {
+      "time": 1790899358.412624,
+      "benchmarks/v4-worker-trial/status.json": {
+        "status": "episodes_complete_pending_metrics",
+        "armed_at": 1790895444.501215,
+        "eval_workers": 2,
+        "trial_collection_workers": 4,
+        "training_algorithm_changed": false,
+        "policy_restarted": false,
+        "batch_root": "/home/v4/skku-vla-grasp-only-20260930/results/coffee-online-bc/rollouts/round-0009/batch-06",
+        "restored_at": 1790897156.5049982,
+        "policy": {
+          "model": "pi05",
+          "version": 8,
+          "ready": true,
+          "base_prefix_enabled": true
+        },
+        "gpu_peak_mib": 21503,
+        "completed_at": 1790897282.5300596,
+        "seeds": [
+          993945,
+          993946,
+          993947,
+          993948
+        ],
+        "versions": [
+          8
+        ],
+        "cups": 0
+      },
+      "benchmarks/v4-worker-trial/watch.log": {
+        "age": 3913.9439158439636,
+        "tail": ""
+      },
+      "watch_ps": "PID     ELAPSED COMMAND",
+      "workers": {
+        "workers": 2,
+        "collection_workers": 4
+      },
+      "free_/home/v4/skku-vla-grasp-only-20260930/results/coffee-online-bc": 32067444736,
+      "evaluation/version-0010": {
+        "results": 0,
+        "versions": [],
+        "logs": [
+          {
+            "path": "evaluation/version-0010/worker-0.log",
+            "age": 1.2403607368469238,
+            "tail": "true, \"mug_lift\": -0.20239655918977495, \"mug_lifted\": false, \"mug_moved_while_held\": true, \"mug_motion\": 0.41318037841204464, \"mug_under_dispenser\": false, \"coffee_machine_on\": false, \"gripper_mug_far\": false, \"gripper_button_far\": true, \"official_success\": false, \"mug_world_position\": [4.0840295467772805, -0.5508814700431385, 1.2558495000054994]}\n"
+          },
+          {
+            "path": "evaluation/version-0010/worker-1.log",
+            "age": 7.396301984786987,
+            "tail": "\"mug_lift\": -2.2150273968346568e-06, \"mug_lifted\": false, \"mug_moved_while_held\": false, \"mug_motion\": 2.4470966579595234e-05, \"mug_under_dispenser\": false, \"coffee_machine_on\": false, \"gripper_mug_far\": true, \"gripper_button_far\": false, \"official_success\": false, \"mug_world_position\": [3.9268079753214784, -0.8026877484996838, 1.457564526824031]}\n"
+          }
+        ]
+      },
+      "shadow-evaluation/base_prefix/version-0006": {
+        "results": 30,
+        "versions": [
+          6
+        ],
+        "logs": [
+          {
+            "path": "shadow-evaluation/base_prefix/version-0006/worker-1.log",
+            "age": 5721.054662704468,
+            "tail": "ture\": 9.628922485047951, \"environment_step_with_observations\": 64.18450127961114, \"observation_history\": 0.09143873956054449, \"success_predicates\": 0.32521624490618706, \"video_encode\": 1.8845870953518897, \"result_and_capture_storage\": 0.028922950848937035, \"policy_inference\": 19.550601482391357, \"episode_before_result_write\": 108.46059256303124}}\n"
+          },
+          {
+            "path": "shadow-evaluation/base_prefix/version-0006/worker-0.log",
+            "age": 5806.373352766037,
+            "tail": "apture\": 7.266301703406498, \"environment_step_with_observations\": 53.42965311463922, \"observation_history\": 0.09542294847778976, \"success_predicates\": 0.24558253004215658, \"video_encode\": 2.0070634211879224, \"result_and_capture_storage\": 0.029884841991588473, \"policy_inference\": 22.60042142868042, \"episode_before_result_write\": 99.52119339886121}}\n"
+          }
+        ]
+      },
+      "policy": {
+        "model": "pi05",
+        "version": 10,
+        "ready": true,
+        "base_prefix_enabled": true
+      },
+      "active_workers": [],
+      "sim_pids": {
+        "c9bce32bbf3b rlinf-mibot-eval:v4 jolly_stonebraker": [
+          "3522864             python3             python3 -m online_bc.rollout.run_coffee --seeds 992002,992004,992006,992008,992010,992012,992014,992016,992018,992020,992022,992024,992026,992028,992030 --model pi05 --out /results/coffee-online-bc/evaluation/version-0010/pi05 --skill cup_placement"
+        ],
+        "547cd3ebaa12 rlinf-mibot-eval:v4 condescending_bose": [
+          "3522848             python3             python3 -m online_bc.rollout.run_coffee --seeds 992001,992003,992005,992007,992009,992011,992013,992015,992017,992019,992021,992023,992025,992027,992029 --model pi05 --out /results/coffee-online-bc/evaluation/version-0010/pi05 --skill cup_placement"
+        ]
+      },
+      "gpu": "18531, 24576, 52"
+    },
+    "learner": {
+      "time": 1790899358.901053,
+      "learner_process": "PID     ELAPSED COMMAND\n  26119    05:55:10 python",
+      "run/service-status.json": {
+        "model": "pi05",
+        "completed_round": 10,
+        "checkpoint": "/home/work/robot_aiden_260930/pi-cup-online-bc/run/training/round-0010/update-000050",
+        "status": "waiting_for_rollouts"
+      },
+      "learner.log": {
+        "age": 148.725337266922,
+        "tail": "ll\": \"cup_placement\", \"source_model\": \"pi05\", \"source_seed\": 993730, \"episode_id\": \"pi05-seed993730\", \"control_revision\": 2, \"seconds\": 0.36440557055175304, \"batch_size\": 4, \"learning_rate\": 1e-05, \"loss\": 0.010812572203576565, \"grad_norm\": 0.011119616217911243, \"canonicalized_zero_std_dims\": [10]}\n{\"step\": 48, \"model\": \"pi05\", \"skill\": \"cup_placement\", \"source_model\": \"pi05\", \"source_seed\": 993458, \"episode_id\": \"pi05-seed993458\", \"control_revision\": 2, \"seconds\": 0.361858076415956, \"batch_size\": 4, \"learning_rate\": 1e-05, \"loss\": 0.025940071791410446, \"grad_norm\": 0.011883233673870564, \"canonicalized_zero_std_dims\": [10]}\n{\"step\": 49, \"model\": \"pi05\", \"skill\": \"cup_placement\", \"source_model\": \"pi05\", \"source_seed\": 993226, \"episode_id\": \"pi05-seed993226\", \"control_revision\": 2, \"seconds\": 0.36366575490683317, \"batch_size\": 4, \"learning_rate\": 1e-05, \"loss\": 0.011561526916921139, \"grad_norm\": 0.0037735612131655216, \"canonicalized_zero_std_dims\": [10]}\n{\"step\": 50, \"model\": \"pi05\", \"skill\": \"cup_placement\", \"source_model\": \"pi05\", \"source_seed\": 993708, \"episode_id\": \"pi05-seed993708\", \"control_revision\": 2, \"seconds\": 0.3631160659715533, \"batch_size\": 4, \"learning_rate\": 1e-05, \"loss\": 0.027613377198576927, \"grad_norm\": 0.010484977625310421, \"canonicalized_zero_std_dims\": [10]}\n"
+      },
+      "free_/home/work/robot_aiden_260930/pi-cup-online-bc": 397924173348864,
+      "checkpoint8_files": {
+        "pi05-lora.npz": {
+          "bytes": 88476838,
+          "mtime": 1790899210.4329052
+        },
+        "metadata.json": {
+          "bytes": 8165,
+          "mtime": 1790899212.143282
+        },
+        "pi05-optimizer.pkl": {
+          "bytes": 176949619,
+          "mtime": 1790899210.621883
+        },
+        "updates.json": {
+          "bytes": 20185,
+          "mtime": 1790899212.142928
+        }
+      },
+      "active_workers": [],
+      "sim_pids": {},
+      "gpu": "0, 81920, [Not Found]"
+    }
+  },
+  "central": {
+    "at": 1790899357.1256683,
+    "status": {
+      "next_round": 11,
+      "status": "collecting",
+      "attempts": 0,
+      "successes": 0,
+      "batch": 1
+    },
+    "coordinator": "PID     ELAPSED COMMAND\n2723301    04:08:53 python3",
+    "telemetry": "PID     ELAPSED COMMAND\n2728044    03:58:51 python",
+    "health": "PID     ELAPSED COMMAND\n2783968    02:12:00 python3",
+    "controls": {
+      "run": "pi05-cup-online-bc-20261001",
+      "revision": 2,
+      "excluded": {},
+      "paused": false,
+      "bootstrap_steps": 0,
+      "review_required": false,
+      "updated_at": 1790870638.0917895
+    },
+    "unresolved_publication_failures": [],
+    "pending-round-0011.json": {
+      "batch": 1,
+      "plan": [
+        {
+          "node": "amp",
+          "episodes": 8,
+          "seed_offset": 0
+        }
+      ],
+      "external_pids": {}
+    },
+    "health_age": 40.717304944992065,
+    "log_age": 67.29307532310486
+  },
+  "wandb_and_hf": {
+    "at": 1790899427.3364565,
+    "wandb": {
+      "train/global_step": 500,
+      "train/loss": 0.027613377198576927,
+      "train/grad_norm": 0.01048497762531042,
+      "train/learning_rate": 1e-05,
+      "eval/version": 9,
+      "eval/cup_success_rate": 0.1,
+      "adaptation/learning_rate": 1e-05
+    },
+    "history": [
+      {
+        "_step": 1046,
+        "train/global_step": 499,
+        "train/loss": 0.01156152691692114,
+        "train/grad_norm": 0.0037735612131655216,
+        "train/learning_rate": 1e-05
+      },
+      {
+        "_step": 1047,
+        "train/global_step": 500,
+        "train/loss": 0.027613377198576927,
+        "train/grad_norm": 0.01048497762531042,
+        "train/learning_rate": 1e-05
+      }
+    ],
+    "hf": {
+      "weights/pi05/round-0010": [
+        [
+          "pi05-cup-online-bc-20261001/weights/pi05/round-0010/metadata.json",
+          8165
+        ],
+        [
+          "pi05-cup-online-bc-20261001/weights/pi05/round-0010/pi05-lora.npz",
+          88476838
+        ],
+        [
+          "pi05-cup-online-bc-20261001/weights/pi05/round-0010/pi05-optimizer.pkl",
+          176949619
+        ],
+        [
+          "pi05-cup-online-bc-20261001/weights/pi05/round-0010/updates.json",
+          20185
+        ]
+      ],
+      "data/pi05/v4/round-0010/batch-04": [
+        [
+          "pi05-cup-online-bc-20261001/data/pi05/v4/round-0010/batch-04/bc-shards.tar.gz",
+          48482648
+        ],
+        [
+          "pi05-cup-online-bc-20261001/data/pi05/v4/round-0010/batch-04/manifest.json",
+          137
+        ]
+      ]
+    }
+  },
+  "inference_transfer_plan": {
+    "at": 1790899474.0150137,
+    "dry_run_only": true,
+    "downloaded_files": false,
+    "production_load_changed": false,
+    "learner_optimizer_retained": true,
+    "source": "hf://buckets/khmin101/vla-rollout-transfer/pi05-cup-online-bc-20261001/weights/pi05/round-0010",
+    "full": {
+      "uploads": 0,
+      "downloads": 4,
+      "deletes": 0,
+      "skips": 0,
+      "total_size": 265454807
+    },
+    "candidate_inference_only": {
+      "uploads": 0,
+      "downloads": 3,
+      "deletes": 0,
+      "skips": 0,
+      "total_size": 88505188
+    }
+  },
+  "research": [
+    {
+      "url": "https://huggingface.co/docs/huggingface_hub/guides/buckets#filtering",
+      "finding": "SDK dry-run include/exclude planning confirmed. Round10 full265454807bytes; candidate optimizer exclusion88505188bytes. No actual filtered download or speed measurement. Backend.load still requires optimizer; inference-only implementation and fixed-RNG action equivalence required before deployment."
+    }
+  ],
+  "changes": {
+    "code_model_action_observation_success_config_flags_changed": false,
+    "processes_restarted": false,
+    "weights_optimizer_preserved": true,
+    "inference_only_load_deployed": false
+  },
+  "eval10_pending": true
+}
