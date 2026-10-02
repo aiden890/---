@@ -1,0 +1,33 @@
+{
+  "at": 1790903712.097527,
+  "status": {
+    "next_round": 12,
+    "status": "insufficient_new_successes",
+    "attempts": 96,
+    "successes": 4
+  },
+  "existing_valid_episodes": [
+    "pi05-seed994208",
+    "pi05-seed994224",
+    "pi05-seed994252",
+    "pi05-seed994283"
+  ],
+  "existing_unique_seeds": 96,
+  "job12_exists": false,
+  "pending_files": [],
+  "coordinator_expected_gate_exit": true,
+  "proposed_additional_window": {
+    "seed_start": 2012001,
+    "seed_end": 2012096,
+    "max_additional_attempts": 96,
+    "existing_attempts_preserved": 96,
+    "maximum_round12_total_attempts_if_user_revises_cap": 192,
+    "seed_intersection_with_recorded_rollouts_and_heldout": 0,
+    "success_target_unchanged": 8,
+    "additional_valid_successes_required": 4,
+    "policy_version": 11,
+    "requires_user_revised_constraint": true,
+    "deployed": false
+  },
+  "learning_and_eligibility_unchanged": true
+}
